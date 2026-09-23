@@ -1,24 +1,24 @@
-1  import streamlit as st
-2  from groq import Groq
-3  from supabase import create_client
-4  import datetime, uuid, requests, time, re, os, json, random, base64, urllib.parse
-5  from typing import Dict, List, Any
-6  import pytz
-7  from fpdf import FPDF
-8  try:
-9      from zoneinfo import ZoneInfo
-10 except Exception:
-11     ZoneInfo = None
-12 try:
-13     from streamlit_mic_recorder import mic_recorder
-14 except Exception:
-15     mic_recorder = None
-16
-17 st.set_page_config(
-18     page_title="ClyxessChat AI",
-19     page_icon="💬",
-20     layout="wide"
-21 )
+  import streamlit as st
+  from groq import Groq
+  from supabase import create_client
+  import datetime, uuid, requests, time, re, os, json, random, base64, urllib.parse
+  from typing import Dict, List, Any
+  import pytz
+  from fpdf import FPDF
+  try:
+      from zoneinfo import ZoneInfo
+ except Exception:
+     ZoneInfo = None
+ try:
+     from streamlit_mic_recorder import mic_recorder
+ except Exception:
+     mic_recorder = None
+
+ st.set_page_config(
+     page_title="ClyxessChat AI",
+     page_icon="💬",
+     layout="wide"
+ )
 # ============================================================
 # CLYXESSCHAT AI
 # NORMAL CHAT + CREATIVE LAB + PLAY & LEARN
