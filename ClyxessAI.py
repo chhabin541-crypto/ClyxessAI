@@ -1,23 +1,23 @@
-  import streamlit as st
-  from groq import Groq
-  from supabase import create_client
-  import datetime, uuid, requests, time, re, os, json, random, base64, urllib.parse
-  from typing import Dict, List, Any
-  import pytz
-  from fpdf import FPDF
-  try:
-      from zoneinfo import ZoneInfo
- except Exception:
-     ZoneInfo = None
- try:
-     from streamlit_mic_recorder import mic_recorder
- except Exception:
-     mic_recorder = None
+import streamlit as st
+from groq import Groq
+from supabase import create_client
+import datetime, uuid, requests, time, re, os, json, random, base64, urllib.parse
+from typing import Dict, List, Any
+import pytz
+from fpdf import FPDF
+try:
+    from zoneinfo import ZoneInfo
+except Exception:
+    ZoneInfo = None
+try:
+    from streamlit_mic_recorder import mic_recorder
+except Exception:
+    mic_recorder = None
 
- st.set_page_config(
-     page_title="ClyxessChat AI",
-     page_icon="💬",
-     layout="wide"
+st.set_page_config(
+    page_title="ClyxessChat AI",
+    page_icon="💬",
+    layout="wide"
  )
 # ============================================================
 # CLYXESSCHAT AI
