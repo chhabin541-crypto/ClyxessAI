@@ -1,6 +1,4 @@
-import streamlit as st 
-if "chat_history" not in st.session_state:
-    st.session_state.chat_history = []
+import streamlit as st
 from groq import Groq
 from supabase import create_client
 import datetime, uuid, requests, time, re, os, json, random, base64, urllib.parse
@@ -15,6 +13,17 @@ try:
     from streamlit_mic_recorder import mic_recorder
 except Exception:
     mic_recorder = None
+
+from tavily import TavilyClient
+
+@st.cache_resource
+def get_tavily_client():
+    try:
+        return TavilyClient(api_key=st.secrets["TAVILY_API_KEY"])
+    except Exception:
+        return None
+
+tavily_client = get_tavily_client()
 
 # ============================================================
 # CLYXESSCHAT AI
