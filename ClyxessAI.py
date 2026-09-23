@@ -1,4 +1,4 @@
-     import streamlit as st
+import streamlit as st
 from groq import Groq
 from supabase import create_client
 import datetime, uuid, requests, time, re, os, json, random, base64, urllib.parse
