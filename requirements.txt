@@ -1,6 +1,6 @@
-streamlit
+streamlit==1.39.0
 groq
-supabase
+supabase==2.9.1
 requests
 fpdf2
 python-dotenv
@@ -10,3 +10,4 @@ qrcode[pil]
 Pillow
 pytz
 openai
+pyarrow==14.0.2
