@@ -1780,59 +1780,40 @@ def render_vision_lab():
         if st.button("🧠 Analyze Image",type="primary",use_container_width=True):
             answer = analyze_image_with_groq(f.getvalue(),f.type,question,PLAY_LANGUAGES[label])
 
-            # --- SMART BOX LOGIC ---
             lang = PLAY_LANGUAGES[label]
-            is_english = "English" in label or "english" in lang.lower()
+            is_english = "English" in label
 
-            # Status soch samajh ke - agar question me "?" ya "solve" hai to check karega
-            if "galat" in answer.lower() or "incorrect" in answer.lower():
-                status_text = "❌ Galat Hai" if not is_english else "❌ Incorrect"
-                status_color = "error"
+            # Upar ka header - har language me
+            header = "🔍 चलिए, मैं आपको साफ-साफ बताता हूँ:" if not is_english else "🔍 Let me explain clearly:"
+            st.markdown(f"### {header}")
+            st.write(answer)
+
+            # --- Naya Simple Example Chart ---
+            # Sahi / Galat ka pata lagana
+            is_wrong = any(x in answer.lower() for x in ["galat", "incorrect", "wrong"])
+            tick = "❌ Galat" if is_wrong else "✅ Sahi"
+            if is_english:
+                tick = "❌ Wrong" if is_wrong else "✅ Correct"
+
+            # Chhota sa table - jaise tumhari photo me hai
+            st.markdown("#### Table")
+            is_math = any(x in (answer+question).lower() for x in ["πr", "area", "volume", "formula"])
+
+            if is_math:
+                # Math hai to example dikhao
+                example_val = "r=7 => A=154" if "πr" in (answer+question).lower() else "l=2,w=3,h=4 => V=24"
+                table_data = {
+                    "Example" if is_english else "उदाहरण": [example_val],
+                    "Status" if is_english else "स्थिति": [tick]
+                }
+                st.table(table_data)
             else:
-                status_text = "✅ Sahi Hai" if not is_english else "✅ Correct"
-                status_color = "success"
-
-            # Example dynamic - paper ke hisab se
-            def get_dynamic_example(ans, lang):
-                # Agar math hai toh usi formula ka dusra example
-                if any(x in ans.lower() for x in ["area", "πr", "volume", "perimeter", "formula"]):
-                    prompt = f"Based on this answer: {ans[:500]}, give 1 short similar solved example in {lang}. Keep it in 2 lines only with values."
-                    # Groq se chhota example generate karwa le
-                    try:
-                        ex = analyze_image_with_groq(b"", "", prompt, lang) # text only call
-                        return ex[:200] # bada bhi ho sakta hai
-                    except:
-                        return "r=10 => A=314" if is_english else "r=10 => A=314"
-                else:
-                    return "Q: Find area if r=10? Try yourself!" if is_english else "Sawal: r=10 ho to Area kya hoga?"
-
-            example_text = get_dynamic_example(answer, lang)
-
-            # Layout
-            col1, col2 = st.columns([3, 1.4])
-            with col1:
-                import time
-                def typewriter_gen(text):
-                    for word in text.split():
-                        yield word + " "
-                        time.sleep(0.02)
-                st.write_stream(typewriter_gen(answer))
-
-            with col2:
-                with st.container(border=True):
-                    box_title = "✅ Check Box" if not is_english else "✅ Check Box"
-                    st.markdown(f"#### {box_title}")
-
-                    if status_color == "success":
-                        st.success(f"Status: {status_text}")
-                    else:
-                        st.error(f"Status: {status_text}")
-
-                    st.markdown(f"**{'Example:' if is_english else 'Udaharan:'}**")
-                    st.code(example_text, language="text")
-
-                    btn_text = "Samajh aa gaya? 👍" if not is_english else "Got it? 👍"
-                    st.success(btn_text)
+                # Simple photo hai to sirf status
+                table_data = {
+                    "Photo" if is_english else "फोटो": ["Samajh aa gayi" if not is_english else "Understood"],
+                    "Status" if is_english else "स्थिति": [tick]
+                }
+                st.table(table_data)
 
 def render_roleplay():
     st.title("🎭 Peer Roleplay Modes")
