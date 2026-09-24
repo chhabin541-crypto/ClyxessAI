@@ -1642,26 +1642,45 @@ def analyze_image_with_groq(image_bytes, mime, question, selected_language="Engl
         else:
             task = "Explain the image clearly and solve the doubt simply."
 
+        # --- WORLD LANGUAGE FIX ---
         final_prompt = f"""
-        You are Clyxess AI tutor. Reply ONLY in {selected_language}.
         Task: {task}
         User Doubt: {question}
-        After answer, always add in {selected_language}: 'Aur koi help chahiye? Main yahan hu aapki madad ke liye! Jis language me aap baat karoge, main usi me jawab dunga.'
+
+        CRITICAL LANGUAGE RULE:
+        You MUST reply ONLY in "{selected_language}" language.
+        - If selected_language is Hindi, reply in pure Hindi (Devanagari).
+        - If selected_language is Tamil, reply in Tamil.
+        - If selected_language is Urdu, reply in Urdu.
+        - If selected_language is Arabic, reply in Arabic.
+        - NEVER reply in English if another language is selected.
+        - Translate everything including formulas explanation in "{selected_language}".
         """
 
         completion = vision_client.chat.completions.create(
             model="meta-llama/llama-4-scout-17b-16e-instruct",
-            messages=[{
-                "role": "user",
-                "content": [
-                    {"type": "text", "text": final_prompt},
-                    {"type": "image_url", "image_url": {"url": f"data:{mime};base64,{b64}"}}
-                ]
-            }],
-            temperature=0.4,
+            messages=[
+                {
+                    "role": "system",
+                    "content": f"You are Clyxess AI tutor. Your output language is strictly {selected_language}. You are forbidden to use English when {selected_language} is not English. You must think and answer in {selected_language} only."
+                },
+                {
+                    "role": "user",
+                    "content": [
+                        {"type": "text", "text": final_prompt},
+                        {"type": "image_url", "image_url": {"url": f"data:{mime};base64,{b64}"}}
+                    ]
+                }
+            ],
+            temperature=0.1,
             max_tokens=2000
         )
-        return completion.choices[0].message.content
+        ans = completion.choices[0].message.content
+
+        # Niche wala help line - ab auto usi language me
+        ans += f"\n\n---\n**{selected_language} me:** Aur koi help chahiye? Main yahan hu aapki madad ke liye! Aap {selected_language} me hi puchiye."
+
+        return ans
     except Exception as e:
         return f"Vision error: {e}"
 
