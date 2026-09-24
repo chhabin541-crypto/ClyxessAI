@@ -1623,63 +1623,64 @@ def render_play_and_learn(client):
 # ============================================================
 # EXTRA FEATURES — integrated without creating duplicate core modes
 # ============================================================
-def analyze_image_with_groq(image_bytes, mime, question, selected_language="English"):
-    from openai import OpenAI
+def analyze_image_with_groq(image_bytes, mime, question, language):
     import base64
+    b64 = base64.b64encode(image_bytes).decode('utf-8')
+
+    lang_map = {
+        "hi": "Hindi", "en": "English", "mr": "Marathi", "ta": "Tamil",
+        "te": "Telugu", "bn": "Bengali", "gu": "Gujarati", "kn": "Kannada",
+        "ml": "Malayalam", "pa": "Punjabi", "ur": "Urdu", "hns": "Chhattisgarhi"
+    }
+
+    help_text_map = {
+        "hi": "Aur kuch samjhna hai kya? Batao, main help karta hu.",
+        "en": "Want to understand anything else? Tell me, I'm here to help.",
+        "mr": "Ajun kahi samjaycha ahe ka? Sang, mi help karto.",
+        "ta": "Vera edhavadhu puriyanuma? Sollu, naan help panren.",
+        "te": "Inka emaina ardham kavalante cheppu, nenu help chestha.",
+        "bn": "Ar kichu bujhte chaicho? Bolo, ami achi.",
+        "gu": "Biju kai samjavanu che? Ke, hu madad karu chu.",
+        "kn": "Innondu artha madbeka? Helu, nanu help madthini.",
+        "ml": "Vere enthenkilum manasilakanundo? Parayu, njan undu.",
+        "pa": "Hor kuch samjhna hai? Dasso, main help karda.",
+        "ur": "Aur kuch samajhna hai? Batao.",
+        "hns": "Aur kuch samjhna he ka? Batao na."
+    }
+
+    lang_name = lang_map.get(language, "Hindi")
+    help_line = help_text_map.get(language, help_text_map["hi"])
+
     try:
-        vision_client = OpenAI(
-            base_url="https://openrouter.ai/api/v1",
-            api_key=st.secrets["OPENROUTER_API_KEY"]
-        )
-        b64 = base64.b64encode(image_bytes).decode("utf-8")
+        system_prompt = f"""
+        You are a friendly, smart human teacher and a good friend, like ChatGPT.
+        Language: {lang_name}. Full answer in {lang_name} only.
 
-        # --- AUTO AI BRAIN ---
-        lower_q = question.lower()
-        if any(x in lower_q for x in ["exam", "paper", "hal karo", "solve", "question"]):
-            task = "This is an EXAM PAPER. Solve all questions step-by-step simply for a kid."
-        elif any(x in lower_q for x in ["estimate", "bill", "hisab", "total"]):
-            task = "This is an ESTIMATE/BILL. Analyse items, rates and total clearly."
-        else:
-            task = "Explain the image clearly and solve the doubt simply."
+        Your Vibe:
+        - Talk like a real human friend, not a robot.
+        - Use easy, chill words. Like "Dekho, ye simple hai".
+        - Never use "beta", "putra". Just be a friend + teacher.
+        - At the end, always ask in SAME language: "{help_line}"
 
-        # --- WORLD LANGUAGE FIX ---
-        final_prompt = f"""
-        Task: {task}
-        User Doubt: {question}
-
-        CRITICAL LANGUAGE RULE:
-        You MUST reply ONLY in "{selected_language}" language.
-        - If selected_language is Hindi, reply in pure Hindi (Devanagari).
-        - If selected_language is Tamil, reply in Tamil.
-        - If selected_language is Urdu, reply in Urdu.
-        - If selected_language is Arabic, reply in Arabic.
-        - NEVER reply in English if another language is selected.
-        - Translate everything including formulas explanation in "{selected_language}".
+        Task:
+        1. If Math/Homework/Diagram: Solve step-by-step in {lang_name}.
+        2. If normal photo: Describe in 3-4 lines naturally in {lang_name}. Don't give math example.
+        3. Keep answer short, simple.
         """
 
-        completion = vision_client.chat.completions.create(
-            model="meta-llama/llama-4-scout-17b-16e-instruct",
+        completion = client.chat.completions.create(
+            model="llama-3.2-11b-vision-preview",
             messages=[
-                {
-                    "role": "system",
-                    "content": f"You are Clyxess AI tutor. Your output language is strictly {selected_language}. You are forbidden to use English when {selected_language} is not English. You must think and answer in {selected_language} only."
-                },
-                {
-                    "role": "user",
-                    "content": [
-                        {"type": "text", "text": final_prompt},
-                        {"type": "image_url", "image_url": {"url": f"data:{mime};base64,{b64}"}}
-                    ]
-                }
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": [
+                    {"type": "text", "text": question if question else f"Explain this image in {lang_name}"},
+                    {"type": "image_url", "image_url": {"url": f"data:{mime};base64,{b64}"}}
+                ]}
             ],
-            temperature=0.1,
+            temperature=0.8,
             max_tokens=2000
         )
         ans = completion.choices[0].message.content
-
-        # Niche wala help line - ab auto usi language me
-        ans += f"\n\n---\n**{selected_language} me:** Aur koi help chahiye? Main yahan hu aapki madad ke liye! Aap {selected_language} me hi puchiye."
-
         return ans
     except Exception as e:
         return f"Vision error: {e}"
