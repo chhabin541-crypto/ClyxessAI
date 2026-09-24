@@ -1677,8 +1677,8 @@ def analyze_image_with_groq(image_bytes, mime, question, selected_language="Engl
         )
         ans = completion.choices[0].message.content
 
-        # Niche wala help line - ab auto usi language 
-        ans += f"\n\n---\n**{selected_language} :** Aur koi help chahiye? Main yahan hu aapki madad ke liye!  {selected_language} ."
+        # Niche wala help line - ab auto usi language me
+        ans += f"\n\n---\n**{selected_language} me:** Aur koi help chahiye? Main yahan hu aapki madad ke liye!  {selected_language} ."
 
         return ans
     except Exception as e:
