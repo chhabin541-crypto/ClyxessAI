@@ -1656,7 +1656,7 @@ def analyze_image_with_groq(image_bytes, mime, question, language):
             ]}
         ]
     )
-    return response.choices[0].message.content  isko dalna bhul gaya tha
+    return response.choices[0].message.content
 
 def save_current_chat_cloud():
     if not supabase or not st.session_state.messages:
