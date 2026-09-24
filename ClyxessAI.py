@@ -1624,16 +1624,42 @@ def render_play_and_learn(client):
 # EXTRA FEATURES — integrated without creating duplicate core modes
 # ============================================================
 def analyze_image_with_groq(image_bytes, mime, question, selected_language="English"):
-    if not client:
-        return "Groq API key missing."
+    from openai import OpenAI
+    import base64
     try:
+        vision_client = OpenAI(
+            base_url="https://openrouter.ai/api/v1",
+            api_key=st.secrets["OPENROUTER_API_KEY"]
+        )
         b64 = base64.b64encode(image_bytes).decode("utf-8")
-        completion = client.chat.completions.create(
-            model="qwen/qwen3.6-27b",
-            messages=[{"role":"user","content":[
-                {"type":"text","text":f"Reply only in {selected_language}. {question}"},
-                {"type":"image_url","image_url":{"url":f"data:{mime};base64,{b64}"}}
-            ]}], temperature=0.4, max_completion_tokens=1500
+
+        # --- AUTO AI BRAIN ---
+        lower_q = question.lower()
+        if any(x in lower_q for x in ["exam", "paper", "hal karo", "solve", "question"]):
+            task = "This is an EXAM PAPER. Solve all questions step-by-step simply for a kid."
+        elif any(x in lower_q for x in ["estimate", "bill", "hisab", "total"]):
+            task = "This is an ESTIMATE/BILL. Analyse items, rates and total clearly."
+        else:
+            task = "Explain the image clearly and solve the doubt simply."
+
+        final_prompt = f"""
+        You are Clyxess AI tutor. Reply ONLY in {selected_language}.
+        Task: {task}
+        User Doubt: {question}
+        After answer, always add in {selected_language}: 'Aur koi help chahiye? Main yahan hu aapki madad ke liye! Jis language me aap baat karoge, main usi me jawab dunga.'
+        """
+
+        completion = vision_client.chat.completions.create(
+            model="meta-llama/llama-4-scout-17b-16e-instruct",
+            messages=[{
+                "role": "user",
+                "content": [
+                    {"type": "text", "text": final_prompt},
+                    {"type": "image_url", "image_url": {"url": f"data:{mime};base64,{b64}"}}
+                ]
+            }],
+            temperature=0.4,
+            max_tokens=2000
         )
         return completion.choices[0].message.content
     except Exception as e:
