@@ -1926,7 +1926,7 @@ with st.sidebar:
         "📋 AI Daily Timetable",
         "📝 Interactive Homework & Test",
         "👨‍👩‍👦 Parent Dashboard", 
-        "🖥️ Learn Coding",  
+        "🖥️ Coding Lab",  
         "🖥️ Learn Coding",  
         "🖥️ Learn Coding",  
         "🖥️ Learn Coding",  
@@ -1946,6 +1946,8 @@ with st.sidebar:
 # ---- routes: one unique screen per feature ----
 if mode == "🔐 Login / Sign Up":
     render_login_signup(); st.stop()
+if mode == "👨‍👩‍👦 Parent Dashboard":
+    render_parent_dashboard(); st.stop() 
 if mode == "👨‍👩‍👦 Parent Dashboard":
     render_parent_dashboard(); st.stop()
 if mode == "🎨 Creative AI Image Generator":
