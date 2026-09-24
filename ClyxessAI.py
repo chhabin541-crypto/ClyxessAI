@@ -1627,63 +1627,36 @@ def analyze_image_with_groq(image_bytes, mime, question, language):
     import base64
     b64 = base64.b64encode(image_bytes).decode('utf-8')
 
-    lang_map = {
-        "hi": "Hindi", "en": "English", "mr": "Marathi", "ta": "Tamil",
-        "te": "Telugu", "bn": "Bengali", "gu": "Gujarati", "kn": "Kannada",
-        "ml": "Malayalam", "pa": "Punjabi", "ur": "Urdu", "hns": "Chhattisgarhi"
-    }
+    # --- INSANO JAISA SOCHNE WALA PROMPT ---
+    system_prompt = f"""
+    You are a smart human teacher. Look at the image carefully.
 
-    help_text_map = {
-        "hi": "Aur kuch samjhna hai kya? Batao, main help karta hu.",
-        "en": "Want to understand anything else? Tell me, I'm here to help.",
-        "mr": "Ajun kahi samjaycha ahe ka? Sang, mi help karto.",
-        "ta": "Vera edhavadhu puriyanuma? Sollu, naan help panren.",
-        "te": "Inka emaina ardham kavalante cheppu, nenu help chestha.",
-        "bn": "Ar kichu bujhte chaicho? Bolo, ami achi.",
-        "gu": "Biju kai samjavanu che? Ke, hu madad karu chu.",
-        "kn": "Innondu artha madbeka? Helu, nanu help madthini.",
-        "ml": "Vere enthenkilum manasilakanundo? Parayu, njan undu.",
-        "pa": "Hor kuch samjhna hai? Dasso, main help karda.",
-        "ur": "Aur kuch samajhna hai? Batao.",
-        "hns": "Aur kuch samjhna he ka? Batao na."
-    }
+    RULE 1: If image is Math, Homework, Science Diagram, or has a Question to solve:
+    - Solve it step-by-step in {language}.
+    - Explain formula and answer clearly.
 
-    lang_name = lang_map.get(language, "Hindi")
-    help_line = help_text_map.get(language, help_text_map["hi"])
+    RULE 2: If image is a simple photo (like car, person, city, book cover, no question):
+    - Do NOT give math example r=10.
+    - Describe naturally in {language} in 3-4 lines.
+    - At the end, ask like a human: "Isme aapko aur kya madad chahiye?" in {language}.
 
-    try:
-        system_prompt = f"""
-        You are a friendly, smart human teacher and a good friend, like ChatGPT.
-        Language: {lang_name}. Full answer in {lang_name} only.
+    RULE 3: Never repeat same line 3 times. Never add "hi me: Aur koi help chahiye? Main yahan hu..." extra footer.
+    Keep answer short and natural for kids.
+    """
 
-        Your Vibe:
-        - Talk like a real human friend, not a robot.
-        - Use easy, chill words. Like "Dekho, ye simple hai".
-        - Never use "beta", "putra". Just be a friend + teacher.
-        - At the end, always ask in SAME language: "{help_line}"
-
-        Task:
-        1. If Math/Homework/Diagram: Solve step-by-step in {lang_name}.
-        2. If normal photo: Describe in 3-4 lines naturally in {lang_name}. Don't give math example.
-        3. Keep answer short, simple.
-        """
-
-        completion = client.chat.completions.create(
-            model="meta-llama/llama-4-scout:free",
-            messages=[
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": [
-                    {"type": "text", "text": question if question else f"Explain this image in {lang_name}"},
-                    {"type": "image_url", "image_url": {"url": f"data:{mime};base64,{b64}"}}
-                ]}
-            ],
-            temperature=0.8,
-            max_tokens=2000
-        )
-        ans = completion.choices[0].message.content
-        return ans
-    except Exception as e:
-        return f"Vision error: {e}"
+    #... tera baki Groq wala API call same rahega...
+    # bas system_prompt ye wala use karna
+    response = client.chat.completions.create(
+        model="llama-3.2-11b-vision-preview",
+        messages=[
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": [
+                {"type": "text", "text": question},
+                {"type": "image_url", "image_url": {"url": f"data:{mime};base64,{b64}"}}
+            ]}
+        ]
+    )
+    return response.choices[0].message.content  isko dalna bhul gaya tha
 
 def save_current_chat_cloud():
     if not supabase or not st.session_state.messages:
