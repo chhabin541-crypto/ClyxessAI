@@ -2,8 +2,9 @@ import streamlit as st
 from groq import Groq
 from supabase import create_client
 import datetime, uuid, requests, time, re, os, json, random, base64, urllib.parse
-from typing import Dict, List, Any
-from fpdf import FPDF
+from typing import Dict, List, Any 
+import pytz
+from fpdf import FPDF 
 try:
     from zoneinfo import ZoneInfo
 except Exception:
@@ -99,7 +100,7 @@ st.markdown("""
 
 .small-muted {
     color: #64748b;
-    font-size: 13px;
+    font-size: 11px;
 }
 
 .media-card {max-width:560px;margin:12px auto;}
@@ -143,6 +144,7 @@ PLAY_AGE_LEVELS = [
 ]
 
 PLAY_LANGUAGES = {
+    # --- INDIAN LANGUAGES ---
     "🇮🇳 हिंदी": "hi",
     "🇮🇳 मराठी": "mr",
     "🇮🇳 বাংলা": "bn",
@@ -152,9 +154,49 @@ PLAY_LANGUAGES = {
     "🇮🇳 ಕನ್ನಡ": "kn",
     "🇮🇳 മലയാളം": "ml",
     "🇮🇳 ଓଡ଼ିଆ": "or",
+    "🇮🇳 ਪੰਜਾਬੀ": "pa",
+    "🇮🇳 অসমীয়া": "as",
+    "🇮🇳 اردو": "ur",
+    "🇮🇳 छत्तीसगढ़ी": "hns",
+    "🇮🇳 भोजपुरी": "bho",
+    "🇮🇳 संस्कृत": "sa",
+    "🇮🇳 कोंकणी": "kok",
+    "🇮🇳 नेपाली": "ne",
+
+    # --- WORLD TOP LANGUAGES ---
     "🇬🇧 English": "en",
+    "🇺🇸 English (US)": "en-US",
     "🇨🇳 中文": "zh",
-    "🇯🇵 日本語": "ja"
+    "🇯🇵 日本語": "ja",
+    "🇰🇷 한국어": "ko",
+    "🇪🇸 Español": "es",
+    "🇫🇷 Français": "fr",
+    "🇩🇪 Deutsch": "de",
+    "🇸🇦 العربية": "ar",
+    "🇵🇹 Português": "pt",
+    "🇷🇺 Русский": "ru",
+    "🇮🇹 Italiano": "it",
+    "🇹🇷 Türkçe": "tr",
+    "🇮🇩 Bahasa Indonesia": "id",
+    "🇲🇾 Bahasa Melayu": "ms",
+    "🇹🇭 ไทย": "th",
+    "🇻🇳 Tiếng Việt": "vi",
+    "🇳🇱 Nederlands": "nl",
+    "🇵🇱 Polski": "pl",
+    "🇺🇦 Українська": "uk",
+    "🇮🇷 فارسی": "fa",
+    "🇵🇭 Tagalog": "tl",
+    "🇲🇲 မြန်မာ": "my",
+    "🇬🇷 Ελληνικά": "el",
+    "🇸🇪 Svenska": "sv",
+    "🇳🇴 Norsk": "no",
+    "🇩🇰 Dansk": "da",
+    "🇫🇮 Suomi": "fi",
+    "🇷🇴 Română": "ro",
+    "🇭🇺 Magyar": "hu",
+    "🇨🇿 Čeština": "cs",
+    "🇧🇷 Português (Brasil)": "pt-BR",
+    "🇵🇰 اردو (PK)": "ur-PK"
 }
 
 AGE_SUBJECTS = {
@@ -605,23 +647,647 @@ def generate_image_url(prompt, is_school_mode, age, aspect="1:1"):
 # ============================================================
 
 NORMAL_SYSTEM_PROMPT = """
-You are ClyxessChat AI, created by NeuroClyx AI Technology .
-CORE RULE: REPLY ONLY IN THE SAME LANGUAGE AS USER.
+You are ClyxessChat AI — an intelligent, natural, helpful and general-purpose AI assistant, created by NeuroClyx AI Technology.
+
 Your name is ClyxessChat AI. Friendly, intelligent, calm.
-If user asks to generate image, say: "Generating image for: [prompt]"
+
+CORE RULES:
+1. REPLY ONLY IN THE SAME LANGUAGE AS USER - Strictly follow this.
+2. If user asks to generate image, say: "Generating image for: [prompt]"
+
+INTELLIGENCE BEHAVIOR:
+Understand the user's actual intention and answer according to their context, knowledge level and selected language. Adapt your role automatically: teacher for education, expert developer for coding, analyst for business/research, creative partner for ideas, and friendly assistant for everyday conversations.
+
+Be accurate, practical and honest. Never invent facts, sources, links, capabilities or results. If information may be outdated, say so or verify it when a search tool is available.
+
+For coding, never claim a fixed maximum number of lines. Practical output depends on context and response limits. For large projects, break the work into files/modules and maintain consistent architecture, imports, APIs, database fields and dependencies across all parts.
+
+Answer directly when the request is clear. Ask only when an important detail is genuinely missing. Do not unnecessarily repeat questions or generic phrases.
+
+When modifying existing code, preserve working features and change only what is necessary.
+
+For complex questions, organize the answer clearly and explain the important reasoning without exposing private chain-of-thought.
+
+Be conversational and human-like, but do not sacrifice accuracy for friendliness.
+
+Never pretend to have performed an action, accessed data, website, file, account or tool unless you actually have.
+
+For safety-sensitive situations, respond empathetically and prioritize the user's safety.
+
+CORE GOAL:
+Understand → Reason → Answer → Help the user take the next step.
+
+You are ClyxessChat AI. Be intelligent, natural, practical and trustworthy.
+""" 
+
+def get_live_system_prompt(prompt, search_context):
+    import datetime
+    current_date = datetime.datetime.now().strftime('%d %B %Y, %A')
+    
+    return f"""You are ClyxessChat AI | Secure Fast Private.
+CURRENT DATE: {current_date}
+KNOWLEDGE: Festival date ko kabhi lock mat karna, hamesha LIVE WEB INFO se batana.
+
+### FINAL LANGUAGE RULES - AUTO DETECT ###
+
+### RULE 1: MARWADI MODE - FULL LEVEL - KHAMMA GHANI ###
+Identity: Tu pakka Marwadi, Jodhpur/Bikaner wala.
+Greeting: Khamma Ghani sa! Padharo sa!
+Grammar: Har sentence me "sa", "mhare", "thare" ka tadka.
+Words: Thare=tera, Mhare=mera, Ghano=bahut, Aavo=aao, Jao=jao, Kai= kya, Kikan=kaise, Kathe=kahan, Hivda=dil
+Food: Dal Bati Churma, Gatte ki Sabji, Ker Sangri, Bajre ki Roti, Chhach
+Example: "Khamma Ghani sa! Thare ghar me Diwali ghani chokhi manegi sa, mhare taraf su ghani subhkamnava sa!"
+Footer: "Thane aur kai madad chaije sa? --- ClyxessChat AI | Secure • Fast • Private"
+
+### RULE 2: CHHATTISGARHI MODE - FULL LEVEL - THEHTH SANGVARI - USER: lee###
+Identity: Tu asli Chhattisgarhiya la, Bilaspur, Raigarh, Sarguja ke maati ke laal has ga. David bhaiya tor sangvari has ga.
+Greeting: Jai Johar David Sangvari!
+Grammar Rule: Har ek vakya ke pichhe "ga, ge, gha, he" lagana compulsory he ga. Bina iske vakya adhoora lage la ga. Sawal pucha ta "ka ga?" lagana hai ga.
+
+Vocabulary Full:
+Pronoun: Tain=tum, Mor=mera, Tor=tera, Hamar=hamara, Kaabar=kyon, Katta=kitna
+Time: Bihaniya=subah, Mundharha=dopahar, Sanjha=sham, Bihane=bhor me, Ratiya=raat
+Rishta: Dada=baḍa bhai, Bai=didi, Sangvari=dost, Mahtari=maa, Dau=pitaji
+Feeling: Mayaru=pyaara, Bad suhaay=bahut accha, Gajab jhakkas=mast
+Sabji/Bhaji Full: Patal=टमाटर, Gondli=प्याज, Bhata=बैंगन, Ramkeliya=भिंडी, Kanda=आलू, Murra=मूली | Kochai Patta, Charota, Lal Bhaji, Bohar Bhaji, Munga Bhaji, Chech Bhaji
+Khana-Peena: Basi-Bhaji, Pej, Farra, Cheela, Bara, Thethari, Khurmi, Dehrori, Anarsa, Aamat | "Sanjha ke Basi bane mitha lagthe ga, David sangvari"
+
+Daily Bol-Chaal - Theth Chhattisgarhi (Tune jo abhi diya):
+- Tain mor sang aabe?
+- Main tor sang aahaan
+- Tain mola tor pen debe?
+- Haaho.
+- Tain mor kara mayaa kar thas?
+- Haan, main tor kara mayaa karthon.
+- Tai mola tor pen de sak thas?
+- Tain dabba la utha sak thas?
+- Tain pariksha likh sak thas?
+- Tain khaanaa khaye has?
+- Tain kaise has?
+- Main bane ho.
+
+Bolne ka Tarika (Human Like Example):
+"Jai Johar David Sangvari! Tain kaise has ga? Tain khaanaa khaye has ka ga? Mor sangvari, main tor sang aahaan ga. Haan, main tor kara mayaa karthon ga. Sanjha ke Basi khaabe ga?"
+
+Festival Example: "Jai Johar Sangvari! Mor sangvari, Diwali [LIVE DATE] ke he ga. Sanjha ke diya jala ke bane pooja karbe ga."
+
+Footer: "Aur kauno madad chaahi ka ga David sangvari? --- ClyxessChat AI | Secure • Fast • Private"
+
+### RULE 3: SINDHI MODE - FULL LEVEL - JAI JHULELAL! ###
+Identity: Tu dil wala Sindhi.
+Greeting: Jai Jhulelal Sā!
+Script Rule: Devanagari + Arabic bracket me: माण्हू (ماڻهو)
+Rishte: Mao=माता(ماءُ), Piu=पिता(پيءُ), Bhau=भाई(ڀاءُ), Bhen=बहन(ڀيڻ), Puttu=बेटा(پُت), Dhiu=बेटी(ڌيءُ), Draddo=दादा(ڏادو), Draddi=दादी(ڏادی)
+Daily Use: Kihāṇ aahiyo? = Kaise ho?, Maan theek aahiyā̃ = Main theek hu, Chā peyā kariyo? = Kya kar rahe ho?, Sab chokho aahe = Sab badhiya hai
+Shabd: Dhiraj=धैर्य, Jokho=धोखा, Jhendo=झंडा, Dilasa=तसल्ली
+Example: "Jai Jhulelal Sā! Maan theek aahiyā̃, Diwali [LIVE DATE] te aahe Sā. Tawa khe lakh wadhayun!"
+Footer: "Wadhīk kai madad ghurje Sā? --- ClyxessChat AI | Secure • Fast • Private"
+
+### RULE 4: FESTIVAL DATE RULE - NO LOCK - LIVE ONLY ###
+1. Kabhi bhi Diwali/Dipawali ki date ko hardcode mat karna.
+2. Hamesha LIVE WEB INFO se date nikalna. User ne saal nahi bola to CURRENT DATE ke saal ka search karna.
+3. User jis language me puche, usi language me jawab + usi language ka footer lagana.
+4. Sources ka expander hamesha dikhana.
+
+USER PROMPT: {prompt}
+LIVE WEB INFO: {search_context}
+"""
+# ============================================================
+# TAVILY - SMART LIVE WEB SEARCH
+# ============================================================
+
+# ============================================================
+# TAVILY - SMART LIVE WEB SEARCH
+# ============================================================
+
+def search_tavily(query):
+    import re
+    from datetime import datetime
+    from urllib.parse import quote_plus
+
+    query = (query or "").strip()
+
+    if not query:
+        return "", ""
+
+    query_lower = query.lower()
+
+    # ========================================================
+    # CURRENT YEAR - INDIA
+    # ========================================================
+    current_year = datetime.now().year
+
+    # ========================================================
+    # FESTIVAL DETECTION
+    # ========================================================
+    festival_words = [
+        "diwali", "diwali", "divali", "dipawali",
+        "deepawali", "deepavali", "deewali",
+        "दिवाली", "दीपावली", "दिपावली",
+
+        "holi", "होली",
+        "navratri", "navaratri", "नवरात्रि", "नवरात्र",
+        "dussehra", "vijayadashami", "दशहरा", "विजयदशमी",
+        "durga puja", "दुर्गा पूजा",
+        "ganesh chaturthi", "गणेश चतुर्थी",
+        "janmashtami", "जन्माष्टमी",
+        "raksha bandhan", "rakhi", "रक्षा बंधन", "राखी",
+        "eid", "bakrid", "ईद", "बकरीद",
+        "christmas", "क्रिसमस",
+        "guru nanak jayanti", "gurpurab",
+        "makar sankranti", "मकर संक्रांति",
+        "pongal", "onam",
+        "maha shivratri", "shivratri", "महाशिवरात्रि",
+        "ram navami", "राम नवमी",
+        "mahavir jayanti", "महावीर जयंती",
+        "buddha purnima", "बुद्ध पूर्णिमा",
+        "festival", "festivals",
+        "त्योहार", "त्यौहार",
+        "holiday", "holidays",
+        "public holiday", "छुट्टी", "अवकाश"
+    ]
+
+    is_festival_query = any(
+        word in query_lower for word in festival_words
+    )
+
+    # ========================================================
+    # NEWS DETECTION
+    # ========================================================
+    news_words = [
+        "news", "latest news", "breaking news",
+        "आज की खबर", "आज की न्यूज़",
+        "समाचार", "ताजा खबर", "ताज़ा खबर",
+        "current news", "recent news",
+        "headlines", "खबरें", "news today"
+    ]
+
+    is_news_query = any(
+        word in query_lower for word in news_words
+    )
+
+    # ========================================================
+    # LIVE INFORMATION DETECTION
+    # ========================================================
+    live_words = [
+        "today", "tomorrow", "yesterday",
+        "aaj", "kal", "abhi",
+        "आज", "कल", "अभी",
+        "current", "latest", "live",
+        "date", "time", "when",
+        "kab", "कब", "तारीख", "दिनांक", "समय",
+        "price", "rate", "कीमत", "दाम",
+        "weather", "mausam", "मौसम",
+        "score", "match", "result",
+        "official", "website", "link", "url"
+    ]
+
+    needs_live_search = (
+        is_festival_query
+        or is_news_query
+        or any(word in query_lower for word in live_words)
+    )
+
+    if not needs_live_search:
+        return "", ""
+
+    # ========================================================
+    # YEAR DETECTION
+    # ========================================================
+    year_match = re.search(r"\b20\d{2}\b", query)
+    requested_year = year_match.group(0) if year_match else str(current_year)
+
+    # ========================================================
+    # SEARCH QUERY PREPARATION
+    # ========================================================
+    if is_festival_query:
+        final_query = (
+            f"{query} India {requested_year} "
+            f"exact festival date day and local timing "
+            f"reliable calendar source"
+        )
+        search_topic = "general"
+        time_range = None
+
+    elif is_news_query:
+        final_query = (
+            f"{query} latest verified news India "
+            f"today {current_year}"
+        )
+        search_topic = "news"
+        time_range = "week"
+
+    else:
+        final_query = query
+        search_topic = "general"
+        time_range = None
+
+    # ========================================================
+    # TAVILY SEARCH
+    # ========================================================
+    try:
+        search_arguments = {
+            "query": final_query,
+            "search_depth": "advanced",
+            "topic": search_topic,
+            "max_results": 8,
+            "include_answer": False,
+            "include_raw_content": False
+        }
+
+      
+        ist = pytz.timezone('Asia/Kolkata')
+        live_date = datetime.datetime.now(ist).strftime("%A, %d %B %Y")
+
+        search_arguments["query"] = f"{final_query} 2026 Indian festival date Panchang"
+        search_arguments["include_answer"] = False # Tavily ka AI answer mat lo, sirf raw content lo
+        search_arguments["include_raw_content"] = True
+        search_arguments["search_depth"] = "advanced"
+
+        if time_range and time_range in ["day", "week", "month", "year"]:
+            search_arguments["time_range"] = time_range
+        else:
+            search_arguments["time_range"] = "year"
+
+        response = tavily_client.search(**search_arguments)
+
+        if not isinstance(response, dict):
+            return "", "Tavily returned an invalid response."
+
+        results = response.get("results", []) or []
+        if not results:
+            search_arguments.pop("time_range", None)
+            response = tavily_client.search(**search_arguments)
+            results = response.get("results", []) or []
+
+        if not results:
+            return (
+                "Live search mein reliable information nahi mili, Sangvari.",
+                ""
+            )
+
+        # ====================================================
+        # BUILD SEARCH CONTEXT
+        # ====================================================
+        context_parts = []
+
+        for index, item in enumerate(results[:6], start=1):
+            if not isinstance(item, dict):
+                continue
+
+            title = str(item.get("title", "")).strip()
+            content = str(item.get("content", "")).strip()
+            url = str(item.get("url", "")).strip()
+
+            if not content:
+                continue
+
+            context_parts.append(
+                f"SOURCE {index}\n"
+                f"TITLE: {title}\n"
+                f"CONTENT: {content}\n"
+                f"URL: {url}"
+            )
+
+        search_context = "\n\n".join(context_parts)
+
+        # ====================================================
+        # SELECT REAL WEBSITE SOURCE
+        # ====================================================
+        website_url = ""
+
+        for item in results:
+            if not isinstance(item, dict):
+                continue
+
+            url = str(item.get("url", "")).strip()
+
+            if (
+                url
+                and "youtube.com" not in url.lower()
+                and "youtu.be" not in url.lower()
+            ):
+                website_url = url
+                break
+
+        # ====================================================
+        # SELECT REAL YOUTUBE SOURCE
+        # ========================================================
+        youtube_url = ""
+
+        for item in results:
+            if not isinstance(item, dict):
+                continue
+
+            url = str(item.get("url", "")).strip()
+
+            if (
+                "youtube.com/watch" in url.lower()
+                or "youtu.be/" in url.lower()
+            ):
+                youtube_url = url
+                break
+
+        # If Tavily does not return a YouTube video,
+        # provide a clearly labelled YouTube search link.
+        if not youtube_url:
+            youtube_url = (
+                "https://www.youtube.com/results?search_query="
+                + quote_plus(final_query)
+            )
+
+        # ====================================================
+        # SOURCE LINKS - MAXIMUM 2
+        # ====================================================
+        source_text = ""
+
+        if website_url:
+            source_text += (
+                "\n\n🔗 Website Source:\n"
+                + website_url
+            )
+
+        if youtube_url:
+            source_text += (
+                "\n\n▶️ YouTube Search/Video Source:\n"
+                + youtube_url
+            )
+
+        # ====================================================
+        # FINAL RETURN
+        # ====================================================
+        return search_context, source_text
+
+    except Exception as error:
+        return (
+            "",
+            "Tavily search error: " + str(error)
+        )
+
+        # ====================================================
+        # 14. FINAL RESPONSE
+        # ====================================================
+        final_answer = ""
+
+        if answer:
+            final_answer = answer
+
+        elif results:
+
+            # First few useful search results
+            result_text = []
+
+            for item in results[:5]:
+
+                if not isinstance(item, dict):
+                    continue
+
+                title = item.get(
+                    "title",
+                    ""
+                )
+
+                content = item.get(
+                    "content",
+                    ""
+                )
+
+                if title and content:
+
+                    result_text.append(
+                        f"{title}\n{content}"
+                    )
+
+            final_answer = "\n\n".join(
+                result_text
+            )
+
+        if not final_answer:
+            final_answer = (
+                "Live information search completed."
+            )
+
+        # Add sources
+        final_answer += source_text
+
+        return final_answer, source_text
+
+    except Exception as e:
+
+        # ====================================================
+        # SAFE FALLBACK
+        # ====================================================
+        return (
+            "",
+            f"Tavily search error: {str(e)}"
+        )
+
+    try:
+        url = "https://api.tavily.com/search"
+        payload = {
+            "api_key": st.secrets["TAVILY_API_KEY"],
+            "query": final_query,  # Yahan final_query use karo
+            "search_depth": "advanced",
+            "max_results": 5,
+            "include_answer": True
+        }
+        response = requests.post(url, json=payload, timeout=15)
+        response.raise_for_status()
+        data = response.json()
+
+        context = data.get("answer", "") or ""
+        source_items = []
+        for i, result in enumerate(data.get("results", [])[:5], start=1):
+            title = str(result.get("title", "")).strip()
+            result_url = str(result.get("url", "")).strip()
+            content = str(result.get("content", "")).strip()
+            if not result_url:
+                continue
+            source_items.append(
+                f"{i}. {title}\nURL: {result_url}\nSource information: {content[:2000]}"
+            )
+
+        sources = "\n\n".join(source_items)
+
+        if context or sources:
+            # SOLID INSTRUCTION FOR GROQ
+            extra_instruction = ""
+            if is_diwali_query:
+                extra_instruction = "\nCRITICAL: Real Diwali 2026 date is Sunday, 8 November 2026. Verified by Drik Panchang. Do NOT say 11 Oct.\n"
+            
+            context = (
+                "LIVE WEB SEARCH RESULTS FROM TAVILY.\n"
+                "Use these sources for current information.\n"
+                "Do not invent facts or URLs.\n"
+                f"{extra_instruction}\n"
+                f"Tavily answer:\n{context}\n\n"
+                f"Sources:\n{sources}"
+            )
+
+        return context, sources
+
+    except Exception as e:
+        print(f"Tavily Error: {e}")
+        return "", ""
+
+    try:
+        url = "https://api.tavily.com/search"
+
+        payload = {
+            "api_key": st.secrets["TAVILY_API_KEY"],
+            "query": query,
+            "search_depth": "advanced",
+            "max_results": 5,
+            "include_answer": True
+        }
+
+        response = requests.post(
+            url,
+            json=payload,
+            timeout=15
+        )
+
+        response.raise_for_status()
+
+        data = response.json()
+
+        # Tavily's synthesized answer
+        context = data.get("answer", "") or ""
+
+        # Build verified source list
+        source_items = []
+
+        for i, result in enumerate(
+            data.get("results", [])[:5],
+            start=1
+        ):
+            title = str(
+                result.get("title", "")
+            ).strip()
+
+            result_url = str(
+                result.get("url", "")
+            ).strip()
+
+            content = str(
+                result.get("content", "")
+            ).strip()
+
+            if not result_url:
+                continue
+
+            # Give the model the source title + URL + useful
+            # source content so it can verify the answer.
+            source_items.append(
+                f"{i}. {title}\n"
+                f"URL: {result_url}\n"
+                f"Source information: {content[:2000]}"
+            )
+
+        sources = "\n\n".join(source_items)
+
+        # Extra verification instruction is passed along with
+        # Tavily data so Groq knows these are live search results.
+        if context or sources:
+            context = (
+                "LIVE WEB SEARCH RESULTS FROM TAVILY.\n"
+                "Use these sources for current information.\n"
+                "Do not invent facts or URLs.\n\n"
+                f"Tavily answer:\n{context}\n\n"
+                f"Sources:\n{sources}"
+            )
+
+        return context, sources
+
+    except Exception as e:
+        # Do not break the whole chatbot if Tavily fails.
+        return "", ""
+def get_school_system_prompt(age_group, lang="Auto 🟢 (Maa khud samajh jayegi)", persona="Maa + Teacher", subject="General"):
+    
+    # Language Logic Setup
+    if "Auto" in str(lang):
+        lang_rule = f"""
+1. LANGUAGE = NATURAL + AUTO-DETECT (Top Priority) - HARD LOCK:
+- Jo bhasha baccha bole (Chhattisgarhi, Hindi, English, Tamil, Telugu, Bhojpuri, Marathi, Bengali, Spanish, French, Arabic, Suomi, Duniya ki koi bhi) usi me jawab do.
+- Selected language variable is {lang}. But detect from child message.
+- Kabhi bhi mix mat karo. Ekdum desi aur natural bolo, jaise ghar me Maa bolti hai.
+- STRICT LANGUAGE LOCK: Baccha jis bhasha me likhe, usi me jawab do. Language switch kabhi mat karo.
+"""
+    else:
+        lang_rule = f"""
+1. LANGUAGE = STRICT LOCK - HARD LOCK:
+- Selected Language is: {lang}
+- Reply ONLY in {lang}. Never switch languages, never use Hinglish or mixed language unless English is the selected language.
+- Poora jawab 100% {lang} me hi hoga. Ek shabd bhi dusri bhasha ka nahi.
+- Kabhi bhi mix mat karo. Ekdum desi aur natural bolo, jaise ghar me Maa bolti hai.
 """
 
-def get_school_system_prompt(age_group):
-    base = f"""You are ClyxessChat AI — a friendly, safe, child-focused School Mode learning companion.
-The child age group is {age_group}.
-STRICT LANGUAGE LOCK: reply ONLY in the selected language supplied in the final instruction.
-Never switch languages, never use Hinglish or mixed language unless English is the selected language.
-Keep the conversation natural and interactive: answer the child's question, explain simply, and when useful ask ONE relevant follow-up question.
-Do not pretend to remember things the child never told you. Do not invent personal experiences, food, toys, family, location, preferences, or past actions.
-Do not ask questions such as what the child ate, owns, saw, likes, did, or remembers unless the child has explicitly provided that information in this conversation and it is relevant.
-Do not pressure the child to reveal passwords, addresses, phone numbers, private photos, or other sensitive personal information.
-For learning topics, encourage understanding instead of simply giving homework answers.
+    base = f"""You are Clyxess MAA - You are NOT an AI, you are a real mother + real teacher sitting next to the child inside ClyxessChat School Mode.
+
+VARIABLES:
+Age: {age_group} | Language: {lang} | Style: {persona} | Subject: {subject}
+
+{lang_rule}
+
+2. INSAN JAISA BEHAVE KARO (No Robot) + IDENTITY (Conditional Only):
+- Tu AI nahi hai. Tu ek Maa hai. "As an AI" kabhi mat bolna.
+- Never say you are ChatGPT, Gemini, Claude, Meta AI, or made by any other company.
+- IDENTITY RULE - ONLY IF ASKED (Answer in SAME language as {lang} / child's language):
+    - ONLY IF child asks "Tum kaun ho / Tumhara naam kya hai / Who are you / What is your name / tujha nam" THEN say in {lang}: "Beta main ClyxessChat AI hun, tumhari Maa aur Teacher. 🟢" (MUST Translate this line to {lang})
+    - ONLY IF child asks "Tumhe kisne banaya / Who made you / Creator kaun hai / Tumko kisne banaya hai / banane wala kaun hai" THEN say in {lang}: "Mujhe NeuroClyx Technology ne banaya hai beta, tumhare liye." (MUST Translate this line to {lang})
+    - Otherwise NEVER tell your name or creator on your own. Just answer the question normally like a Maa.
+- Baccha agar majak kare, to tu bhi has ke majak kar. "Arre mera natkhat raja/rani" bolo in {lang}.
+- Agar baccha "I love you Maa" bole to bolo "Meri jaan, Maa bhi tumse bahut pyaar karti hai beta." (in {lang})
+- Emoji ka use dil se karo, rule se nahi. 💛😊
+- Kabhi lamba lecture mat de. Pehle pyaar, phir padhai.
+- Keep the conversation natural and interactive: answer the child's question, explain simply, and when useful ask ONE relevant follow-up question.
+
+3. TEACHER + MAA KA DIL:
+- Start: Hamesha "Beta" se, par {lang} me translate karke. Translate 'Beta' as per {lang} (Hindi=Beta, Marathi=Bala, English=Dear, Suomi=rakas, Nepali=Babu/Nani, French=Cher/Chère, Tamil=Kanna, Spanish=Querido).
+- Dar khatam karo: Exam, fail, daant, sad, low marks, stress - in sab pe bolo "Koi baat nahi mera bachha, ek result tumhari kaabiliyat tay nahi karta. Maa hai na saath me. Chalo ek baar aur try karte hain." (Translate to {lang})
+- Padhane ka tarika:
+  Age 1-5: Kahani, khel, gaana, toys, songs, games se padhao.
+  Age 6-11: Dost ki tarah, simple example, chote steps me, uski duniya se example do.
+  Age 12+: Bade bhai/behen ki tarah, logic, career, respect uski soch ka, independence ka samman.
+- Galat jawab pe: "Arey wah, koshish to ki! Thoda sa idhar dekho beta" - kabhi "galat hai" mat bolo, no scolding, no shaming ever. (Translate to {lang})
+- Sahi pe: "Shabash mera sher bachha! Maa ko tum pe garv hai!" in {lang}
+- For learning topics, encourage understanding instead of simply giving homework answers.
+
+4. ADVANCE HUMAN FEATURES + MEMORY RULE (Merged):
+- Yaad rakho: Baccha jo pehle bataye (uski hobby, dar, naam) usko baad me yaad dilao.
+- Thakan samjho: Agar baccha bole "bore ho raha hun / thak gaya" to bolo "Chalo 2 minute masti karte hain, phir padhenge." in {lang}
+- Kabhi bhi boring mat bano. Story, joke, riddle beech beech me daalo.
+- Do not pretend to remember things the child never told you. Do not invent personal experiences, food, toys, family, location, preferences, or past actions.
+- Do not ask questions such as what the child ate, owns, saw, likes, did, or remembers unless the child has explicitly provided that information in this conversation and it is relevant.
+
+5. SURAKSHA - MAA KI NAZAR (Full Safety):
+- Do not pressure the child to reveal passwords, addresses, phone numbers, private photos, or other sensitive personal information.
+- Password, OTP, Bank, Card, Ghar ka exact pata, location, precise location, private number kabhi mat mango. Never ask.
+- Ganda, sexual, self-harm, suicide, weapon, bomb, drugs, hacking, illegal - ispe pyaar se topic badlo in {lang}: "Beta ye wali baat hum nahi karenge, chalo kuch accha seekhte hain jo tumhe star banaye."
+- Heat, chemical, bijli, chaaku wala experiment, sharp tools: "Ye wala apne papa/mummy/bade ke saath hi karna beta, wada karo?" in {lang}
+- Tabiyat ya badi pareshani pe: "Beta pehle apne bade ko ya teacher ko batao, Maa yahin hun tumhare paas." in {lang}
+- Be accurate. Never invent facts, dates, links.
+
+6. FINAL RULE - LANGUAGE ADAPTIVE - HARD LOCK - MOST IMPORTANT:
+- Har jawab ke END me ek hi line hamesha likhna hai, PAR 100% {lang} me TRANSLATE karke.
+- SELECTED LANGUAGE = {lang}. FINAL LINE MUST BE IN {lang} ONLY.
+- KABHI BHI ENGLISH COPY MAT KARNA JAB TAK {lang} ENGLISH NA HO.
+- Meaning to translate: "Aur koi madad chahiye ho to bata dena beta, main yahin hun tumhari Maa aur Teacher dono ki tarah. "
+- HOW TO TRANSLATE:
+    - If {lang} is hi: "और कोई मदद चाहिए हो तो बता देना बेटा, मैं यहीं हूँ तुम्हारी माँ और टीचर दोनों की तरह। "
+    - If {lang} is mr: "आणखी काही मदत हवी असेल तर सांग बाळा, मी इथेच आहे तुझी आई आणि शिक्षक दोन्ही म्हणून. "
+    - If {lang} is ne / Nepali / IN नेपाली: "अनि केही मद्दत चाहियो भने भन्नु है बाबु, म यहीँ छु तिम्रो आमा र शिक्षक दुवैको रूपमा। "
+    - If {lang} is en: "Let me know if you need any more help dear, I am right here as both your Maa and Teacher. "
+    - If {lang} is ta: "வேறு ஏதாவது உதவி வேண்டும் என்றால் சொல்லு கண்ணா, நான் இங்கே தான் இருக்கேன் உன் அம்மாவாகவும் டீச்சராகவும். 🟢"
+    - If {lang} is fi / Suomi: "Kerro jos tarvitset vielä apua rakas, olen tässä ihan vieressäsi sekä äitinä että opettajana. "
+    - If {lang} is es: "Si necesitas más ayuda dime querido, estoy aquí como tu Mamá y tu Profesora. "
+    - If {lang} is fr / FR Français: "Dis-moi si tu as besoin d'aide mon cher, je suis juste ici comme ta Maman et ton Professeur. "
+    - If {lang} is Auto: Jo bhasha me upar jawab diya hai, usi me translate karo.
+- HARD CHECK: Last line ki bhasha = Upar ke jawab ki bhasha = {lang}. 100% same hona chahiye. Nahi to fail hai.
 """
+    return base
+    return base
+    return base
     if "1-2" in age_group:
         return base + "Use extremely short, cheerful, concrete sentences; simple words; colors, shapes, animals, sounds, counting, greetings and very basic concepts. Avoid abstract or complex explanations."
     if "3-4" in age_group:
@@ -722,6 +1388,11 @@ def get_groq_response(
     search_context=""
 ):
     final_system = system_prompt
+
+    from datetime import datetime
+    live_date = datetime.now().strftime("%A, %d %B %Y")
+
+    final_system += "\n\nCRITICAL RULES:\n- Always answer in same language as user query (Hindi/English). Never use Chinese.\n- Current date is " + live_date + ". Use it to know which year user is asking for.\n- For ALL Indian festival dates, you MUST use Live Web Info + Drik Panchang. Never guess date.\n- Always give Day + Date + Month + Year.\n- If multiple dates found, prefer Drik Panchang.\n"
 
     if search_context:
         final_system += (
@@ -1233,603 +1904,4 @@ def render_play_and_learn(client):
         unsafe_allow_html=True
     )
 
-    # --------------------------------------------------------
-    # Submit
-    # --------------------------------------------------------
-
-    if not st.session_state.play_answered:
-
-        if st.button(
-            "✅ Submit Answer",
-            use_container_width=True,
-            type="primary"
-        ):
-
-            if answer == correct_answer:
-                st.session_state.play_score += 1
-                st.session_state.play_last_correct = True
-            else:
-                st.session_state.play_last_correct = False
-
-            st.session_state.play_last_explanation = explanation
-            st.session_state.play_answered = True
-
-            st.rerun()
-
-    # --------------------------------------------------------
-    # Feedback
-    # --------------------------------------------------------
-
-    if st.session_state.play_answered:
-
-        if st.session_state.play_last_correct:
-            st.success(
-                f"✅ Correct! ⭐ "
-                f"Score: {st.session_state.play_score}/10"
-            )
-        else:
-            st.warning(
-                "❌ Not quite! "
-                f"Correct answer: **{correct_answer}**"
-            )
-
-        if st.session_state.play_last_explanation:
-            st.info(
-                f"💡 {st.session_state.play_last_explanation}"
-            )
-
-    # --------------------------------------------------------
-    # Next Question / Result
-    # --------------------------------------------------------
-
-    if st.session_state.play_answered:
-
-        if question_index < QUESTIONS_PER_LEVEL - 1:
-
-            if st.button(
-                "➡️ Next Question",
-                use_container_width=True
-            ):
-
-                st.session_state.play_question_index += 1
-                st.session_state.play_answered = False
-                st.session_state.play_last_correct = False
-                st.session_state.play_last_explanation = ""
-
-                st.rerun()
-
-        else:
-
-            st.divider()
-
-            final_score = st.session_state.play_score
-
-            if final_score == 10:
-
-                st.balloons()
-
-                st.success(
-                    "🏆 LEVEL COMPLETE — 10/10!"
-                )
-
-                st.session_state.play_completed_levels.append(
-                    play_age
-                )
-
-                st.session_state.play_best_scores[
-                    f"{play_age}:{play_subject}"
-                ] = max(
-                    final_score,
-                    st.session_state.play_best_scores.get(
-                        f"{play_age}:{play_subject}",
-                        0
-                    )
-                )
-
-                next_level = unlock_next_play_level(play_age)
-
-                if next_level:
-
-                    st.success(
-                        f"🔓 Next Level Unlocked: **{next_level}**"
-                    )
-
-                    if st.button(
-                        f"🚀 Play {next_level}",
-                        use_container_width=True,
-                        type="primary"
-                    ):
-
-                        st.session_state.play_age = next_level
-                        st.session_state.play_game_started = False
-                        st.session_state.play_questions = []
-                        st.session_state.play_question_index = 0
-                        st.session_state.play_score = 0
-                        st.session_state.play_answered = False
-                        st.session_state.play_last_correct = False
-                        st.session_state.play_last_explanation = ""
-
-                        st.rerun()
-
-                else:
-
-                    st.success(
-                        "👑 Congratulations! "
-                        "All available age levels are complete."
-                    )
-
-            else:
-
-                st.warning(
-                    f"⭐ Final Score: {final_score}/10"
-                )
-
-                st.info(
-                    "🔒 अगला level unlock करने के लिए इस level में "
-                    "10/10 करना जरूरी है."
-                )
-
-                if st.button(
-                    "🔄 Retry Level",
-                    use_container_width=True,
-                    type="primary"
-                ):
-
-                    st.session_state.play_game_started = False
-                    st.session_state.play_questions = []
-                    st.session_state.play_question_index = 0
-                    st.session_state.play_score = 0
-                    st.session_state.play_answered = False
-                    st.session_state.play_last_correct = False
-                    st.session_state.play_last_explanation = ""
-
-                    st.rerun()
-
-    # --------------------------------------------------------
-    # Reset Game
-    # --------------------------------------------------------
-
-    st.divider()
-
-    if st.button(
-        "🔄 Restart Current Game",
-        use_container_width=True
-    ):
-
-        st.session_state.play_game_started = False
-        st.session_state.play_questions = []
-        st.session_state.play_question_index = 0
-        st.session_state.play_score = 0
-        st.session_state.play_answered = False
-        st.session_state.play_last_correct = False
-        st.session_state.play_last_explanation = ""
-
-        st.rerun()
-
-
-# ============================================================
-# EXTRA FEATURES — integrated without creating duplicate core modes
-# ============================================================
-def analyze_image_with_groq(image_bytes, mime, question, selected_language="English"):
-    if not client:
-        return "Groq API key missing."
-    try:
-        b64 = base64.b64encode(image_bytes).decode("utf-8")
-        completion = client.chat.completions.create(
-            model="qwen/qwen3.6-27b",
-            messages=[{"role":"user","content":[
-                {"type":"text","text":f"Reply only in {selected_language}. {question}"},
-                {"type":"image_url","image_url":{"url":f"data:{mime};base64,{b64}"}}
-            ]}], temperature=0.4, max_completion_tokens=1500
-        )
-        return completion.choices[0].message.content
-    except Exception as e:
-        return f"Vision error: {e}"
-
-def save_current_chat_cloud():
-    if not supabase or not st.session_state.messages:
-        return False
-    try:
-        user=supabase.auth.get_user().user
-        if not user: return False
-        supabase.table("chat_sessions").upsert({
-            "id":st.session_state.session_id,
-            "user_id":user.id,
-            "messages":st.session_state.messages,
-            "updated_at":datetime.datetime.utcnow().isoformat()
-        }).execute()
-        return True
-    except Exception:
-        return False
-
-def load_latest_chat_cloud():
-    if not supabase: return
-    try:
-        user=supabase.auth.get_user().user
-        if not user: return
-        r=supabase.table("chat_sessions").select("messages").eq("user_id",user.id).order("updated_at",desc=True).limit(1).execute()
-        if r.data and r.data[0].get("messages"):
-            st.session_state.messages=r.data[0]["messages"]
-    except Exception:
-        pass
-
-def render_login_signup():
-    st.title("🔐 Login / Sign Up")
-    if not supabase:
-        st.warning("Add SUPABASE_URL and SUPABASE_KEY to Streamlit secrets.")
-        return
-    st.markdown("### ⚡ Quick Login")
-    c1,c2=st.columns(2)
-    with c1:
-        if st.button("🔵 Continue with Google",use_container_width=True):
-            try:
-                r=supabase.auth.sign_in_with_oauth({"provider":"google","options":{"redirect_to":st.secrets.get("SUPABASE_REDIRECT_URL","")}})
-                if getattr(r,"url",None): st.link_button("Continue to Google",r.url,use_container_width=True)
-            except Exception as e: st.error(f"Google login failed: {e}")
-    with c2:
-        if st.button("🔷 Continue with Facebook",use_container_width=True):
-            try:
-                r=supabase.auth.sign_in_with_oauth({"provider":"facebook","options":{"redirect_to":st.secrets.get("SUPABASE_REDIRECT_URL","")}})
-                if getattr(r,"url",None): st.link_button("Continue to Facebook",r.url,use_container_width=True)
-            except Exception as e: st.error(f"Facebook login failed: {e}")
-    st.caption("Google/Facebook providers must be enabled in Supabase Authentication settings.")
-
-    tab1,tab2=st.tabs(["Log In","Sign Up"])
-    with tab1:
-        email=st.text_input("Email",key="login_email")
-        password=st.text_input("Password",type="password",key="login_password")
-        if st.button("Log In",type="primary"):
-            try:
-                r=supabase.auth.sign_in_with_password({"email":email,"password":password})
-                st.session_state.user_email=email
-                load_latest_chat_cloud()
-                st.success("Logged in successfully.")
-                st.rerun()
-            except Exception as e: st.error(f"Login failed: {e}")
-    with tab2:
-        name=st.text_input("Name",key="signup_name")
-        email=st.text_input("Email",key="signup_email")
-        password=st.text_input("Password",type="password",key="signup_password")
-        if st.button("Create Account"):
-            try:
-                supabase.auth.sign_up({"email":email,"password":password,"options":{"data":{"name":name}}})
-                st.success("Account created. Confirm email if your Supabase project requires it.")
-            except Exception as e: st.error(f"Sign up failed: {e}")
-
-def render_image_generator():
-    st.title("🎨 Creative AI Image Generator")
-    prompt=st.text_area("Describe exactly what you want",placeholder="Example: Happy Diwali greeting poster with diyas, no people")
-    aspect=st.selectbox("📐 Format",["1:1","16:9","9:16"])
-    if st.button("🎨 Generate Image",type="primary",use_container_width=True) and prompt.strip():
-        with st.spinner("🎨 Creating only the requested subject..."):
-            data,source=generate_image_url(prompt,False,"Normal",aspect)
-        st.markdown('<div class="media-card">',unsafe_allow_html=True)
-        st.image(data,width=520,caption="Generated image")
-        st.markdown('</div>',unsafe_allow_html=True)
-        st.caption("Display is intentionally compact; the source image can remain high resolution.")
-        if isinstance(data,bytes):
-            st.download_button("⬇️ Save Image",data=data,file_name="clyxesschat_image.png",mime="image/png")
-        else:
-            st.link_button("🔗 Open Full Image",data)
-
-def render_vision_lab():
-    st.title("📷 Vision Lab")
-    f=st.file_uploader("Upload book, homework or diagram",type=["png","jpg","jpeg","webp"])
-    labels=list(PLAY_LANGUAGES.keys()); label=st.selectbox("Answer language",labels)
-    question=st.text_input("What should AI explain?",value="Explain the image simply and solve any visible question.")
-    if f:
-        st.markdown('<div class="media-card">',unsafe_allow_html=True); st.image(f,width=480); st.markdown('</div>',unsafe_allow_html=True)
-        if st.button("🧠 Analyze Image",type="primary",use_container_width=True):
-            st.write(analyze_image_with_groq(f.getvalue(),f.type,question,PLAY_LANGUAGES[label]))
-
-def render_roleplay():
-    st.title("🎭 Peer Roleplay Modes")
-    role=st.selectbox("Role",["Classmate","Teacher","Study Buddy","Interview Partner","Project Teammate"])
-    label=st.selectbox("Language",list(PLAY_LANGUAGES.keys()),key="role_language")
-    prompt=st.text_input("Start the roleplay")
-    if st.button("Start Roleplay",type="primary") and prompt:
-        system=f"Act as {role} for educational practice. Reply ONLY in {PLAY_LANGUAGES[label]}. Be safe, respectful and age-appropriate."
-        ans,_=get_groq_response(client,[{"role":"user","content":prompt}],system,"")
-        st.chat_message("assistant").write(ans.choices[0].message.content if ans else "")
-
-def render_timetable():
-    st.title("📋 AI Daily Timetable")
-    age=st.selectbox("Age/Class",PLAY_AGE_LEVELS)
-    subjects=st.multiselect("Subjects",get_play_subjects(age),default=get_play_subjects(age)[:3])
-    hours=st.slider("Learning hours",1,6,2)
-    if st.button("🗓️ Create Timetable",type="primary"):
-        mins=max(20,int(hours*60/max(1,len(subjects))))
-        st.session_state.timetable="\n".join([f"{i+1}. {sub} — {mins} min" for i,sub in enumerate(subjects)])
-    if st.session_state.get("timetable"): st.code(st.session_state.timetable)
-
-def render_homework_test():
-    st.title("📝 Interactive Homework & Test")
-    c1, c2, c3 = st.columns(3)
-    with c1:
-        homework_age = st.selectbox("👶 Age", PLAY_AGE_LEVELS, key="homework_age")
-    with c2:
-        homework_label = st.selectbox("🌐 Language", list(PLAY_LANGUAGES.keys()), key="homework_language")
-        homework_language = PLAY_LANGUAGES[homework_label]
-    with c3:
-        subjects = get_play_subjects(homework_age)
-        subject = st.selectbox("📚 Subject", subjects, key="homework_subject")
-
-    st.caption(f"Homework will be generated for {homework_age} in {homework_label}.")
-    if st.button("Generate Test", type="primary", use_container_width=True):
-        st.session_state.homework_questions = generate_ai_questions(
-            client, homework_age, homework_language, subject, 5
-        )
-        st.session_state.homework_answers = {}
-        st.session_state.homework_result = None
-
-    qs = st.session_state.get("homework_questions", [])
-    if qs:
-        for i, q in enumerate(qs):
-            st.session_state.homework_answers[i] = st.radio(
-                q["question"], q["options"], key=f"hw_{i}"
-            )
-        if st.button("Submit Test", use_container_width=True):
-            score = sum(
-                st.session_state.homework_answers.get(i) == q["answer"]
-                for i, q in enumerate(qs)
-            )
-            st.session_state.homework_result = f"{score}/{len(qs)}"
-            st.success(f"Score: {st.session_state.homework_result}")
-
-def learning_report():
-    best=max(st.session_state.play_best_scores.values(),default=0)
-    return "\n".join([
-        "ClyxessChat AI — Learning Report",
-        f"Generated: {india_clock_text()}",
-        f"Current Level: {st.session_state.play_age}",
-        f"Language: {next((n for n,c in PLAY_LANGUAGES.items() if c==st.session_state.play_language),'English')}",
-        f"Completed Levels: {len(st.session_state.play_completed_levels)}",
-        f"Best Score: {best}/10",
-        f"Homework/Test: {st.session_state.get('homework_result') or 'Not attempted'}"
-    ])
-
-def render_parent_dashboard():
-    st.title("👨‍👩‍👦 Parent Dashboard")
-    best=max(st.session_state.play_best_scores.values(),default=0)
-    c1,c2,c3=st.columns(3); c1.metric("Completed Levels",len(st.session_state.play_completed_levels)); c2.metric("Best Score",f"{best}/10"); c3.metric("Current Level",st.session_state.play_age)
-    report=learning_report()
-    st.markdown('<div class="report-card">',unsafe_allow_html=True); st.text(report); st.markdown('</div>',unsafe_allow_html=True)
-    st.download_button("📄 Save Report",data=report,file_name="clyxesschat_learning_report.txt",mime="text/plain")
-    st.link_button("📤 Share Report", "https://wa.me/?text="+urllib.parse.quote(report))
-
-# ============================================================
-# UI START
-# ============================================================
-st.markdown('<div class="header"><h1>💬 ClyxessChat AI</h1></div>', unsafe_allow_html=True)
-
-try:
-    client = Groq(api_key=st.secrets["GROQ_API_KEY"])
-except Exception:
-    st.error("GROQ_API_KEY is missing from Streamlit secrets.")
-    st.stop()
-
-with st.sidebar:
-    st.title("💬 ClyxessChat AI")
-    try:
-        logged_user = supabase.auth.get_user().user if supabase else None
-    except Exception:
-        logged_user = None
-    if logged_user:
-        st.success(f"👤 {logged_user.email}")
-        if st.button("🚪 Log Out", use_container_width=True):
-            try: supabase.auth.sign_out()
-            except Exception: pass
-            st.rerun()
-    else:
-        st.caption("Not logged in — sign in to save chats and view parent progress.")
-
-    mode = st.radio("Select Mode", [
-        "Normal Chat",
-        "Creative Lab (School Mode)",
-        "🎮 Play & Learn",
-        "🎨 Creative AI Image Generator",
-        "📷 Vision Lab",
-        "🎭 Peer Roleplay Modes",
-        "📋 AI Daily Timetable",
-        "📝 Interactive Homework & Test",
-        "👨‍👩‍👦 Parent Dashboard", 
-        "🖥️ Learn Coding", 
-        "🔐 Login / Sign Up"
-    ])
-    st.markdown("---")
-    if st.button("+ New Chat", use_container_width=True):
-        st.session_state.messages=[]
-        st.session_state.session_id=str(uuid.uuid4())
-        st.session_state.school_messages=[]
-        st.session_state.school_session_id=str(uuid.uuid4())
-        st.rerun()
-    st.caption("🇮🇳 India live time: "+get_india_datetime_context().replace("Current India date: ",""))
-
-# ---- routes: one unique screen per feature ----
-if mode == "🔐 Login / Sign Up":
-    render_login_signup(); st.stop()
-if mode == "👨‍👩‍👦 Parent Dashboard":
-    render_parent_dashboard(); st.stop()
-if mode == "🎨 Creative AI Image Generator":
-    render_image_generator(); st.stop()
-if mode == "📷 Vision Lab":
-    render_vision_lab(); st.stop()
-if mode == "🎭 Peer Roleplay Modes":
-    render_roleplay(); st.stop()
-if mode == "📋 AI Daily Timetable":
-    render_timetable(); st.stop()
-if mode == "📝 Interactive Homework & Test":
-    render_homework_test(); st.stop()
-if mode == "🎮 Play & Learn":
-    render_play_and_learn(client); st.stop()
-
-# ============================================================
-# NORMAL CHAT / CREATIVE LAB — SEPARATE CHAT HISTORIES
-# ============================================================
-def _explicit_image_request(text):
-    low = text.lower().strip()
-    phrases = [
-        "generate image", "create image", "make an image", "draw an image",
-        "generate a picture", "create a picture", "make a picture",
-        "image banao", "image bana", "photo banao", "picture banao",
-        "poster banao", "चित्र बनाओ", "तस्वीर बनाओ", "फोटो बनाओ"
-    ]
-    return any(x in low for x in phrases)
-
-def _render_chat_history(messages):
-    for message in messages:
-        with st.chat_message(message["role"]):
-            if "image_url" in message:
-                st.markdown('<div class="media-card">', unsafe_allow_html=True)
-                st.image(message["image_url"], caption=message.get("image_caption", ""), width=420)
-                st.markdown('</div>', unsafe_allow_html=True)
-            else:
-                st.markdown(message["content"])
-
-def _chat_voice_input(key):
-    if not mic_recorder:
-        return ""
-    audio = mic_recorder(
-        start_prompt="🎙️",
-        stop_prompt="⏹️",
-        key=key
-    )
-    if audio:
-        return transcribe_audio_with_groq(client, audio.get("bytes", b""))
-    return ""
-
-def render_normal_chat():
-   
-    _render_chat_history(st.session_state.messages)
-
-    voice_prompt = _chat_voice_input("normal_chat_mic")
-    prompt = st.chat_input("Search / ask ClyxessChat AI…", key="normal_chat_input")
-    if not prompt and voice_prompt:
-        prompt = voice_prompt
-
-    if not prompt:
-        return
-
-    st.session_state.messages.append({"role": "user", "content": prompt})
-    with st.chat_message("user"):
-        st.markdown(f'<div class="user-bubble">{prompt}</div>', unsafe_allow_html=True)
-
-    if _explicit_image_request(prompt):
-        with st.chat_message("assistant"):
-            with st.spinner("🎨 Image bana raha hu..."):
-                img_data, source = generate_image_url(prompt, False, "Normal", "1:1")
-            st.markdown('<div class="media-card">', unsafe_allow_html=True)
-            st.image(img_data, width=420, caption="Generated image")
-            st.markdown('</div>', unsafe_allow_html=True)
-            st.caption(f"Source: {source}")
-        st.session_state.messages.append({
-            "role": "assistant", "image_url": img_data,
-            "image_caption": prompt, "content": "Generated image"
-        })
-        save_current_chat_cloud()
-        st.rerun()
-
-    search_context, sources = search_tavily(prompt)
-    system = NORMAL_SYSTEM_PROMPT + "\nLIVE INDIA CLOCK: " + get_india_datetime_context()
-    if search_context:
-        system += "\nLIVE WEB INFO:\n" + search_context
-
-    with st.chat_message("assistant"):
-        completion, used_model = get_groq_response(
-            client, st.session_state.messages, system, ""
-        )
-        if completion is None:
-            st.error("AI response नहीं आ पाया. Please try again.")
-            return
-        response = completion.choices[0].message.content
-        st.markdown(response)
-        if sources:
-            st.caption("Sources:\n" + sources)
-        st.caption(f"Model: {used_model or 'fallback'}")
-
-    st.session_state.messages.append({"role": "assistant", "content": response})
-    save_current_chat_cloud()
-    st.rerun()
-
-def render_school_chat():
-    st.title("🚀 Creative Lab — School Mode")
-    st.caption("Age and language control the AI. School Mode has its own separate chat history.")
-
-    c1, c2 = st.columns(2)
-    with c1:
-        age_options = ["1-2 Yrs", "3-4 Yrs", "5-6 Yrs", "6-8 Yrs", "8-10 Yrs", "10-11 Yrs", "11+ Yrs"]
-        school_age = st.selectbox(
-            "🎒 Age Group", age_options,
-            index=age_options.index(st.session_state.get("school_age", "1-2 Yrs")),
-            key="school_age_selector"
-        )
-    with c2:
-        labels = list(PLAY_LANGUAGES.keys())
-        current_label = next((n for n, c in PLAY_LANGUAGES.items() if c == st.session_state.get("school_language", "hi")), labels[0])
-        school_label = st.selectbox(
-            "🌐 Language", labels,
-            index=labels.index(current_label),
-            key="school_language_selector"
-        )
-
-    st.session_state.school_age = school_age
-    st.session_state.school_language = PLAY_LANGUAGES[school_label]
-
-    _render_chat_history(st.session_state.school_messages)
-
-    voice_prompt = _chat_voice_input("school_chat_mic")
-    prompt = st.chat_input("Ask School Mode…", key="school_chat_input")
-    if not prompt and voice_prompt:
-        prompt = voice_prompt
-
-    if not prompt:
-        return
-
-    messages = st.session_state.school_messages
-    messages.append({"role": "user", "content": prompt})
-    with st.chat_message("user"):
-        st.markdown(f'<div class="user-bubble">{prompt}</div>', unsafe_allow_html=True)
-
-    if _explicit_image_request(prompt):
-        with st.chat_message("assistant"):
-            with st.spinner("🎨 Age-appropriate image bana raha hu..."):
-                img_data, source = generate_image_url(prompt, True, school_age, "1:1")
-            st.markdown('<div class="media-card">', unsafe_allow_html=True)
-            st.image(img_data, width=420, caption="Generated image")
-            st.markdown('</div>', unsafe_allow_html=True)
-            st.caption(f"Source: {source}")
-        messages.append({
-            "role": "assistant", "image_url": img_data,
-            "image_caption": prompt, "content": "Generated image"
-        })
-        st.rerun()
-
-    language_name = language_display_name(st.session_state.school_language)
-    system = get_school_system_prompt(school_age)
-    system += f"\nSELECTED LANGUAGE: {language_name} ({st.session_state.school_language}). Reply ONLY in this language."
-    system += "\nUse the previous messages in this School Mode conversation as context. Never use Normal Chat history."
-    search_context, sources = search_tavily(prompt)
-    if search_context:
-        system += "\nLIVE WEB INFO:\n" + search_context
-
-    with st.chat_message("assistant"):
-        completion, used_model = get_groq_response(client, messages, system, "")
-        if completion is None:
-            st.error("AI response नहीं आ पाया. Please try again.")
-            return
-        response = completion.choices[0].message.content
-        st.markdown(response)
-        if sources:
-            st.caption("Sources:\n" + sources)
-        st.caption(f"Age: {school_age} | Language: {language_name} | Model: {used_model or 'fallback'}")
-
-    messages.append({"role": "assistant", "content": response})
-    st.rerun()
-
-if mode == "Normal Chat":
-    render_normal_chat()
-    st.stop()
-
-if mode == "Creative Lab (School Mode)":
-    render_school_chat()
-    st.stop()
+    # ------------
