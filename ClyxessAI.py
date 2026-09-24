@@ -1846,6 +1846,11 @@ with st.sidebar:
         "📋 AI Daily Timetable",
         "📝 Interactive Homework & Test",
         "👨‍👩‍👦 Parent Dashboard", 
+        "🖥️ Learn Coding",  
+        "🖥️ Learn Coding",  
+        "🖥️ Learn Coding",  
+        "🖥️ Learn Coding",  
+        "🖥️ Learn Coding", 
         "🖥️ Learn Coding", 
         "🔐 Login / Sign Up"
     ])
