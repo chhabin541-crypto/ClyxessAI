@@ -1623,40 +1623,66 @@ def render_play_and_learn(client):
 # ============================================================
 # EXTRA FEATURES — integrated without creating duplicate core modes
 # ============================================================
-def analyze_image_with_groq(image_bytes, mime, question, language):
+def analyze_image_with_groq(image_bytes, mime, question, selected_language="English"):
+    from openai import OpenAI
     import base64
-    b64 = base64.b64encode(image_bytes).decode('utf-8')
+    try:
+        vision_client = OpenAI(
+            base_url="https://openrouter.ai/api/v1",
+            api_key=st.secrets["OPENROUTER_API_KEY"]
+        )
+        b64 = base64.b64encode(image_bytes).decode("utf-8")
 
-    # --- INSANO JAISA SOCHNE WALA PROMPT ---
-    system_prompt = f"""
-    You are a smart human teacher. Look at the image carefully.
+        # --- AUTO AI BRAIN ---
+        lower_q = question.lower()
+        if any(x in lower_q for x in ["exam", "paper", "hal karo", "solve", "question"]):
+            task = "This is an EXAM PAPER. Solve all questions step-by-step simply for a kid."
+        elif any(x in lower_q for x in ["estimate", "bill", "hisab", "total"]):
+            task = "This is an ESTIMATE/BILL. Analyse items, rates and total clearly."
+        else:
+            task = "Explain the image clearly and solve the doubt simply."
 
-    RULE 1: If image is Math, Homework, Science Diagram, or has a Question to solve:
-    - Solve it step-by-step in {language}.
-    - Explain formula and answer clearly.
+        # --- WORLD LANGUAGE FIX ---
+        final_prompt = f"""
+        Task: {task}
+        User Doubt: {question}
 
-    RULE 2: If image is a simple photo (like car, person, city, book cover, no question):
-    - Do NOT give math example r=10.
-    - Describe naturally in {language} in 3-4 lines.
-    - At the end, ask like a human: "Isme aapko aur kya madad chahiye?" in {language}.
+        CRITICAL LANGUAGE RULE:
+        You MUST reply ONLY in "{selected_language}" language.
+        - If selected_language is Hindi, reply in pure Hindi (Devanagari).
+        - If selected_language is Tamil, reply in Tamil.
+        - If selected_language is Urdu, reply in Urdu.
+        - If selected_language is Arabic, reply in Arabic.
+        - NEVER reply in English if another language is selected.
+        - Translate everything including formulas explanation in "{selected_language}".
+        """
 
-    RULE 3: Never repeat same line 3 times. Never add "hi me: Aur koi help chahiye? Main yahan hu..." extra footer.
-    Keep answer short and natural for kids.
-    """
+        completion = vision_client.chat.completions.create(
+            model="meta-llama/llama-4-scout-17b-16e-instruct",
+            messages=[
+                {
+                    "role": "system",
+                    "content": f"You are Clyxess AI tutor. Your output language is strictly {selected_language}. You are forbidden to use English when {selected_language} is not English. You must think and answer in {selected_language} only."
+                },
+                {
+                    "role": "user",
+                    "content": [
+                        {"type": "text", "text": final_prompt},
+                        {"type": "image_url", "image_url": {"url": f"data:{mime};base64,{b64}"}}
+                    ]
+                }
+            ],
+            temperature=0.1,
+            max_tokens=2000
+        )
+        ans = completion.choices[0].message.content
 
-    #... tera baki Groq wala API call same rahega...
-    # bas system_prompt ye wala use karna
-    response = client.chat.completions.create(
-        model="llama-3.2-11b-vision-preview",
-        messages=[
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": [
-                {"type": "text", "text": question},
-                {"type": "image_url", "image_url": {"url": f"data:{mime};base64,{b64}"}}
-            ]}
-        ]
-    )
-    return response.choices[0].message.content
+        # Niche wala help line - ab auto usi language me
+        ans += f"\n\n---\n**{selected_language} me:** Aur koi help chahiye? Main yahan hu aapki madad ke liye! Aap {selected_language} me hi puchiye."
+
+        return ans
+    except Exception as e:
+        return f"Vision error: {e}"
 
 def save_current_chat_cloud():
     if not supabase or not st.session_state.messages:
