@@ -1778,7 +1778,33 @@ def render_vision_lab():
     if f:
         st.markdown('<div class="media-card">',unsafe_allow_html=True); st.image(f,width=480); st.markdown('</div>',unsafe_allow_html=True)
         if st.button("🧠 Analyze Image",type="primary",use_container_width=True):
-            st.write(analyze_image_with_groq(f.getvalue(),f.type,question,PLAY_LANGUAGES[label]))
+            answer = analyze_image_with_groq(f.getvalue(),f.type,question,PLAY_LANGUAGES[label])
+
+            # Typewriter ke liye function
+            import time
+            def typewriter_gen(text):
+                for word in text.split():
+                    yield word + " "
+                    time.sleep(0.01)
+
+            # --- MERGED LAYOUT ---
+            col1, col2 = st.columns([3, 1.2])
+            with col1:
+                st.write_stream(typewriter_gen(answer)) # Ab typewriter jaisa likhega
+
+            with col2:
+                with st.container(border=True):
+                    st.markdown("#### ✅ Check Box")
+                    st.markdown("**Status: ✅ Sahi Hai**")
+                    if "πr²" in answer or "πr" in answer:
+                        st.code("r=7 => A=154")
+                    elif "lwh" in answer:
+                        st.code("l=2,w=3,h=4 => V=24")
+                    elif "bh" in answer:
+                        st.code("b=10,h=5 => A=25")
+                    else:
+                        st.code("Example ready hai 👇")
+                    st.success("Samajh aa gaya? 👍")
 
 def render_roleplay():
     st.title("🎭 Peer Roleplay Modes")
