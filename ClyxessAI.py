@@ -1784,7 +1784,7 @@ def render_vision_lab():
             is_english = "English" in label
 
             # Upar ka header - har language me
-            header = "🔍 चलिए, मैं आपको साफ-साफ बताता हूँ:" if not is_english else "🔍 Let me explain clearly:"
+            header = "🔍 ClyxessChat AI:" if not is_english else "🔍 Let me explain clearly:"
             st.markdown(f"### {header}")
             st.write(answer)
 
