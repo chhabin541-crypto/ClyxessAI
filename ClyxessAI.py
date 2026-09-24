@@ -182,7 +182,7 @@ if prompt := st.chat_input("Apna idea type karein ya draw karein..." if "Creativ
         for word in response.split():
             full_response += word + " "
             message_placeholder.markdown(full_response + "▌")
-            time.sleep(0.03)
+            time.sleep(0.01)
         message_placeholder.markdown(full_response)
         st.caption(f"Mode: {mode} | Age: {current_age} | Model: {used_model}")
 
