@@ -1,6 +1,6 @@
 import streamlit as st
 from groq import Groq
-from supabase import create_client
+from auth import supabase, show_user_sidebar, auth_page
 import datetime, uuid, requests, time, re, os, json, random, base64, urllib.parse
 from typing import Dict, List, Any
 from fpdf import FPDF
@@ -23,7 +23,16 @@ st.set_page_config(
     page_icon="💬",
     layout="wide"
 )
+# ========= LOGIN SYSTEM =========
+show_user_sidebar()
 
+if "user" not in st.session_state:
+    st.session_state.user = None
+
+if st.session_state.user is None:
+    auth_page()
+    st.stop()
+# ========= LOGIN KHATAM, AB TERA CODE =========
 # ============================================================
 # CSS
 # ============================================================
