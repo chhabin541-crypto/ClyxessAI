@@ -1,16 +1,16 @@
 import streamlit as st
+from supabase import create_client, Client
 
-if "user" not in st.session_state:
-    st.session_state.user = None
+def get_supabase() -> Client:
+    # Naya aur Purana dono naam support karega
+    url = st.secrets.get("SUPABASE_URL")
+    key = st.secrets.get("SUPABASE_ANON_KEY") or st.secrets.get("SUPABASE_KEY") or st.secrets.get("SUPABASE_ANON")
+    
+    if not url or not key:
+        return None
+    return create_client(url, key)
 
-def _get_supabase():
-    try:
-        from supabase import create_client
-        url = st.secrets.get("SUPABASE_URL")
-        key = st.secrets.get("SUPABASE_ANON_KEY") or st.secrets.get("SUPABASE_KEY")
-        if not url or not key:
-            return None
-        return create_client(url, key)
+# baaki tera wahi code rahega jo maine diya tha
     except Exception:
         return None
 
