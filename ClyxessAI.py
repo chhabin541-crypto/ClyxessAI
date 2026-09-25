@@ -12,14 +12,15 @@ try:
     from streamlit_mic_recorder import mic_recorder
 except Exception:
     mic_recorder = None
-mic_recorder = None
 
-# --- LOGIN CHECK - YAHAN DALO ---
+# --- LOGIN CHECK ---
 show_user_sidebar()
 if st.session_state.get("user") is None:
     auth_page()
     st.stop()
 # --- LOGIN CHECK END ---
+
+# =============================================
 
 # =============================================
 # ============================================================
