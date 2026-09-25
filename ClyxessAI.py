@@ -1,6 +1,6 @@
 import streamlit as st
 from groq import Groq
-from auth import supabase, show_user_sidebar, auth_page
+from auth import show_user_sidebar, auth_page
 import datetime, uuid, requests, time, re, os, json, random, base64, urllib.parse
 from typing import Dict, List, Any
 from fpdf import FPDF
