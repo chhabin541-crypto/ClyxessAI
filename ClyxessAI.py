@@ -1929,10 +1929,9 @@ with st.sidebar:
         "📋 AI Daily Timetable",
         "📝 Interactive Homework & Test",
         "👨‍👩‍👦 Parent Dashboard", 
-        "👨‍💻Coding Lab",  
+        "👨‍💻 Coding Lab",  
         "🤖 Learn Feature AI"
-        "🧪 Chemistry Lab"
-        "🚀Physics Lab"
+        "🚀 Physics Lab"
         "🔢 Math Lab"
         "💸 Finance Lab"
         "📊 Data Science"
