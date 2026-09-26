@@ -1932,7 +1932,7 @@ with st.sidebar:
         "👨‍💻 Coding Lab",  
         "🖥️ Learn Future AI",  
         "🖥️ Physics Lab",  
-        "🖥️ Math Lab",  
+        "🔢 Math Lab",  
         "🖥️ Learn Finance", 
         "🖥️ Learn Data Science",  
         "🔐 Login / Sign Up"
