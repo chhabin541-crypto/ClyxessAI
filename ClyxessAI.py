@@ -2104,7 +2104,7 @@ with st.sidebar:
 if mode == "🔐 Login / Sign Up":
     render_login_signup(); st.stop()
 if mode == "👨‍💻 Coding Lab":
-    render_coding_lab(); st.stop() 
+    render_coding_lab_mode(); st.stop() 
 if mode == "👨‍👩‍👦 Parent Dashboard":
     render_parent_dashboard(); st.stop()
 if mode == "🎨 Creative AI Image Generator":
