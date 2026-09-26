@@ -1930,7 +1930,7 @@ with st.sidebar:
         "📝 Interactive Homework & Test",
         "👨‍👩‍👦 Parent Dashboard", 
         "🖥️ Coding Lab",  
-        "🖥️ Learn AI",  
+        "🖥️ Learn Future AI",  
         "🖥️ Physics Lab",  
         "🖥️ Math Lab",  
         "🖥️ Learn Finance", 
