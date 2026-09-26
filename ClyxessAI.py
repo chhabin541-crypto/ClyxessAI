@@ -1930,11 +1930,11 @@ with st.sidebar:
         "📝 Interactive Homework & Test",
         "👨‍👩‍👦 Parent Dashboard", 
         "👨‍💻 Coding Lab",  
-        "🖥️ Learn Future AI",  
-        "🖥️ Physics Lab",  
+        "🤖 Learn Deeply Future AI",  
+        "🚀 Physics Lab",  
         "🔢 Math Lab",  
-        "🖥️ Learn Finance", 
-        "🖥️ Learn Data Science",  
+        "💸Learn Finance", 
+        "📈 Learn Data Science",  
         "🔐 Login / Sign Up"
     ])
     st.markdown("---")
