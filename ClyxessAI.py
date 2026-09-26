@@ -1929,12 +1929,14 @@ with st.sidebar:
         "📋 AI Daily Timetable",
         "📝 Interactive Homework & Test",
         "👨‍👩‍👦 Parent Dashboard", 
-        "🖥️ Coding Lab",  
-        "🖥️ Learn Future AI",  
-        "🖥️ Physics Lab",  
-        "🖥️ Math Lab",  
-        "🖥️ Learn Finance", 
-        "🖥️ Learn Data Science", 
+        "👨‍💻Coding Lab",  
+        "🤖 Learn Feature AI"
+        "🧪 Chemistry Lab"
+        "🚀Physics Lab"
+        "🔢 Math Lab"
+        "💸 Finance Lab"
+        "📊 Data Science"
+        "💻 Coding Lab" 
         "🔐 Login / Sign Up"
     ])
     st.markdown("---")
@@ -1949,8 +1951,8 @@ with st.sidebar:
 # ---- routes: one unique screen per feature ----
 if mode == "🔐 Login / Sign Up":
     render_login_signup(); st.stop()
-if mode == "👨‍👩‍👦 Parent Dashboard":
-    render_parent_dashboard(); st.stop() 
+if mode == "👨‍💻 Coding Lab":
+    render_coding_lab(); st.stop() 
 if mode == "👨‍👩‍👦 Parent Dashboard":
     render_parent_dashboard(); st.stop()
 if mode == "🎨 Creative AI Image Generator":
