@@ -2084,7 +2084,7 @@ with st.sidebar:
         "📝 Interactive Homework & Test",
         "👨‍👩‍👦 Parent Dashboard", 
         "👨‍💻 Coding Lab",  
-        "🧠 Learn Deeply Future AI",  
+        "🧠 Learn AI",  
         "🚀 Physics Lab",  
         "🔢 Math Lab",  
         "💸Learn Finance", 
@@ -2103,7 +2103,7 @@ with st.sidebar:
 # ---- routes: one unique screen per feature ----
 if mode == "🔐 Login / Sign Up":
     render_login_signup(); st.stop() 
-if mode == "👨‍👩‍👦 Lean Ai":
+if mode == "👨‍👩‍👦 Learn Ai":
     render_learn_ai(); st.stop()
 if mode == "👨‍💻 Coding Lab":
     render_coding_lab_mod(); st.stop() 
