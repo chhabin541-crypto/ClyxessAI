@@ -4661,7 +4661,7 @@ with st.sidebar:
 # ---- routes: one unique screen per feature ----
 if mode == "🔐 Login / Sign Up":
     render_login_signup(); st.stop() 
-if mode == "🚀 Physics Lab ":
+if mode == "🚀 Physics Lab":
     render_physics_lab(client); st.stop()   
 if mode == "🧠 Learn AI":
     render_learn_ai(client); st.stop()
