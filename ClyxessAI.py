@@ -2283,7 +2283,168 @@ def render_physics_lab(client):
                         reply = "Beta, thodi dikkat aa gayi. Phir se pucho."
                     st.markdown(reply)
                     st.session_state.phy_doubts.append({"role": "assistant", "content": reply})
-                                
+# ============================================================
+# MATH GAME MASTER (DAY 4 - FINAL INTERACTIVE GAME EDITION)
+# ============================================================
+
+def render_math_game(client):
+    # सारे imports फंक्शन के अंदर ही रखे हैं ताकि बाहर कोई conflict न हो
+    import json
+    import re
+    import random
+
+    # JSON साफ करने का हेल्पर फंक्शन (अंदर ही रखा है)
+    def clean_json_text(text):
+        text = text.strip()
+        text = re.sub(r"^```(?:json)?\s*", "", text, flags=re.IGNORECASE)
+        text = re.sub(r"\s*```$", "", text)
+        start = text.find("[")
+        end = text.rfind("]")
+        if start != -1 and end != -1:
+            return text[start:end + 1].strip()
+        start = text.find("{")
+        end = text.rfind("}")
+        if start != -1 and end != -1:
+            return text[start:end + 1].strip()
+        return text
+
+    st.markdown('<div class="header"><h1>🎮 Math Game Master - Clyxess AI School</h1></div>', unsafe_allow_html=True)
+    st.caption("खेलो और सीखो! अपनी क्लास चुनो और AI के बनाए सवालों को हल करो।")
+
+    # 1. क्लास/लेवल चुनना (Adaptive Difficulty)
+    class_level = st.selectbox(
+        "🎓 Select Your Level",
+        [
+            "Class 1-2 (Basic Counting & Shapes)", 
+            "Class 3-5 (Addition, Subtraction, Tables)", 
+            "Class 6-8 (Algebra, Geometry, Logic)", 
+            "Class 9-10 (Advanced Algebra, Trigonometry)", 
+            "Class 11-12 (Calculus, Competitive Math)", 
+            "University (Cryptography, Game Theory, Finance)"
+        ],
+        key="math_game_level"
+    )
+
+    # 2. स्कोर, लाइफ और क्वेश्चन ID सेट करना
+    if "math_game_score" not in st.session_state:
+        st.session_state.math_game_score = 0
+    if "math_game_streak" not in st.session_state:
+        st.session_state.math_game_streak = 0
+    if "math_current_question" not in st.session_state:
+        st.session_state.math_current_question = None
+    if "math_game_answered" not in st.session_state:
+        st.session_state.math_game_answered = False
+    if "math_game_q_id" not in st.session_state:
+        st.session_state.math_game_q_id = 0 # रेडियो बटन रीसेट करने के लिए
+
+    # 3. स्कोरबोर्ड
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.metric("🏆 Total Score", st.session_state.math_game_score)
+    with col2:
+        st.metric("🔥 Streak", f"{st.session_state.math_game_streak} Correct")
+    with col3:
+        st.metric("📚 Level", class_level.split(" ")[0] + " " + class_level.split(" ")[1])
+
+    st.divider()
+
+    # 4. नया सवाल बनाने का फंक्शन (AI के साथ + Fallback)
+    def generate_math_question(level):
+        prompt = f"""
+        You are a fun Math Game Master. Generate ONE multiple-choice math question for a student of level: {level}.
+        The question should be age-appropriate and engaging.
+        - For Class 1-2: Simple counting, shapes, or basic addition (e.g., 2 + 3 = ?).
+        - For Class 3-5: Multiplication tables, simple word problems, fractions.
+        - For Class 6-8: Algebra (solve for x), basic geometry, patterns.
+        - For Class 9-10: Quadratic equations, trigonometry, probability.
+        - For Class 11-12: Calculus (derivatives/integrals), complex numbers, competitive coding math.
+        - For University: RSA encryption math, Game Theory scenarios, Quantitative Finance.
+
+        Provide the response in STRICT JSON format ONLY:
+        {{
+            "question": "The math question text here",
+            "options": ["Option A", "Option B", "Option C", "Option D"],
+            "answer": "The exact correct option (must match one of the options)",
+            "explanation": "A short, simple Hinglish explanation of why this is the answer."
+        }}
+        """
+        try:
+            response = client.chat.completions.create(
+                model="llama-3.3-70b-versatile",
+                messages=[{"role": "user", "content": prompt}],
+                temperature=0.7, max_tokens=800
+            )
+            raw_text = response.choices[0].message.content
+            clean_json = clean_json_text(raw_text)
+            question_data = json.loads(clean_json)
+            
+            if all(k in question_data for k in ["question", "options", "answer", "explanation"]):
+                return question_data
+        except Exception as e:
+            st.warning(f"AI se naya sawal nahi ban paya. Fallback use kar rahe hain.")
+        
+        # Fallback questions (अगर AI फेल हो जाए तो गेम नहीं रुकेगा)
+        fallbacks = {
+            "Class 1-2": {"question": "2 + 3 = ?", "options": ["4", "5", "6", "7"], "answer": "5", "explanation": "2 aur 3 milakar 5 hote hain."},
+            "Class 3-5": {"question": "7 x 8 = ?", "options": ["48", "56", "64", "72"], "answer": "56", "explanation": "7 ko 8 baar jodne par 56 aata hai."},
+            "Class 6-8": {"question": "If 2x + 5 = 15, what is x?", "options": ["5", "10", "15", "20"], "answer": "5", "explanation": "2x = 10, so x = 5."},
+            "Class 9-10": {"question": "What is the value of sin(90°)?", "options": ["0", "0.5", "1", "Undefined"], "answer": "1", "explanation": "Trigonometry me sin(90°) ki value 1 hoti hai."},
+            "Class 11-12": {"question": "What is the derivative of x²?", "options": ["x", "2x", "x³", "2"], "answer": "2x", "explanation": "Power rule ke hisaab se derivative 2x hota hai."},
+            "University": {"question": "In RSA, if p=3 and q=11, what is n?", "options": ["14", "33", "44", "22"], "answer": "33", "explanation": "n = p * q = 3 * 11 = 33."}
+        }
+        level_key = class_level.split(" ")[0] + " " + class_level.split(" ")[1]
+        return fallbacks.get(level_key, fallbacks["Class 6-8"])
+
+    # 5. अगर कोई सवाल नहीं है, तो नया बनाओ
+    if st.session_state.math_current_question is None:
+        with st.spinner("🎲 नया सवाल बन रहा है..."):
+            st.session_state.math_current_question = generate_math_question(class_level)
+            st.session_state.math_game_answered = False
+
+    q = st.session_state.math_current_question
+
+    # 6. सवाल दिखाना (Game UI)
+    st.markdown(f"### ❓ {q['question']}")
+    
+    # ऑप्शन्स को बटन की तरह दिखाना (ID का इस्तेमाल करके रीसेट किया जा रहा है)
+    selected_option = st.radio(
+        "Choose your answer:", 
+        q["options"], 
+        key=f"math_opt_{st.session_state.math_game_q_id}"
+    )
+
+    col_btn1, col_btn2 = st.columns([1, 1])
+    with col_btn1:
+        if st.button("✅ Submit Answer", use_container_width=True):
+            st.session_state.math_game_answered = True
+            if selected_option == q["answer"]:
+                st.session_state.math_game_score += 10
+                st.session_state.math_game_streak += 1
+                st.balloons()
+                st.success(f"🎉 शाबाश! सही जवाब। +10 Points")
+            else:
+                st.session_state.math_game_streak = 0
+                st.error(f"❌ गलत जवाब। सही उत्तर: {q['answer']}")
+            
+            st.info(f"💡 **Explanation:** {q['explanation']}")
+
+    # 7. अगला सवाल बटन
+    if st.session_state.math_game_answered:
+        with col_btn2:
+            if st.button("➡️ Next Question", use_container_width=True, type="primary"):
+                st.session_state.math_current_question = None
+                st.session_state.math_game_answered = False
+                st.session_state.math_game_q_id += 1 # ID बढ़ाओ ताकि रेडियो बटन रीसेट हो जाए
+                st.rerun()
+
+    # 8. रीसेट बटन
+    if st.button("🔄 Reset Game"):
+        st.session_state.math_game_score = 0
+        st.session_state.math_game_streak = 0
+        st.session_state.math_current_question = None
+        st.session_state.math_game_answered = False
+        st.session_state.math_game_q_id += 1
+        st.rerun()                               
 # ============================================================
 # 🤖 CLYXESSCHAT AI — LEARN AI
 # FINAL ADVANCED GLOBAL EDITION
@@ -4661,6 +4822,8 @@ with st.sidebar:
 # ---- routes: one unique screen per feature ----
 if mode == "🔐 Login / Sign Up":
     render_login_signup(); st.stop() 
+if mode == "🔢 Math Lab":
+    render_math_lab(client); st.stop()        
 if mode == "🚀 Physics Lab":
     render_physics_lab(client); st.stop()   
 if mode == "🧠 Learn AI":
