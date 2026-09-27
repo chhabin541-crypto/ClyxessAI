@@ -2033,7 +2033,257 @@ applyAge("5 Years");
 </body>
 </html>
 '''
-    components.html(html_code, height=950, scrolling=False) 
+    components.html(html_code, height=950, scrolling=False)  
+# ============================================================
+# PHYSICS LAB MODULE (DAY 2 - FULL ADVANCED GLOBAL EDITION)
+# Features: Quantum, Space, Robotics, Renewable Energy, 3D Mechanics
+# ============================================================
+
+def render_physics_lab(client):
+    st.markdown('<div class="header"><h1>⚛️ Physics Lab - Clyxess AI School</h1></div>', unsafe_allow_html=True)
+    st.caption("यहाँ बच्चे Virtual Experiments करेंगे, Formulas देखेंगे, Observations लिखेंगे और AI से समझेंगे।")
+
+    # 1. क्लास/लेवल चुनना
+    class_level = st.selectbox(
+        "🎓 Select Class / Level",
+        ["Class 5-6", "Class 7-8", "Class 9-10", "Class 11-12", "University Level"],
+        key="physics_class"
+    )
+
+    # 2. टैब्स बनाना
+    tab1, tab2, tab3, tab4 = st.tabs(["📖 Learn (सीखो)", "🧪 Virtual Lab (प्रयोग)", "🎯 Challenge (टेस्ट)", "💬 Ask a Doubt (सवाल)"])
+
+    # ============================================================
+    # TAB 1: LEARN (कॉन्सेप्ट सीखना)
+    # ============================================================
+    with tab1:
+        st.subheader("📖 Advanced Physics Concepts")
+        topic = st.selectbox(
+            "कौन सा टॉपिक सीखना है?",
+            ["Quantum Computing Basics", "Space Tech & Rocket Science", "Renewable Energy", 
+             "Robotics Simulation", "3D Mechanics", "Newton's Laws of Motion", 
+             "Gravity", "Energy & Work", "Light & Optics", "Sound & Waves"]
+        )
+        if st.button("🚀 Explain this Topic"):
+            with st.spinner("Teacher समझा रहा है..."):
+                prompt = f"""
+                You are a Physics Teacher. Explain '{topic}' to a student of {class_level}.
+                Use simple Hinglish (Hindi + English). Give real-life examples (like cricket, cars, space, robots).
+                Make it engaging, not boring. End with a quick question to check understanding.
+                """
+                try:
+                    response = client.chat.completions.create(
+                        model="llama-3.3-70b-versatile",
+                        messages=[{"role": "user", "content": prompt}],
+                        temperature=0.7, max_tokens=1500
+                    )
+                    st.markdown(response.choices[0].message.content)
+                except Exception:
+                    st.error("Explanation नहीं आ पाया। फिर कोशिश करें।")
+
+    # ============================================================
+    # TAB 2: VIRTUAL LAB (इंटरैक्टिव प्रयोग, Variables, Formulas, Observations)
+    # ============================================================
+    with tab2:
+        st.subheader("🧪 Interactive Virtual Lab")
+        st.write("स्लाइडर घुमाओ, फॉर्मूला देखो और ऑब्जर्वेशन करो!")
+
+        experiment = st.selectbox("प्रयोग चुनें:", 
+            ["Space Tech: Rocket Launch", "Renewable Energy: Solar Power", "Gravity: Weight on Planets"])
+
+        st.markdown("---")
+
+        # --- Experiment A: Rocket Launch (Space Tech) ---
+        if experiment == "Space Tech: Rocket Launch":
+            st.markdown("### 🚀 Experiment: Rocket Launch Simulation")
+            
+            col1, col2 = st.columns(2)
+            with col1:
+                thrust = st.slider("Thrust (बल) in Newtons:", 1000, 50000, 15000)
+            with col2:
+                mass = st.slider("Rocket Mass (वजन) in kg:", 500, 5000, 2000)
+            
+            g = 9.8  # Earth's gravity
+            net_force = thrust - (mass * g)
+            acceleration = net_force / mass
+
+            # Formula Display
+            st.info(f"📐 **Formula:** Acceleration = (Thrust - (Mass × Gravity)) / Mass")
+            st.info(f"📐 **Calculation:** ({thrust} - ({mass} × {g})) / {mass} = **{acceleration:.2f} m/s²**")
+
+            if acceleration > 0:
+                st.success(f"🚀 Rocket उड़ान भर रहा है! Acceleration: {acceleration:.2f} m/s²")
+            else:
+                st.error("❌ Rocket नहीं उड़ पाएगा! Thrust कम है या Mass ज्यादा है।")
+
+            # Observation Section
+            st.markdown("📝 **Observation:**")
+            st.write("जब Thrust बढ़ाते हैं, तो Acceleration बढ़ता है। जब Mass बढ़ाते हैं, तो Acceleration घटता है।")
+            
+            if st.button("AI से समझो (Rocket)"):
+                with st.spinner("AI समझा रहा है..."):
+                    prompt = f"Explain Rocket Launch physics (Thrust, Mass, Acceleration, Net Force) to a {class_level} student in simple Hinglish. The rocket had thrust={thrust}N, mass={mass}kg, giving acceleration={acceleration:.2f} m/s². Explain why it goes up or fails."
+                    try:
+                        response = client.chat.completions.create(
+                            model="llama-3.3-70b-versatile",
+                            messages=[{"role": "user", "content": prompt}],
+                            temperature=0.7, max_tokens=800
+                        )
+                        st.info(response.choices[0].message.content)
+                    except:
+                        st.error("AI बिज़ी है।")
+
+        # --- Experiment B: Solar Power (Renewable Energy) ---
+        elif experiment == "Renewable Energy: Solar Power":
+            st.markdown("### ☀️ Experiment: Solar Panel Output")
+            
+            col1, col2 = st.columns(2)
+            with col1:
+                sunlight = st.slider("Sunlight Intensity (0-100%):", 0, 100, 80)
+            with col2:
+                panel_area = st.slider("Panel Area (sq meters):", 1.0, 10.0, 5.0)
+            
+            efficiency = 0.18  # 18% efficiency
+            energy = sunlight * panel_area * efficiency
+
+            # Formula Display
+            st.info(f"📐 **Formula:** Energy = Sunlight × Area × Efficiency")
+            st.info(f"📐 **Calculation:** {sunlight} × {panel_area} × {efficiency} = **{energy:.2f} kWh**")
+
+            st.metric(label="⚡ Energy Generated", value=f"{energy:.2f} kWh")
+
+            # Observation Section
+            st.markdown("📝 **Observation:**")
+            st.write("धूप तेज़ होगी, तो बिजली ज्यादा बनेगी। पैनल बड़ा होगा, तो बिजली ज्यादा बनेगी।")
+
+            if st.button("AI से समझो (Solar)"):
+                with st.spinner("AI समझा रहा है..."):
+                    prompt = f"Explain Solar Energy and Renewable Energy to a {class_level} student in simple Hinglish. The student got {energy:.2f} kWh with sunlight={sunlight}%, area={panel_area}sqm. Explain why renewable energy is important for Earth."
+                    try:
+                        response = client.chat.completions.create(
+                            model="llama-3.3-70b-versatile",
+                            messages=[{"role": "user", "content": prompt}],
+                            temperature=0.7, max_tokens=800
+                        )
+                        st.info(response.choices[0].message.content)
+                    except:
+                        st.error("AI बिज़ी है।")
+
+        # --- Experiment C: Gravity (Weight on Planets) ---
+        elif experiment == "Gravity: Weight on Planets":
+            st.markdown("### 🌍 Experiment: Weight on Different Planets")
+            mass = st.slider("अपना वजन चुनें (Mass in kg):", 10, 100, 50)
+            
+            planet = st.selectbox(
+                "किस ग्रह पर जाना है?",
+                ["Earth (9.8 m/s²)", "Moon (1.6 m/s²)", "Mars (3.7 m/s²)", "Jupiter (24.8 m/s²)"]
+            )
+            
+            gravity_map = {"Earth (9.8 m/s²)": 9.8, "Moon (1.6 m/s²)": 1.6, "Mars (3.7 m/s²)": 3.7, "Jupiter (24.8 m/s²)": 24.8}
+            gravity = gravity_map[planet]
+            weight = mass * gravity
+
+            st.info(f"📐 **Formula:** Weight = Mass × Gravity")
+            st.metric(label=f"तुम्हारा वजन {planet} पर", value=f"{weight:.2f} N (Newtons)")
+
+            st.markdown("📝 **Observation:**")
+            st.write("Mass हमेशा same रहता है, लेकिन Weight gravity के कारण बदल जाता है।")
+
+            if st.button("AI से समझो (Gravity)"):
+                with st.spinner("AI समझा रहा है..."):
+                    prompt = f"Explain Mass vs Weight to a {class_level} student in simple Hinglish. On {planet}, a {mass}kg student weighs {weight:.2f}N. Explain why weight changes but mass stays the same."
+                    try:
+                        response = client.chat.completions.create(
+                            model="llama-3.3-70b-versatile",
+                            messages=[{"role": "user", "content": prompt}],
+                            temperature=0.7, max_tokens=800
+                        )
+                        st.info(response.choices[0].message.content)
+                    except:
+                        st.error("AI बिज़ी है।")
+
+    # ============================================================
+    # TAB 3: CHALLENGE (टेस्ट और पहेली)
+    # ============================================================
+    with tab3:
+        st.subheader("🎯 Physics Challenge (Advanced)")
+        if st.button("🚀 Start Physics Quiz"):
+            with st.spinner("सवाल बन रहे हैं..."):
+                quiz_prompt = f"""
+                Create 5 multiple-choice questions (MCQs) on Advanced Physics concepts (like Space, Quantum, Energy, Mechanics) for a {class_level} student.
+                Format strictly as JSON:
+                [{{"question":"...", "options":["A","B","C","D"], "answer":"A"}}]
+                Language: Hinglish. Focus on real-life examples.
+                """
+                try:
+                    completion = client.chat.completions.create(
+                        model="llama-3.3-70b-versatile",
+                        messages=[{"role": "user", "content": quiz_prompt}],
+                        temperature=0.5, max_tokens=1500
+                    )
+                    import json
+                    raw_text = completion.choices[0].message.content
+                    start = raw_text.find("["); end = raw_text.rfind("]") + 1
+                    quiz_data = json.loads(raw_text[start:end])
+                    st.session_state.phy_quiz_data = quiz_data
+                    st.session_state.phy_quiz_score = 0
+                    st.session_state.phy_quiz_index = 0
+                except:
+                    st.error("Quiz generate नहीं हो पाया।")
+
+        if "phy_quiz_data" in st.session_state and st.session_state.phy_quiz_data:
+            q_index = st.session_state.phy_quiz_index
+            if q_index < len(st.session_state.phy_quiz_data):
+                q = st.session_state.phy_quiz_data[q_index]
+                st.write(f"**Q{q_index+1}: {q['question']}**")
+                user_ans = st.radio("Choose:", q["options"], key=f"phy_q_{q_index}")
+                if st.button("Submit", key=f"phy_sub_{q_index}"):
+                    if user_ans == q["answer"]:
+                        st.success("✅ सही जवाब! शाबाश!")
+                        st.session_state.phy_quiz_score += 1
+                    else:
+                        st.error(f"❌ गलत। सही जवाब: {q['answer']}")
+                    st.session_state.phy_quiz_index += 1
+                    st.rerun()
+            else:
+                st.balloons()
+                st.success(f"🎉 Quiz पूरा! स्कोर: {st.session_state.phy_quiz_score}/{len(st.session_state.phy_quiz_data)}")
+                if st.button("🔄 फिर से खेलें"):
+                    del st.session_state.phy_quiz_data
+                    st.rerun()
+
+    # ============================================================
+    # TAB 4: ASK A DOUBT (सवाल पूछना)
+    # ============================================================
+    with tab4:
+        st.subheader("💬 Ask an Advanced Physics Doubt")
+        if "phy_doubts" not in st.session_state:
+            st.session_state.phy_doubts = []
+
+        for msg in st.session_state.phy_doubts:
+            with st.chat_message(msg["role"]):
+                st.markdown(msg["content"])
+
+        doubt_input = st.chat_input("कोई भी Physics का सवाल पूछो (Space, Quantum, Energy, etc.)...")
+        if doubt_input:
+            st.session_state.phy_doubts.append({"role": "user", "content": doubt_input})
+            with st.chat_message("user"):
+                st.markdown(doubt_input)
+            with st.chat_message("assistant"):
+                with st.spinner("Teacher soch raha hai..."):
+                    prompt = f"You are a loving Physics Teacher. Answer this doubt for a {class_level} student in simple Hinglish: {doubt_input}"
+                    try:
+                        response = client.chat.completions.create(
+                            model="llama-3.3-70b-versatile",
+                            messages=[{"role": "system", "content": prompt}] + st.session_state.phy_doubts[-4:],
+                            temperature=0.7, max_tokens=1000
+                        )
+                        reply = response.choices[0].message.content
+                    except:
+                        reply = "Beta, thodi dikkat aa gayi. Phir se pucho."
+                    st.markdown(reply)
+                    st.session_state.phy_doubts.append({"role": "assistant", "content": reply})
+                                
 # ============================================================
 # 🤖 CLYXESSCHAT AI — LEARN AI
 # FINAL ADVANCED GLOBAL EDITION
@@ -4395,7 +4645,7 @@ with st.sidebar:
         "🧠 Learn AI",  
         "🚀 Physics Lab",  
         "🔢 Math Lab",  
-        "💸Learn Finance", 
+        "💸 Learn Finance", 
         "📈 Learn Data Science",  
         "🔐 Login / Sign Up"
     ])
@@ -4411,6 +4661,8 @@ with st.sidebar:
 # ---- routes: one unique screen per feature ----
 if mode == "🔐 Login / Sign Up":
     render_login_signup(); st.stop() 
+if mode == "🚀 Physics Lab ":
+    render_physics_lab(client); st.stop()   
 if mode == "🧠 Learn AI":
     render_learn_ai(client); st.stop()
 if mode == "👨‍💻 Coding Lab":
