@@ -2287,7 +2287,7 @@ def render_physics_lab(client):
 # MATH GAME MASTER (DAY 4 - FINAL INTERACTIVE GAME EDITION)
 # ============================================================
 
-def render_math_game(client):
+def render_math_lab(client):
     # सारे imports फंक्शन के अंदर ही रखे हैं ताकि बाहर कोई conflict न हो
     import json
     import re
