@@ -2284,88 +2284,178 @@ def render_physics_lab(client):
                     st.markdown(reply)
                     st.session_state.phy_doubts.append({"role": "assistant", "content": reply})
 # ============================================================
-# MATH GAME MASTER (DAY 4 - FINAL INTERACTIVE GAME EDITION)
+# MATH GAME MASTER (GLOBAL MULTILINGUAL EDITION)
 # ============================================================
 
 def render_math_lab(client):
-    # सारे imports फंक्शन के अंदर ही रखे हैं ताकि बाहर कोई conflict न हो
     import json
     import re
     import random
 
-    # JSON साफ करने का हेल्पर फंक्शन (अंदर ही रखा है)
     def clean_json_text(text):
         text = text.strip()
         text = re.sub(r"^```(?:json)?\s*", "", text, flags=re.IGNORECASE)
         text = re.sub(r"\s*```$", "", text)
         start = text.find("[")
         end = text.rfind("]")
-        if start != -1 and end != -1:
-            return text[start:end + 1].strip()
+        if start != -1 and end != -1: return text[start:end + 1].strip()
         start = text.find("{")
         end = text.rfind("}")
-        if start != -1 and end != -1:
-            return text[start:end + 1].strip()
+        if start != -1 and end != -1: return text[start:end + 1].strip()
         return text
 
-    st.markdown('<div class="header"><h1>🎮 Math Game Master - Clyxess AI School</h1></div>', unsafe_allow_html=True)
-    st.caption("खेलो और सीखो! अपनी क्लास चुनो और AI के बनाए सवालों को हल करो।")
+    # ============================================================
+    # 1. 50+ LANGUAGES LIST (Global & Indian)
+    # ============================================================
+    LANGUAGES = {
+        "🇬🇧 English": "en",
+        "🇮🇳 हिंदी (Hindi)": "hi",
+        "🇮🇳 বাংলা (Bengali)": "bn",
+        "🇮🇳 मराठी (Marathi)": "mr",
+        "🇮🇳 తెలుగు (Telugu)": "te",
+        "🇮🇳 தமிழ் (Tamil)": "ta",
+        "🇮🇳 ગુજરાતી (Gujarati)": "gu",
+        "🇮🇳 ಕನ್ನಡ (Kannada)": "kn",
+        "🇮🇳 മലയാളം (Malayalam)": "ml",
+        "🇮🇳 ଓଡ଼ିଆ (Odia)": "or",
+        "🇮🇳 ਪੰਜਾਬੀ (Punjabi)": "pa",
+        "🇮🇳 অসমীয়া (Assamese)": "as",
+        "🇮🇳 اردو (Urdu)": "ur",
+        "🇨🇳 中文 (Chinese)": "zh",
+        "🇯🇵 日本語 (Japanese)": "ja",
+        "🇰🇷 한국어 (Korean)": "ko",
+        "🇪🇸 Español (Spanish)": "es",
+        "🇫🇷 Français (French)": "fr",
+        "🇩🇪 Deutsch (German)": "de",
+        "🇸🇦 العربية (Arabic)": "ar",
+        "🇵🇹 Português (Portuguese)": "pt",
+        "🇷🇺 Русский (Russian)": "ru",
+        "🇮🇹 Italiano (Italian)": "it",
+        "🇹🇷 Türkçe (Turkish)": "tr",
+        "🇮🇩 Bahasa Indonesia": "id",
+        "🇲🇾 Bahasa Melayu": "ms",
+        "🇹🇭 ไทย (Thai)": "th",
+        "🇻🇳 Tiếng Việt (Vietnamese)": "vi",
+        "🇳🇱 Nederlands (Dutch)": "nl",
+        "🇵🇱 Polski (Polish)": "pl",
+        "🇺🇦 Українська (Ukrainian)": "uk",
+        "🇮🇷 فارسی (Persian)": "fa",
+        "🇵🇭 Tagalog (Filipino)": "tl",
+        "🇲🇲 မြန်မာ (Burmese)": "my",
+        "🇬🇷 Ελληνικά (Greek)": "el",
+        "🇸🇪 Svenska (Swedish)": "sv",
+        "🇳🇴 Norsk (Norwegian)": "no",
+        "🇩🇰 Dansk (Danish)": "da",
+        "🇫🇮 Suomi (Finnish)": "fi",
+        "🇷🇴 Română (Romanian)": "ro",
+        "🇭🇺 Magyar (Hungarian)": "hu",
+        "🇨🇿 Čeština (Czech)": "cs",
+        "🇮🇱 עברית (Hebrew)": "he",
+        "🇿🇦 Zulu": "zu",
+        "🇰🇪 Swahili": "sw",
+        "🇳🇬 Yoruba": "yo",
+        "🇵🇰 پښتو (Pashto)": "ps",
+        "🇱🇰 සිංහල (Sinhala)": "si",
+        "🇳🇵 नेपाली (Nepali)": "ne"
+    }
+    
+    # UI का अनुवाद (Top 10 भाषाओं के लिए)
+    UI_TEXTS = {
+        "en": {"title": "Math Game Master", "score": "Total Score", "streak": "Streak", "level": "Level", "submit": "Submit Answer", "next": "Next Question", "reset": "Reset Game", "correct": "Correct!", "wrong": "Wrong! Correct answer:", "explain": "Explanation:"},
+        "hi": {"title": "गणित गेम मास्टर", "score": "कुल स्कोर", "streak": "लगातार सही", "level": "स्तर", "submit": "उत्तर जमा करें", "next": "अगला सवाल", "reset": "गेम रीसेट करें", "correct": "शाबाश! सही जवाब!", "wrong": "गलत जवाब। सही उत्तर:", "explain": "व्याख्या:"},
+        "bn": {"title": "গণিত গেম মাস্টার", "score": "মোট স্কোর", "streak": "স্ট্রিক", "level": "স্তর", "submit": "উত্তর জমা দিন", "next": "পরবর্তী প্রশ্ন", "reset": "গেম রিসেট করুন", "correct": "সঠিক!", "wrong": "ভুল! সঠিক উত্তর:", "explain": "ব্যাখ্যা:"},
+        "ta": {"title": "கணித விளையாட்டு மாஸ்டர்", "score": "மொத்த மதிப்பெண்", "streak": "தொடர் வெற்றி", "level": "நிலை", "submit": "பதிலை சமர்ப்பிக்கவும்", "next": "அடுத்த கேள்வி", "reset": "விளையாட்டை மீட்டமைக்கவும்", "correct": "சரி!", "wrong": "தவறு! சரியான பதில்:", "explain": "விளக்கம்:"},
+        "te": {"title": "గణిత గేమ్ మాస్టర్", "score": "మొత్తం స్కోరు", "streak": "వరుస విజయాలు", "level": "స్థాయి", "submit": "సమాధానం సమర్పించండి", "next": "తదుపరి ప్రశ్న", "reset": "గేమ్ రీసెట్ చేయండి", "correct": "సరైనది!", "wrong": "తప్పు! సరైన సమాధానం:", "explain": "వివరణ:"},
+        "mr": {"title": "गणित गेम मास्टर", "score": "एकूण गुण", "streak": "स्ट्रीक", "level": "स्तर", "submit": "उत्तर सबमिट करा", "next": "पुढील प्रश्न", "reset": "गेम रीसेट करा", "correct": "बरोबर!", "wrong": "चूक! बरोबर उत्तर:", "explain": "स्पष्टीकरण:"},
+        "zh": {"title": "数学游戏大师", "score": "总分", "streak": "连胜", "level": "等级", "submit": "提交答案", "next": "下一题", "reset": "重置游戏", "correct": "正确!", "wrong": "错误! 正确答案:", "explain": "解释:"},
+        "ja": {"title": "数学ゲームマスター", "score": "合計スコア", "streak": "連続正解", "level": "レベル", "submit": "回答を送信", "next": "次の問題", "reset": "ゲームをリセット", "correct": "正解!", "wrong": "不正解! 正しい答え:", "explain": "解説:"},
+        "es": {"title": "Maestro de Matemáticas", "score": "Puntuación Total", "streak": "Racha", "level": "Nivel", "submit": "Enviar Respuesta", "next": "Siguiente Pregunta", "reset": "Reiniciar Juego", "correct": "¡Correcto!", "wrong": "¡Incorrecto! Respuesta correcta:", "explain": "Explicación:"},
+        "fr": {"title": "Maître des Maths", "score": "Score Total", "streak": "Série", "level": "Niveau", "submit": "Soumettre la Réponse", "next": "Question Suivante", "reset": "Réinitialiser le Jeu", "correct": "Correct!", "wrong": "Incorrect! Bonne réponse:", "explain": "Explication:"}
+    }
 
-    # 1. क्लास/लेवल चुनना (Adaptive Difficulty)
-    class_level = st.selectbox(
-        "🎓 Select Your Level",
-        [
-            "Class 1-2 (Basic Counting & Shapes)", 
-            "Class 3-5 (Addition, Subtraction, Tables)", 
-            "Class 6-8 (Algebra, Geometry, Logic)", 
-            "Class 9-10 (Advanced Algebra, Trigonometry)", 
-            "Class 11-12 (Calculus, Competitive Math)", 
-            "University (Cryptography, Game Theory, Finance)"
-        ],
-        key="math_game_level"
-    )
+    # ============================================================
+    # 2. LANGUAGE & LEVEL SELECTION
+    # ============================================================
+    col_lang, col_level = st.columns([1, 2])
+    with col_lang:
+        selected_lang_label = st.selectbox("🌐 Language", list(LANGUAGES.keys()), key="math_lang_select")
+        lang_code = LANGUAGES[selected_lang_label]
+    
+    with col_level:
+        class_level = st.selectbox(
+            "🎓 Select Your Level",
+            ["Class 1-2", "Class 3-5", "Class 6-8", "Class 9-10", "Class 11-12", "University"],
+            key="math_game_level"
+        )
 
-    # 2. स्कोर, लाइफ और क्वेश्चन ID सेट करना
-    if "math_game_score" not in st.session_state:
-        st.session_state.math_game_score = 0
-    if "math_game_streak" not in st.session_state:
-        st.session_state.math_game_streak = 0
-    if "math_current_question" not in st.session_state:
-        st.session_state.math_current_question = None
-    if "math_game_answered" not in st.session_state:
-        st.session_state.math_game_answered = False
-    if "math_game_q_id" not in st.session_state:
-        st.session_state.math_game_q_id = 0 # रेडियो बटन रीसेट करने के लिए
+    # UI टेक्स्ट लोड करना (अगर भाषा नहीं मिली तो English)
+    t = UI_TEXTS.get(lang_code, UI_TEXTS["en"])
+    is_junior = class_level.startswith(("Class 1-2", "Class 3-5", "Class 6-8"))
 
-    # 3. स्कोरबोर्ड
+    # ============================================================
+    # 3. CSS THEME (Adaptive for Kids vs Teens)
+    # ============================================================
+    if is_junior:
+        st.markdown("""
+        <style>
+        .stApp { background-color: #131F24; }
+        .header-box { background: linear-gradient(90deg, #6a11cb 0%, #2575fc 100%); padding: 15px; border-radius: 15px; color: white; text-align: center; }
+        .metric-card { background: #1e1e2f; border: 2px solid #333; border-radius: 15px; padding: 15px; text-align: center; color: white; }
+        .question-card { background: linear-gradient(135deg, #1f1c2c, #3b3b5c); padding: 25px; border-radius: 15px; border: 1px solid #444; margin: 20px 0; text-align: center; }
+        .question-text { font-size: 26px; font-weight: bold; color: #fff; }
+        .feedback-success { background-color: #D7FFB8; color: #2E7D32; padding: 15px; border-radius: 15px; text-align: center; font-weight: bold; }
+        .feedback-error { background-color: #FFDFE0; color: #C62828; padding: 15px; border-radius: 15px; text-align: center; font-weight: bold; }
+        </style>
+        """, unsafe_allow_html=True)
+        header_title = f"🎮 {t['title']}"
+    else:
+        st.markdown("""
+        <style>
+        .stApp { background-color: #0E1117; }
+        .header-box { background: #1E293B; padding: 20px; border-radius: 8px; border-left: 5px solid #3B82F6; color: white; }
+        .metric-card { background: #1E293B; border: 1px solid #334155; border-radius: 8px; padding: 15px; color: #94A3B8; text-align: left; }
+        .metric-value { font-size: 24px; font-weight: bold; color: #3B82F6; font-family: monospace; }
+        .question-card { background: #1E293B; padding: 30px; border-radius: 8px; border: 1px solid #334155; margin: 20px 0; }
+        .question-text { font-size: 22px; font-weight: 500; color: #F8FAFC; font-family: 'Inter', sans-serif; }
+        .feedback-success { background-color: #064E3B; color: #34D399; padding: 15px; border-radius: 8px; border-left: 4px solid #10B981; }
+        .feedback-error { background-color: #450A0A; color: #F87171; padding: 15px; border-radius: 8px; border-left: 4px solid #EF4444; }
+        </style>
+        """, unsafe_allow_html=True)
+        header_title = f"📊 {t['title']}"
+
+    st.markdown(f'<div class="header-box"><h2>{header_title}</h2></div>', unsafe_allow_html=True)
+
+    # ============================================================
+    # 4. STATE & DASHBOARD
+    # ============================================================
+    if "math_game_score" not in st.session_state: st.session_state.math_game_score = 0
+    if "math_game_streak" not in st.session_state: st.session_state.math_game_streak = 0
+    if "math_current_question" not in st.session_state: st.session_state.math_current_question = None
+    if "math_game_answered" not in st.session_state: st.session_state.math_game_answered = False
+    if "math_game_q_id" not in st.session_state: st.session_state.math_game_q_id = 0
+
     col1, col2, col3 = st.columns(3)
-    with col1:
-        st.metric("🏆 Total Score", st.session_state.math_game_score)
-    with col2:
-        st.metric("🔥 Streak", f"{st.session_state.math_game_streak} Correct")
-    with col3:
-        st.metric("📚 Level", class_level.split(" ")[0] + " " + class_level.split(" ")[1])
+    with col1: st.markdown(f'<div class="metric-card">🏆 {t["score"]}<br><span class="metric-value">{st.session_state.math_game_score}</span></div>', unsafe_allow_html=True)
+    with col2: st.markdown(f'<div class="metric-card">🔥 {t["streak"]}<br><span class="metric-value">{st.session_state.math_game_streak}</span></div>', unsafe_allow_html=True)
+    with col3: st.markdown(f'<div class="metric-card">📚 {t["level"]}<br><span class="metric-value" style="font-size:16px;">{class_level}</span></div>', unsafe_allow_html=True)
 
-    st.divider()
+    st.write("")
 
-    # 4. नया सवाल बनाने का फंक्शन (AI के साथ + Fallback)
-    def generate_math_question(level):
+    # ============================================================
+    # 5. AI QUESTION GENERATION (IN SELECTED LANGUAGE)
+    # ============================================================
+    def generate_math_question(level, is_junior, lang_name):
+        tone = "fun and engaging" if is_junior else "professional and challenging"
         prompt = f"""
-        You are a fun Math Game Master. Generate ONE multiple-choice math question for a student of level: {level}.
-        The question should be age-appropriate and engaging.
-        - For Class 1-2: Simple counting, shapes, or basic addition (e.g., 2 + 3 = ?).
-        - For Class 3-5: Multiplication tables, simple word problems, fractions.
-        - For Class 6-8: Algebra (solve for x), basic geometry, patterns.
-        - For Class 9-10: Quadratic equations, trigonometry, probability.
-        - For Class 11-12: Calculus (derivatives/integrals), complex numbers, competitive coding math.
-        - For University: RSA encryption math, Game Theory scenarios, Quantitative Finance.
-
+        You are an expert Math Tutor. Generate ONE multiple-choice math question for a student of level: {level}.
+        The tone should be {tone}.
+        IMPORTANT: The question, options, and explanation MUST be in this language: {lang_name}.
         Provide the response in STRICT JSON format ONLY:
         {{
-            "question": "The math question text here",
+            "question": "The math question in {lang_name}",
             "options": ["Option A", "Option B", "Option C", "Option D"],
-            "answer": "The exact correct option (must match one of the options)",
-            "explanation": "A short, simple Hinglish explanation of why this is the answer."
+            "answer": "The exact correct option",
+            "explanation": "Short explanation in {lang_name}."
         }}
         """
         try:
@@ -2377,74 +2467,75 @@ def render_math_lab(client):
             raw_text = response.choices[0].message.content
             clean_json = clean_json_text(raw_text)
             question_data = json.loads(clean_json)
-            
             if all(k in question_data for k in ["question", "options", "answer", "explanation"]):
                 return question_data
-        except Exception as e:
-            st.warning(f"AI se naya sawal nahi ban paya. Fallback use kar rahe hain.")
+        except Exception:
+            pass
         
-        # Fallback questions (अगर AI फेल हो जाए तो गेम नहीं रुकेगा)
+        # Fallback (in English if AI fails)
         fallbacks = {
-            "Class 1-2": {"question": "2 + 3 = ?", "options": ["4", "5", "6", "7"], "answer": "5", "explanation": "2 aur 3 milakar 5 hote hain."},
-            "Class 3-5": {"question": "7 x 8 = ?", "options": ["48", "56", "64", "72"], "answer": "56", "explanation": "7 ko 8 baar jodne par 56 aata hai."},
-            "Class 6-8": {"question": "If 2x + 5 = 15, what is x?", "options": ["5", "10", "15", "20"], "answer": "5", "explanation": "2x = 10, so x = 5."},
-            "Class 9-10": {"question": "What is the value of sin(90°)?", "options": ["0", "0.5", "1", "Undefined"], "answer": "1", "explanation": "Trigonometry me sin(90°) ki value 1 hoti hai."},
-            "Class 11-12": {"question": "What is the derivative of x²?", "options": ["x", "2x", "x³", "2"], "answer": "2x", "explanation": "Power rule ke hisaab se derivative 2x hota hai."},
-            "University": {"question": "In RSA, if p=3 and q=11, what is n?", "options": ["14", "33", "44", "22"], "answer": "33", "explanation": "n = p * q = 3 * 11 = 33."}
+            "Class 1-2": {"question": "2 + 3 = ?", "options": ["4", "5", "6", "7"], "answer": "5", "explanation": "2 + 3 = 5"},
+            "Class 3-5": {"question": "7 x 8 = ?", "options": ["48", "56", "64", "72"], "answer": "56", "explanation": "7 x 8 = 56"},
+            "Class 6-8": {"question": "If 2x + 5 = 15, what is x?", "options": ["5", "10", "15", "20"], "answer": "5", "explanation": "2x = 10, x = 5"},
+            "Class 9-10": {"question": "sin(90°) = ?", "options": ["0", "0.5", "1", "Undefined"], "answer": "1", "explanation": "sin(90°) = 1"},
+            "Class 11-12": {"question": "Derivative of x²?", "options": ["x", "2x", "x³", "2"], "answer": "2x", "explanation": "d/dx(x²) = 2x"},
+            "University": {"question": "RSA: p=3, q=11, n=?", "options": ["14", "33", "44", "22"], "answer": "33", "explanation": "n = p*q = 33"}
         }
-        level_key = class_level.split(" ")[0] + " " + class_level.split(" ")[1]
-        return fallbacks.get(level_key, fallbacks["Class 6-8"])
+        return fallbacks.get(class_level, fallbacks["Class 6-8"])
 
-    # 5. अगर कोई सवाल नहीं है, तो नया बनाओ
     if st.session_state.math_current_question is None:
-        with st.spinner("🎲 नया सवाल बन रहा है..."):
-            st.session_state.math_current_question = generate_math_question(class_level)
+        with st.spinner("Generating..." if not is_junior else "🎲 नया सवाल बन रहा है..."):
+            st.session_state.math_current_question = generate_math_question(class_level, is_junior, selected_lang_label)
             st.session_state.math_game_answered = False
 
     q = st.session_state.math_current_question
 
-    # 6. सवाल दिखाना (Game UI)
-    st.markdown(f"### ❓ {q['question']}")
-    
-    # ऑप्शन्स को बटन की तरह दिखाना (ID का इस्तेमाल करके रीसेट किया जा रहा है)
-    selected_option = st.radio(
-        "Choose your answer:", 
-        q["options"], 
-        key=f"math_opt_{st.session_state.math_game_q_id}"
-    )
+    # ============================================================
+    # 6. QUESTION DISPLAY & SUBMISSION
+    # ============================================================
+    st.markdown(f'<div class="question-card"><div class="question-text">{q["question"]}</div></div>', unsafe_allow_html=True)
+
+    selected_option = st.radio("Choose:", q["options"], key=f"math_opt_{st.session_state.math_game_q_id}", label_visibility="collapsed")
 
     col_btn1, col_btn2 = st.columns([1, 1])
     with col_btn1:
-        if st.button("✅ Submit Answer", use_container_width=True):
-            st.session_state.math_game_answered = True
-            if selected_option == q["answer"]:
-                st.session_state.math_game_score += 10
-                st.session_state.math_game_streak += 1
-                st.balloons()
-                st.success(f"🎉 शाबाश! सही जवाब। +10 Points")
-            else:
-                st.session_state.math_game_streak = 0
-                st.error(f"❌ गलत जवाब। सही उत्तर: {q['answer']}")
-            
-            st.info(f"💡 **Explanation:** {q['explanation']}")
-
-    # 7. अगला सवाल बटन
-    if st.session_state.math_game_answered:
-        with col_btn2:
-            if st.button("➡️ Next Question", use_container_width=True, type="primary"):
-                st.session_state.math_current_question = None
-                st.session_state.math_game_answered = False
-                st.session_state.math_game_q_id += 1 # ID बढ़ाओ ताकि रेडियो बटन रीसेट हो जाए
+        if not st.session_state.math_game_answered:
+            if st.button(f"✅ {t['submit']}", use_container_width=True, type="primary"):
+                st.session_state.math_game_answered = True
+                if selected_option == q["answer"]:
+                    st.session_state.math_game_score += 10
+                    st.session_state.math_game_streak += 1
+                    if is_junior: st.balloons()
+                else:
+                    st.session_state.math_game_streak = 0
                 st.rerun()
 
-    # 8. रीसेट बटन
-    if st.button("🔄 Reset Game"):
+    # ============================================================
+    # 7. FEEDBACK & NEXT
+    # ============================================================
+    if st.session_state.math_game_answered:
+        if selected_option == q["answer"]:
+            st.markdown(f'<div class="feedback-success">✅ {t["correct"]} +10</div>', unsafe_allow_html=True)
+        else:
+            st.markdown(f'<div class="feedback-error">❌ {t["wrong"]} {q["answer"]}</div>', unsafe_allow_html=True)
+        
+        st.info(f"💡 **{t['explain']}** {q['explanation']}")
+        
+        with col_btn2:
+            if st.button(f"➡️ {t['next']}", use_container_width=True, type="primary"):
+                st.session_state.math_current_question = None
+                st.session_state.math_game_answered = False
+                st.session_state.math_game_q_id += 1
+                st.rerun()
+
+    st.divider()
+    if st.button(f"🔄 {t['reset']}", use_container_width=True):
         st.session_state.math_game_score = 0
         st.session_state.math_game_streak = 0
         st.session_state.math_current_question = None
         st.session_state.math_game_answered = False
         st.session_state.math_game_q_id += 1
-        st.rerun()                               
+        st.rerun()                              
 # ============================================================
 # 🤖 CLYXESSCHAT AI — LEARN AI
 # FINAL ADVANCED GLOBAL EDITION
