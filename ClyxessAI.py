@@ -2033,7 +2033,287 @@ applyAge("5 Years");
 </body>
 </html>
 '''
-    components.html(html_code, height=950, scrolling=False)  
+    components.html(html_code, height=950, scrolling=False) 
+# ============================================================
+# FINTECH & GLOBAL ECONOMICS LAB (GLOBAL LANGUAGE & BANKING)
+# ============================================================
+
+def render_learn_finance(client):
+    import json
+    import re
+    import random
+
+    def clean_json_text(text):
+        text = text.strip()
+        text = re.sub(r"^```(?:json)?\s*", "", text, flags=re.IGNORECASE)
+        text = re.sub(r"\s*```$", "", text)
+        start = text.find("{"); end = text.rfind("}")
+        if start != -1 and end != -1: return text[start:end + 1].strip()
+        return text
+
+    # ============================================================
+    # 1. 50+ LANGUAGES LIST
+    # ============================================================
+    LANGUAGES = {
+        "🇬🇧 English": "en",
+        "🇮🇳 हिंदी (Hindi)": "hi",
+        "🇮🇳 বাংলা (Bengali)": "bn",
+        "🇮🇳 मराठी (Marathi)": "mr",
+        "🇮🇳 తెలుగు (Telugu)": "te",
+        "🇮🇳 தமிழ் (Tamil)": "ta",
+        "🇮🇳 ગુજરાતી (Gujarati)": "gu",
+        "🇮🇳 ಕನ್ನಡ (Kannada)": "kn",
+        "🇮🇳 മലയാളം (Malayalam)": "ml",
+        "🇮🇳 ଓଡ଼ିଆ (Odia)": "or",
+        "🇮🇳 ਪੰਜਾਬੀ (Punjabi)": "pa",
+        "🇮🇳 অসমীয়া (Assamese)": "as",
+        "🇮🇳 اردو (Urdu)": "ur",
+        "🇨🇳 中文 (Chinese)": "zh",
+        "🇯🇵 日本語 (Japanese)": "ja",
+        "🇰🇷 한국어 (Korean)": "ko",
+        "🇪🇸 Español (Spanish)": "es",
+        "🇫🇷 Français (French)": "fr",
+        "🇩🇪 Deutsch (German)": "de",
+        "🇸🇦 العربية (Arabic)": "ar",
+        "🇵🇹 Português (Portuguese)": "pt",
+        "🇷🇺 Русский (Russian)": "ru",
+        "🇮🇹 Italiano (Italian)": "it",
+        "🇹🇷 Türkçe (Turkish)": "tr",
+        "🇮🇩 Bahasa Indonesia": "id",
+        "🇲🇾 Bahasa Melayu": "ms",
+        "🇹🇭 ไทย (Thai)": "th",
+        "🇻🇳 Tiếng Việt (Vietnamese)": "vi",
+        "🇳🇱 Nederlands (Dutch)": "nl",
+        "🇵🇱 Polski (Polish)": "pl",
+        "🇺🇦 Українська (Ukrainian)": "uk",
+        "🇮🇷 فارسی (Persian)": "fa",
+        "🇵🇭 Tagalog (Filipino)": "tl",
+        "🇲🇲 မြန်မာ (Burmese)": "my",
+        "🇬🇷 Ελληνικά (Greek)": "el",
+        "🇸🇪 Svenska (Swedish)": "sv",
+        "🇳🇴 Norsk (Norwegian)": "no",
+        "🇩🇰 Dansk (Danish)": "da",
+        "🇫🇮 Suomi (Finnish)": "fi",
+        "🇷🇴 Română (Romanian)": "ro",
+        "🇭🇺 Magyar (Hungarian)": "hu",
+        "🇨🇿 Čeština (Czech)": "cs",
+        "🇮🇱 עברית (Hebrew)": "he",
+        "🇿🇦 Zulu": "zu",
+        "🇰🇪 Swahili": "sw",
+        "🇳🇬 Yoruba": "yo",
+        "🇵🇰 پښتو (Pashto)": "ps",
+        "🇱🇰 සිංහල (Sinhala)": "si",
+        "🇳🇵 नेपाली (Nepali)": "ne"
+    }
+
+    # UI TRANSLATION (Major Languages)
+    UI_TEXTS = {
+        "en": {"title": "FinTech Lab", "learn": "Learn Finance", "market": "Virtual Stock Market", "banking": "Banking System", "startup": "Startup & Web3", "cash": "Cash Balance", "portfolio": "Portfolio Value", "networth": "Net Worth", "deposit": "Deposit", "withdraw": "Withdraw", "loan": "Take Loan", "repay": "Repay Loan", "buy": "Buy", "sell": "Sell", "lang": "Language"},
+        "hi": {"title": "फिनटेक लैब", "learn": "फाइनेंस सीखें", "market": "वर्चुअल स्टॉक मार्केट", "banking": "बैंकिंग सिस्टम", "startup": "स्टार्टअप और वेब3", "cash": "कैश बैलेंस", "portfolio": "पोर्टफोलियो वैल्यू", "networth": "कुल संपत्ति", "deposit": "जमा करें", "withdraw": "निकालें", "loan": "लोन लें", "repay": "लोन चुकाएं", "buy": "खरीदें", "sell": "बेचें", "lang": "भाषा"},
+        "bn": {"title": "ফিনটেক ল্যাব", "learn": "ফিনান্স শিখুন", "market": "ভার্চুয়াল স্টক মার্কেট", "banking": "ব্যাংকিং সিস্টেম", "startup": "স্টার্টআপ এবং ওয়েব3", "cash": "নগদ ব্যালেন্স", "portfolio": "পোর্টফোলিও মূল্য", "networth": "মোট সম্পদ", "deposit": "জমা করুন", "withdraw": "উত্তোলন করুন", "loan": "ঋণ নিন", "repay": "ঋণ পরিশোধ করুন", "buy": "কিনুন", "sell": "বিক্রয় করুন", "lang": "ভাষা"},
+        "ta": {"title": "ஃபின்டெக் லேப்", "learn": "நிதி கற்க", "market": "மெய்நிகர் பங்குச் சந்தை", "banking": "வங்கி அமைப்பு", "startup": "ஸ்டார்ட்அப் & வெப்3", "cash": "பண இருப்பு", "portfolio": "போர்ட்ஃபோலியோ மதிப்பு", "networth": "நிகர மதிப்பு", "deposit": "வைப்பு", "withdraw": "எடு", "loan": "கடன் பெறு", "repay": "கடன் திரும்பச் செலுத்து", "buy": "வாங்கு", "sell": "விற்", "lang": "மொழி"},
+        "te": {"title": "ఫిన్టెక్ ల్యాబ్", "learn": "ఫైనాన్స్ నేర్చుకో", "market": "వర్చువల్ స్టాక్ మార్కెట్", "banking": "బ్యాంకింగ్ సిస్టమ్", "startup": "స్టార్టప్ & వెబ్3", "cash": "నగదు నిల్వ", "portfolio": "పోర్ట్ఫోలియో విలువ", "networth": "నికర విలువ", "deposit": "జమ", "withdraw": "విత్డ్రా", "loan": "రుణం తీసుకో", "repay": "రుణం తిరిగి చెల్లించు", "buy": "కొనుగోలు", "sell": "అమ్మకం", "lang": "భాష"},
+        "mr": {"title": "फिनटेक लॅब", "learn": "फायनान्स शिका", "market": "व्हर्च्युअल स्टॉक मार्केट", "banking": "बँकिंग सिस्टम", "startup": "स्टार्टअप आणि वेब3", "cash": "रोख शिल्लक", "portfolio": "पोर्टफोलिओ मूल्य", "networth": "निव्वळ संपत्ती", "deposit": "जमा करा", "withdraw": "काढा", "loan": "कर्ज घ्या", "repay": "कर्ज परत करा", "buy": "खरेदी करा", "sell": "विक्री करा", "lang": "भाषा"},
+        "zh": {"title": "金融科技实验室", "learn": "学习金融", "market": "虚拟股票市场", "banking": "银行系统", "startup": "初创企业与Web3", "cash": "现金余额", "portfolio": "投资组合价值", "networth": "净资产", "deposit": "存款", "withdraw": "取款", "loan": "贷款", "repay": "还款", "buy": "买入", "sell": "卖出", "lang": "语言"},
+        "ja": {"title": "フィンテックラボ", "learn": "金融を学ぶ", "market": "バーチャル株式市場", "banking": "銀行システム", "startup": "スタートアップとWeb3", "cash": "現金残高", "portfolio": "ポートフォリオ価値", "networth": "純資産", "deposit": "預金", "withdraw": "引き出し", "loan": "ローン", "repay": "返済", "buy": "買う", "sell": "売る", "lang": "言語"}
+    }
+
+    # ============================================================
+    # 2. DROPDOWNS (Level, Currency, Language)
+    # ============================================================
+    col1, col2, col3 = st.columns(3)
+    
+    with col1:
+        class_level = st.selectbox(
+            "🎓 Select Your Level",
+            ["Class 5-8 (Basics)", "Class 9-10 (Intermediate)", "Class 11-12 (Advanced)", "College / University (Professional)"],
+            key="fin_class_level"
+        )
+    
+    with col2:
+        CURRENCIES = {
+            "🇮🇳 INR (₹)": {"symbol": "₹", "rate": 83.0},
+            "🇺🇸 USD ($)": {"symbol": "$", "rate": 1.0},
+            "🇨🇳 CNY (¥)": {"symbol": "¥", "rate": 7.2},
+            "🇵🇰 PKR (₨)": {"symbol": "₨", "rate": 278.0},
+            "🇪🇺 EUR (€)": {"symbol": "€", "rate": 0.92},
+            "🇬🇧 GBP (£)": {"symbol": "£", "rate": 0.79},
+            "🇯🇵 JPY (¥)": {"symbol": "¥", "rate": 150.0},
+            "🇦🇪 AED (د.إ)": {"symbol": "د.إ", "rate": 3.67}, 
+            "🇧🇩 BDT (৳)": {"symbol": "৳", "rate": 110.0},
+            "🇷🇺 RUB (₽)": {"symbol": "₽", "rate": 92.0},
+            "🇿🇦 ZAR (R)": {"symbol": "R", "rate": 18.5},
+            "🇧🇷 BRL (R$)": {"symbol": "R$", "rate": 5.0}
+        }
+        if "fin_currency" not in st.session_state: st.session_state.fin_currency = "🇮🇳 INR (₹)"
+        curr_label = st.selectbox("🌐 Select Currency", list(CURRENCIES.keys()), index=list(CURRENCIES.keys()).index(st.session_state.fin_currency))
+        st.session_state.fin_currency = curr_label
+
+    with col3:
+        # 50+ Language Dropdown
+        if "fin_lang" not in st.session_state: st.session_state.fin_lang = "🇬🇧 English"
+        selected_lang_label = st.selectbox("🌍 Select Language", list(LANGUAGES.keys()), index=list(LANGUAGES.keys()).index(st.session_state.fin_lang))
+        st.session_state.fin_lang = selected_lang_label
+        lang_code = LANGUAGES[selected_lang_label]
+
+    # UI टेक्स्ट लोड करना
+    t = UI_TEXTS.get(lang_code, UI_TEXTS["en"])
+    curr = CURRENCIES[curr_label]
+    sym, rate = curr["symbol"], curr["rate"]
+
+    is_junior = "Class 5-8" in class_level
+
+    # ============================================================
+    # 3. ADAPTIVE CSS (Kids vs Teens/Adults)
+    # ============================================================
+    if is_junior:
+        st.markdown("""
+        <style>
+        .stApp { background-color: #F0F8FF; }
+        .fin-header { background: linear-gradient(90deg, #FF9A9E 0%, #FECFEF 99%, #FECFEF 100%); padding: 15px; border-radius: 15px; color: #333; text-align: center; }
+        .fin-card { background: #FFFFFF; border: 2px solid #FFD700; border-radius: 15px; padding: 15px; text-align: center; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        .fin-value { font-size: 24px; font-weight: bold; color: #FF5722; }
+        </style>
+        """, unsafe_allow_html=True)
+    else:
+        st.markdown("""
+        <style>
+        .stApp { background-color: #0B0E14; }
+        .fin-header { background: linear-gradient(90deg, #0F2027, #203A43, #2C5364); padding: 20px; border-radius: 10px; border-bottom: 3px solid #00FFAA; color: white; text-align: center; }
+        .fin-card { background: #1A202C; border: 1px solid #2D3748; border-radius: 10px; padding: 15px; color: #A0AEC0; text-align: center; }
+        .fin-value { font-size: 22px; font-weight: bold; color: #00FFAA; font-family: monospace; }
+        </style>
+        """, unsafe_allow_html=True)
+
+    st.markdown(f'<div class="fin-header"><h1>💰 {t["title"]} - {class_level.split(" ")[0]} {class_level.split(" ")[1]}</h1></div>', unsafe_allow_html=True)
+
+    # ============================================================
+    # 4. STATE MANAGEMENT (Internal USD)
+    # ============================================================
+    if "fin_cash_usd" not in st.session_state: st.session_state.fin_cash_usd = 10000.0 if is_junior else 50000.0
+    if "fin_loan_usd" not in st.session_state: st.session_state.fin_loan_usd = 0.0
+    if "fin_portfolio" not in st.session_state: st.session_state.fin_portfolio = {"TECH": 0, "AI": 0, "EDU": 0, "CRYPTO": 0}
+    if "fin_stock_prices_usd" not in st.session_state: 
+        st.session_state.fin_stock_prices_usd = {"TECH": 150.0, "AI": 320.0, "EDU": 80.0, "CRYPTO": 500.0}
+
+    def format_money(usd_val): return f"{sym}{usd_val * rate:,.2f}"
+
+    # ============================================================
+    # 5. TABS
+    # ============================================================
+    tab1, tab2, tab3, tab4 = st.tabs([f"📖 {t['learn']}", f"📈 {t['market']}", f"🏦 {t['banking']}", f"🚀 {t['startup']}"])
+
+    # --- TAB 1: LEARN FINANCE ---
+    with tab1:
+        st.subheader(f"📖 {t['learn']}")
+        topics = ["Money Basics & Saving", "Banking & Interest", "Global Macroeconomics", "Algorithmic Trading", "Startup Valuation", "AI in Finance"]
+        if is_junior: topics = topics[:3] # छोटों के लिए सिर्फ बेसिक टॉपिक
+        
+        topic = st.selectbox("Select Topic:", topics)
+        if st.button("🚀 Explain this Topic"):
+            with st.spinner("AI समझा रहा है..."):
+                tone = "very simple, fun, and with toys/candy examples" if is_junior else "professional and analytical"
+                prompt = f"You are a Financial Expert. Explain '{topic}' to a student of level {class_level} in this language: {selected_lang_label}. Tone: {tone}."
+                try:
+                    response = client.chat.completions.create(model="llama-3.3-70b-versatile", messages=[{"role": "user", "content": prompt}], temperature=0.7, max_tokens=1500)
+                    st.markdown(response.choices[0].message.content)
+                except Exception:
+                    st.error("Explanation नहीं आ पाया।")
+
+    # --- TAB 2: VIRTUAL STOCK MARKET ---
+    with tab2:
+        st.subheader(f"📈 {t['market']}")
+        
+        # Price Fluctuation
+        for stock in st.session_state.fin_stock_prices_usd:
+            change = random.uniform(-0.05, 0.05)
+            st.session_state.fin_stock_prices_usd[stock] = max(10.0, round(st.session_state.fin_stock_prices_usd[stock] * (1 + change), 2))
+
+        total_portfolio_value_usd = sum(st.session_state.fin_portfolio[s] * st.session_state.fin_stock_prices_usd[s] for s in st.session_state.fin_portfolio)
+        total_net_worth_usd = st.session_state.fin_cash_usd + total_portfolio_value_usd - st.session_state.fin_loan_usd
+
+        c1, c2, c3 = st.columns(3)
+        with c1: st.markdown(f'<div class="fin-card">💵 {t["cash"]}<br><span class="fin-value">{format_money(st.session_state.fin_cash_usd)}</span></div>', unsafe_allow_html=True)
+        with c2: st.markdown(f'<div class="fin-card">📊 {t["portfolio"]}<br><span class="fin-value">{format_money(total_portfolio_value_usd)}</span></div>', unsafe_allow_html=True)
+        with c3: st.markdown(f'<div class="fin-card">🏆 {t["networth"]}<br><span class="fin-value">{format_money(total_net_worth_usd)}</span></div>', unsafe_allow_html=True)
+
+        st.divider()
+        for stock, price_usd in st.session_state.fin_stock_prices_usd.items():
+            col_a, col_b, col_c = st.columns([2, 1, 1])
+            with col_a:
+                st.markdown(f'**{stock}** | Price: {format_money(price_usd)} | Owned: {st.session_state.fin_portfolio[stock]}')
+            with col_b:
+                if st.button(f"{t['buy']}", key=f"buy_{stock}"):
+                    if st.session_state.fin_cash_usd >= price_usd:
+                        st.session_state.fin_cash_usd -= price_usd
+                        st.session_state.fin_portfolio[stock] += 1
+                        st.rerun()
+                    else: st.error("पैसे कम हैं!")
+            with col_c:
+                if st.button(f"{t['sell']}", key=f"sell_{stock}"):
+                    if st.session_state.fin_portfolio[stock] > 0:
+                        st.session_state.fin_cash_usd += price_usd
+                        st.session_state.fin_portfolio[stock] -= 1
+                        st.rerun()
+                    else: st.error("शेयर नहीं हैं!")
+
+    # --- TAB 3: BANKING SYSTEM ---
+    with tab3:
+        st.subheader(f"🏦 {t['banking']}")
+        st.write(f"{t['cash']}: **{format_money(st.session_state.fin_cash_usd)}**")
+        st.write(f"{t['loan']}: **{format_money(st.session_state.fin_loan_usd)}**")
+
+        col1, col2 = st.columns(2)
+        with col1:
+            amt = st.number_input("Amount:", min_value=100, value=1000)
+            amt_usd = amt / rate
+            if st.button(f"📥 {t['deposit']}"):
+                st.session_state.fin_cash_usd += amt_usd
+                st.rerun()
+            if st.button(f"📤 {t['withdraw']}"):
+                if st.session_state.fin_cash_usd >= amt_usd:
+                    st.session_state.fin_cash_usd -= amt_usd
+                    st.rerun()
+                else: st.error("बैलेंस कम है!")
+
+        with col2:
+            loan_amt = st.number_input("Loan Amount:", min_value=500, value=5000)
+            loan_usd = loan_amt / rate
+            if st.button(f"📝 {t['loan']}"):
+                st.session_state.fin_cash_usd += loan_usd
+                st.session_state.fin_loan_usd += loan_usd
+                st.rerun()
+            if st.button(f"✅ {t['repay']}"):
+                if st.session_state.fin_cash_usd >= loan_usd:
+                    st.session_state.fin_cash_usd -= loan_usd
+                    st.session_state.fin_loan_usd = max(0.0, st.session_state.fin_loan_usd - loan_usd)
+                    st.rerun()
+                else: st.error("पैसे कम हैं!")
+
+    # --- TAB 4: STARTUP & WEB3 ---
+    with tab4:
+        st.subheader(f"🚀 {t['startup']}")
+        
+        if is_junior:
+            st.info("यह सेक्शन आपकी क्लास के लिए अभी थोड़ा एडवांस है, लेकिन आप इसे पढ़ सकते हैं!")
+        
+        col1, col2 = st.columns(2)
+        with col1:
+            st.markdown("### 📊 Startup Valuation Calculator")
+            revenue = st.number_input(f"Annual Revenue ({sym}):", min_value=1000, value=50000)
+            growth = st.slider("Growth Rate (%):", 1, 100, 20)
+            valuation = (revenue * (1 + growth/100) * 5) / 5
+            st.metric(label="Estimated Valuation", value=f"{sym}{valuation:,.2f}")
+
+        with col2:
+            st.markdown("### 🤖 Explain Web3 & Smart Contracts")
+            if st.button("Ask AI"):
+                with st.spinner("AI सोच रहा है..."):
+                    prompt = f"Explain Web3 and Smart Contracts to a {class_level} student in this language: {selected_lang_label}. Provide a small Solidity code example." if not is_junior else f"Explain what is Blockchain and Crypto in very simple words for a small kid in this language: {selected_lang_label}."
+                    try:
+                        response = client.chat.completions.create(model="llama-3.3-70b-versatile", messages=[{"role": "user", "content": prompt}], temperature=0.7, max_tokens=1000)
+                        st.info(response.choices[0].message.content)
+                    except: st.error("AI बिज़ी है।")                               
 # ============================================================
 # PHYSICS LAB MODULE (DAY 2 - FULL ADVANCED GLOBAL EDITION)
 # Features: Quantum, Space, Robotics, Renewable Energy, 3D Mechanics
@@ -4913,6 +5193,8 @@ with st.sidebar:
 # ---- routes: one unique screen per feature ----
 if mode == "🔐 Login / Sign Up":
     render_login_signup(); st.stop() 
+if mode == "💸 Learn Finance":
+    render_learn_finance(client); st.stop()   
 if mode == "🔢 Math Lab":
     render_math_lab(client); st.stop()        
 if mode == "🚀 Physics Lab":
