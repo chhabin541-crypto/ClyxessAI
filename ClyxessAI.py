@@ -5632,7 +5632,7 @@ with st.sidebar:
         "🎨 Creative AI Image Generator",
         "📷 Vision Lab", 
         "📷 3D Machine Lab", 
-        "🖥️ Think & Solve Puzzle", 
+        "🧩Think & Solve Puzzle", 
         "🖥️ Real World Project",  
         "🎭 Peer Roleplay Modes",
         "📋 AI Daily Timetable",
@@ -5672,7 +5672,7 @@ if mode == "👨‍👩‍👦 Parent Dashboard":
     render_parent_dashboard(); st.stop()
 if mode == "🎨 Creative AI Image Generator":
     render_image_generator(); st.stop() 
-if mode == "📷 Solve Puzzle":
+if mode == "🧩 Solve Puzzle":
     render_solve_puzzle(); st.stop()
 if mode == "📷 Vision Lab":
     render_vision_lab(); st.stop()
