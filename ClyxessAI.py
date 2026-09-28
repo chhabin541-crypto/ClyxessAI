@@ -2817,7 +2817,7 @@ def render_math_lab(client):
         st.session_state.math_game_q_id += 1
         st.rerun()  
         
-def render_global_kids_lab():
+def render_kids_logic_lab():
     # ============================================================
     # Imports अब फंक्शन के अंदर हैं (ताकि कोई conflict न हो)
     # ============================================================
