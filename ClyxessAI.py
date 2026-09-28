@@ -2815,7 +2815,472 @@ def render_math_lab(client):
         st.session_state.math_current_question = None
         st.session_state.math_game_answered = False
         st.session_state.math_game_q_id += 1
-        st.rerun()                              
+        st.rerun()  
+        
+def render_solve_puzzle_lab():
+    # ============================================================
+    # Imports अब फंक्शन के अंदर हैं (ताकि कोई conflict न हो)
+    # ============================================================
+    import streamlit as st
+    import streamlit.components.v1 as components
+
+    # ============================================================
+    # यह पूरा HTML/JS गेम Streamlit के अंदर एम्बेड किया जा रहा है
+    # ============================================================
+    HTML_TEMPLATE = """
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Clyxess Global Kids Logic & AI Puzzle Lab</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+        <!-- JS Confetti Library for Balloon & Party Poppers Effect -->
+        <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    </head>
+    <body class="bg-slate-950 text-slate-100 min-h-screen p-3 md:p-6 font-sans">
+
+        <!-- Global Top Bar: Class Filter + Indian & International Languages Selector -->
+        <header class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center bg-slate-900 border border-slate-800 p-4 rounded-2xl mb-6 gap-4 shadow-xl">
+            <div class="flex items-center space-x-3">
+                <div class="p-3 bg-emerald-500/10 border border-emerald-500/30 rounded-xl text-emerald-400">
+                    <i class="fa-solid fa-earth-americas text-2xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold text-white tracking-wide">Clyxess <span class="text-emerald-400">Global AI School</span></h1>
+                    <p class="text-xs text-slate-400">Interactive Logic, Engineering & Multi-Language Playground</p>
+                </div>
+            </div>
+
+            <!-- Controls: Age/Class & Multi-Language Selector -->
+            <div class="flex flex-wrap items-center gap-3">
+                
+                <!-- Indian & Global Languages Dropdown -->
+                <div class="flex items-center space-x-2 bg-slate-950 px-3 py-1.5 rounded-xl border border-slate-700">
+                    <i class="fa-solid fa-language text-amber-400 text-sm"></i>
+                    <select id="languageSelect" onchange="changeLanguage()" class="bg-transparent text-amber-400 text-xs font-bold focus:outline-none cursor-pointer">
+                        <option value="hi">हिंदी (Hindi)</option>
+                        <option value="te">తెలుగు (Telugu)</option>
+                        <option value="ta">தமிழ் (Tamil)</option>
+                        <option value="ml">മലയാളം (Malayalam)</option>
+                        <option value="kn">ಕನ್ನಡ (Kannada)</option>
+                        <option value="bn">বাংলা (Bengali)</option>
+                        <option value="gu">ગુજરાતી (Gujarati)</option>
+                        <option value="mr">मराठी (Marathi)</option>
+                        <option value="or">ଓଡ଼ିଆ (Odia)</option>
+                        <option value="pa">ਪੰਜਾਬੀ (Punjabi)</option>
+                        <option value="ur">اردو (Urdu)</option>
+                        <option value="en" selected>English (US/UK)</option>
+                        <option value="es">Español (Spanish)</option>
+                        <option value="fr">Français (French)</option>
+                        <option value="de">Deutsch (German)</option>
+                        <option value="zh">中文 (Mandarin)</option>
+                        <option value="ja">日本語 (Japanese)</option>
+                        <option value="ar">العربية (Arabic)</option>
+                        <option value="ru">Русский (Russian)</option>
+                        <option value="pt">Português (Portuguese)</option>
+                        <option value="ko">한국어 (Korean)</option>
+                        <option value="it">Italiano (Italian)</option>
+                        <option value="tr">Türkçe (Turkish)</option>
+                        <option value="vi">Tiếng Việt (Vietnamese)</option>
+                        <option value="th">ไทย (Thai)</option>
+                        <option value="id">Bahasa Indonesia</option>
+                        <option value="fa">فارسی (Persian)</option>
+                        <option value="ne">नेपाली (Nepali)</option>
+                        <option value="si">සිංහල (Sinhala)</option>
+                    </select>
+                </div>
+
+                <!-- Class & Age Dropdown Filter -->
+                <select id="ageFilter" onchange="filterGamesByAge()" class="bg-slate-950 text-emerald-400 text-xs font-bold border border-emerald-500/40 rounded-xl px-3 py-2 focus:outline-none cursor-pointer">
+                    <option value="group1">Class 1-2 (5-7 Yrs) • Visual Puzzles</option>
+                    <option value="group2">Class 3-5 (8-10 Yrs) • Science & Machines</option>
+                    <option value="group3">Class 6-7 (11-13 Yrs) • Advanced Engineering</option>
+                </select>
+
+            </div>
+        </header>
+
+        <!-- Main Workspace Container -->
+        <main class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            <!-- Left Panel: Puzzle Selection Dropdown & Lock System -->
+            <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 space-y-4">
+                <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                    <h2 class="text-xs font-bold text-slate-300 uppercase tracking-wider"><i class="fa-solid fa-gamepad text-emerald-400 mr-2"></i> Puzzles Dashboard</h2>
+                    <span id="completedBadge" class="bg-emerald-500/10 text-emerald-400 text-xs px-2.5 py-1 rounded-full border border-emerald-500/20 font-bold">Unlocked: 1/15</span>
+                </div>
+
+                <!-- Select Game Dropdown -->
+                <div>
+                    <label id="lblSelectGame" class="text-xs text-slate-400 block mb-1">Select Puzzle Game:</label>
+                    <select id="gameSelectDropdown" onchange="loadSelectedGame()" class="w-full bg-slate-950 text-white text-xs border border-slate-700 rounded-xl p-3 focus:outline-none focus:border-emerald-400 cursor-pointer font-bold">
+                        <!-- Dynamic Options -->
+                    </select>
+                </div>
+
+                <!-- Interactive List View -->
+                <div id="gameListContainer" class="space-y-2 max-h-[360px] overflow-y-auto pr-1">
+                    <!-- Dynamic Items -->
+                </div>
+            </div>
+
+            <!-- Right Panel: Puzzle Assembly Workspace -->
+            <div class="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-3xl p-6 flex flex-col justify-between relative overflow-hidden">
+                
+                <div>
+                    <!-- Active Puzzle Title Header -->
+                    <div class="flex justify-between items-center mb-4 border-b border-slate-800 pb-3">
+                        <div>
+                            <span id="puzzleCategoryTag" class="text-[10px] uppercase font-bold tracking-widest px-2.5 py-0.5 rounded-full bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">Cartoon Puzzle</span>
+                            <h3 id="puzzleTitle" class="text-base font-bold text-white mt-1">Solve The Cute Cat Puzzle</h3>
+                        </div>
+                        <div id="statusIcon" class="text-amber-400 text-xs font-bold bg-amber-500/10 border border-amber-500/20 px-3 py-1 rounded-xl flex items-center gap-1.5">
+                            <i class="fa-solid fa-hourglass-start"></i> In Progress
+                        </div>
+                    </div>
+
+                    <!-- Puzzle Blocks & Drop Zone Grid -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 my-4">
+                        
+                        <!-- Toolbox -->
+                        <div class="bg-slate-950 border border-slate-800 rounded-2xl p-4">
+                            <h4 id="lblToolbox" class="text-xs font-bold text-slate-400 mb-3 uppercase tracking-wider"><i class="fa-solid fa-toolbox mr-1 text-emerald-400"></i> Available Blocks</h4>
+                            <div id="availableBlocks" class="space-y-2">
+                                <!-- Dynamic Blocks -->
+                            </div>
+                        </div>
+
+                        <!-- Assembly Zone -->
+                        <div class="bg-slate-950 border border-emerald-500/30 rounded-2xl p-4">
+                            <h4 id="lblAssembly" class="text-xs font-bold text-emerald-400 mb-3 uppercase tracking-wider"><i class="fa-solid fa-layer-group mr-1"></i> Assembly Sequence</h4>
+                            <div id="assemblyZone" class="space-y-2 min-h-[140px] border-2 border-dashed border-slate-800 rounded-xl p-2 flex flex-col justify-center items-center">
+                                <p class="text-xs text-slate-500 italic">Click blocks to assemble here</p>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Visual Output Display Area -->
+                    <div class="bg-slate-950 border border-slate-800 rounded-2xl p-4 text-center relative overflow-hidden min-h-[160px] flex flex-col items-center justify-center">
+                        <div id="visualDisplay" class="transition-all duration-500">
+                            <i class="fa-solid fa-puzzle-piece text-5xl text-slate-700 animate-pulse"></i>
+                            <p class="text-xs text-slate-500 mt-2">Arrange blocks correctly & press 'Assemble'</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Controls -->
+                <div class="flex justify-between items-center mt-6 pt-4 border-t border-slate-800">
+                    <button onclick="resetCurrentPuzzle()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold rounded-xl transition"><i class="fa-solid fa-rotate-left mr-1"></i> Clear Blocks</button>
+                    <button onclick="checkPuzzleSolution()" class="px-6 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-bold rounded-xl shadow-lg shadow-emerald-500/20 transition flex items-center gap-2 uppercase tracking-wider">
+                        <i class="fa-solid fa-play"></i> Assemble & Run
+                    </button>
+                </div>
+
+            </div>
+
+        </main>
+
+        <!-- Bottom Section: Fun Math Fruit Puzzle -->
+        <section class="max-w-6xl mx-auto mt-6 bg-slate-900 border border-slate-800 rounded-3xl p-6">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-slate-800 pb-4 mb-4 gap-4">
+                <div>
+                    <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                        <span class="text-lg">🥭</span> Visual Fruit Math Challenge
+                    </h3>
+                    <p class="text-xs text-slate-400">Improve numerical thinking with interactive counting</p>
+                </div>
+
+                <div class="flex items-center space-x-2">
+                    <select id="mathDropdown" onchange="loadMathPuzzle()" class="bg-slate-950 text-amber-400 text-xs font-bold border border-amber-500/30 rounded-xl p-2 focus:outline-none cursor-pointer">
+                        <option value="m1">1. Addition: 3 Mangoes + 2 Mangoes</option>
+                        <option value="m2">2. Subtraction: 6 Mangoes - 3 Mangoes</option>
+                        <option value="m3">3. Multiplication: 2 Groups of 4 Mangoes</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
+                <div class="md:col-span-2 bg-slate-950 border border-slate-800 p-4 rounded-2xl flex items-center justify-center text-2xl">
+                    <div id="mathVisualBox" class="flex items-center space-x-3 text-2xl"></div>
+                </div>
+
+                <div class="bg-slate-950 border border-slate-800 p-4 rounded-2xl flex flex-col space-y-2">
+                    <input type="number" id="mathAnswerInput" placeholder="Total mangoes?" class="bg-slate-900 text-white font-bold text-center text-sm border border-slate-700 rounded-xl p-2 focus:outline-none">
+                    <button onclick="verifyMathAnswer()" class="w-full py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-bold rounded-xl transition">Check Answer</button>
+                    <p id="mathResultText" class="text-xs text-center font-bold h-4"></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- JavaScript Engine -->
+        <script>
+            // Multi-Language Greetings Dictionary (Includes Indian Local Languages)
+            const congratsDict = {
+                "hi": { congrats: "🎉 बहुत-बहुत बधाई!", welcome: "अगले गेम में आपका स्वागत है: " },
+                "te": { congrats: "🎉 అభినందనలు!", welcome: "తదుపరి గేమ్‌కు స్వాగతం: " },
+                "ta": { congrats: "🎉 வாழ்த்துகள்!", welcome: "அடுத்த விளையாட்டிற்கு வரவேற்கிறோம்: " },
+                "ml": { congrats: "🎉 ആശംസകൾ!", welcome: "അടുത്ത ഗെയിമിലേക്ക് സ്വാഗതം: " },
+                "kn": { congrats: "🎉 ಅಭಿನಂದನೆಗಳು!", welcome: "ಮುಂದಿನ ಆಟಕ್ಕೆ ಸ್ವಾಗತ: " },
+                "bn": { congrats: "🎉 অনেক অনেক অভিনন্দন!", welcome: "পরবর্তী গেমে স্বাগতম: " },
+                "gu": { congrats: "🎉 ખૂબ ખૂબ અભિનંદન!", welcome: "આગામી ગેમમાં આપનું સ્વાગત છે: " },
+                "mr": { congrats: "🎉 खूप खूप अभिनंदन!", welcome: "पुढील गेममध्ये तुमचे स्वागत आहे: " },
+                "or": { congrats: "🎉 ଅଭିନନ୍ଦନ!", welcome: "ପରବର୍ତ୍ତୀ ଖେଳକୁ ସ୍ୱାଗତ: " },
+                "pa": { congrats: "🎉 ਬਹੁਤ ਬਹੁਤ ਵਧਾਈਆਂ!", welcome: "ਅਗਲੇ ਗੇਮ ਵਿੱਚ ਤੁਹਾਡਾ ਸੁਆਗਤ ਹੈ: " },
+                "ur": { congrats: "🎉 بہت مبارک ہو!", welcome: "اگلے گیم میں آپ کا استقبال ہے: " },
+                "en": { congrats: "🎉 Congratulations!", welcome: "Welcome to the Next Game: " },
+                "es": { congrats: "🎉 ¡Felicitaciones!", welcome: "Bienvenido al siguiente juego: " },
+                "fr": { congrats: "🎉 Félicitations!", welcome: "Bienvenue dans le jeu suivant: " },
+                "de": { congrats: "🎉 Herzlichen Glückwunsch!", welcome: "Willkommen beim nächsten Spiel: " },
+                "zh": { congrats: "🎉 恭喜你！", welcome: "欢迎来到下一个游戏： " },
+                "ja": { congrats: "🎉 おめでとうございます！", welcome: "次のゲームへようこそ： " },
+                "ar": { congrats: "🎉 مبروك!", welcome: "مرحباً بك في اللعبة التالية: " },
+                "ru": { congrats: "🎉 Поздравляем!", welcome: "Добро пожаловать в следующую игру: " },
+                "pt": { congrats: "🎉 Parabéns!", welcome: "Bem-vindo ao próximo jogo: " },
+                "ko": { congrats: "🎉 축하합니다!", welcome: "다음 게임에 오신 것을 환영합니다: " }
+            };
+
+            let currentLang = "en";
+
+            let gamesData = [
+                // Class 1-2 (5-7 Yrs)
+                { id: 1, title: "Solve Cute Cat Puzzle", group: "group1", cat: "Cartoon", icon: "fa-cat text-pink-400", locked: false, blocks: ["Fix Ears & Whiskers", "Draw Cat Face", "Attach Tail"], solution: ["Draw Cat Face", "Fix Ears & Whiskers", "Attach Tail"] },
+                { id: 2, title: "Solve Puppy Dog Puzzle", group: "group1", cat: "Cartoon", icon: "fa-dog text-amber-400", locked: true, blocks: ["Attach Bark Sound", "Add Paws", "Fix Puppy Body"], solution: ["Fix Puppy Body", "Add Paws", "Attach Bark Sound"] },
+                { id: 3, title: "Solve Magic Star Puzzle", group: "group1", cat: "Cartoon", icon: "fa-star text-yellow-400", locked: true, blocks: ["Add Neon Glow", "Draw 5 Points", "Sparkle Effect"], solution: ["Draw 5 Points", "Add Neon Glow", "Sparkle Effect"] },
+                { id: 4, title: "Solve Helicopter Assembly", group: "group1", cat: "Engineering", icon: "fa-helicopter text-cyan-400", locked: true, blocks: ["Attach Main Rotor", "Mount Cockpit Glass", "Fix Tail Propeller"], solution: ["Mount Cockpit Glass", "Attach Main Rotor", "Fix Tail Propeller"] },
+                { id: 5, title: "Solve Racing Car Puzzle", group: "group1", cat: "Engineering", icon: "fa-car-side text-emerald-400", locked: true, blocks: ["Fit 4 Wheels", "Attach Chassis Frame", "Install Engine"], solution: ["Attach Chassis Frame", "Install Engine", "Fit 4 Wheels"] },
+
+                // Class 3-5 (8-10 Yrs)
+                { id: 6, title: "Solve Aeroplane Jet Logic", group: "group2", cat: "Engineering", icon: "fa-plane-departure text-sky-400", locked: true, blocks: ["Calibrate Jet Turbines", "Attach Wings", "Deploy Landing Gear"], solution: ["Attach Wings", "Calibrate Jet Turbines", "Deploy Landing Gear"] },
+                { id: 7, title: "Solve Rocket Launch Sequence", group: "group2", cat: "Engineering", icon: "fa-rocket text-red-400", locked: true, blocks: ["Ignite Boosters", "Fill Fuel Tanks", "Countdown 3..2..1"], solution: ["Fill Fuel Tanks", "Countdown 3..2..1", "Ignite Boosters"] },
+                { id: 8, title: "Solve Train Engine Mechanics", group: "group2", cat: "Engineering", icon: "fa-train text-indigo-400", locked: true, blocks: ["Connect Electric Pantograph", "Couple Steam Engine", "Signal Green Light"], solution: ["Couple Steam Engine", "Connect Electric Pantograph", "Signal Green Light"] },
+                { id: 9, title: "Solve Submarine Depth Control", group: "group2", cat: "Engineering", icon: "fa-ship text-blue-400", locked: true, blocks: ["Seal Oxygen Valves", "Fill Ballast Tanks", "Sonar Pulse Check"], solution: ["Seal Oxygen Valves", "Fill Ballast Tanks", "Sonar Pulse Check"] },
+                { id: 10, title: "Solve Windmill Power Generator", group: "group2", cat: "Engineering", icon: "fa-wind text-teal-400", locked: true, blocks: ["Connect Turbine Shaft", "Fix 3 Large Blades", "Store Electricity in Battery"], solution: ["Fix 3 Large Blades", "Connect Turbine Shaft", "Store Electricity in Battery"] },
+
+                // Class 6-7 (11-13 Yrs)
+                { id: 11, title: "Solve Smart Drone Navigation", group: "group3", cat: "Engineering", icon: "fa-paper-plane text-purple-400", locked: true, blocks: ["Calibrate Flight Gyroscope", "Connect 4 Brushless Motors", "Link GPS & Camera"], solution: ["Connect 4 Brushless Motors", "Calibrate Flight Gyroscope", "Link GPS & Camera"] },
+                { id: 12, title: "Solve Industrial Robot Arm", group: "group3", cat: "Engineering", icon: "fa-robot text-emerald-400", locked: true, blocks: ["Connect Servo Motors", "Program Hydraulic Gripper", "Calibrate Motion Sensor"], solution: ["Connect Servo Motors", "Calibrate Motion Sensor", "Program Hydraulic Gripper"] },
+                { id: 13, title: "Solve EV Battery & Motor Setup", group: "group3", cat: "Engineering", icon: "fa-bolt text-yellow-400", locked: true, blocks: ["Connect Lithium Cells", "Attach Regenerative Brakes", "Configure Motor Inverter"], solution: ["Connect Lithium Cells", "Configure Motor Inverter", "Attach Regenerative Brakes"] },
+                { id: 14, title: "Solve Space Satellite Solar Array", group: "group3", cat: "Engineering", icon: "fa-satellite text-cyan-400", locked: true, blocks: ["Deploy Solar Panels", "Orient Thrusters to Orbit", "Establish Radio Telemetry"], solution: ["Deploy Solar Panels", "Establish Radio Telemetry", "Orient Thrusters to Orbit"] },
+                { id: 15, title: "Solve Hydraulic Crane Lift", group: "group3", cat: "Engineering", icon: "fa-truck-pickup text-amber-400", locked: true, blocks: ["Pressurize Fluid Pumps", "Extend Telescopic Boom", "Engage Counterweights"], solution: ["Engage Counterweights", "Pressurize Fluid Pumps", "Extend Telescopic Boom"] }
+            ];
+
+            let activeGameId = 1;
+            let selectedSequence = [];
+
+            window.onload = function() {
+                filterGamesByAge();
+                loadMathPuzzle();
+            };
+
+            function changeLanguage() {
+                currentLang = document.getElementById('languageSelect').value;
+            }
+
+            function filterGamesByAge() {
+                const group = document.getElementById('ageFilter').value;
+                const dropdown = document.getElementById('gameSelectDropdown');
+                const listContainer = document.getElementById('gameListContainer');
+                
+                dropdown.innerHTML = '';
+                listContainer.innerHTML = '';
+
+                const filteredGames = gamesData.filter(g => g.group === group);
+
+                filteredGames.forEach(game => {
+                    const opt = document.createElement('option');
+                    opt.value = game.id;
+                    opt.disabled = game.locked;
+                    opt.innerText = `${game.locked ? '🔒' : '✅'} ${game.title}`;
+                    dropdown.appendChild(opt);
+
+                    const item = document.createElement('div');
+                    item.className = `p-3 rounded-xl border flex justify-between items-center cursor-pointer transition ${game.id === activeGameId ? 'bg-slate-800 border-emerald-400' : 'bg-slate-950 border-slate-800'}`;
+                    item.onclick = () => { if(!game.locked) { activeGameId = game.id; dropdown.value = game.id; loadSelectedGame(); } };
+                    
+                    item.innerHTML = `
+                        <div class="flex items-center space-x-3">
+                            <i class="fa-solid ${game.icon} text-base"></i>
+                            <span class="text-xs font-bold ${game.locked ? 'text-slate-500' : 'text-slate-200'}">${game.title}</span>
+                        </div>
+                        ${game.locked ? '<i class="fa-solid fa-lock text-slate-600 text-xs"></i>' : '<i class="fa-solid fa-circle-check text-emerald-400 text-xs"></i>'}
+                    `;
+                    listContainer.appendChild(item);
+                });
+
+                const firstAvailable = filteredGames.find(g => !g.locked) || filteredGames[0];
+                activeGameId = firstAvailable.id;
+                dropdown.value = activeGameId;
+                loadSelectedGame();
+            }
+
+            function loadSelectedGame() {
+                const dropdownVal = parseInt(document.getElementById('gameSelectDropdown').value);
+                activeGameId = dropdownVal;
+                const game = gamesData.find(g => g.id === activeGameId);
+
+                document.getElementById('puzzleTitle').innerText = game.title;
+                document.getElementById('puzzleCategoryTag').innerText = game.cat + " Puzzle";
+                
+                document.getElementById('statusIcon').className = "text-amber-400 text-xs font-bold bg-amber-500/10 border border-amber-500/20 px-3 py-1 rounded-xl flex items-center gap-1.5";
+                document.getElementById('statusIcon').innerHTML = '<i class="fa-solid fa-hourglass-start"></i> In Progress';
+
+                resetCurrentPuzzle();
+
+                const blocksContainer = document.getElementById('availableBlocks');
+                blocksContainer.innerHTML = '';
+                
+                let shuffled = [...game.blocks].sort(() => 0.5 - Math.random());
+                shuffled.forEach(blockText => {
+                    const b = document.createElement('div');
+                    b.className = "p-2 bg-slate-900 border border-slate-700 hover:border-emerald-400 rounded-xl text-xs font-semibold text-slate-200 cursor-pointer transition flex items-center justify-between";
+                    b.innerHTML = `<span>${blockText}</span> <i class="fa-solid fa-plus text-slate-500 text-[10px]"></i>`;
+                    b.onclick = () => addToAssembly(blockText, b);
+                    blocksContainer.appendChild(b);
+                });
+
+                const solvedCount = gamesData.filter(g => !g.locked).length;
+                document.getElementById('completedBadge').innerText = `Unlocked: ${solvedCount}/${gamesData.length}`;
+            }
+
+            function addToAssembly(text, element) {
+                if(!selectedSequence.includes(text)) {
+                    selectedSequence.push(text);
+                    element.classList.add('opacity-40', 'pointer-events-none');
+                    renderAssemblyZone();
+                }
+            }
+
+            function renderAssemblyZone() {
+                const zone = document.getElementById('assemblyZone');
+                zone.innerHTML = '';
+                
+                if(selectedSequence.length === 0) {
+                    zone.innerHTML = '<p class="text-xs text-slate-500 italic">Click blocks to assemble here</p>';
+                    return;
+                }
+
+                selectedSequence.forEach((text, index) => {
+                    const item = document.createElement('div');
+                    item.className = "w-full p-2 bg-emerald-500/10 border border-emerald-500/40 rounded-xl text-xs font-bold text-emerald-400 flex justify-between items-center";
+                    item.innerHTML = `<span>${index + 1}. ${text}</span> <i class="fa-solid fa-check text-[10px]"></i>`;
+                    zone.appendChild(item);
+                });
+            }
+
+            function resetCurrentPuzzle() {
+                selectedSequence = [];
+                renderAssemblyZone();
+                document.getElementById('visualDisplay').innerHTML = `
+                    <i class="fa-solid fa-puzzle-piece text-5xl text-slate-700 animate-pulse"></i>
+                    <p class="text-xs text-slate-500 mt-2">Arrange blocks correctly & press 'Assemble'</p>
+                `;
+                
+                const blocks = document.getElementById('availableBlocks').children;
+                for(let b of blocks) {
+                    b.classList.remove('opacity-40', 'pointer-events-none');
+                }
+            }
+
+            // CONFETTI + LOCAL LANGUAGE WELCOME TRIGGER
+            function checkPuzzleSolution() {
+                const game = gamesData.find(g => g.id === activeGameId);
+                const isCorrect = JSON.stringify(selectedSequence) === JSON.stringify(game.solution);
+
+                const display = document.getElementById('visualDisplay');
+                const status = document.getElementById('statusIcon');
+
+                if(isCorrect) {
+                    // 1. Fire Balloons/Confetti Burst!
+                    confetti({
+                        particleCount: 130,
+                        spread: 85,
+                        origin: { y: 0.6 }
+                    });
+
+                    status.className = "text-emerald-400 text-xs font-bold bg-emerald-500/10 border border-emerald-500/30 px-3 py-1 rounded-xl flex items-center gap-1.5";
+                    status.innerHTML = '<i class="fa-solid fa-circle-check"></i> Puzzle Solved!';
+
+                    // Unlock Next Game
+                    const currentIndex = gamesData.findIndex(g => g.id === activeGameId);
+                    let nextGameTitle = "";
+                    
+                    if(currentIndex + 1 < gamesData.length) {
+                        gamesData[currentIndex + 1].locked = false;
+                        nextGameTitle = gamesData[currentIndex + 1].title;
+                    }
+
+                    // Selected Language Greeting Text
+                    const langText = congratsDict[currentLang] || congratsDict["en"];
+                    const congratsMsg = langText.congrats;
+                    const welcomeMsg = langText.welcome + (nextGameTitle ? nextGameTitle : "Final Master Level!");
+
+                    display.innerHTML = `
+                        <div class="text-emerald-400 animate-bounce">
+                            <i class="fa-solid ${game.icon} text-6xl"></i>
+                        </div>
+                        <h4 class="text-base font-bold text-amber-400 mt-2">${congratsMsg}</h4>
+                        <p class="text-xs font-bold text-emerald-400 mt-1">${welcomeMsg}</p>
+                    `;
+
+                    setTimeout(() => {
+                        filterGamesByAge();
+                    }, 2200);
+
+                } else {
+                    status.className = "text-rose-400 text-xs font-bold bg-rose-500/10 border border-rose-500/30 px-3 py-1 rounded-xl flex items-center gap-1.5";
+                    status.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> Wrong Sequence';
+
+                    display.innerHTML = `
+                        <i class="fa-solid fa-bug text-5xl text-rose-500"></i>
+                        <p class="text-xs text-rose-400 mt-2 font-bold">Assembly Failed! Try rearranging the blocks.</p>
+                    `;
+                }
+            }
+
+            // --- Math Fruit Logic ---
+            let currentMathAnswer = 5;
+
+            function loadMathPuzzle() {
+                const val = document.getElementById('mathDropdown').value;
+                const box = document.getElementById('mathVisualBox');
+                document.getElementById('mathAnswerInput').value = '';
+                document.getElementById('mathResultText').innerText = '';
+
+                if(val === 'm1') {
+                    currentMathAnswer = 5;
+                    box.innerHTML = '<span>🥭🥭🥭</span> <span class="text-amber-400 font-bold">+</span> <span>🥭🥭</span> <span class="text-amber-400 font-bold">=</span> <span>❓</span>';
+                } else if(val === 'm2') {
+                    currentMathAnswer = 3;
+                    box.innerHTML = '<span>🥭🥭🥭🥭🥭🥭</span> <span class="text-rose-400 font-bold">-</span> <span>🥭🥭🥭</span> <span class="text-amber-400 font-bold">=</span> <span>❓</span>';
+                } else if(val === 'm3') {
+                    currentMathAnswer = 8;
+                    box.innerHTML = '<span>(🥭🥭🥭🥭)</span> <span class="text-amber-400 font-bold">x 2</span> <span class="text-amber-400 font-bold">=</span> <span>❓</span>';
+                }
+            }
+
+            function verifyMathAnswer() {
+                const userAns = parseInt(document.getElementById('mathAnswerInput').value);
+                const res = document.getElementById('mathResultText');
+
+                if(userAns === currentMathAnswer) {
+                    confetti({ particleCount: 50, spread: 50, origin: { y: 0.8 } });
+                    res.className = "text-xs text-center font-bold text-emerald-400";
+                    res.innerText = "🌟 Correct! Excellent Counting!";
+                } else {
+                    res.className = "text-xs text-center font-bold text-rose-400";
+                    res.innerText = "❌ Count the mangoes again!";
+                }
+            }
+        </script>
+    </body>
+    </html>
+    """
+    
+    # Streamlit में HTML को रेंडर करना (यह लाइन आपके ऐप में इसे चलाएगी)
+    components.html(HTML_TEMPLATE, height=900, scrolling=True)       
 # ============================================================
 # 🤖 CLYXESSCHAT AI — LEARN AI
 # FINAL ADVANCED GLOBAL EDITION
