@@ -2817,7 +2817,7 @@ def render_math_lab(client):
         st.session_state.math_game_q_id += 1
         st.rerun()  
         
-def render_solve_puzzle_lab():
+def render_kids_logic_lab():
     # ============================================================
     # Imports अब फंक्शन के अंदर हैं (ताकि कोई conflict न हो)
     # ============================================================
@@ -5632,7 +5632,7 @@ with st.sidebar:
         "🎨 Creative AI Image Generator",
         "📷 Vision Lab", 
         "📷 3D Machine Lab", 
-        "🧩Think & Solve Puzzle", 
+        "🧩 Kids Logic Lab", 
         "🖥️ Real World Project",  
         "🎭 Peer Roleplay Modes",
         "📋 AI Daily Timetable",
@@ -5672,8 +5672,8 @@ if mode == "👨‍👩‍👦 Parent Dashboard":
     render_parent_dashboard(); st.stop()
 if mode == "🎨 Creative AI Image Generator":
     render_image_generator(); st.stop() 
-if mode == "🧩 Solve Puzzle":
-    render_solve_puzzle(); st.stop()
+if mode == "🧩 Kids Logic lab":
+    render_kidslogic_lab(); st.stop()
 if mode == "📷 Vision Lab":
     render_vision_lab(); st.stop()
 if mode == "🎭 Peer Roleplay Modes":
