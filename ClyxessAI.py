@@ -5672,7 +5672,7 @@ if mode == "👨‍👩‍👦 Parent Dashboard":
     render_parent_dashboard(); st.stop()
 if mode == "🎨 Creative AI Image Generator":
     render_image_generator(); st.stop() 
-if mode == "🧩 Kids Logic lab":
+if mode == "🧩 Kids Logic Lab":
     render_kidslogic_lab(); st.stop()
 if mode == "📷 Vision Lab":
     render_vision_lab(); st.stop()
