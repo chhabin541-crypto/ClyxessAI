@@ -5207,8 +5207,8 @@ if mode == "👨‍👩‍👦 Parent Dashboard":
     render_parent_dashboard(); st.stop()
 if mode == "🎨 Creative AI Image Generator":
     render_image_generator(); st.stop() 
-if mode == "📷 Thinck & Solve Puzzle":
-    render_vision_lab(); st.stop()
+if mode == "📷 Solve Puzzle":
+    render_solve_puzzle(); st.stop()
 if mode == "📷 Vision Lab":
     render_vision_lab(); st.stop()
 if mode == "🎭 Peer Roleplay Modes":
