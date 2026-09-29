@@ -1771,9 +1771,6 @@ def render_image_generator():
             st.link_button("🔗 Open Full Image",data) 
             
 def render_ai_autonomous_behavior():
-    # ============================================================
-    # Imports अंदर हैं ताकि कोई conflict न हो
-    # ============================================================
     import streamlit as st
     import streamlit.components.v1 as components
 
@@ -1787,11 +1784,14 @@ def render_ai_autonomous_behavior():
         <script src="https://cdn.tailwindcss.com"></script>
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
         <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+        <style>
+            body { background: transparent!important; }
+        </style>
     </head>
-    <body class="bg-slate-950 text-slate-100 min-h-screen p-4 font-sans flex flex-col justify-center items-center">
+    <body class="bg-transparent text-slate-100 min-h-screen p-4 font-sans flex flex-col justify-center items-center">
 
         <div class="w-full max-w-5xl bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl space-y-6">
-            
+
             <!-- Header & Language Selector -->
             <div class="flex flex-col sm:flex-row justify-between items-center pb-4 border-b border-slate-800 gap-4">
                 <div class="flex items-center space-x-3">
@@ -1874,7 +1874,7 @@ def render_ai_autonomous_behavior():
 
                 <!-- Right Area: Simulation Canvas & Logic Sequence -->
                 <div class="lg:col-span-2 bg-slate-950 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between space-y-4">
-                    
+
                     <!-- Arena -->
                     <div class="relative bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-col items-center justify-center overflow-hidden h-[220px]">
                         <div class="absolute inset-0 bg-[radial-gradient(#3b82f6_1px,transparent_1px)] [background-size:16px_16px] opacity-20"></div>
@@ -2016,7 +2016,6 @@ def render_ai_autonomous_behavior():
                     list.innerHTML = '<p class="text-xs text-slate-600 italic">Click blocks to chain logic sequence...</p>';
                     return;
                 }
-
                 sequence.forEach((item, index) => {
                     const b = document.createElement('span');
                     b.className = "bg-purple-500/20 text-purple-300 border border-purple-500/40 text-xs px-2.5 py-1 rounded-lg font-bold flex items-center gap-1.5";
@@ -2045,18 +2044,14 @@ def render_ai_autonomous_behavior():
             function runAISwarm() {
                 const sprite = document.getElementById('droneSprite');
                 const feedback = document.getElementById('statusFeedback');
-
                 const t = translations[currentLang] || translations["en"];
-
                 if(sequence.length === 0) {
                     feedback.innerText = t.emptyError;
                     feedback.className = "text-xs font-bold text-rose-400";
                     return;
                 }
-
                 const hasShield = sequence.includes("Activate Energy Shield");
                 const hasSonar = sequence.includes("Sonar Scan Barrier");
-
                 if(currentDrone === 'falcon') {
                     if(hasShield) {
                         sprite.style.left = '80%';
@@ -2085,9 +2080,7 @@ def render_ai_autonomous_behavior():
     </body>
     </html>
     """
-    
-    # यह लाइन HTML को Streamlit में दिखाएगी
-    components.html(HTML_TEMPLATE, height=850, scrolling=True)
+    components.html(HTML_TEMPLATE, height=950, scrolling=False)
     
 def render_vision_lab(): 
     st.title("📷 Vision Lab")
