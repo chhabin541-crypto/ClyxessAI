@@ -3,7 +3,8 @@ from groq import Groq
 from supabase import create_client
 import datetime, uuid, requests, time, re, os, json, random, base64, urllib.parse
 from typing import Dict, List, Any
-from fpdf import FPDF
+from fpdf import FPDF 
+from ai_drone_lab import render_ai_autonomous_behavior
 try:
     from zoneinfo import ZoneInfo
 except Exception:
