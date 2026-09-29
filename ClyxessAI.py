@@ -6114,7 +6114,7 @@ with st.sidebar:
         "🎮 Play & Learn",
         "🎨 Creative AI Image Generator",
         "📷 Vision Lab", 
-        "🤖 AI Autonomous Behaviar", 
+        "🫧 AI Autonomous Behaviar", 
         "🧩 Kids Logic Lab", 
         "🖥️ Real World Project",  
         "🎭 Peer Roleplay Modes",
@@ -6157,7 +6157,7 @@ if mode == "🎨 Creative AI Image Generator":
     render_image_generator(); st.stop() 
 if mode == "🧩 Kids Logic Lab":
     render_kids_logic_lab(); st.stop() 
-if mode == "🤖 AI Autononous Behaviar":
+if mode == "🫧 AI Autononous Behaviar":
     render_aiautonomous_behaviar(); st.stop()       
 if mode == "📷 Vision Lab":
     render_vision_lab(); st.stop()
