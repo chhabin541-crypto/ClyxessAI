@@ -5905,9 +5905,9 @@ def render_normal_chat():
         st.markdown(f'<div class="user-bubble">{prompt}</div>', unsafe_allow_html=True)
 
     def _is_diagram_request(t):
-    tl = t.lower()
-    # tera wala typo "digram" bhi pakdega
-    return any(x in tl for x in ["diagram", "digram", "digr", "चित्र", "आरेख", "figure", "बनाओ", "machine", "यन्त्र"])
+        tl = t.lower()
+        # tera wala typo "digram" bhi pakdega
+        return any(x in tl for x in ["diagram", "digram", "digr", "चित्र", "आरेख", "figure", "बनाओ", "machine", "यन्त्र"])
 
 # PEHLE diagram check karo, BAAD me image check
 if _is_diagram_request(prompt):
