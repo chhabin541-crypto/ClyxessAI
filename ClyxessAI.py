@@ -6115,7 +6115,7 @@ with st.sidebar:
         "🎮 Play & Learn",
         "🎨 Creative AI Image Generator",
         "📷 Vision Lab", 
-        "🫧 AI Autonomous Behaviar", 
+        "🫧 AI Autonomous Behavior", 
         "🧩 Kids Logic Lab", 
         "🖥️ Real World Project",  
         "🎭 Peer Roleplay Modes",
