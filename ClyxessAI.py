@@ -1770,7 +1770,7 @@ def render_image_generator():
         else:
             st.link_button("🔗 Open Full Image",data) 
             
-def render_aiautonomous_behaviar():
+def render_ai_autonomous_behaviar():
     # ============================================================
     # Imports अंदर हैं ताकि कोई conflict न हो
     # ============================================================
@@ -6158,7 +6158,7 @@ if mode == "🎨 Creative AI Image Generator":
 if mode == "🧩 Kids Logic Lab":
     render_kids_logic_lab(); st.stop() 
 if mode == "🫧 AI Autononous Behaviar":
-    render_aiautonomous_behaviar(); st.stop()       
+    render_ai_autonomous_behaviar(); st.stop()       
 if mode == "📷 Vision Lab":
     render_vision_lab(); st.stop()
 if mode == "🎭 Peer Roleplay Modes":
