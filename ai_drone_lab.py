@@ -1,11 +1,10 @@
-# ============================================================
-# ai_drone_lab.py (नई फाइल)
-# ============================================================
-import streamlit as st
-import streamlit.components.v1 as components
-
 def render_ai_autonomous_behavior():
+    # ============================================================
     # Imports अंदर हैं ताकि कोई conflict न हो
+    # ============================================================
+    import streamlit as st
+    import streamlit.components.v1 as components
+
     HTML_TEMPLATE = """
     <!DOCTYPE html>
     <html lang="en">
@@ -168,6 +167,41 @@ def render_ai_autonomous_behavior():
                     successOwl: "🎉 सफलता! Cautious Owl ने बैरियर को स्कैन किया और सुरक्षित पार किया!",
                     stallOwl: "⚠️ रुकावट! Cautious Owl ने लेजर देखा और बिना Sonar Scan के आगे बढ़ने से मना कर दिया!",
                     emptyError: "❌ कृपया कम से कम 1 लॉजिक ब्लॉक जोड़ें!"
+                },
+                "te": {
+                    successFalcon: "🎉 విజయం! Brave Falcon లేజర్ బారియర్‌ను దాటడానికి షీల్డ్‌ని ఉపయోగించింది!",
+                    crashFalcon: "💥 క్రాష్! Brave Falcon షీల్డ్ లేకుండా లేజర్‌ను ఢీకొట్టింది!",
+                    successOwl: "🎉 విజయం! Cautious Owl బారియర్‌ను స్కాన్ చేసి సురక్షితంగా దాటింది!",
+                    stallOwl: "⚠️ నిలిచిపోయింది! Cautious Owl సోనార్ స్కాన్ లేకుండా ముందుకు సాగలేదు!",
+                    emptyError: "❌ దయచేసి కనీసం 1 లాజిక్ బ్లాక్‌ను జోడించండి!"
+                },
+                "ta": {
+                    successFalcon: "🎉 வெற்றி! Brave Falcon லேசர் தடையைக் கடக்க கேடயத்தைப் பயன்படுத்தியது!",
+                    crashFalcon: "💥 விபத்து! Brave Falcon கேடயம் இல்லாமல் லேசரில் மோதியது!",
+                    successOwl: "🎉 வெற்றி! Cautious Owl தடையை ஸ்கேன் செய்து பாதுகாப்பாகக் கடந்தது!",
+                    stallOwl: "⚠️ நின்றது! Cautious Owl சோனார் ஸ்கேன் இல்லாமல் நகர மறுத்துவிட்டது!",
+                    emptyError: "❌ தயவுசெய்து குறைந்தபட்சம் 1 லாஜிக் பிளாக்கைச் சேர்க்கவும்!"
+                },
+                "mr": {
+                    successFalcon: "🎉 यश! Brave Falcon ने लेझर बॅरियर पार करण्यासाठी शील्ड वापरली!",
+                    crashFalcon: "💥 क्रॅश! Brave Falcon शील्डशिवाय लेझरला धडकला!",
+                    successOwl: "🎉 यश! Cautious Owl ने बॅरियर स्कॅन केले आणि सुरक्षितपणे पार केले!",
+                    stallOwl: "⚠️ थांबला! Cautious Owl ने सोन्यार स्कॅनशिवाय पुढे जाण्यास नकार दिला!",
+                    emptyError: "❌ कृपया किमान १ लॉजिक ब्लॉक जोडा!"
+                },
+                "gu": {
+                    successFalcon: "🎉 સફળતા! Brave Falcon એ લેઝર બેરિયર પાર કરવા માટે શીલ્ડનો ઉપયોગ કર્યો!",
+                    crashFalcon: "💥 ક્રેશ! Brave Falcon શીલ્ડ વગર લેઝર સાથે અથડાયું!",
+                    successOwl: "🎉 સફળતા! Cautious Owl એ બેરિયર સ્કેન કર્યું અને સુરક્ષિત રીતે પાર કર્યું!",
+                    stallOwl: "⚠️ અટકી ગયું! Cautious Owl એ સોનાર સ્કેન વગર આગળ વધવાની ના પાડી!",
+                    emptyError: "❌ કૃપા કરીને ઓછામાં ઓછું ૧ લોજિક બ્લોક ઉમેરો!"
+                },
+                "bn": {
+                    successFalcon: "🎉 সাফল্য! Brave Falcon লেজার ব্যারিয়ার পার হতে শিল্ড ব্যবহার করেছে!",
+                    crashFalcon: "💥 ক্র্যাশ! Brave Falcon শিল্ড ছাড়া লেজারে ধাক্কা খেয়েছে!",
+                    successOwl: "🎉 সাফল্য! Cautious Owl ব্যারিয়ার স্ক্যান করে নিরাপদে পার হয়েছে!",
+                    stallOwl: "⚠️ থমকে গেছে! Cautious Owl সোনার স্ক্যান ছাড়া এগোতে রাজি হয়নি!",
+                    emptyError: "❌ অনুগ্রহ করে অন্তত ১টি লজিক ব্লক যোগ করুন!"
                 }
             };
 
@@ -280,5 +314,5 @@ def render_ai_autonomous_behavior():
     </html>
     """
     
-    # Streamlit में HTML को रेंडर करना
+    # यह लाइन HTML को Streamlit में दिखाएगी
     components.html(HTML_TEMPLATE, height=850, scrolling=True)
