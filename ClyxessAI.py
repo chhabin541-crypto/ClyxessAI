@@ -5904,38 +5904,94 @@ def render_normal_chat():
     with st.chat_message("user"):
         st.markdown(f'<div class="user-bubble">{prompt}</div>', unsafe_allow_html=True)
 
-    def _is_diagram_request(t):
-        tl = t.lower()
-        # tera wala typo "digram" bhi pakdega
-        return any(x in tl for x in ["diagram", "digram", "digr", "चित्र", "आरेख", "figure", "बनाओ", "machine", "यन्त्र"])
+    def render_normal_chat():
+    st.markdown('<div class="card chat-card">', unsafe_allow_html=True)
+    st.markdown(f"### 💬 {t('chat_title','Chat with')} ClyxessAI", unsafe_allow_html=True)
 
-# PEHLE diagram check karo, BAAD me image check
-if _is_diagram_request(prompt):
-    with st.chat_message("assistant"):
-        with st.spinner("✨ Colorful diagram + explanation bana raha hu..."):
-            sys_p = f'User: "{prompt}". Reply in SAME language. Give EXPLANATION in points with emojis and give matplotlib code inside CODE_START and CODE_END. Code must be colorful dark bg #0f172a, labels in user language. End with plt.tight_layout()'
-            comp, _ = get_groq_response(client, [{"role":"user","content": sys_p}], "You are helpful", "")
-            full = comp.choices[0].message.content if comp else ""
-            import re
-            exp = full.split("EXPLANATION:")[1].split("CODE_START")[0] if "EXPLANATION:" in full else full.split("CODE_START")[0]
-            st.markdown(exp)
-            if "CODE_START" in full:
-                try:
-                    code_raw = full.split("CODE_START")[1].split("CODE_END")[0]
-                    code = re.sub(r"```python|```", "", code_raw).strip()
-                    import matplotlib.pyplot as plt
-                    import matplotlib.patches as patches
-                    fig = plt.figure(figsize=(8,6), facecolor='#0f172a')
-                    exec(code, {"plt": plt, "patches": patches, "__builtins__": __builtins__})
-                    st.pyplot(fig)
-                    plt.close(fig)
-                except Exception as e:
-                    st.caption(f"Error: {e}")
-            st.session_state.messages.append({"role": "assistant", "content": exp})
-    save_current_chat_cloud()
-    st.rerun()
+    if st.session_state.get("editing_chat_id"):
+        st.info(f"✏️ Editing: {st.session_state.editing_chat_name}")
+        if st.button("❌ Cancel Edit"):
+            st.session_state.editing_chat_id = None
+            st.session_state.editing_chat_name = None
+            st.rerun()
 
-elif _explicit_image_request(prompt):
+    for m in st.session_state.messages:
+        if m["role"] == "user":
+            with st.chat_message("user"):
+                st.markdown(f'<div class="user-bubble">{m["content"]}</div>', unsafe_allow_html=True)
+        else:
+            with st.chat_message("assistant"):
+                if "image_url" in m:
+                    st.image(m["image_url"], width=420, caption=m.get("image_caption",""))
+                if m.get("content"):
+                    st.markdown(m["content"])
+
+    if prompt := st.chat_input("Ask ClyxessAI..."):
+        st.session_state.messages.append({"role": "user", "content": prompt})
+        with st.chat_message("user"):
+            st.markdown(f'<div class="user-bubble">{prompt}</div>', unsafe_allow_html=True)
+
+        # --- FINAL DIAGRAM FIX - NO def, NO return ---
+        is_diag = any(x in prompt.lower() for x in ["diagram","digram","digr","चित्र","आरेख","figure","machine","यन्त्र","तकनीक"])
+
+        if is_diag:
+            with st.chat_message("assistant"):
+                with st.spinner("✨ Colorful diagram + explanation bana raha hu..."):
+                    sys_p = f'User prompt: "{prompt}". Reply in SAME language as user. First give EXPLANATION: in points with emojis. Then give CODE_START and CODE_END block with matplotlib code. Code must be colorful, dark background #0f172a, labels in user language, end with plt.tight_layout()'
+                    comp, _ = get_groq_response(client, [{"role":"user","content": sys_p}], "You are diagram expert", "")
+                    full = comp.choices[0].message.content if comp and comp.choices else "EXPLANATION: Yaha diagram ka explanation ayega\nCODE_START\nimport matplotlib.pyplot as plt\nplt.text(0.5,0.5,'Diagram',ha='center',color='white')\nplt.tight_layout()\nCODE_END"
+                    import re
+                    exp = full.split("EXPLANATION:")[1].split("CODE_START")[0] if "EXPLANATION:" in full else full.split("CODE_START")[0]
+                    st.markdown(exp)
+                    if "CODE_START" in full:
+                        try:
+                            code_raw = full.split("CODE_START")[1].split("CODE_END")[0]
+                            code = re.sub(r"```python|```", "", code_raw).strip()
+                            import matplotlib.pyplot as plt
+                            import matplotlib.patches as patches
+                            fig = plt.figure(figsize=(8,6), facecolor='#0f172a')
+                            ax = fig.add_subplot(111)
+                            ax.set_facecolor('#0f172a')
+                            exec(code, {"plt": plt, "patches": patches, "ax": ax, "__builtins__": __builtins__})
+                            st.pyplot(fig)
+                            plt.close(fig)
+                        except Exception as e:
+                            st.caption(f"Diagram render error: {e}")
+                    st.session_state.messages.append({"role": "assistant", "content": exp})
+            save_current_chat_cloud()
+            st.rerun()
+
+        elif _explicit_image_request(prompt):
+            with st.chat_message("assistant"):
+                with st.spinner("🎨 Image bana raha hu..."):
+                    img_data, source = generate_image_url(prompt, False, "Normal", "1:1")
+                    st.markdown('<div class="media-card">', unsafe_allow_html=True)
+                    st.image(img_data, width=420, caption="Generated image")
+                    st.markdown('</div>', unsafe_allow_html=True)
+                    st.caption(f"Source: {source}")
+                    st.session_state.messages.append({"role": "assistant", "image_url": img_data, "image_caption": prompt, "content": "Generated image"})
+                    save_current_chat_cloud()
+                    st.rerun()
+
+        # --- Normal Search + Groq ---
+        search_context, sources = search_tavily(prompt)
+        system = st.session_state.get("system_prompt","")
+        if search_context:
+            system += "\nLIVE WEB INFO:\n" + search_context
+
+        with st.chat_message("assistant"):
+            completion, used_model = get_groq_response(client, st.session_state.messages, system, "")
+            if completion is None:
+                st.error("AI response नहीं आ पाया. Please try again.")
+                return
+            response = completion.choices[0].message.content
+            st.markdown(response)
+            if sources:
+                st.caption("Sources:\n" + sources)
+            st.caption(f"Model: {used_model or 'fallback'}")
+            st.session_state.messages.append({"role": "assistant", "content": response})
+            save_current_chat_cloud()
+            st.rerun()
 
     search_context, sources = search_tavily(prompt)
     system = NORMAL_SYSTEM_PROMPT + "\nLIVE INDIA CLOCK: " + get_india_datetime_context()
