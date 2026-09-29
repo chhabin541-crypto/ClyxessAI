@@ -5904,20 +5904,39 @@ def render_normal_chat():
     with st.chat_message("user"):
         st.markdown(f'<div class="user-bubble">{prompt}</div>', unsafe_allow_html=True)
 
-    if _explicit_image_request(prompt):
+    # --- DIAGRAM + IMAGE DONO EK SATH ---
+    def _is_diagram_request(t):
+        kws = ["diagram", "चित्र", "आरेख", "figure", "draw", "बनाओ", "machine", "यन्त्र", "तकनीक", "engine", "technology", "प्रणाली"]
+        return any(k in t.lower() for k in kws)
+
+    if _is_diagram_request(prompt):
         with st.chat_message("assistant"):
-            with st.spinner("🎨 Image bana raha hu..."):
-                img_data, source = generate_image_url(prompt, False, "Normal", "1:1")
-            st.markdown('<div class="media-card">', unsafe_allow_html=True)
-            st.image(img_data, width=420, caption="Generated image")
-            st.markdown('</div>', unsafe_allow_html=True)
-            st.caption(f"Source: {source}")
-        st.session_state.messages.append({
-            "role": "assistant", "image_url": img_data,
-            "image_caption": prompt, "content": "Generated image"
-        })
+            with st.spinner("✨ Diagram + Explanation bana raha hu..."):
+                sys_p = f'User: "{prompt}". Reply in SAME language as user. Give EXPLANATION in points with emojis and also give matplotlib code inside CODE_START and CODE_END. Code must be colorful, dark bg #0f172a, labels in user language. End with plt.tight_layout()'
+                comp, _ = get_groq_response(client, [{"role":"user","content": sys_p}], "You are helpful", "")
+                full = comp.choices[0].message.content if comp else ""
+                import re
+                exp = full.split("EXPLANATION:")[1].split("CODE_START")[0] if "EXPLANATION:" in full else full.split("CODE_START")[0]
+                st.markdown(exp)
+                if "CODE_START" in full:
+                    try:
+                        code_raw = full.split("CODE_START")[1].split("CODE_END")[0]
+                        code = re.sub(r"```python|```", "", code_raw).strip()
+                        import matplotlib.pyplot as plt
+                        import matplotlib.patches as patches
+                        fig = plt.figure(figsize=(8,6), facecolor='#0f172a')
+                        exec(code, {"plt": plt, "patches": patches, "__builtins__": __builtins__})
+                        st.pyplot(fig)
+                        plt.close(fig)
+                    except Exception as e:
+                        st.caption(f"Diagram render error: {e}")
+                st.session_state.messages.append({"role": "assistant", "content": exp})
         save_current_chat_cloud()
         st.rerun()
+
+
+    # iske baad teri purani line aayegi ->
+    search_context, sources = search_tavily(prompt)
 
     search_context, sources = search_tavily(prompt)
     system = NORMAL_SYSTEM_PROMPT + "\nLIVE INDIA CLOCK: " + get_india_datetime_context()
