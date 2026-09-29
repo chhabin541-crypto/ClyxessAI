@@ -1770,7 +1770,7 @@ def render_image_generator():
         else:
             st.link_button("🔗 Open Full Image",data) 
             
-def render_ai_autonomous_behaviar():
+def render_ai_autonomous_behavior():
     # ============================================================
     # Imports अंदर हैं ताकि कोई conflict न हो
     # ============================================================
@@ -2086,9 +2086,10 @@ def render_ai_autonomous_behaviar():
     </html>
     """
     
-    # Streamlit में HTML को रेंडर करना
+    # यह लाइन HTML को Streamlit में दिखाएगी
     components.html(HTML_TEMPLATE, height=850, scrolling=True)
-def render_vision_lab():
+    
+def render_vision_lab(): 
     st.title("📷 Vision Lab")
     f=st.file_uploader("Upload book, homework or diagram",type=["png","jpg","jpeg","webp"])
     labels=list(PLAY_LANGUAGES.keys()); label=st.selectbox("Answer language",labels)
@@ -6157,8 +6158,8 @@ if mode == "🎨 Creative AI Image Generator":
     render_image_generator(); st.stop() 
 if mode == "🧩 Kids Logic Lab":
     render_kids_logic_lab(); st.stop() 
-if mode == "🫧 AI Autononous Behaviar":
-    render_ai_autonomous_behaviar(); st.stop()       
+if mode == "🫧 AI Autononous Behavior":
+    render_ai_autonomous_behavior(); st.stop()       
 if mode == "📷 Vision Lab":
     render_vision_lab(); st.stop()
 if mode == "🎭 Peer Roleplay Modes":
