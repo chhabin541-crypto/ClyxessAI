@@ -6245,30 +6245,36 @@ def render_normal_chat():
     def render_normal_chat():
     client = get_groq_client()
     messages = st.session_state.get("messages", [])
-    prompt = st.session_state.get("last_prompt", "")
-    search_context, sources = search_tavily(prompt) if prompt else ("", "")
+
+    search_context = ""
+    sources = ""
+
     system = NORMAL_SYSTEM_PROMPT + "\nLIVE INDIA CLOCK: " + get_india_datetime_context()
-    if search_context:
-        system += "\nLIVE WEB INFO:\n" + search_context
+
     with st.chat_message("assistant"):
         completion, used_model = get_groq_response(client, messages, system, "")
+
         if completion is None:
-            st.error("AI response नहीं आ पाया. Please try again.")
+            st.error("AI response nahi aaya. Try again.")
             return
+
         response = completion.choices[0].message.content
         placeholder = st.empty()
         typed = ""
+
         for char in response:
             typed += char
             placeholder.markdown(typed + "▌")
             time.sleep(0.005)
+
         placeholder.markdown(response)
+
         if sources:
             st.caption("Sources:\n" + sources)
         st.caption("🔒 ClyxessChat AI | Secure • Fast • Private")
+
         messages.append({"role": "assistant", "content": response})
         st.session_state["messages"] = messages
-        st.rerun()
 
 def render_school_chat():
     st.title("🚀 Creative Lab — School Mode")
