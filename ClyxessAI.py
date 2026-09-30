@@ -6326,13 +6326,22 @@ def render_school_chat():
             st.error("AI response नहीं आ पाया. Please try again.")
             return
         response = completion.choices[0].message.content
-        st.markdown(response)
         if sources:
-            st.caption("Sources:\n" + sources)
-        st.caption(f"Age: {school_age} | Language: {language_name} | Model: {used_model or 'fallback'}")
+            response += f"\n\nSources:\n{sources}"
 
-    messages.append({"role": "assistant", "content": response})
-    st.rerun()
+        # --- TYPEWRITER EFFECT ---
+        message_placeholder = st.empty()
+        full_response = ""
+        for word in response.split():
+            full_response += word + " "
+            message_placeholder.markdown(full_response + "▌")
+            time.sleep(0.02)
+
+        message_placeholder.markdown(full_response)
+        st.caption(f"Age: {school_age} | Language: {language_name} | Model: {used_model}")
+
+        messages.append({"role": "assistant", "content": full_response})
+        st.rerun()
 
 if mode == "Normal Chat":
     render_normal_chat()
