@@ -6321,25 +6321,25 @@ def render_school_chat():
         system += "\nLIVE WEB INFO:\n" + search_context
 
     with st.chat_message("assistant"):
-    message_placeholder = st.empty()
-    full_response = ""
+        message_placeholder = st.empty()
+        full_response = ""
 
-    search_context, sources = search_tavily(prompt)
-    completion, used_model = get_groq_response(client, st.session_state.messages, search_context)
+        search_context, sources = search_tavily(prompt)
+        completion, used_model = get_groq_response(client, st.session_state.messages, search_context)
 
-    if completion is None:
-        st.stop()
+        if completion is None:
+            st.stop()
 
-    response = completion.choices[0].message.content
-    if sources:
-        response += f"\n\n**Source:**\n{sources}"
+        response = completion.choices[0].message.content
+        if sources:
+            response += f"\n\n**Source:**\n{sources}"
 
-    for char in response:
-        full_response += char
-        message_placeholder.markdown(full_response + "▌")
-        time.sleep(0.007)
+        for char in response:
+            full_response += char
+            message_placeholder.markdown(full_response + "▌")
+            time.sleep(0.01)
 
-    message_placeholder.markdown(full_response)
+        message_placeholder.markdown(full_response)
     st.caption(f"Age: {school_age} | Language: {language_name} | Model: {used_model}")
     messages.append({"role": "assistant", "content": full_response})
     st.rerun()
