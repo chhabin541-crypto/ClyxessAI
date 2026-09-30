@@ -6321,34 +6321,30 @@ def render_school_chat():
         system += "\nLIVE WEB INFO:\n" + search_context
 
     with st.chat_message("assistant"):
-        message_placeholder = st.empty()
-        full_response = ""
+    message_placeholder = st.empty()
+    full_response = ""
 
-        search_context, sources = search_tavily(prompt)
-        completion, used_model = get_groq_response(client, st.session_state.messages, search_context)
+    search_context, sources = search_tavily(prompt)
+    completion, used_model = get_groq_response(client, st.session_state.messages, search_context)
 
-        if completion is None:
-            st.stop()
+    if completion is None:
+        st.stop()
 
-        response = completion.choices[0].message.content
-        if sources:
-            response += f"\n\n**Source:**\n{sources}"
+    response = completion.choices[0].message.content
+    if sources:
+        response += f"\n\n**Source:**\n{sources}"
 
-        # Human jaisa typing effect
-        for word in response.split():
-            full_response += word + " "
-            message_placeholder.markdown(
-            f'<div class="gradient-text">{full_response}<span style="opacity:0.6;">▌</span></div>',
-            unsafe_allow_html=True
-            )
-            time.sleep(0.07)
+    # Human jaisa typing effect - BOX SAHI WALA
+    for char in response:
+        full_response += char
+        message_placeholder.markdown(full_response + "▌")
+        time.sleep(0.007)
 
-        message_placeholder.empty()
-        st.markdown(full_response)
-        st.caption(f"Age: {school_age} | Language: {language_name} | Model: {used_model}")
+    message_placeholder.markdown(full_response)
+    st.caption(f"Age: {school_age} | Language: {language_name} | Model: {used_model}")
 
-        messages.append({"role": "assistant", "content": full_response})
-        st.rerun()
+    messages.append({"role": "assistant", "content": full_response})
+    st.rerun()
 
 if mode == "Normal Chat":
     render_normal_chat()
