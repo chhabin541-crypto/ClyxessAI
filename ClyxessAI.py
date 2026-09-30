@@ -6341,7 +6341,7 @@ def render_school_chat():
             f'<div class="gradient-text">{full_response}<span style="opacity:0.6;">▌</span></div>',
             unsafe_allow_html=True
             )
-            time.sleep(0.02)
+            time.sleep(0.07)
 
         message_placeholder.empty()
         st.markdown(full_response)
