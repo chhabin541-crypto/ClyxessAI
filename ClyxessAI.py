@@ -6334,7 +6334,6 @@ def render_school_chat():
     if sources:
         response += f"\n\n**Source:**\n{sources}"
 
-    # Human jaisa typing effect - BOX SAHI WALA
     for char in response:
         full_response += char
         message_placeholder.markdown(full_response + "▌")
@@ -6342,7 +6341,6 @@ def render_school_chat():
 
     message_placeholder.markdown(full_response)
     st.caption(f"Age: {school_age} | Language: {language_name} | Model: {used_model}")
-
     messages.append({"role": "assistant", "content": full_response})
     st.rerun()
 
