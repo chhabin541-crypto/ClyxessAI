@@ -247,7 +247,7 @@ if prompt := st.chat_input("Ask ClyxessChat AI"):
                 f'<div class="gradient-text">{full_response}<span style="opacity:0.6;">▌</span></div>', 
                 unsafe_allow_html=True
             )
-            time.sleep(0.05)
+            time.sleep(0.01)
         
         message_placeholder.empty()
         display_message(full_response)
