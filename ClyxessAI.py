@@ -6321,28 +6321,23 @@ def render_school_chat():
         system += "\nLIVE WEB INFO:\n" + search_context
 
     with st.chat_message("assistant"):
-        message_placeholder = st.empty()
-        full_response = ""
-
-        search_context, sources = search_tavily(prompt)
-        completion, used_model = get_groq_response(client, st.session_state.messages, search_context)
-
+        completion, used_model = get_groq_response(client, messages, system, "")
         if completion is None:
-            st.stop()
-
+            st.error("AI response नहीं आ पाया. Please try again.")
+            return
         response = completion.choices[0].message.content
+        placeholder = st.empty()
+        typed = ""
+        for word in response.split(" "):
+            typed += word + " "
+            placeholder.markdown(typed + "▌")
+            time.sleep(0.02)
+        placeholder.markdown(response)
         if sources:
-            response += f"\n\n**Source:**\n{sources}"
-
-        for char in response:
-            full_response += char
-            message_placeholder.markdown(full_response + "▌")
-            time.sleep(0.01)
-
-        message_placeholder.markdown(full_response)
-    st.caption(f"Age: {school_age} | Language: {language_name} | Model: {used_model}")
-    messages.append({"role": "assistant", "content": full_response})
-    st.rerun()
+            st.caption("Sources:\n" + sources)
+        st.caption("🔒 ClyxessChat AI | Secure • Fast • Private")
+        messages.append({"role": "assistant", "content": response})
+        st.rerun()
 
 if mode == "Normal Chat":
     render_normal_chat()
