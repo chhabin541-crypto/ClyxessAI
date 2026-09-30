@@ -6335,7 +6335,7 @@ def render_school_chat():
         for word in response.split():
             full_response += word + " "
             message_placeholder.markdown(full_response + "▌")
-            time.sleep(0.02)
+            time.sleep(0.04)
 
         message_placeholder.markdown(full_response)
         st.caption(f"Age: {school_age} | Language: {language_name} | Model: {used_model}")
