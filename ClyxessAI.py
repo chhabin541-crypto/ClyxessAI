@@ -6243,21 +6243,24 @@ def render_normal_chat():
         system += "\nLIVE WEB INFO:\n" + search_context
 
     with st.chat_message("assistant"):
-        completion, used_model = get_groq_response(
-            client, st.session_state.messages, system, ""
-        )
+        completion, used_model = get_groq_response(client, st.session_state.messages, system, "")
         if completion is None:
             st.error("AI response नहीं आ पाया. Please try again.")
             return
         response = completion.choices[0].message.content
-        st.markdown(response)
+        placeholder = st.empty()
+        typed = ""
+        for word in response.split(" "):
+            typed += word + " "
+            placeholder.markdown(typed + "▌")
+            time.sleep(0.02)
+        placeholder.markdown(response)
         if sources:
             st.caption("Sources:\n" + sources)
-        st.caption(f"Model: {used_model or 'fallback'}")
-
-    st.session_state.messages.append({"role": "assistant", "content": response})
-    save_current_chat_cloud()
-    st.rerun()
+        st.caption("🔒 ClyxessChat AI | Secure • Fast • Private")
+        st.session_state.messages.append({"role": "assistant", "content": response})
+        save_current_chat_cloud()
+        st.rerun()
 
 def render_school_chat():
     st.title("🚀 Creative Lab — School Mode")
