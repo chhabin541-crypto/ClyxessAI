@@ -2147,7 +2147,6 @@ def render_roleplay():
         ans,_=get_groq_response(client,[{"role":"user","content":prompt}],system,"")
         st.chat_message("assistant").write(ans.choices[0].message.content if ans else "")
 
-
 def render_cyber_security():
     import os
     import math
@@ -2158,25 +2157,191 @@ def render_cyber_security():
     import secrets
     import sqlite3
     import threading
+    import random
     from dataclasses import dataclass, asdict
     from collections import defaultdict, deque
     from typing import Any, Dict, List, Optional, Tuple
     import streamlit as st
+    import streamlit.components.v1 as components
 
-    # ========================================================
-    # 1. ALLOWED LANGUAGES
-    # ========================================================
-    SUPPORTED_LANGUAGES = {
-        "English": "en",
-        "Hindi": "hi",
-        "Chinese": "zh",
-        "Japanese": "ja",
-        "Russian": "ru",
+    # ============================================================
+    # PART 1: SCHOOL CORE LOGIC (Learning School Engine)
+    # ============================================================
+
+    SCHOOL_PRINCIPLE = """
+    Advanced technology in the backend.
+    Simple learning experience for the child.
+    """
+
+    AGE_LEVELS = {
+        "5-7": {"style": "story_game", "difficulty": "very_easy", "explanation": "very_simple", "activity": "play"},
+        "8-10": {"style": "game_experiment", "difficulty": "easy", "explanation": "simple", "activity": "discover"},
+        "11-13": {"style": "experiment_problem", "difficulty": "medium", "explanation": "simple_with_examples", "activity": "solve"},
+        "14-16": {"style": "project_challenge", "difficulty": "medium_advanced", "explanation": "practical", "activity": "build"},
+        "17-18": {"style": "advanced_project", "difficulty": "advanced", "explanation": "technical", "activity": "build_and_analyze"},
+        "college_university": {"style": "research_project", "difficulty": "advanced", "explanation": "technical", "activity": "research_create"}
     }
 
-    # ========================================================
-    # 2. SECURITY CONFIG
-    # ========================================================
+    CONCEPT_TRANSLATOR = {
+        "encryption": "Secret message that only the right person can read",
+        "hashing": "A special fingerprint made from information",
+        "authentication": "Proving that you are really you",
+        "firewall": "A security guard checking who can enter",
+        "artificial_intelligence": "A computer learning patterns from examples",
+        "machine_learning": "Teaching a computer using many examples",
+        "neural_network": "A computer system inspired by how the brain finds patterns",
+        "data_science": "Finding useful answers from lots of information",
+        "statistics": "Using numbers to understand what is happening",
+        "physics": "Understanding how things move, push, pull, heat and interact",
+        "finance": "Learning how money is earned, saved, spent and planned"
+    }
+
+    LEARNING_MODES = ["Learn", "Practice", "Challenge", "Experiment", "Project", "Assessment"]
+
+    SUBJECTS = {
+        "Math Lab": ["Numbers", "Fractions", "Decimals", "Geometry", "Algebra", "Probability", "Statistics", "Calculus", "Linear Algebra"],
+        "Physics Lab": ["Motion", "Force", "Energy", "Heat", "Light", "Sound", "Electricity", "Magnetism", "Modern Physics"],
+        "Data Science Lab": ["Data", "Charts", "Average", "Probability", "Statistics", "Python", "Data Cleaning", "Machine Learning", "AI"],
+        "Learn AI": ["What is AI?", "How AI learns", "Machine Learning", "Generative AI", "Prompting", "Computer Vision", "NLP", "AI Agents", "AI Ethics"],
+        "Learn Finance": ["Money", "Saving", "Budget", "Banking", "Interest", "Inflation", "Business", "Accounting", "Finance"],
+        "Coding Lab": ["Logic", "Algorithms", "Python", "Web Development", "Apps", "Projects"]
+    }
+
+    CYBER_LEARNING = {
+        "password": {"simple_name": "Secret Key Game", "activity": "Create a strong secret", "concept": "Password security"},
+        "encryption": {"simple_name": "Secret Message", "activity": "Hide and reveal a message", "concept": "Encryption"},
+        "firewall": {"simple_name": "Security Guard Game", "activity": "Allow safe visitors and block unsafe ones", "concept": "Firewall"},
+        "authentication": {"simple_name": "Who Are You?", "activity": "Identity verification puzzle", "concept": "Authentication"},
+        "privacy": {"simple_name": "What Should We Share?", "activity": "Choose safe information", "concept": "Privacy"}
+    }
+
+    CYBER_SCHOOL_RULE = """
+    Teach security, privacy and responsible technology.
+    Use games, puzzles and simulations.
+    Never ask children to attack real systems, real websites, real accounts or real networks.
+    """
+
+    FINAL_RULE = """
+    ClyxessChat AI is a Learning School.
+    The child should never feel that they are reading a complicated technical manual.
+    First: Play
+    Then: Understand
+    Then: Try
+    Then: Make mistakes
+    Then: Learn
+    Then: Create
+    Advanced concepts are introduced only when the student is ready for them.
+    """
+
+    # ------ Stub implementations for missing functions ------
+    def story_based_explanation(topic):
+        return f"Once upon a time, a curious child discovered {topic}..."
+
+    def example_based_explanation(topic):
+        return f"Think of {topic} like this: imagine you have a magic box..."
+
+    def concept_plus_example(topic):
+        return f"Concept: {topic}. Example: When you save money in a piggy bank, that's like {topic} in action!"
+
+    def practical_explanation(topic):
+        return f"In real life, {topic} is used when engineers build systems..."
+
+    def technical_explanation(topic):
+        return f"Technically, {topic} involves: structure, function, and real-world application."
+
+    def explain_simple(topic, level):
+        if level["explanation"] == "very_simple":
+            return story_based_explanation(topic)
+        elif level["explanation"] == "simple":
+            return example_based_explanation(topic)
+        elif level["explanation"] == "simple_with_examples":
+            return concept_plus_example(topic)
+        elif level["explanation"] == "practical":
+            return practical_explanation(topic)
+        else:
+            return technical_explanation(topic)
+
+    def show_real_life_example(topic, level):
+        return f"Real-life example of {topic}: Look around you — {topic} is everywhere!"
+
+    def create_activity(topic, difficulty, style):
+        return {"topic": topic, "difficulty": difficulty, "style": style, "question": f"Try to explain {topic} in your own words!"}
+
+    def run_activity(activity):
+        return {"answer": None, "completed": False, "activity": activity}
+
+    def evaluate_student(result):
+        return {"mistake": False, "score": 100}
+
+    def give_hint(level, mistake):
+        return "Here is a small hint to help you!"
+
+    def allow_retry():
+        return True
+
+    def calculate_mastery(performance):
+        return 85
+
+    def adaptive_difficulty(mastery):
+        if mastery < 40:
+            return "easier"
+        elif mastery < 70:
+            return "same_level"
+        elif mastery < 90:
+            return "slightly_harder"
+        else:
+            return "next_level"
+
+    def show_feedback(performance, mastery):
+        return {"mastery": mastery, "message": "Great job!"}
+
+    def help_student(question, attempts):
+        if attempts == 0:
+            return "Try it yourself first."
+        elif attempts == 1:
+            return "Here is a small hint."
+        elif attempts == 2:
+            return "Let's look at a simple example."
+        else:
+            return "Let's solve it together step by step."
+
+    def lesson_summary():
+        return {
+            "what_you_learned": True,
+            "skill": True,
+            "mistake_explanation": True,
+            "real_world_example": True,
+            "next_challenge": True
+        }
+
+    def learning_loop(student, topic):
+        age_level = student["age_level"]
+        level = AGE_LEVELS[age_level]
+        explain_simple(topic, level)
+        show_real_life_example(topic, level)
+        activity = create_activity(topic=topic, difficulty=level["difficulty"], style=level["style"])
+        result = run_activity(activity)
+        performance = evaluate_student(result)
+        if performance["mistake"]:
+            give_hint(level=level, mistake=performance["mistake"])
+            retry = allow_retry()
+            if retry:
+                return learning_loop(student, topic)
+        mastery = calculate_mastery(performance)
+        next_level = adaptive_difficulty(mastery)
+        show_feedback(performance=performance, mastery=mastery)
+        return next_level
+
+    STUDENT_FLOW = """
+    Choose Age -> Choose Language -> Choose Subject -> Choose Topic
+    -> Simple Story / Example -> Interactive Activity -> Try Yourself
+    -> AI Hint if Needed -> Retry -> Challenge -> Assessment -> Mastery
+    -> Difficulty Automatically Adjusts -> Project Unlock -> Next Skill
+    """
+
+    # ============================================================
+    # PART 2: SECURITY CONFIG
+    # ============================================================
     class CyberConfig:
         APP_NAME = "ClyxessChat AI Cyber Engine"
         SECRET_KEY = os.environ.get("CLYXESS_SECRET_KEY", "CHANGE_THIS_IN_PRODUCTION")
@@ -2187,33 +2352,29 @@ def render_cyber_security():
         DEFAULT_BEHAVIOR_TOLERANCE = 0.35
         MIN_STROKE_POINTS = 3
 
-    # ========================================================
-    # 3. BASIC CRYPTOGRAPHY UTILITIES
-    # ========================================================
+    # ============================================================
+    # PART 3: CRYPTOGRAPHY UTILITIES
+    # ============================================================
     class CryptoEngine:
         @staticmethod
         def sha256(value: str) -> str:
             return hashlib.sha256(value.encode("utf-8")).hexdigest()
-
         @staticmethod
         def sha3_256(value: str) -> str:
             return hashlib.sha3_256(value.encode("utf-8")).hexdigest()
-
         @staticmethod
         def hmac_sha256(secret: str, message: str) -> str:
             return hmac.new(secret.encode("utf-8"), message.encode("utf-8"), hashlib.sha256).hexdigest()
-
         @staticmethod
         def secure_compare(a: str, b: str) -> bool:
             return hmac.compare_digest(str(a), str(b))
-
         @staticmethod
         def random_nonce(length: int = 32) -> str:
             return secrets.token_urlsafe(length)
 
-    # ========================================================
-    # 4. BIOMETRIC DATA MODEL
-    # ========================================================
+    # ============================================================
+    # PART 4: BIOMETRIC DATA MODEL
+    # ============================================================
     @dataclass
     class BehavioralProfile:
         avg_velocity: float
@@ -2226,9 +2387,9 @@ def render_cyber_security():
         max_velocity: float
         created_at: float
 
-    # ========================================================
-    # 5. CLYXESS CYBER ENGINE
-    # ========================================================
+    # ============================================================
+    # PART 5: CLYXESS CYBER ENGINE (Real Python Logic)
+    # ============================================================
     class ClyxessCyberEngine:
         def __init__(self, secret_key: Optional[str] = None, database_path: str = "clyxess_cyber.db"):
             self.secret_key = secret_key or os.environ.get("CLYXESS_SECRET_KEY", CyberConfig.SECRET_KEY)
@@ -2608,62 +2769,146 @@ def render_cyber_security():
                 "one_time_access": token, "security_notice": "Educational security engine. Production authentication should use WebAuthn/FIDO2/passkeys."
             }
 
-    # ========================================================
-    # STREAMLIT UI FRONTEND
-    # ========================================================
-    st.markdown("### 🛡️ Clyxess AI Cyber & Biometric Engine")
-    st.caption("Educational defensive security engine. Not for production use.")
+    # ============================================================
+    # PART 6: STREAMLIT UI
+    # ============================================================
+    st.markdown("### 🛡️ Clyxess AI — Cyber School Core")
+    st.caption("Advanced technology in the backend. Simple learning experience for the child.")
 
-    # Initialize engine
     if "cyber_engine" not in st.session_state:
         st.session_state.cyber_engine = ClyxessCyberEngine(database_path="clyxess_cyber_streamlit.db")
     engine = st.session_state.cyber_engine
 
-    tab1, tab2, tab3, tab4 = st.tabs(["🔬 Biometric Test", "🧱 Firewall Simulator", "📊 Log Forensics", "⚛️ Quantum BB84"])
+    tab1, tab2, tab3, tab4 = st.tabs(["🎨 Biometric Draw", "🧱 Firewall Sim", "📊 Log Forensics", "⚛️ Quantum BB84"])
 
     with tab1:
-        st.subheader("Biometric Drawing Simulation")
-        st.write("Simulate drawing strokes to test the engine.")
-        
-        # Dummy strokes
-        dummy_strokes = [
-            {"x": 10, "y": 10, "timestamp_ms": 100},
-            {"x": 50, "y": 50, "timestamp_ms": 250},
-            {"x": 100, "y": 30, "timestamp_ms": 400},
-            {"x": 150, "y": 80, "timestamp_ms": 600}
-        ]
-        
-        user_id_input = st.text_input("User ID", value="student_01")
-        
-        if st.button("🚀 Process Cipher Drawing"):
-            with st.spinner("Analyzing biometrics..."):
-                result = engine.process_cipher(user_id_input, dummy_strokes)
-                st.json(result)
+        st.markdown("#### 🎨 Draw Your Secret Biometric Cipher")
+
+        HTML_TEMPLATE = """
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Biometric Canvas</title>
+            <script src="https://cdn.tailwindcss.com"></script>
+            <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+            <style>canvas { touch-action: none; }</style>
+        </head>
+        <body class="bg-slate-950 text-slate-100 p-4 font-sans flex flex-col justify-center items-center">
+            <div class="w-full max-w-4xl bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl">
+                <h2 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                    <i class="fa-solid fa-pen-fancy text-purple-400"></i> Draw Your Secret Symbol
+                </h2>
+                <div class="relative bg-slate-950 border-2 border-dashed border-purple-500/50 rounded-2xl p-2 flex justify-center items-center h-[350px]">
+                    <canvas id="glyphCanvas" width="600" height="330" class="cursor-crosshair bg-slate-900 rounded-xl"></canvas>
+                </div>
+                <p class="text-xs text-slate-500 mt-2 text-center">Draw any shape. The AI records your <b>speed</b> and <b>angle</b> to create a unique key.</p>
+                <div class="flex space-x-2 mt-4">
+                    <button onclick="clearCanvas()" class="w-1/3 py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 text-sm font-bold rounded-xl transition">Clear Canvas</button>
+                    <button onclick="generateJSON()" class="w-2/3 py-3 bg-purple-500 hover:bg-purple-400 text-slate-950 text-sm font-bold rounded-xl shadow-lg transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-microchip"></i> Generate Data for AI
+                    </button>
+                </div>
+                <div id="jsonOutputBox" class="mt-4 hidden">
+                    <p class="text-xs text-emerald-400 font-bold mb-1">✅ Data captured! Copy this code and paste it below:</p>
+                    <textarea id="jsonOutput" class="w-full h-24 bg-slate-950 text-emerald-300 font-mono text-xs p-2 rounded-xl border border-emerald-500/30" readonly></textarea>
+                </div>
+            </div>
+            <script>
+                const canvas = document.getElementById('glyphCanvas');
+                const ctx = canvas.getContext('2d');
+                let isDrawing = false;
+                let strokePoints = [];
+                ctx.strokeStyle = "#a855f7"; ctx.lineWidth = 4; ctx.lineCap = "round"; ctx.lineJoin = "round";
+                function getPos(e) {
+                    const rect = canvas.getBoundingClientRect();
+                    const cx = e.touches ? e.touches[0].clientX : e.clientX;
+                    const cy = e.touches ? e.touches[0].clientY : e.clientY;
+                    return { x: cx - rect.left, y: cy - rect.top };
+                }
+                function startDrawing(e) {
+                    isDrawing = true; const pos = getPos(e);
+                    ctx.beginPath(); ctx.moveTo(pos.x, pos.y);
+                    strokePoints = [{ x: pos.x, y: pos.y, timestamp_ms: Date.now() }];
+                }
+                function draw(e) {
+                    if (!isDrawing) return; e.preventDefault();
+                    const pos = getPos(e); ctx.lineTo(pos.x, pos.y); ctx.stroke();
+                    strokePoints.push({ x: pos.x, y: pos.y, timestamp_ms: Date.now() });
+                }
+                function stopDrawing() { isDrawing = false; }
+                canvas.addEventListener('mousedown', startDrawing);
+                canvas.addEventListener('mousemove', draw);
+                canvas.addEventListener('mouseup', stopDrawing);
+                canvas.addEventListener('mouseout', stopDrawing);
+                canvas.addEventListener('touchstart', startDrawing);
+                canvas.addEventListener('touchmove', draw);
+                canvas.addEventListener('touchend', stopDrawing);
+                function clearCanvas() {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    strokePoints = [];
+                    document.getElementById('jsonOutputBox').classList.add('hidden');
+                }
+                function generateJSON() {
+                    if (strokePoints.length < 3) { alert("Please draw a longer pattern first!"); return; }
+                    document.getElementById('jsonOutput').value = JSON.stringify(strokePoints);
+                    document.getElementById('jsonOutputBox').classList.remove('hidden');
+                }
+            </script>
+        </body>
+        </html>
+        """
+        components.html(HTML_TEMPLATE, height=550, scrolling=False)
+
+        st.markdown("---")
+        st.markdown("#### 🤖 Step 2: Process with Python AI Engine")
+        st.info("Draw above → click 'Generate Data for AI' → copy the JSON → paste below.")
+
+        json_input = st.text_area("Paste JSON data here:", height=120, placeholder='[{"x": 100, "y": 150, "timestamp_ms": 167...}]')
+
+        if st.button("🚀 Run Python Cyber Engine", type="primary"):
+            if not json_input.strip():
+                st.warning("Please paste the JSON data first!")
+            else:
+                try:
+                    stroke_data = json.loads(json_input)
+                    with st.spinner("Analyzing biometrics, geometry, and cryptography..."):
+                        result = engine.process_cipher("student_01", stroke_data)
+                        if result.get("status") == "SUCCESS":
+                            st.success("🎉 Analysis Complete! Your biometric signature is processed.")
+                            st.balloons()
+                            c1, c2, c3 = st.columns(3)
+                            with c1: st.metric("Avg Velocity", f"{result['biometric_physics']['avg_velocity']} px/ms")
+                            with c2: st.metric("Geometry Type", result['geometry']['geometry_type'])
+                            with c3: st.metric("AI Command", result['dsl_command'].split(":")[1].strip())
+                            with st.expander("🔍 View Detailed Security Proof"):
+                                st.json(result)
+                        else:
+                            st.error(f"Engine Error: {result.get('reason', 'Unknown error')}")
+                except json.JSONDecodeError:
+                    st.error("❌ Invalid data format. Copy the full JSON from the green box.")
+                except Exception as e:
+                    st.error(f"An unexpected error occurred: {str(e)}")
 
     with tab2:
-        st.subheader("Firewall Rule Simulator")
+        st.markdown("#### 🧱 Firewall Simulator")
         col1, col2, col3 = st.columns(3)
-        with col1:
-            rule_name = st.text_input("Rule Name", value="Block_Unknown_IP")
-        with col2:
-            source_ip = st.text_input("Source IP", value="192.168.1.100")
-        with col3:
-            action = st.selectbox("Action", ["ALLOW", "DENY", "LOG"])
-
+        with col1: rule_name = st.text_input("Rule Name", value="Block_Unknown_IP")
+        with col2: source_ip = st.text_input("Source IP", value="192.168.1.100")
+        with col3: action = st.selectbox("Action", ["ALLOW", "DENY", "LOG"])
         if st.button("Add Firewall Rule"):
             try:
                 engine.add_firewall_rule(rule_name, source_ip, action)
                 st.success("Rule added successfully!")
             except Exception as e:
                 st.error(f"Error: {e}")
-
         test_ip = st.text_input("Test Source IP", value="192.168.1.100")
         if st.button("Simulate Firewall Request"):
-            result = engine.simulate_firewall(test_ip)
-            st.json(result)
+            st.json(engine.simulate_firewall(test_ip))
 
     with tab3:
-        st.subheader("AI Security Log Triage")
+        st.markdown("#### 📊 AI Security Log Triage")
         sample_logs = [
             {"event_type": "LOGIN_FAILED", "user_id": "user_1"},
             {"event_type": "REPLAY_ATTEMPT", "user_id": "user_2"},
@@ -2671,16 +2916,27 @@ def render_cyber_security():
             {"event_type": "RATE_LIMIT_BLOCK", "user_id": "user_3"}
         ]
         if st.button("Analyze Sample Logs"):
-            result = engine.ai_security_triage(sample_logs)
-            st.json(result)
+            st.json(engine.ai_security_triage(sample_logs))
 
     with tab4:
-        st.subheader("Quantum BB84 Key Distribution Simulator")
+        st.markdown("#### ⚛️ Quantum BB84 Key Distribution")
         bits = st.slider("Number of bits", 4, 64, 16)
         eavesdropper = st.checkbox("Simulate Eavesdropper (Eve)")
         if st.button("Run BB84 Simulation"):
-            result = engine.simulate_bb84(bits, eavesdropper)
-            st.json(result)
+            st.json(engine.simulate_bb84(bits, eavesdropper))
+
+    # ============================================================
+    # PART 7: SCHOOL LOGIC PANEL (Educational Info)
+    # ============================================================
+    with st.expander("📚 Clyxess School Core Principles"):
+        st.markdown(f"**Principle:** {SCHOOL_PRINCIPLE}")
+        st.markdown("**Age Adaptive Levels:**")
+        st.json(AGE_LEVELS)
+        st.markdown("**Concept Translator:**")
+        st.json(CONCEPT_TRANSLATOR)
+        st.markdown("**Student Flow:**")
+        st.code(STUDENT_FLOW)
+        st.markdown(f"**Final Rule:** {FINAL_RULE}")
 
 def render_homework_test():
     st.title("📝 Interactive Homework & Test")
