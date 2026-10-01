@@ -2148,11 +2148,6 @@ def render_roleplay():
         st.chat_message("assistant").write(ans.choices[0].message.content if ans else "")
 
 def render_ai_autonomous_behavior():
-    # ============================================================
-# ai_drone_lab.py
-# ============================================================
-
-def render_ai_autonomous_behavior():
     # Imports yahan andar hain, taaki upar file mein koi gadbad na ho
     import streamlit as st
     import streamlit.components.v1 as components
