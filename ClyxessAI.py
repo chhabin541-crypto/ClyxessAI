@@ -2157,496 +2157,535 @@ def render_cyber_security():
     import secrets
     import sqlite3
     import threading
-    import random
     from dataclasses import dataclass, asdict
     from collections import defaultdict, deque
-    from typing import Any, Dict, List, Optional, Tuple
+    from typing import Any, Dict, List, Optional
     import streamlit as st
     import streamlit.components.v1 as components
 
     # ============================================================
-    # PART 1: SCHOOL CORE LOGIC (Learning School Engine)
+    # SECTION 1: KIDS CYBER SAFETY ZONE (Age-Based Learning)
     # ============================================================
+    def render_kids_cyber_safety():
+        HTML_TEMPLATE = """
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Kids Cyber Safety Zone</title>
+            <script src="https://cdn.tailwindcss.com"></script>
+            <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+            <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+            <style>
+                canvas { touch-action: none; }
+                .glow { box-shadow: 0 0 15px rgba(16, 185, 129, 0.5); }
+            </style>
+        </head>
+        <body class="bg-gradient-to-br from-indigo-950 via-purple-950 to-slate-950 text-slate-100 min-h-screen p-4 font-sans">
+            <div class="max-w-6xl mx-auto space-y-5">
+                
+                <header class="bg-slate-900/80 backdrop-blur border-2 border-emerald-500/40 p-5 rounded-3xl text-center shadow-2xl">
+                    <h1 class="text-2xl md:text-3xl font-bold text-white">🛡️ Kids Cyber Safety Zone</h1>
+                    <p class="text-xs text-emerald-300 mt-1">Khel-Khel Mein Cyber Suraksha Seekho • Ages 5-15</p>
+                </header>
 
-    SCHOOL_PRINCIPLE = """
-    Advanced technology in the backend.
-    Simple learning experience for the child.
-    """
+                <!-- Main Age Group Selector -->
+                <div class="bg-slate-900/80 backdrop-blur border border-slate-700 p-4 rounded-2xl">
+                    <label class="text-xs font-bold text-slate-300 block mb-2 text-center">👶 Apni Umar (Age Group) Chuno:</label>
+                    <div class="grid grid-cols-3 gap-2">
+                        <button onclick="setAge('junior')" id="btnJunior" class="age-btn py-3 rounded-xl text-xs font-bold bg-emerald-500 text-slate-950 transition">🎈 5-8 Saal<br><span class="text-[9px]">Junior</span></button>
+                        <button onclick="setAge('middle')" id="btnMiddle" class="age-btn py-3 rounded-xl text-xs font-bold bg-slate-800 text-slate-300 transition">🚀 9-12 Saal<br><span class="text-[9px]">Explorer</span></button>
+                        <button onclick="setAge('senior')" id="btnSenior" class="age-btn py-3 rounded-xl text-xs font-bold bg-slate-800 text-slate-300 transition">🧠 13-15 Saal<br><span class="text-[9px]">Thinker</span></button>
+                    </div>
+                </div>
 
-    AGE_LEVELS = {
-        "5-7": {"style": "story_game", "difficulty": "very_easy", "explanation": "very_simple", "activity": "play"},
-        "8-10": {"style": "game_experiment", "difficulty": "easy", "explanation": "simple", "activity": "discover"},
-        "11-13": {"style": "experiment_problem", "difficulty": "medium", "explanation": "simple_with_examples", "activity": "solve"},
-        "14-16": {"style": "project_challenge", "difficulty": "medium_advanced", "explanation": "practical", "activity": "build"},
-        "17-18": {"style": "advanced_project", "difficulty": "advanced", "explanation": "technical", "activity": "build_and_analyze"},
-        "college_university": {"style": "research_project", "difficulty": "advanced", "explanation": "technical", "activity": "research_create"}
-    }
+                <!-- Activity Selector (50+ dropdown options) -->
+                <div class="bg-slate-900/80 backdrop-blur border border-slate-700 p-4 rounded-2xl">
+                    <label class="text-xs font-bold text-slate-300 block mb-2">📚 Seekhne Ka Topic Chuno:</label>
+                    <select id="topicSelect" onchange="loadTopic()" class="w-full bg-slate-950 text-emerald-400 font-bold text-sm p-3 rounded-xl border border-emerald-500/40 cursor-pointer">
+                        <!-- Populated by JS -->
+                    </select>
+                </div>
 
-    CONCEPT_TRANSLATOR = {
-        "encryption": "Secret message that only the right person can read",
-        "hashing": "A special fingerprint made from information",
-        "authentication": "Proving that you are really you",
-        "firewall": "A security guard checking who can enter",
-        "artificial_intelligence": "A computer learning patterns from examples",
-        "machine_learning": "Teaching a computer using many examples",
-        "neural_network": "A computer system inspired by how the brain finds patterns",
-        "data_science": "Finding useful answers from lots of information",
-        "statistics": "Using numbers to understand what is happening",
-        "physics": "Understanding how things move, push, pull, heat and interact",
-        "finance": "Learning how money is earned, saved, spent and planned"
-    }
+                <!-- Main Workspace -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+                    
+                    <!-- Left: Activity Area -->
+                    <div class="bg-slate-900/80 backdrop-blur border border-slate-700 rounded-3xl p-5 space-y-4">
+                        <div id="activityHeader" class="border-b border-slate-700 pb-3">
+                            <span id="activityTag" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-pink-500/20 text-pink-300">Quiz</span>
+                            <h2 id="activityTitle" class="text-lg font-bold text-white mt-1">Loading...</h2>
+                            <p id="activityDesc" class="text-xs text-slate-400 mt-1">...</p>
+                        </div>
 
-    LEARNING_MODES = ["Learn", "Practice", "Challenge", "Experiment", "Project", "Assessment"]
+                        <!-- Drawing Area (only for drawing topics) -->
+                        <div id="drawingArea" class="hidden">
+                            <div class="relative bg-slate-950 border-2 border-dashed border-purple-500/50 rounded-2xl p-2 flex justify-center items-center h-[280px]">
+                                <canvas id="glyphCanvas" width="420" height="260" class="cursor-crosshair bg-slate-900 rounded-xl"></canvas>
+                            </div>
+                            <p class="text-[10px] text-slate-500 text-center mt-2">Apna secret symbol banao! AI tumhari speed aur angle record karega.</p>
+                            <div class="flex gap-2 mt-2">
+                                <button onclick="clearCanvas()" class="w-1/3 py-2 bg-slate-800 text-slate-300 text-xs font-bold rounded-xl">Clear</button>
+                                <button onclick="registerGlyph()" class="w-2/3 py-2 bg-purple-500 text-slate-950 text-xs font-bold rounded-xl">Register Symbol</button>
+                            </div>
+                        </div>
 
-    SUBJECTS = {
-        "Math Lab": ["Numbers", "Fractions", "Decimals", "Geometry", "Algebra", "Probability", "Statistics", "Calculus", "Linear Algebra"],
-        "Physics Lab": ["Motion", "Force", "Energy", "Heat", "Light", "Sound", "Electricity", "Magnetism", "Modern Physics"],
-        "Data Science Lab": ["Data", "Charts", "Average", "Probability", "Statistics", "Python", "Data Cleaning", "Machine Learning", "AI"],
-        "Learn AI": ["What is AI?", "How AI learns", "Machine Learning", "Generative AI", "Prompting", "Computer Vision", "NLP", "AI Agents", "AI Ethics"],
-        "Learn Finance": ["Money", "Saving", "Budget", "Banking", "Interest", "Inflation", "Business", "Accounting", "Finance"],
-        "Coding Lab": ["Logic", "Algorithms", "Python", "Web Development", "Apps", "Projects"]
-    }
+                        <!-- Quiz Area (for quiz topics) -->
+                        <div id="quizArea" class="space-y-3">
+                            <div id="questionBox" class="bg-slate-950 border-2 border-emerald-500/40 rounded-2xl p-5 text-center">
+                                <div class="text-5xl mb-2" id="qEmoji">❓</div>
+                                <p class="text-base font-bold text-white" id="qText">Loading question...</p>
+                            </div>
+                            <div class="grid grid-cols-2 gap-2">
+                                <button id="btnYes" onclick="answerQuiz(true)" class="py-3 bg-emerald-500 text-slate-950 text-sm font-bold rounded-xl">✅ SAFE / HAAN</button>
+                                <button id="btnNo" onclick="answerQuiz(false)" class="py-3 bg-rose-500 text-slate-950 text-sm font-bold rounded-xl">❌ UNSAFE / NAHI</button>
+                            </div>
+                            <div id="quizFeedback" class="text-center font-bold text-sm h-8"></div>
+                        </div>
+                    </div>
 
-    CYBER_LEARNING = {
-        "password": {"simple_name": "Secret Key Game", "activity": "Create a strong secret", "concept": "Password security"},
-        "encryption": {"simple_name": "Secret Message", "activity": "Hide and reveal a message", "concept": "Encryption"},
-        "firewall": {"simple_name": "Security Guard Game", "activity": "Allow safe visitors and block unsafe ones", "concept": "Firewall"},
-        "authentication": {"simple_name": "Who Are You?", "activity": "Identity verification puzzle", "concept": "Authentication"},
-        "privacy": {"simple_name": "What Should We Share?", "activity": "Choose safe information", "concept": "Privacy"}
-    }
+                    <!-- Right: Information & Database Panel -->
+                    <div class="bg-slate-900/80 backdrop-blur border border-slate-700 rounded-3xl p-5 space-y-4">
+                        
+                        <!-- Progress Panel -->
+                        <div class="grid grid-cols-3 gap-2 text-center">
+                            <div class="bg-slate-950 rounded-xl p-3 border border-emerald-500/30">
+                                <div class="text-[10px] text-slate-400">Score</div>
+                                <div class="text-xl font-bold text-emerald-400" id="scoreVal">0</div>
+                            </div>
+                            <div class="bg-slate-950 rounded-xl p-3 border border-rose-500/30">
+                                <div class="text-[10px] text-slate-400">Hearts</div>
+                                <div class="text-xl font-bold text-rose-400" id="heartsVal">5</div>
+                            </div>
+                            <div class="bg-slate-950 rounded-xl p-3 border border-amber-500/30">
+                                <div class="text-[10px] text-slate-400">Streak</div>
+                                <div class="text-xl font-bold text-amber-400" id="streakVal">0</div>
+                            </div>
+                        </div>
 
-    CYBER_SCHOOL_RULE = """
-    Teach security, privacy and responsible technology.
-    Use games, puzzles and simulations.
-    Never ask children to attack real systems, real websites, real accounts or real networks.
-    """
+                        <!-- Live Analysis Panel (shows info when drawing) -->
+                        <div class="bg-slate-950 border border-slate-700 rounded-2xl p-4">
+                            <h3 class="text-xs font-bold text-cyan-400 mb-2 uppercase flex items-center gap-1">
+                                <i class="fa-solid fa-microchip"></i> Real-Time Analysis
+                            </h3>
+                            <div class="space-y-1 font-mono text-[10px]">
+                                <div class="flex justify-between"><span class="text-slate-500">Speed:</span><span class="text-emerald-400" id="statSpeed">0.00</span></div>
+                                <div class="flex justify-between"><span class="text-slate-500">Angle Changes:</span><span class="text-emerald-400" id="statAngle">0</span></div>
+                                <div class="flex justify-between"><span class="text-slate-500">Stroke Points:</span><span class="text-emerald-400" id="statPoints">0</span></div>
+                                <div class="flex justify-between"><span class="text-slate-500">Total Time:</span><span class="text-emerald-400" id="statTime">0ms</span></div>
+                                <div class="flex justify-between"><span class="text-slate-500">Distance:</span><span class="text-emerald-400" id="statDist">0px</span></div>
+                                <div class="flex justify-between"><span class="text-slate-500">Geometry:</span><span class="text-cyan-400" id="statGeo">-</span></div>
+                            </div>
+                        </div>
 
-    FINAL_RULE = """
-    ClyxessChat AI is a Learning School.
-    The child should never feel that they are reading a complicated technical manual.
-    First: Play
-    Then: Understand
-    Then: Try
-    Then: Make mistakes
-    Then: Learn
-    Then: Create
-    Advanced concepts are introduced only when the student is ready for them.
-    """
+                        <!-- Registered Symbols Database -->
+                        <div class="bg-slate-950 border border-slate-700 rounded-2xl p-4">
+                            <h3 class="text-xs font-bold text-purple-400 mb-2 uppercase flex items-center gap-1">
+                                <i class="fa-solid fa-database"></i> Your Symbols Database
+                            </h3>
+                            <div id="glyphList" class="space-y-2 max-h-[180px] overflow-y-auto pr-1">
+                                <p class="text-[10px] text-slate-500 italic">No symbols yet. Drawing karo aur register karo!</p>
+                            </div>
+                        </div>
 
-    # ------ Stub implementations for missing functions ------
-    def story_based_explanation(topic):
-        return f"Once upon a time, a curious child discovered {topic}..."
+                        <!-- Learn Log -->
+                        <div class="bg-slate-950 border border-slate-700 rounded-2xl p-4">
+                            <h3 class="text-xs font-bold text-amber-400 mb-2 uppercase flex items-center gap-1">
+                                <i class="fa-solid fa-lightbulb"></i> Aaj Kya Seekha?
+                            </h3>
+                            <div id="learnLog" class="space-y-1 font-mono text-[10px] max-h-[140px] overflow-y-auto">
+                                <p class="text-slate-500">Learning log shuru karo...</p>
+                            </div>
+                        </div>
 
-    def example_based_explanation(topic):
-        return f"Think of {topic} like this: imagine you have a magic box..."
+                    </div>
+                </div>
+            </div>
 
-    def concept_plus_example(topic):
-        return f"Concept: {topic}. Example: When you save money in a piggy bank, that's like {topic} in action!"
+            <script>
+                // ============================================
+                // 50+ TOPICS DATA (Age-based)
+                // ============================================
+                const TOPICS = {
+                    junior: [
+                        { id: "j1", title: "🎮 Online Game Khelna", type: "quiz", emoji: "🎮", q: "Internet par game khelna chahiye?", safe: true, why: "Games khelna theek hai, par time limit rakho!" },
+                        { id: "j2", title: "🏠 Ghar Ka Address", type: "quiz", emoji: "🏠", q: "Ghar ka address online batana?", safe: false, why: "Ghar ka address kabhi share nahi karte!" },
+                        { id: "j3", title: "📚 Padhai Ki Video", type: "quiz", emoji: "📚", q: "Padhai ki video dekhna?", safe: true, why: "Padhai ki videos dekhna accha hai!" },
+                        { id: "j4", title: "📸 Anjaan Ko Photo", type: "quiz", emoji: "📸", q: "Anjaan ko apni photo bhejna?", safe: false, why: "Anjaan logon ko photo mat bhejo!" },
+                        { id: "j5", title: "🔐 Password Batana", type: "quiz", emoji: "🔐", q: "Password kisi dost ko batana?", safe: false, why: "Password sabse bada raaz hai!" },
+                        { id: "j6", title: "👨‍👩‍👧 Mummy-Papa", type: "quiz", emoji: "👨‍👩‍👧", q: "Mummy-Papa se internet ki baat karna?", safe: true, why: "Family se sab baat karni chahiye!" },
+                        { id: "j7", title: "🎁 Free Gift Link", type: "quiz", emoji: "🎁", q: "Free gift wala link kholna?", safe: false, why: "Fake links se virus aata hai!" },
+                        { id: "j8", title: "📖 Online Kahani", type: "quiz", emoji: "📖", q: "Online kahani padhna?", safe: true, why: "Kahani padhna accha hai!" },
+                        { id: "j9", title: "🤝 Anjaan Se Milna", type: "quiz", emoji: "🤝", q: "Anjaan se milne jaana?", safe: false, why: "Anjaan se kabhi mat milo!" },
+                        { id: "j10", title: "🎵 Music Sunna", type: "quiz", emoji: "🎵", q: "Online music sunna?", safe: true, why: "Music sunna theek hai!" },
+                        { id: "j11", title: "✏️ Apna Symbol Banao", type: "drawing", emoji: "✏️", desc: "Ek secret symbol banao jo tumhara password banega." },
+                        { id: "j12", title: "🎨 Safe Logo Banao", type: "drawing", emoji: "🎨", desc: "Ek aisa logo banao jo bataye 'Yahan Safe Hai'." },
+                        { id: "j13", title: "🛡️ Shield Design", type: "drawing", emoji: "🛡️", desc: "Ek digital shield banao jo tumhari security kare." },
+                        { id: "j14", title: "🔑 Secret Key Drawing", type: "drawing", emoji: "🔑", desc: "Ek secret key ka shape banao." }
+                    ],
+                    middle: [
+                        { id: "m1", title: "🔐 Strong Password", type: "quiz", emoji: "🔐", q: "Kya '123456' ek strong password hai?", safe: false, why: "Ye sabse weak password hai! 8+ characters, numbers, symbols use karo." },
+                        { id: "m2", title: "🎣 Fake Email Pakdo", type: "quiz", emoji: "🎣", q: "Bank ka email jo OTP maange — kya sach hai?", safe: false, why: "Bank kabhi email se OTP nahi maangta!" },
+                        { id: "m3", title: "📱 Public WiFi", type: "quiz", emoji: "📱", q: "Public WiFi par bank app use karna?", safe: false, why: "Public WiFi unsafe hota hai. VPN use karo." },
+                        { id: "m4", title: "🔒 Two-Factor Auth", type: "quiz", emoji: "🔒", q: "2FA lagana chahiye?", safe: true, why: "2FA account ko double secure banata hai!" },
+                        { id: "m5", title: "📧 Suspicious Link", type: "quiz", emoji: "📧", q: "Anjaan email ka link kholna?", safe: false, why: "Anjaan link kabhi mat kholo — phishing ho sakta hai!" },
+                        { id: "m6", title: "💾 Backup", type: "quiz", emoji: "💾", q: "Regular data backup lena chahiye?", safe: true, why: "Backup se data safe rehta hai!" },
+                        { id: "m7", title: "🎮 Game Download", type: "quiz", emoji: "🎮", q: "Unknown website se game download karna?", safe: false, why: "Sirf official app store se download karo." },
+                        { id: "m8", title: "🔄 Update Karna", type: "quiz", emoji: "🔄", q: "Software update karte rehna chahiye?", safe: true, why: "Updates security holes fix karte hain!" },
+                        { id: "m9", title: "📸 Social Media", type: "quiz", emoji: "📸", q: "Location tag karna har photo mein?", safe: false, why: "Location tag se chori ka khatra hai!" },
+                        { id: "m10", title: "🤐 Stranger Chat", type: "quiz", emoji: "🤐", q: "Online stranger se personal baat?", safe: false, why: "Stranger ko personal info mat do!" },
+                        { id: "m11", title: "🧠 Cyber Bullying", type: "quiz", emoji: "🧠", q: "Online bullying ignore karni chahiye?", safe: false, why: "Bullying report karo, chup mat raho!" },
+                        { id: "m12", title: "💳 Card Details", type: "quiz", emoji: "💳", q: "Card details kisi ko batana?", safe: false, why: "Card details sirf secure site par daalo!" },
+                        { id: "m13", title: "🎯 Firewall Drawing", type: "drawing", emoji: "🎯", desc: "Ek firewall ka diagram banao jo network secure kare." },
+                        { id: "m14", title: "🔗 Encryption Key", type: "drawing", emoji: "🔗", desc: "Encryption key ka symbol banao." },
+                        { id: "m15", title: "👁️ Privacy Symbol", type: "drawing", emoji: "👁️", desc: "Ek privacy ka symbol banao." },
+                        { id: "m16", title: "🛰️ Network Map", type: "drawing", emoji: "🛰️", desc: "Apna ghar ka network diagram banao." }
+                    ],
+                    senior: [
+                        { id: "s1", title: "🔐 Password Hashing", type: "quiz", emoji: "🔐", q: "Password plain text mein store karna chahiye?", safe: false, why: "Password hamesha hash karke store karo (SHA-256, bcrypt)!" },
+                        { id: "s2", title: "🎣 Phishing vs Real", type: "quiz", emoji: "🎣", q: "HTTPS wali site hamesha safe hoti hai?", safe: false, why: "HTTPS bhi phishing ho sakti hai. URL check karo!" },
+                        { id: "s3", title: "🕵️ VPN", type: "quiz", emoji: "🕵️", q: "Free VPN use karna safe hai?", safe: false, why: "Free VPN data bechte hain. Paid trusted VPN use karo!" },
+                        { id: "s4", title: "🔒 Zero Trust", type: "quiz", emoji: "🔒", q: "Zero Trust model mein sab par bharosa karte hain?", safe: false, why: "Zero Trust means 'trust no one, verify everything'!" },
+                        { id: "s5", title: "📊 Data Breach", type: "quiz", emoji: "📊", q: "Data breach hone par password change karna?", safe: true, why: "Turant password change karo aur 2FA lagao!" },
+                        { id: "s6", title: "🔑 Keylogger", type: "quiz", emoji: "🔑", q: "Antivirus se keylogger detect hota hai?", safe: true, why: "Good antivirus keyloggers detect karta hai!" },
+                        { id: "s7", title: "🌐 SQL Injection", type: "quiz", emoji: "🌐", q: "User input ko directly query mein daalna chahiye?", safe: false, why: "SQL injection ka khatra! Parameterized queries use karo." },
+                        { id: "s8", title: "🔐 Encryption Standard", type: "quiz", emoji: "🔐", q: "AES-128 weak hai AES-256 se?", safe: false, why: "Dono strong hain. 128-bit bhi brute force se safe hai." },
+                        { id: "s9", title: "🌍 Public Key", type: "quiz", emoji: "🌍", q: "Public key ko share kar sakte hain?", safe: true, why: "Public key share karne ke liye hi hoti hai!" },
+                        { id: "s10", title: "⚡ Zero-Day Attack", type: "quiz", emoji: "⚡", q: "Zero-day ka patch pehle se hota hai?", safe: false, why: "Zero-day means 'no patch yet'!" },
+                        { id: "s11", title: "🔐 RSA vs Symmetric", type: "quiz", emoji: "🔐", q: "RSA symmetric encryption hai?", safe: false, why: "RSA asymmetric hai. AES symmetric hai." },
+                        { id: "s12", title: "🕵️ Steganography", type: "quiz", emoji: "🕵️", q: "Image ke andar message chhipana possible hai?", safe: true, why: "Haan, ye steganography kehlata hai!" },
+                        { id: "s13", title: "🔗 Blockchain Hashing", type: "drawing", emoji: "🔗", desc: "Blockchain ka block structure design karo." },
+                        { id: "s14", title: "🏛️ CIA Triad", type: "drawing", emoji: "🏛️", desc: "Confidentiality, Integrity, Availability ka diagram banao." },
+                        { id: "s15", title: "🔐 Quantum Circuit", type: "drawing", emoji: "🔐", desc: "Ek quantum key distribution circuit banao." },
+                        { id: "s16", title: "🌐 Network Topology", type: "drawing", emoji: "🌐", desc: "Ek secure network topology banao." }
+                    ]
+                };
 
-    def practical_explanation(topic):
-        return f"In real life, {topic} is used when engineers build systems..."
+                let currentAge = "junior";
+                let currentTopic = null;
+                let score = 0, hearts = 5, streak = 0;
+                let currentQuizTopic = null;
 
-    def technical_explanation(topic):
-        return f"Technically, {topic} involves: structure, function, and real-world application."
+                // Drawing state
+                let isDrawing = false;
+                let strokeData = [];
+                let glyphs = [];
+                let glyphCounter = 0;
+                let startTime = 0, lastX = 0, lastY = 0, totalTime = 0, strokePoints = 0, totalDistance = 0, angleChanges = 0, lastAngle = null;
 
-    def explain_simple(topic, level):
-        if level["explanation"] == "very_simple":
-            return story_based_explanation(topic)
-        elif level["explanation"] == "simple":
-            return example_based_explanation(topic)
-        elif level["explanation"] == "simple_with_examples":
-            return concept_plus_example(topic)
-        elif level["explanation"] == "practical":
-            return practical_explanation(topic)
-        else:
-            return technical_explanation(topic)
+                const canvas = document.getElementById('glyphCanvas');
+                const ctx = canvas.getContext('2d');
+                ctx.strokeStyle = "#a855f7";
+                ctx.lineWidth = 4;
+                ctx.lineCap = "round";
+                ctx.lineJoin = "round";
 
-    def show_real_life_example(topic, level):
-        return f"Real-life example of {topic}: Look around you — {topic} is everywhere!"
+                // ============================================
+                // AGE SELECTION
+                // ============================================
+                function setAge(age) {
+                    currentAge = age;
+                    ['Junior','Middle','Senior'].forEach(a => {
+                        const btn = document.getElementById('btn' + a);
+                        const isActive = a.toLowerCase() === age;
+                        if (isActive) {
+                            btn.className = "age-btn py-3 rounded-xl text-xs font-bold bg-emerald-500 text-slate-950 transition";
+                        } else {
+                            btn.className = "age-btn py-3 rounded-xl text-xs font-bold bg-slate-800 text-slate-300 transition";
+                        }
+                    });
+                    populateTopics();
+                    logLearn(`Age group changed to: ${age.toUpperCase()}`);
+                }
 
-    def create_activity(topic, difficulty, style):
-        return {"topic": topic, "difficulty": difficulty, "style": style, "question": f"Try to explain {topic} in your own words!"}
+                function populateTopics() {
+                    const sel = document.getElementById('topicSelect');
+                    sel.innerHTML = '';
+                    TOPICS[currentAge].forEach(t => {
+                        const opt = document.createElement('option');
+                        opt.value = t.id;
+                        opt.innerText = t.title;
+                        sel.appendChild(opt);
+                    });
+                    if (TOPICS[currentAge].length > 0) loadTopic();
+                }
 
-    def run_activity(activity):
-        return {"answer": None, "completed": False, "activity": activity}
+                // ============================================
+                // LOAD TOPIC
+                // ============================================
+                function loadTopic() {
+                    const id = document.getElementById('topicSelect').value;
+                    const topic = TOPICS[currentAge].find(t => t.id === id);
+                    if (!topic) return;
+                    currentTopic = topic;
 
-    def evaluate_student(result):
-        return {"mistake": False, "score": 100}
+                    document.getElementById('activityTag').innerText = topic.type === 'drawing' ? 'Drawing' : 'Quiz';
+                    document.getElementById('activityTag').className = topic.type === 'drawing' ? 
+                        "text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300" :
+                        "text-[10px] font-bold px-2 py-0.5 rounded-full bg-pink-500/20 text-pink-300";
+                    document.getElementById('activityTitle').innerText = topic.title;
+                    document.getElementById('activityDesc').innerText = topic.type === 'drawing' ? (topic.desc || '') : 'Sahi jawab chuno!';
 
-    def give_hint(level, mistake):
-        return "Here is a small hint to help you!"
+                    if (topic.type === 'drawing') {
+                        document.getElementById('drawingArea').classList.remove('hidden');
+                        document.getElementById('quizArea').classList.add('hidden');
+                        logLearn(`🎨 Drawing topic: ${topic.title}`);
+                    } else {
+                        document.getElementById('drawingArea').classList.add('hidden');
+                        document.getElementById('quizArea').classList.remove('hidden');
+                        currentQuizTopic = topic;
+                        document.getElementById('qEmoji').innerText = topic.emoji;
+                        document.getElementById('qText').innerText = topic.q;
+                        document.getElementById('quizFeedback').innerText = '';
+                        logLearn(`❓ Quiz topic: ${topic.title}`);
+                    }
+                }
 
-    def allow_retry():
-        return True
+                // ============================================
+                // QUIZ LOGIC
+                // ============================================
+                function answerQuiz(userSaysSafe) {
+                    if (!currentQuizTopic) return;
+                    const fb = document.getElementById('quizFeedback');
+                    if (userSaysSafe === currentQuizTopic.safe) {
+                        score += 10;
+                        streak += 1;
+                        document.getElementById('scoreVal').innerText = score;
+                        document.getElementById('streakVal').innerText = streak;
+                        fb.className = "text-center font-bold text-sm text-emerald-400 h-8";
+                        fb.innerText = "🎉 Shabash! " + currentQuizTopic.why;
+                        confetti({ particleCount: 60, spread: 70, origin: { y: 0.7 } });
+                        logLearn(`✅ Sahi: ${currentQuizTopic.title}`);
+                    } else {
+                        hearts = Math.max(0, hearts - 1);
+                        streak = 0;
+                        document.getElementById('heartsVal').innerText = hearts;
+                        document.getElementById('streakVal').innerText = streak;
+                        fb.className = "text-center font-bold text-sm text-rose-400 h-8";
+                        fb.innerText = "❌ Oops! " + currentQuizTopic.why;
+                        logLearn(`❌ Galat: ${currentQuizTopic.title}`);
+                    }
+                }
 
-    def calculate_mastery(performance):
-        return 85
+                // ============================================
+                // DRAWING LOGIC
+                // ============================================
+                function getPos(e) {
+                    const rect = canvas.getBoundingClientRect();
+                    const cx = e.touches ? e.touches[0].clientX : e.clientX;
+                    const cy = e.touches ? e.touches[0].clientY : e.clientY;
+                    return { x: cx - rect.left, y: cy - rect.top };
+                }
 
-    def adaptive_difficulty(mastery):
-        if mastery < 40:
-            return "easier"
-        elif mastery < 70:
-            return "same_level"
-        elif mastery < 90:
-            return "slightly_harder"
-        else:
-            return "next_level"
+                function startDrawing(e) {
+                    isDrawing = true;
+                    const pos = getPos(e);
+                    ctx.beginPath();
+                    ctx.moveTo(pos.x, pos.y);
+                    startTime = Date.now();
+                    lastX = pos.x; lastY = pos.y;
+                    strokePoints = 0; totalDistance = 0; angleChanges = 0; lastAngle = null;
+                    strokeData = [{ x: pos.x, y: pos.y, timestamp_ms: Date.now() }];
+                }
 
-    def show_feedback(performance, mastery):
-        return {"mastery": mastery, "message": "Great job!"}
+                function draw(e) {
+                    if (!isDrawing) return;
+                    e.preventDefault();
+                    const pos = getPos(e);
+                    ctx.lineTo(pos.x, pos.y);
+                    ctx.stroke();
+                    strokeData.push({ x: pos.x, y: pos.y, timestamp_ms: Date.now() });
 
-    def help_student(question, attempts):
-        if attempts == 0:
-            return "Try it yourself first."
-        elif attempts == 1:
-            return "Here is a small hint."
-        elif attempts == 2:
-            return "Let's look at a simple example."
-        else:
-            return "Let's solve it together step by step."
+                    const dx = pos.x - lastX, dy = pos.y - lastY;
+                    const dist = Math.sqrt(dx*dx + dy*dy);
+                    totalDistance += dist;
+                    strokePoints++;
 
-    def lesson_summary():
-        return {
-            "what_you_learned": True,
-            "skill": True,
-            "mistake_explanation": True,
-            "real_world_example": True,
-            "next_challenge": True
-        }
+                    if (dist > 2) {
+                        const angle = Math.atan2(dy, dx) * (180 / Math.PI);
+                        if (lastAngle !== null) {
+                            let diff = Math.abs(angle - lastAngle);
+                            if (diff > 180) diff = 360 - diff;
+                            if (diff > 15) angleChanges++;
+                        }
+                        lastAngle = angle;
+                    }
 
-    def learning_loop(student, topic):
-        age_level = student["age_level"]
-        level = AGE_LEVELS[age_level]
-        explain_simple(topic, level)
-        show_real_life_example(topic, level)
-        activity = create_activity(topic=topic, difficulty=level["difficulty"], style=level["style"])
-        result = run_activity(activity)
-        performance = evaluate_student(result)
-        if performance["mistake"]:
-            give_hint(level=level, mistake=performance["mistake"])
-            retry = allow_retry()
-            if retry:
-                return learning_loop(student, topic)
-        mastery = calculate_mastery(performance)
-        next_level = adaptive_difficulty(mastery)
-        show_feedback(performance=performance, mastery=mastery)
-        return next_level
+                    lastX = pos.x; lastY = pos.y;
 
-    STUDENT_FLOW = """
-    Choose Age -> Choose Language -> Choose Subject -> Choose Topic
-    -> Simple Story / Example -> Interactive Activity -> Try Yourself
-    -> AI Hint if Needed -> Retry -> Challenge -> Assessment -> Mastery
-    -> Difficulty Automatically Adjusts -> Project Unlock -> Next Skill
-    """
+                    // Live update stats panel
+                    updateStats();
+                }
+
+                function stopDrawing() {
+                    if (isDrawing) {
+                        totalTime = Date.now() - startTime;
+                        isDrawing = false;
+                        updateStats();
+                    }
+                }
+
+                function updateStats() {
+                    const speed = (totalDistance / (totalTime || 1)).toFixed(2);
+                    document.getElementById('statSpeed').innerText = speed + " px/ms";
+                    document.getElementById('statAngle').innerText = angleChanges;
+                    document.getElementById('statPoints').innerText = strokePoints;
+                    document.getElementById('statTime').innerText = totalTime + "ms";
+                    document.getElementById('statDist').innerText = totalDistance.toFixed(1) + "px";
+                    
+                    // Geometry classification
+                    let geo = "-";
+                    if (strokeData.length >= 3) {
+                        const xs = strokeData.map(p => p.x);
+                        const ys = strokeData.map(p => p.y);
+                        const w = Math.max(...xs) - Math.min(...xs);
+                        const h = Math.max(...ys) - Math.min(...ys);
+                        const closure = Math.hypot(strokeData[0].x - strokeData[strokeData.length-1].x, strokeData[0].y - strokeData[strokeData.length-1].y);
+                        const maxDim = Math.max(w, h, 1);
+                        if (closure < maxDim * 0.15) geo = "CLOSED";
+                        else if (w > h*2) geo = "HORIZONTAL";
+                        else if (h > w*2) geo = "VERTICAL";
+                        else geo = "COMPLEX";
+                    }
+                    document.getElementById('statGeo').innerText = geo;
+                }
+
+                function clearCanvas() {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    strokeData = [];
+                    strokePoints = 0; totalDistance = 0; totalTime = 0; angleChanges = 0;
+                    updateStats();
+                }
+
+                canvas.addEventListener('mousedown', startDrawing);
+                canvas.addEventListener('mousemove', draw);
+                canvas.addEventListener('mouseup', stopDrawing);
+                canvas.addEventListener('mouseout', stopDrawing);
+                canvas.addEventListener('touchstart', startDrawing);
+                canvas.addEventListener('touchmove', draw);
+                canvas.addEventListener('touchend', stopDrawing);
+
+                // ============================================
+                // REGISTER GLYPH (with full info display)
+                // ============================================
+                function registerGlyph() {
+                    if (strokeData.length < 3) {
+                        logLearn("❌ Symbol bahut chhota hai, aur banao!");
+                        return;
+                    }
+
+                    // Generate hash from shape
+                    const shapeData = canvas.toDataURL();
+                    let sh = 0;
+                    for (let i = 0; i < shapeData.length; i++) {
+                        sh = ((sh << 5) - sh) + shapeData.charCodeAt(i);
+                        sh = sh & sh;
+                    }
+                    const speed = (totalDistance / (totalTime || 1)).toFixed(2);
+                    const behaviorStr = `SPD:${speed}|ANG:${angleChanges}|PTS:${strokePoints}|TIME:${totalTime}|DIST:${totalDistance.toFixed(1)}`;
+                    let bh = 0;
+                    for (let i = 0; i < behaviorStr.length; i++) {
+                        bh = ((bh << 5) - bh) + behaviorStr.charCodeAt(i);
+                        bh = bh & bh;
+                    }
+                    const finalHash = "BM-" + Math.abs(sh).toString(16).toUpperCase().substring(0,8) + "-" + Math.abs(bh).toString(16).toUpperCase().substring(0,6);
+                    
+                    const id = "GLYPH-" + (++glyphCounter);
+                    const topicName = currentTopic ? currentTopic.title : "Unknown";
+
+                    // Display full info in database
+                    const list = document.getElementById('glyphList');
+                    if (glyphs.length === 0) list.innerHTML = '';
+
+                    const geo = document.getElementById('statGeo').innerText;
+
+                    const item = document.createElement('div');
+                    item.className = "bg-slate-900 border border-purple-500/40 p-3 rounded-xl space-y-1 font-mono text-[10px]";
+                    item.innerHTML = `
+                        <div class="flex justify-between items-center border-b border-purple-500/20 pb-1">
+                            <span class="text-purple-300 font-bold">${id}</span>
+                            <span class="text-[8px] bg-purple-500/20 text-purple-300 px-2 py-0.5 rounded-full">${topicName}</span>
+                        </div>
+                        <div class="text-cyan-300 break-all">🔑 HASH: ${finalHash}</div>
+                        <div class="grid grid-cols-2 gap-1 text-slate-400 mt-1">
+                            <span>⚡ Speed: ${speed} px/ms</span>
+                            <span>📐 Angles: ${angleChanges}</span>
+                            <span>📍 Points: ${strokePoints}</span>
+                            <span>⏱️ Time: ${totalTime}ms</span>
+                            <span>📏 Distance: ${totalDistance.toFixed(1)}px</span>
+                            <span>🔷 Shape: ${geo}</span>
+                        </div>
+                        <div class="text-emerald-400 text-[9px] mt-1">✓ Registered ${new Date().toLocaleTimeString()}</div>
+                    `;
+                    list.appendChild(item);
+
+                    glyphs.push({ id, hash: finalHash, topic: topicName });
+                    confetti({ particleCount: 80, spread: 70, origin: { y: 0.7 } });
+                    logLearn(`✅ Symbol registered: ${id} (${geo} shape)`);
+                    logLearn(`🔑 Hash: ${finalHash.substring(0, 20)}...`);
+
+                    clearCanvas();
+                }
+
+                // ============================================
+                // LEARNING LOG
+                // ============================================
+                function logLearn(msg) {
+                    const log = document.getElementById('learnLog');
+                    if (log.querySelector('p') && log.querySelector('p').innerText === "Learning log shuru karo...") {
+                        log.innerHTML = '';
+                    }
+                    const p = document.createElement('p');
+                    p.className = "text-slate-300";
+                    p.innerText = `[${new Date().toLocaleTimeString()}] ${msg}`;
+                    log.appendChild(p);
+                    log.scrollTop = log.scrollHeight;
+                }
+
+                // ============================================
+                // INITIALIZE
+                // ============================================
+                window.onload = function() {
+                    populateTopics();
+                    logLearn("🚀 Cyber Safety Zone ready!");
+                };
+            </script>
+        </body>
+        </html>
+        """
+        components.html(HTML_TEMPLATE, height=1000, scrolling=True)
 
     # ============================================================
-    # PART 2: SECURITY CONFIG
+    # SECTION 2: ADVANCED CYBER LAB (For Adults/Seniors)
     # ============================================================
     class CyberConfig:
-        APP_NAME = "ClyxessChat AI Cyber Engine"
-        SECRET_KEY = os.environ.get("CLYXESS_SECRET_KEY", "CHANGE_THIS_IN_PRODUCTION")
-        TOKEN_TTL_SECONDS = 60
-        MAX_FAILED_ATTEMPTS = 5
         RATE_LIMIT_WINDOW_SECONDS = 60
         RATE_LIMIT_MAX_REQUESTS = 30
-        DEFAULT_BEHAVIOR_TOLERANCE = 0.35
-        MIN_STROKE_POINTS = 3
 
-    # ============================================================
-    # PART 3: CRYPTOGRAPHY UTILITIES
-    # ============================================================
-    class CryptoEngine:
-        @staticmethod
-        def sha256(value: str) -> str:
-            return hashlib.sha256(value.encode("utf-8")).hexdigest()
-        @staticmethod
-        def sha3_256(value: str) -> str:
-            return hashlib.sha3_256(value.encode("utf-8")).hexdigest()
-        @staticmethod
-        def hmac_sha256(secret: str, message: str) -> str:
-            return hmac.new(secret.encode("utf-8"), message.encode("utf-8"), hashlib.sha256).hexdigest()
-        @staticmethod
-        def secure_compare(a: str, b: str) -> bool:
-            return hmac.compare_digest(str(a), str(b))
-        @staticmethod
-        def random_nonce(length: int = 32) -> str:
-            return secrets.token_urlsafe(length)
-
-    # ============================================================
-    # PART 4: BIOMETRIC DATA MODEL
-    # ============================================================
-    @dataclass
-    class BehavioralProfile:
-        avg_velocity: float
-        avg_acceleration: float
-        total_distance: float
-        total_time_sec: float
-        stroke_count: int
-        direction_changes: int
-        min_velocity: float
-        max_velocity: float
-        created_at: float
-
-    # ============================================================
-    # PART 5: CLYXESS CYBER ENGINE (Real Python Logic)
-    # ============================================================
     class ClyxessCyberEngine:
-        def __init__(self, secret_key: Optional[str] = None, database_path: str = "clyxess_cyber.db"):
-            self.secret_key = secret_key or os.environ.get("CLYXESS_SECRET_KEY", CyberConfig.SECRET_KEY)
+        def __init__(self, database_path="clyxess_cyber.db"):
             self.database_path = database_path
-            self.crypto = CryptoEngine()
             self._rate_lock = threading.Lock()
             self.rate_tracker = defaultdict(deque)
-            self.used_tokens = set()
-            self.behavior_profiles = {}
             self._initialize_database()
 
         def _get_db(self):
-            connection = sqlite3.connect(self.database_path, check_same_thread=False)
-            connection.row_factory = sqlite3.Row
-            return connection
+            conn = sqlite3.connect(self.database_path, check_same_thread=False)
+            conn.row_factory = sqlite3.Row
+            return conn
 
         def _initialize_database(self):
             db = self._get_db()
             try:
-                db.execute("""CREATE TABLE IF NOT EXISTS security_audit (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id TEXT, event_type TEXT, severity TEXT, event_data TEXT, created_at REAL)""")
-                db.execute("""CREATE TABLE IF NOT EXISTS security_tokens (token_hash TEXT PRIMARY KEY, user_id TEXT, created_at REAL, expires_at REAL, used INTEGER DEFAULT 0)""")
-                db.execute("""CREATE TABLE IF NOT EXISTS behavioral_profiles (user_id TEXT PRIMARY KEY, profile_json TEXT, updated_at REAL)""")
                 db.execute("""CREATE TABLE IF NOT EXISTS firewall_rules (id INTEGER PRIMARY KEY AUTOINCREMENT, rule_name TEXT, source TEXT, action TEXT, enabled INTEGER DEFAULT 1, created_at REAL)""")
                 db.commit()
             finally:
                 db.close()
 
-        def audit(self, user_id: str, event_type: str, severity: str = "INFO", data: Optional[Dict[str, Any]] = None):
-            db = self._get_db()
-            try:
-                db.execute("""INSERT INTO security_audit (user_id, event_type, severity, event_data, created_at) VALUES (?, ?, ?, ?, ?)""", (user_id, event_type, severity, json.dumps(data or {}, ensure_ascii=False), time.time()))
-                db.commit()
-            finally:
-                db.close()
-
-        def check_rate_limit(self, identity: str) -> bool:
-            now = time.time()
-            with self._rate_lock:
-                queue = self.rate_tracker[identity]
-                while queue and (now - queue[0] > CyberConfig.RATE_LIMIT_WINDOW_SECONDS):
-                    queue.popleft()
-                if len(queue) >= CyberConfig.RATE_LIMIT_MAX_REQUESTS:
-                    self.audit(identity, "RATE_LIMIT_BLOCK", "WARNING")
-                    return False
-                queue.append(now)
-                return True
-
-        def analyze_biometric_physics(self, stroke_points: List[Dict[str, Any]]) -> Dict[str, Any]:
-            if len(stroke_points) < 2:
-                return {"error": "INSUFFICIENT_POINTS"}
-            processed_points = []
-            total_distance = 0.0
-            total_time_sec = 0.0
-            velocities = []
-            accelerations = []
-            for i in range(1, len(stroke_points)):
-                p1 = stroke_points[i - 1]
-                p2 = stroke_points[i]
-                try:
-                    x1 = float(p1["x"]); y1 = float(p1["y"])
-                    x2 = float(p2["x"]); y2 = float(p2["y"])
-                    t1 = float(p1["timestamp_ms"]); t2 = float(p2["timestamp_ms"])
-                except (KeyError, TypeError, ValueError):
-                    continue
-                dt_ms = t2 - t1
-                if dt_ms <= 0: continue
-                dt = dt_ms / 1000.0
-                dx = x2 - x1; dy = y2 - y1
-                distance = math.hypot(dx, dy)
-                velocity = distance / dt
-                previous_velocity = velocities[-1] if velocities else 0.0
-                acceleration = (velocity - previous_velocity) / dt
-                velocities.append(velocity)
-                accelerations.append(acceleration)
-                total_distance += distance
-                total_time_sec += dt
-                processed_points.append({"x": x2, "y": y2, "time_delta_ms": round(dt_ms, 3), "distance": round(distance, 3), "velocity": round(velocity, 3), "acceleration": round(acceleration, 3)})
-            if not velocities:
-                return {"error": "INVALID_TIMING_DATA"}
-            avg_velocity = total_distance / total_time_sec if total_time_sec > 0 else 0
-            avg_acceleration = sum(abs(x) for x in accelerations) / len(accelerations) if accelerations else 0
-            return {
-                "avg_velocity": round(avg_velocity, 3),
-                "avg_acceleration": round(avg_acceleration, 3),
-                "total_distance": round(total_distance, 3),
-                "total_time_sec": round(total_time_sec, 3),
-                "min_velocity": round(min(velocities), 3),
-                "max_velocity": round(max(velocities), 3),
-                "point_count": len(processed_points),
-                "points": processed_points
-            }
-
-        def analyze_gesture_geometry(self, stroke_points: List[Dict[str, Any]]) -> Dict[str, Any]:
-            if len(stroke_points) < 3:
-                return {"error": "TOO_FEW_POINTS"}
-            xs = [float(p["x"]) for p in stroke_points]
-            ys = [float(p["y"]) for p in stroke_points]
-            width = max(xs) - min(xs)
-            height = max(ys) - min(ys)
-            angles = []
-            for i in range(1, len(stroke_points)):
-                p1 = stroke_points[i - 1]; p2 = stroke_points[i]
-                dx = float(p2["x"]) - float(p1["x"]); dy = float(p2["y"]) - float(p1["y"])
-                if dx == 0 and dy == 0: continue
-                angle = math.degrees(math.atan2(dy, dx))
-                angles.append(angle)
-            direction_changes = 0
-            for i in range(1, len(angles)):
-                difference = abs(angles[i] - angles[i - 1])
-                difference = min(difference, 360 - difference)
-                if difference > 30:
-                    direction_changes += 1
-            start = stroke_points[0]; end = stroke_points[-1]
-            closure_distance = math.hypot(float(start["x"]) - float(end["x"]), float(start["y"]) - float(end["y"]))
-            return {
-                "width": round(width, 3), "height": round(height, 3),
-                "closure_distance": round(closure_distance, 3),
-                "direction_changes": direction_changes,
-                "angle_count": len(angles),
-                "geometry_type": self._classify_geometry(width, height, closure_distance)
-            }
-
-        def _classify_geometry(self, width: float, height: float, closure_distance: float) -> str:
-            max_dimension = max(width, height, 1)
-            if closure_distance < (max_dimension * 0.15): return "CLOSED_GESTURE"
-            if width > height * 2: return "HORIZONTAL_SWEEP"
-            if height > width * 2: return "VERTICAL_SWEEP"
-            if width > 0 and height > 0: return "DIAGONAL_OR_COMPLEX"
-            return "UNKNOWN"
-
-        def compile_visual_dsl(self, stroke_points: List[Dict[str, Any]]) -> str:
-            geometry = self.analyze_gesture_geometry(stroke_points)
-            if "error" in geometry: return "COMMAND: LOGIC_TOO_SHORT"
-            shape = geometry["geometry_type"]
-            if shape == "CLOSED_GESTURE": return "COMMAND: VERIFY_CRYPTOGRAPHIC_COMMITMENT"
-            if shape == "HORIZONTAL_SWEEP": return "COMMAND: SIMULATE_NETWORK_FIREWALL_RULE"
-            if shape == "VERTICAL_SWEEP": return "COMMAND: SIMULATE_DATA_ENCRYPTION"
-            if shape == "DIAGONAL_OR_COMPLEX": return "COMMAND: SIMULATE_ZERO_TRUST_LOCK"
-            return "COMMAND: OBSERVE_AND_LOG"
-
-        def generate_commitment(self, stroke_points: List[Dict[str, Any]]) -> Dict[str, Any]:
-            canonical = json.dumps(stroke_points, sort_keys=True, separators=(",", ":"))
-            nonce = self.crypto.random_nonce(24)
-            commitment_payload = canonical + ":" + nonce
-            commitment = self.crypto.sha256(commitment_payload)
-            return {"commitment": commitment, "nonce": nonce, "algorithm": "SHA-256", "educational_note": "This is a commitment simulation, not a full zero-knowledge proof."}
-
-        def verify_commitment(self, stroke_points: List[Dict[str, Any]], nonce: str, commitment: str) -> bool:
-            canonical = json.dumps(stroke_points, sort_keys=True, separators=(",", ":"))
-            expected = self.crypto.sha256(canonical + ":" + nonce)
-            return self.crypto.secure_compare(expected, commitment)
-
-        def generate_security_proof(self, stroke_points: List[Dict[str, Any]]) -> Dict[str, Any]:
-            physics = self.analyze_biometric_physics(stroke_points)
-            geometry = self.analyze_gesture_geometry(stroke_points)
-            commitment = self.generate_commitment(stroke_points)
-            dsl = self.compile_visual_dsl(stroke_points)
-            return {
-                "physics": physics, "geometry": geometry, "commitment": commitment, "dsl_command": dsl,
-                "hashes": {
-                    "sha256": self.crypto.sha256(json.dumps(stroke_points, sort_keys=True)),
-                    "sha3_256": self.crypto.sha3_256(json.dumps(stroke_points, sort_keys=True))
-                }
-            }
-
-        def create_behavior_profile(self, analysis: Dict[str, Any]) -> 'BehavioralProfile':
-            return BehavioralProfile(
-                avg_velocity=float(analysis.get("avg_velocity", 0)),
-                avg_acceleration=float(analysis.get("avg_acceleration", 0)),
-                total_distance=float(analysis.get("total_distance", 0)),
-                total_time_sec=float(analysis.get("total_time_sec", 0)),
-                stroke_count=int(analysis.get("point_count", 0)),
-                direction_changes=0,
-                min_velocity=float(analysis.get("min_velocity", 0)),
-                max_velocity=float(analysis.get("max_velocity", 0)),
-                created_at=time.time()
-            )
-
-        def store_behavior_profile(self, user_id: str, profile: 'BehavioralProfile'):
-            db = self._get_db()
-            try:
-                db.execute("""INSERT INTO behavioral_profiles (user_id, profile_json, updated_at) VALUES (?, ?, ?) ON CONFLICT(user_id) DO UPDATE SET profile_json = excluded.profile_json, updated_at = excluded.updated_at""", (user_id, json.dumps(asdict(profile)), time.time()))
-                db.commit()
-            finally:
-                db.close()
-
-        def load_behavior_profile(self, user_id: str) -> Optional['BehavioralProfile']:
-            db = self._get_db()
-            try:
-                row = db.execute("""SELECT profile_json FROM behavioral_profiles WHERE user_id = ?""", (user_id,)).fetchone()
-                if not row: return None
-                data = json.loads(row["profile_json"])
-                return BehavioralProfile(**data)
-            finally:
-                db.close()
-
-        def verify_behavior(self, stored_profile: 'BehavioralProfile', incoming_analysis: Dict[str, Any], tolerance: float = 0.35) -> Dict[str, Any]:
-            current_velocity = float(incoming_analysis.get("avg_velocity", 0))
-            current_acceleration = float(incoming_analysis.get("avg_acceleration", 0))
-            current_distance = float(incoming_analysis.get("total_distance", 0))
-            current_time = float(incoming_analysis.get("total_time_sec", 0))
-            def similarity(expected, actual):
-                denominator = max(abs(expected), 1e-9)
-                difference = abs(expected - actual)
-                ratio = difference / denominator
-                return max(0.0, 1.0 - ratio)
-            velocity_score = similarity(stored_profile.avg_velocity, current_velocity)
-            acceleration_score = similarity(stored_profile.avg_acceleration, current_acceleration)
-            distance_score = similarity(stored_profile.total_distance, current_distance)
-            time_score = similarity(stored_profile.total_time_sec, current_time)
-            overall_score = (velocity_score * 0.35 + acceleration_score * 0.20 + distance_score * 0.20 + time_score * 0.25)
-            verified = overall_score >= (1.0 - tolerance)
-            return {
-                "verified": verified, "score": round(overall_score, 4), "score_percent": round(overall_score * 100, 2),
-                "signals": {"velocity": round(velocity_score * 100, 2), "acceleration": round(acceleration_score * 100, 2), "distance": round(distance_score * 100, 2), "timing": round(time_score * 100, 2)},
-                "classification": ("BEHAVIOR_MATCH" if verified else "BEHAVIOR_MISMATCH")
-            }
-
-        def generate_polymorphic_token(self, user_id: str, purpose: str = "cipher_access") -> Dict[str, Any]:
-            now = int(time.time())
-            nonce = secrets.token_urlsafe(24)
-            payload = f"{user_id}:{purpose}:{now}:{nonce}"
-            signature = self.crypto.hmac_sha256(self.secret_key, payload)
-            raw_token = f"{payload}:{signature}"
-            token = secrets.token_urlsafe(48) + "." + self.crypto.sha3_256(raw_token)
-            token_hash = self.crypto.sha256(token)
-            expires_at = now + CyberConfig.TOKEN_TTL_SECONDS
-            db = self._get_db()
-            try:
-                db.execute("""INSERT INTO security_tokens (token_hash, user_id, created_at, expires_at, used) VALUES (?, ?, ?, ?, 0)""", (token_hash, user_id, now, expires_at))
-                db.commit()
-            finally:
-                db.close()
-            return {"token": token, "created_at": now, "expires_at": expires_at, "ttl_seconds": CyberConfig.TOKEN_TTL_SECONDS, "status": "ACTIVE_SINGLE_USE", "purpose": purpose}
-
-        def consume_token(self, token: str, user_id: str) -> Dict[str, Any]:
-            token_hash = self.crypto.sha256(token)
-            now = time.time()
-            db = self._get_db()
-            try:
-                row = db.execute("""SELECT * FROM security_tokens WHERE token_hash = ? AND user_id = ?""", (token_hash, user_id)).fetchone()
-                if not row: return {"valid": False, "reason": "TOKEN_NOT_FOUND"}
-                if row["used"]:
-                    self.audit(user_id, "REPLAY_ATTEMPT", "HIGH")
-                    return {"valid": False, "reason": "TOKEN_ALREADY_USED"}
-                if now > row["expires_at"]: return {"valid": False, "reason": "TOKEN_EXPIRED"}
-                db.execute("""UPDATE security_tokens SET used = 1 WHERE token_hash = ?""", (token_hash,))
-                db.commit()
-                self.audit(user_id, "ONE_TIME_TOKEN_CONSUMED", "INFO")
-                return {"valid": True, "reason": "TOKEN_ACCEPTED"}
-            finally:
-                db.close()
-
-        def add_firewall_rule(self, rule_name: str, source: str, action: str):
-            allowed_actions = {"ALLOW", "DENY", "LOG"}
+        def add_firewall_rule(self, rule_name, source, action):
             action = action.upper()
-            if action not in allowed_actions: raise ValueError("Unsupported firewall action")
+            if action not in {"ALLOW", "DENY", "LOG"}: raise ValueError("Unsupported action")
             db = self._get_db()
             try:
                 db.execute("""INSERT INTO firewall_rules (rule_name, source, action, enabled, created_at) VALUES (?, ?, ?, 1, ?)""", (rule_name, source, action, time.time()))
@@ -2654,7 +2693,7 @@ def render_cyber_security():
             finally:
                 db.close()
 
-        def simulate_firewall(self, source: str) -> Dict[str, Any]:
+        def simulate_firewall(self, source):
             db = self._get_db()
             try:
                 rules = db.execute("""SELECT * FROM firewall_rules WHERE enabled = 1 ORDER BY id DESC""").fetchall()
@@ -2663,280 +2702,139 @@ def render_cyber_security():
             for rule in rules:
                 if rule["source"] == source or rule["source"] == "*":
                     return {"source": source, "matched_rule": rule["rule_name"], "action": rule["action"]}
-            return {"source": source, "matched_rule": None, "action": "LOG", "reason": "No explicit rule matched"}
+            return {"source": source, "matched_rule": None, "action": "LOG", "reason": "No rule matched"}
 
-        def zero_trust_decision(self, identity_verified: bool, device_verified: bool, behavior_verified: bool, requested_resource: str, allowed_resources: List[str]) -> Dict[str, Any]:
-            checks = {"identity": identity_verified, "device": device_verified, "behavior": behavior_verified, "resource_permission": requested_resource in allowed_resources}
-            granted = all(checks.values())
-            return {"access": "GRANTED" if granted else "DENIED", "checks": checks, "principle": "VERIFY_EACH_REQUEST"}
-
-        def analyze_security_logs(self, logs: List[Dict[str, Any]]) -> Dict[str, Any]:
+        def analyze_security_logs(self, logs):
+            failed = replay = rate = 0
             suspicious = []
-            failed_logins = 0; replay_events = 0; rate_limit_events = 0
             for log in logs:
-                event = str(log.get("event_type", "")).upper()
-                if "LOGIN_FAILED" in event: failed_logins += 1
-                if "REPLAY" in event:
-                    replay_events += 1
-                    suspicious.append(log)
-                if "RATE_LIMIT" in event:
-                    rate_limit_events += 1
-                    suspicious.append(log)
-            risk_score = min(100, failed_logins * 5 + replay_events * 20 + rate_limit_events * 10)
-            if risk_score >= 70: classification = "HIGH_RISK"
-            elif risk_score >= 30: classification = "MEDIUM_RISK"
-            else: classification = "LOW_RISK"
-            return {"risk_score": risk_score, "classification": classification, "failed_logins": failed_logins, "replay_events": replay_events, "rate_limit_events": rate_limit_events, "suspicious_events": suspicious}
+                e = str(log.get("event_type", "")).upper()
+                if "LOGIN_FAILED" in e: failed += 1
+                if "REPLAY" in e: replay += 1; suspicious.append(log)
+                if "RATE_LIMIT" in e: rate += 1; suspicious.append(log)
+            risk = min(100, failed*5 + replay*20 + rate*10)
+            cls = "HIGH_RISK" if risk >= 70 else "MEDIUM_RISK" if risk >= 30 else "LOW_RISK"
+            return {"risk_score": risk, "classification": cls, "failed_logins": failed, "replay_events": replay, "rate_limit_events": rate, "suspicious_events": suspicious}
 
-        def privacy_score(self, collects_raw_biometrics: bool, stores_device_data: bool, stores_minimum_data: bool, encryption_enabled: bool, user_can_delete_data: bool) -> Dict[str, Any]:
-            score = 0
-            if not collects_raw_biometrics: score += 25
-            if not stores_device_data: score += 15
-            if stores_minimum_data: score += 20
-            if encryption_enabled: score += 20
-            if user_can_delete_data: score += 20
-            return {"privacy_score": score, "max_score": 100, "classification": ("STRONG" if score >= 80 else "DEVELOPING" if score >= 50 else "NEEDS_IMPROVEMENT")}
-
-        def ai_security_triage(self, logs: List[Dict[str, Any]]) -> Dict[str, Any]:
-            analysis = self.analyze_security_logs(logs)
-            recommendations = []
-            if analysis["replay_events"] > 0: recommendations.append("Investigate replay attempts.")
-            if analysis["rate_limit_events"] > 0: recommendations.append("Review repeated request patterns.")
-            if analysis["failed_logins"] >= 5: recommendations.append("Review authentication failures.")
-            if not recommendations: recommendations.append("No obvious high-risk pattern detected in this simulation.")
-            return {"engine": "Clyxess AI Security Triage", "analysis": analysis, "recommended_actions": recommendations, "human_review_required": True}
-
-        def simulate_bb84(self, number_of_bits: int = 16, eavesdropper: bool = False) -> Dict[str, Any]:
-            if number_of_bits < 1: number_of_bits = 1
-            alice_bits = [secrets.randbelow(2) for _ in range(number_of_bits)]
-            alice_bases = [secrets.randbelow(2) for _ in range(number_of_bits)]
-            bob_bases = [secrets.randbelow(2) for _ in range(number_of_bits)]
-            bob_bits = []
-            errors = 0; compared = 0
-            for i in range(number_of_bits):
-                bit = alice_bits[i]
+        def simulate_bb84(self, n=16, eavesdropper=False):
+            if n < 1: n = 1
+            ab = [secrets.randbelow(2) for _ in range(n)]
+            abase = [secrets.randbelow(2) for _ in range(n)]
+            bbase = [secrets.randbelow(2) for _ in range(n)]
+            bb = []
+            for i in range(n):
+                bit = ab[i]
                 if eavesdropper:
-                    eve_basis = secrets.randbelow(2)
-                    if eve_basis != alice_bases[i]: bit = secrets.randbelow(2)
-                if bob_bases[i] == alice_bases[i]: bob_bits.append(bit)
-                else: bob_bits.append(secrets.randbelow(2))
-            sifted_key = []
-            for i in range(number_of_bits):
-                if alice_bases[i] == bob_bases[i]:
-                    compared += 1
-                    if alice_bits[i] != bob_bits[i]: errors += 1
-                    sifted_key.append(bob_bits[i])
-            error_rate = errors / compared if compared else 0
-            return {"bits_sent": number_of_bits, "sifted_key_length": len(sifted_key), "eavesdropper_simulated": eavesdropper, "sample_error_rate": round(error_rate, 4), "educational_result": ("Potential interception signal detected" if eavesdropper and error_rate > 0 else "No interception signal detected in this sample")}
-
-        def red_blue_security_game(self, firewall_enabled: bool, strong_authentication: bool, rate_limiting: bool, audit_logging: bool, encrypted_storage: bool) -> Dict[str, Any]:
-            controls = {"firewall": firewall_enabled, "strong_authentication": strong_authentication, "rate_limiting": rate_limiting, "audit_logging": audit_logging, "encrypted_storage": encrypted_storage}
-            defense_points = sum(20 for value in controls.values() if value)
-            missing = [key for key, value in controls.items() if not value]
-            return {"defense_score": defense_points, "max_score": 100, "enabled_controls": controls, "missing_controls": missing, "simulation_only": True, "lesson": "Students identify weaknesses and improve defensive controls."}
-
-        def cyber_architect_score(self, authentication: int, cryptography: int, privacy: int, network_security: int, monitoring: int, recovery: int) -> Dict[str, Any]:
-            values = [authentication, cryptography, privacy, network_security, monitoring, recovery]
-            values = [max(0, min(100, int(x))) for x in values]
-            score = round(sum(values) / len(values), 2)
-            if score >= 90: level = "CYBER ARCHITECT"
-            elif score >= 75: level = "SECURITY ENGINEER"
-            elif score >= 50: level = "SECURITY BUILDER"
-            else: level = "SECURITY EXPLORER"
-            return {"score": score, "level": level, "components": {"authentication": values[0], "cryptography": values[1], "privacy": values[2], "network_security": values[3], "monitoring": values[4], "recovery": values[5]}}
-
-        def process_cipher(self, user_id: str, stroke_points: List[Dict[str, Any]]) -> Dict[str, Any]:
-            if not self.check_rate_limit(user_id):
-                return {"status": "BLOCKED", "reason": "RATE_LIMIT_EXCEEDED"}
-            if len(stroke_points) < CyberConfig.MIN_STROKE_POINTS:
-                return {"status": "ERROR", "reason": "INSUFFICIENT_STROKE_POINTS"}
-            physics = self.analyze_biometric_physics(stroke_points)
-            geometry = self.analyze_gesture_geometry(stroke_points)
-            dsl = self.compile_visual_dsl(stroke_points)
-            proof = self.generate_security_proof(stroke_points)
-            profile = self.create_behavior_profile(physics)
-            stored = self.load_behavior_profile(user_id)
-            if stored:
-                behavior_result = self.verify_behavior(stored, physics)
-            else:
-                behavior_result = {"verified": False, "first_profile": True, "score": None, "message": "No previous behavioral profile exists."}
-            self.store_behavior_profile(user_id, profile)
-            token = self.generate_polymorphic_token(user_id)
-            self.audit(user_id, "CIPHER_PROCESSED", "INFO", {"dsl": dsl, "geometry": geometry.get("geometry_type"), "behavior_verified": behavior_result.get("verified", False)})
-            return {
-                "status": "SUCCESS", "user_id": user_id, "biometric_physics": physics, "geometry": geometry,
-                "dsl_command": dsl, "cryptographic_proof": proof, "behavior_analysis": behavior_result,
-                "one_time_access": token, "security_notice": "Educational security engine. Production authentication should use WebAuthn/FIDO2/passkeys."
-            }
-
-    # ============================================================
-    # PART 6: STREAMLIT UI
-    # ============================================================
-    st.markdown("### 🛡️ Clyxess AI — Cyber School Core")
-    st.caption("Advanced technology in the backend. Simple learning experience for the child.")
+                    eb = secrets.randbelow(2)
+                    if eb != abase[i]: bit = secrets.randbelow(2)
+                bb.append(bit if bbase[i] == abase[i] else secrets.randbelow(2))
+            err = cmp = 0
+            for i in range(n):
+                if abase[i] == bbase[i]:
+                    cmp += 1
+                    if ab[i] != bb[i]: err += 1
+            er = err / cmp if cmp else 0
+            return {"bits_sent": n, "eavesdropper": eavesdropper, "error_rate": round(er, 4), "result": "Interception detected" if eavesdropper and er > 0 else "Safe"}
 
     if "cyber_engine" not in st.session_state:
-        st.session_state.cyber_engine = ClyxessCyberEngine(database_path="clyxess_cyber_streamlit.db")
+        st.session_state.cyber_engine = ClyxessCyberEngine(database_path="clyxess_cyber.db")
     engine = st.session_state.cyber_engine
 
-    tab1, tab2, tab3, tab4 = st.tabs(["🎨 Biometric Draw", "🧱 Firewall Sim", "📊 Log Forensics", "⚛️ Quantum BB84"])
+    def render_advanced_cyber_lab():
+        st.markdown("#### ⚙️ Advanced Cyber Security Lab")
+        st.caption("For senior students & adults. Real-world security simulations.")
 
-    with tab1:
-        st.markdown("#### 🎨 Draw Your Secret Biometric Cipher")
+        tab1, tab2, tab3, tab4 = st.tabs(["🧱 Firewall Sim", "📊 Log Forensics", "⚛️ Quantum BB84", "📚 Learn Topics"])
 
-        HTML_TEMPLATE = """
-        <!DOCTYPE html>
-        <html lang="en">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Biometric Canvas</title>
-            <script src="https://cdn.tailwindcss.com"></script>
-            <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-            <style>canvas { touch-action: none; }</style>
-        </head>
-        <body class="bg-slate-950 text-slate-100 p-4 font-sans flex flex-col justify-center items-center">
-            <div class="w-full max-w-4xl bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl">
-                <h2 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
-                    <i class="fa-solid fa-pen-fancy text-purple-400"></i> Draw Your Secret Symbol
-                </h2>
-                <div class="relative bg-slate-950 border-2 border-dashed border-purple-500/50 rounded-2xl p-2 flex justify-center items-center h-[350px]">
-                    <canvas id="glyphCanvas" width="600" height="330" class="cursor-crosshair bg-slate-900 rounded-xl"></canvas>
-                </div>
-                <p class="text-xs text-slate-500 mt-2 text-center">Draw any shape. The AI records your <b>speed</b> and <b>angle</b> to create a unique key.</p>
-                <div class="flex space-x-2 mt-4">
-                    <button onclick="clearCanvas()" class="w-1/3 py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 text-sm font-bold rounded-xl transition">Clear Canvas</button>
-                    <button onclick="generateJSON()" class="w-2/3 py-3 bg-purple-500 hover:bg-purple-400 text-slate-950 text-sm font-bold rounded-xl shadow-lg transition flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-microchip"></i> Generate Data for AI
-                    </button>
-                </div>
-                <div id="jsonOutputBox" class="mt-4 hidden">
-                    <p class="text-xs text-emerald-400 font-bold mb-1">✅ Data captured! Copy this code and paste it below:</p>
-                    <textarea id="jsonOutput" class="w-full h-24 bg-slate-950 text-emerald-300 font-mono text-xs p-2 rounded-xl border border-emerald-500/30" readonly></textarea>
-                </div>
-            </div>
-            <script>
-                const canvas = document.getElementById('glyphCanvas');
-                const ctx = canvas.getContext('2d');
-                let isDrawing = false;
-                let strokePoints = [];
-                ctx.strokeStyle = "#a855f7"; ctx.lineWidth = 4; ctx.lineCap = "round"; ctx.lineJoin = "round";
-                function getPos(e) {
-                    const rect = canvas.getBoundingClientRect();
-                    const cx = e.touches ? e.touches[0].clientX : e.clientX;
-                    const cy = e.touches ? e.touches[0].clientY : e.clientY;
-                    return { x: cx - rect.left, y: cy - rect.top };
-                }
-                function startDrawing(e) {
-                    isDrawing = true; const pos = getPos(e);
-                    ctx.beginPath(); ctx.moveTo(pos.x, pos.y);
-                    strokePoints = [{ x: pos.x, y: pos.y, timestamp_ms: Date.now() }];
-                }
-                function draw(e) {
-                    if (!isDrawing) return; e.preventDefault();
-                    const pos = getPos(e); ctx.lineTo(pos.x, pos.y); ctx.stroke();
-                    strokePoints.push({ x: pos.x, y: pos.y, timestamp_ms: Date.now() });
-                }
-                function stopDrawing() { isDrawing = false; }
-                canvas.addEventListener('mousedown', startDrawing);
-                canvas.addEventListener('mousemove', draw);
-                canvas.addEventListener('mouseup', stopDrawing);
-                canvas.addEventListener('mouseout', stopDrawing);
-                canvas.addEventListener('touchstart', startDrawing);
-                canvas.addEventListener('touchmove', draw);
-                canvas.addEventListener('touchend', stopDrawing);
-                function clearCanvas() {
-                    ctx.clearRect(0, 0, canvas.width, canvas.height);
-                    strokePoints = [];
-                    document.getElementById('jsonOutputBox').classList.add('hidden');
-                }
-                function generateJSON() {
-                    if (strokePoints.length < 3) { alert("Please draw a longer pattern first!"); return; }
-                    document.getElementById('jsonOutput').value = JSON.stringify(strokePoints);
-                    document.getElementById('jsonOutputBox').classList.remove('hidden');
-                }
-            </script>
-        </body>
-        </html>
-        """
-        components.html(HTML_TEMPLATE, height=550, scrolling=False)
-
-        st.markdown("---")
-        st.markdown("#### 🤖 Step 2: Process with Python AI Engine")
-        st.info("Draw above → click 'Generate Data for AI' → copy the JSON → paste below.")
-
-        json_input = st.text_area("Paste JSON data here:", height=120, placeholder='[{"x": 100, "y": 150, "timestamp_ms": 167...}]')
-
-        if st.button("🚀 Run Python Cyber Engine", type="primary"):
-            if not json_input.strip():
-                st.warning("Please paste the JSON data first!")
-            else:
+        with tab1:
+            c1, c2, c3 = st.columns(3)
+            with c1: rule_name = st.text_input("Rule Name", value="Block_Unknown_IP")
+            with c2: source_ip = st.text_input("Source IP", value="192.168.1.100")
+            with c3: action = st.selectbox("Action", ["ALLOW", "DENY", "LOG"])
+            if st.button("Add Firewall Rule"):
                 try:
-                    stroke_data = json.loads(json_input)
-                    with st.spinner("Analyzing biometrics, geometry, and cryptography..."):
-                        result = engine.process_cipher("student_01", stroke_data)
-                        if result.get("status") == "SUCCESS":
-                            st.success("🎉 Analysis Complete! Your biometric signature is processed.")
-                            st.balloons()
-                            c1, c2, c3 = st.columns(3)
-                            with c1: st.metric("Avg Velocity", f"{result['biometric_physics']['avg_velocity']} px/ms")
-                            with c2: st.metric("Geometry Type", result['geometry']['geometry_type'])
-                            with c3: st.metric("AI Command", result['dsl_command'].split(":")[1].strip())
-                            with st.expander("🔍 View Detailed Security Proof"):
-                                st.json(result)
-                        else:
-                            st.error(f"Engine Error: {result.get('reason', 'Unknown error')}")
-                except json.JSONDecodeError:
-                    st.error("❌ Invalid data format. Copy the full JSON from the green box.")
+                    engine.add_firewall_rule(rule_name, source_ip, action)
+                    st.success("Rule added!")
                 except Exception as e:
-                    st.error(f"An unexpected error occurred: {str(e)}")
+                    st.error(f"Error: {e}")
+            test_ip = st.text_input("Test Source IP", value="192.168.1.100")
+            if st.button("Simulate Request"):
+                st.json(engine.simulate_firewall(test_ip))
 
-    with tab2:
-        st.markdown("#### 🧱 Firewall Simulator")
-        col1, col2, col3 = st.columns(3)
-        with col1: rule_name = st.text_input("Rule Name", value="Block_Unknown_IP")
-        with col2: source_ip = st.text_input("Source IP", value="192.168.1.100")
-        with col3: action = st.selectbox("Action", ["ALLOW", "DENY", "LOG"])
-        if st.button("Add Firewall Rule"):
-            try:
-                engine.add_firewall_rule(rule_name, source_ip, action)
-                st.success("Rule added successfully!")
-            except Exception as e:
-                st.error(f"Error: {e}")
-        test_ip = st.text_input("Test Source IP", value="192.168.1.100")
-        if st.button("Simulate Firewall Request"):
-            st.json(engine.simulate_firewall(test_ip))
+        with tab2:
+            sample_logs = [
+                {"event_type": "LOGIN_FAILED", "user_id": "user_1"},
+                {"event_type": "REPLAY_ATTEMPT", "user_id": "user_2"},
+                {"event_type": "LOGIN_FAILED", "user_id": "user_1"},
+                {"event_type": "RATE_LIMIT_BLOCK", "user_id": "user_3"}
+            ]
+            if st.button("Analyze Sample Logs"):
+                st.json(engine.analyze_security_logs(sample_logs))
 
-    with tab3:
-        st.markdown("#### 📊 AI Security Log Triage")
-        sample_logs = [
-            {"event_type": "LOGIN_FAILED", "user_id": "user_1"},
-            {"event_type": "REPLAY_ATTEMPT", "user_id": "user_2"},
-            {"event_type": "LOGIN_FAILED", "user_id": "user_1"},
-            {"event_type": "RATE_LIMIT_BLOCK", "user_id": "user_3"}
-        ]
-        if st.button("Analyze Sample Logs"):
-            st.json(engine.ai_security_triage(sample_logs))
+        with tab3:
+            bits = st.slider("Number of bits", 4, 64, 16)
+            eve = st.checkbox("Simulate Eavesdropper (Eve)")
+            if st.button("Run BB84 Simulation"):
+                st.json(engine.simulate_bb84(bits, eve))
 
-    with tab4:
-        st.markdown("#### ⚛️ Quantum BB84 Key Distribution")
-        bits = st.slider("Number of bits", 4, 64, 16)
-        eavesdropper = st.checkbox("Simulate Eavesdropper (Eve)")
-        if st.button("Run BB84 Simulation"):
-            st.json(engine.simulate_bb84(bits, eavesdropper))
+        with tab4:
+            st.markdown("""
+            ### 📚 Advanced Cyber Security Topics
+            
+            **🔐 Cryptography:**
+            - Symmetric Encryption (AES, DES)
+            - Asymmetric Encryption (RSA, ECC)
+            - Hash Functions (SHA-256, bcrypt)
+            - Digital Signatures
+            
+            **🌐 Network Security:**
+            - Firewalls (Stateful, Stateless)
+            - IDS/IPS Systems
+            - VPN Tunnels
+            - Zero Trust Architecture
+            
+            **🕵️ Ethical Hacking:**
+            - Penetration Testing
+            - Vulnerability Assessment
+            - Social Engineering
+            - Red Team vs Blue Team
+            
+            **⚛️ Quantum Security:**
+            - Quantum Key Distribution (BB84)
+            - Post-Quantum Cryptography
+            - Quantum-Resistant Algorithms
+            
+            **📊 Forensics:**
+            - Log Analysis
+            - Incident Response
+            - Malware Analysis
+            - Chain of Custody
+            
+            **🔒 Privacy:**
+            - GDPR & Data Protection
+            - Anonymity Networks (Tor)
+            - Differential Privacy
+            - Secure Multi-Party Computation
+            """)
 
     # ============================================================
-    # PART 7: SCHOOL LOGIC PANEL (Educational Info)
+    # MAIN UI: TWO SECTIONS (Kids & Adults)
     # ============================================================
-    with st.expander("📚 Clyxess School Core Principles"):
-        st.markdown(f"**Principle:** {SCHOOL_PRINCIPLE}")
-        st.markdown("**Age Adaptive Levels:**")
-        st.json(AGE_LEVELS)
-        st.markdown("**Concept Translator:**")
-        st.json(CONCEPT_TRANSLATOR)
-        st.markdown("**Student Flow:**")
-        st.code(STUDENT_FLOW)
-        st.markdown(f"**Final Rule:** {FINAL_RULE}")
+    st.markdown("### 🎓 Clyxess AI — Cyber Security School")
+    st.caption("Bacchon se lekar badon tak — sab ke liye cyber suraksha!")
+
+    section = st.radio(
+        "👥 Section Chuno:",
+        ["👶 Bacchon Ka Section (5-15 Saal)", "🧑 Badon Ka Section (15+ Saal)"],
+        horizontal=True
+    )
+
+    st.markdown("---")
+
+    if "Bacchon" in section:
+        render_kids_cyber_safety()
+    else:
+        render_advanced_cyber_lab()
 
 def render_homework_test():
     st.title("📝 Interactive Homework & Test")
