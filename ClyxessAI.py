@@ -2148,8 +2148,7 @@ def render_roleplay():
         st.chat_message("assistant").write(ans.choices[0].message.content if ans else "")
 
 
-def render_ai_autonomous_behavior():
-    # Imports yahan andar hain, taaki upar file mein koi gadbad na ho
+def render_cyber_security():
     import streamlit as st
     import streamlit.components.v1 as components
 
@@ -2159,182 +2158,314 @@ def render_ai_autonomous_behavior():
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>AI Emotional Swarm Drone Game</title>
+        <title>AI Biometric Cipher Matrix</title>
         <script src="https://cdn.tailwindcss.com"></script>
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
         <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+        <style>
+            canvas { touch-action: none; }
+            .glow-btn { box-shadow: 0 0 10px rgba(168, 85, 247, 0.5); }
+            .glow-btn:hover { box-shadow: 0 0 20px rgba(168, 85, 247, 0.8); }
+        </style>
     </head>
-    <body class="bg-slate-950 text-slate-100 min-h-screen p-4 font-sans flex flex-col justify-center items-center">
-        <div class="w-full max-w-5xl bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl space-y-6">
-            <div class="flex flex-col sm:flex-row justify-between items-center pb-4 border-b border-slate-800 gap-4">
+    <body class="bg-slate-950 text-slate-100 min-h-screen p-4 font-sans">
+        <div class="max-w-6xl mx-auto space-y-6">
+            <header class="bg-slate-900 border border-slate-800 p-5 rounded-3xl flex flex-col md:flex-row justify-between items-center shadow-2xl gap-4">
                 <div class="flex items-center space-x-3">
                     <div class="p-3 bg-purple-500/10 border border-purple-500/30 rounded-2xl text-purple-400">
-                        <i class="fa-solid fa-brain-circuit text-2xl"></i>
+                        <i class="fa-solid fa-fingerprint text-3xl"></i>
                     </div>
                     <div>
-                        <h1 class="text-xl font-bold text-white tracking-wide">AI Emotional <span class="text-purple-400">Swarm Drone</span></h1>
-                        <p class="text-xs text-slate-400">Behavioral Logic & Personality-Driven Drone Simulator</p>
+                        <h1 class="text-xl font-bold text-white tracking-wide">AI Biometric <span class="text-purple-400">Cipher Matrix</span></h1>
+                        <p class="text-xs text-slate-400">Invent Un-Hackable Language Using Your Unique Hand Movement</p>
                     </div>
                 </div>
-                <div class="flex items-center space-x-2 bg-slate-950 px-3 py-2 rounded-xl border border-slate-700">
-                    <i class="fa-solid fa-language text-amber-400 text-base"></i>
-                    <select id="languageSelect" onchange="changeLanguage()" class="bg-transparent text-amber-400 text-xs font-bold focus:outline-none cursor-pointer">
-                        <option value="en" selected>English</option>
-                        <option value="hi">हिंदी (Hindi)</option>
-                        <option value="te">తెలుగు (Telugu)</option>
-                        <option value="ta">தமிழ் (Tamil)</option>
-                        <option value="ml">മലയാളം (Malayalam)</option>
-                        <option value="kn">ಕನ್ನಡ (Kannada)</option>
-                        <option value="bn">বাংলা (Bengali)</option>
-                        <option value="gu">ગુજરાતી (Gujarati)</option>
-                        <option value="mr">मराठी (Marathi)</option>
-                        <option value="or">ଓଡ଼ିଆ (Odia)</option>
-                        <option value="pa">ਪੰਜਾਬੀ (Punjabi)</option>
-                        <option value="ur">اردو (Urdu)</option>
-                        <option value="es">Español</option>
-                        <option value="fr">Français</option>
-                        <option value="de">Deutsch</option>
+                <div class="flex items-center space-x-2">
+                    <span class="text-[10px] font-bold px-3 py-1 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 rounded-full">
+                        <i class="fa-solid fa-shield-halved text-emerald-400 mr-1"></i> Behavioral Biometrics Active
+                    </span>
+                </div>
+            </header>
+
+            <div class="bg-slate-900 border border-slate-800 p-4 rounded-3xl grid grid-cols-1 md:grid-cols-2 gap-4 shadow-xl">
+                <div class="flex flex-col space-y-1">
+                    <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider"><i class="fa-solid fa-graduation-cap text-amber-400"></i> Age / Class Level</label>
+                    <select id="levelSelect" class="bg-slate-950 text-amber-400 text-xs font-bold p-3 rounded-2xl border border-slate-800 focus:outline-none cursor-pointer">
+                        <option>Class 6-8 (Basic Behavioral Hash)</option>
+                        <option selected>Class 9-10 (Speed, Angle & Time Analysis)</option>
+                        <option>Class 11-12 (Multi-Factor Biometric Security)</option>
+                    </select>
+                </div>
+                <div class="flex flex-col space-y-1">
+                    <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider"><i class="fa-solid fa-earth-asia text-emerald-400"></i> Interface Language</label>
+                    <select id="langSelect" class="bg-slate-950 text-emerald-400 text-xs font-bold p-3 rounded-2xl border border-slate-800 focus:outline-none cursor-pointer">
+                        <option>English</option>
+                        <option>हिंदी (Hindi)</option>
+                        <option>தமிழ் (Tamil)</option>
+                        <option>తెలుగు (Telugu)</option>
+                        <option>বাংলা (Bengali)</option>
                     </select>
                 </div>
             </div>
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div class="bg-slate-950 border border-slate-800 rounded-2xl p-5 space-y-4">
-                    <h2 class="text-xs font-bold text-slate-300 uppercase tracking-wider border-b border-slate-800 pb-2 flex items-center gap-2">
-                        <i class="fa-solid fa-robot text-purple-400"></i> Select AI Drone Agent
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Left: Drawing Pad -->
+                <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 space-y-4 shadow-xl">
+                    <h2 class="text-sm font-bold text-white flex items-center gap-2 border-b border-slate-800 pb-2">
+                        <i class="fa-solid fa-pen-fancy text-purple-400"></i> Step 1: Draw Your Secret Symbol
                     </h2>
-                    <div class="space-y-2">
-                        <button onclick="selectDrone('falcon')" id="btnFalcon" class="w-full p-3 bg-slate-800 border-2 border-purple-500 rounded-xl text-left flex items-center justify-between transition">
-                            <div>
-                                <p class="text-xs font-bold text-purple-300">🦅 Brave Falcon</p>
-                                <p class="text-[10px] text-slate-400 mt-0.5">High speed & aggressive. Needs Energy Shield to pass lasers.</p>
-                            </div>
-                            <span class="text-[10px] bg-purple-500/20 text-purple-400 px-2 py-0.5 rounded-md font-bold">Brave</span>
-                        </button>
-                        <button onclick="selectDrone('owl')" id="btnOwl" class="w-full p-3 bg-slate-900 border border-slate-800 rounded-xl text-left flex items-center justify-between transition">
-                            <div>
-                                <p class="text-xs font-bold text-cyan-300">🦉 Cautious Owl</p>
-                                <p class="text-[10px] text-slate-400 mt-0.5">Slow & cautious. Stalls at laser traps without Sonar Scan.</p>
-                            </div>
-                            <span class="text-[10px] bg-cyan-500/20 text-cyan-400 px-2 py-0.5 rounded-md font-bold">Cautious</span>
-                        </button>
+                    <div class="relative bg-slate-950 border-2 border-dashed border-purple-500/50 rounded-2xl p-2 flex justify-center items-center h-[300px]">
+                        <canvas id="glyphCanvas" width="300" height="280" class="cursor-crosshair bg-slate-900 rounded-xl"></canvas>
                     </div>
-                    <div class="pt-2">
-                        <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Behavioral Logic Blocks</h3>
-                        <div class="space-y-2">
-                            <button onclick="addBlock('Move Forward')" class="w-full p-2.5 bg-slate-900 border border-slate-700 hover:border-purple-400 rounded-xl text-xs font-bold text-slate-200 text-left flex justify-between items-center transition">
-                                <span>🚀 Move Forward</span> <i class="fa-solid fa-plus text-slate-500 text-[10px]"></i>
-                            </button>
-                            <button onclick="addBlock('Activate Energy Shield')" class="w-full p-2.5 bg-slate-900 border border-slate-700 hover:border-purple-400 rounded-xl text-xs font-bold text-purple-300 text-left flex justify-between items-center transition">
-                                <span>🛡️ Activate Energy Shield</span> <i class="fa-solid fa-plus text-slate-500 text-[10px]"></i>
-                            </button>
-                            <button onclick="addBlock('Sonar Scan Barrier')" class="w-full p-2.5 bg-slate-900 border border-slate-700 hover:border-purple-400 rounded-xl text-xs font-bold text-cyan-300 text-left flex justify-between items-center transition">
-                                <span>📡 Sonar Scan Barrier</span> <i class="fa-solid fa-plus text-slate-500 text-[10px]"></i>
-                            </button>
-                        </div>
+                    <p class="text-[10px] text-slate-500 text-center">Draw your symbol slowly or quickly. The AI will record your <b>speed</b> and <b>movement angle</b> to create a unique biometric key.</p>
+                    <div class="flex space-x-2">
+                        <button onclick="clearCanvas()" class="w-1/3 py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold rounded-xl transition">Clear</button>
+                        <button onclick="registerBiometricGlyph()" class="w-2/3 py-3 bg-purple-500 hover:bg-purple-400 text-slate-950 text-xs font-bold rounded-xl shadow-lg shadow-purple-500/20 transition flex items-center justify-center gap-2 glow-btn">
+                            <i class="fa-solid fa-fingerprint"></i> Register Biometric Glyph
+                        </button>
                     </div>
                 </div>
-                <div class="lg:col-span-2 bg-slate-950 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between space-y-4">
-                    <div class="relative bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-col items-center justify-center overflow-hidden h-[220px]">
-                        <div class="absolute inset-0 bg-[radial-gradient(#3b82f6_1px,transparent_1px)] [background-size:16px_16px] opacity-20"></div>
-                        <div class="absolute right-8 top-1/2 -translate-y-1/2 w-12 h-12 bg-emerald-500/10 border-2 border-emerald-400 rounded-full flex items-center justify-center animate-pulse">
-                            <i class="fa-solid fa-bullseye text-emerald-400 text-xl"></i>
-                        </div>
-                        <div id="laserBarrier" class="absolute left-1/2 top-0 bottom-0 w-2 bg-rose-500 shadow-[0_0_15px_#f43f5e] z-10 flex items-center justify-center">
-                            <span class="text-[9px] bg-rose-950 text-rose-300 font-bold px-1 rounded -rotate-90">LASER TRAP</span>
-                        </div>
-                        <div id="droneSprite" class="absolute left-8 top-1/2 -translate-y-1/2 transition-all duration-700 z-20 flex flex-col items-center">
-                            <i id="droneIcon" class="fa-solid fa-helicopter text-4xl text-purple-400"></i>
-                            <span id="droneAITag" class="text-[9px] font-bold bg-slate-950 px-2 py-0.5 rounded-full border border-purple-500/40 text-purple-300 mt-1">Brave AI</span>
+
+                <!-- Right: Database & Security -->
+                <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 flex flex-col justify-between space-y-4 shadow-xl">
+                    <div>
+                        <h2 class="text-sm font-bold text-white flex items-center gap-2 border-b border-slate-800 pb-2">
+                            <i class="fa-solid fa-database text-emerald-400"></i> Step 2: Your Secret Biometric Database
+                        </h2>
+                        <div id="glyphList" class="mt-4 space-y-2 max-h-[200px] overflow-y-auto pr-2">
+                            <p class="text-xs text-slate-500 italic text-center py-4">No biometrics recorded yet. Draw and click 'Register'.</p>
                         </div>
                     </div>
-                    <div class="bg-slate-900 border border-slate-800 rounded-xl p-4">
-                        <div class="flex justify-between items-center mb-2">
-                            <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider">AI Execution Sequence</h4>
-                            <button onclick="clearSequence()" class="text-[10px] text-rose-400 hover:underline">Clear Sequence</button>
+                    
+                    <div class="bg-slate-950 border border-slate-800 rounded-2xl p-4 space-y-3">
+                        <h3 class="text-xs font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1"><i class="fa-solid fa-shield-virus"></i> Step 3: Database Security Test</h3>
+                        <p class="text-[10px] text-slate-400">Only your unique hand movement can unlock the secure database. A hacker might copy the shape, but not your speed or angle.</p>
+                        
+                        <div class="flex flex-col space-y-2">
+                            <button onclick="simulateHack()" class="w-full py-2.5 bg-rose-500/10 border border-rose-500/40 hover:bg-rose-500/20 text-rose-300 text-xs font-bold rounded-xl transition flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-user-ninja"></i> Hacker Attempt (Copy Shape)
+                            </button>
+                            <button onclick="simulateValidAccess()" class="w-full py-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-bold rounded-xl transition flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-key"></i> Authentic Access (My Biometrics)
+                            </button>
                         </div>
-                        <div id="sequenceList" class="min-h-[60px] border border-dashed border-slate-800 rounded-xl p-2 flex flex-wrap gap-2 items-center">
-                            <p class="text-xs text-slate-600 italic">Click blocks to chain logic sequence...</p>
+                        <div id="securityLog" class="bg-slate-900 border border-slate-800 rounded-xl p-3 h-[80px] overflow-y-auto font-mono text-[10px] space-y-1">
+                            <p class="text-slate-500">System ready. Awaiting biometric definition...</p>
                         </div>
-                    </div>
-                    <div class="flex flex-col sm:flex-row justify-between items-center pt-2 border-t border-slate-800 gap-3">
-                        <p id="statusFeedback" class="text-xs font-bold text-slate-400">Status: Ready for deployment</p>
-                        <button onclick="runAISwarm()" class="w-full sm:w-auto px-6 py-2.5 bg-purple-500 hover:bg-purple-400 text-slate-950 text-xs font-bold rounded-xl shadow-lg shadow-purple-500/20 transition flex items-center justify-center gap-2">
-                            <i class="fa-solid fa-bolt"></i> Execute AI Swarm Logic
-                        </button>
                     </div>
                 </div>
             </div>
         </div>
+
         <script>
-            let currentDrone = "falcon";
-            let sequence = [];
-            let currentLang = "en";
-            const translations = {
-                "en": { successFalcon: "🎉 Success! Brave Falcon used Shield to cross Laser Barrier!", crashFalcon: "💥 Crash! Brave Falcon was too aggressive and hit Laser without Shield!", successOwl: "🎉 Success! Cautious Owl scanned the barrier & crossed safely!", stallOwl: "⚠️ Stalled! Cautious Owl detected Laser Hazard & refused to move without Sonar Scan!", emptyError: "❌ Please add at least 1 logic block!" },
-                "hi": { successFalcon: "🎉 सफलता! Brave Falcon ने Laser Barrier पार करने के लिए Shield का उपयोग किया!", crashFalcon: "💥 क्रैश! Brave Falcon बहुत तेज था और बिना Shield के Laser से टकरा गया!", successOwl: "🎉 सफलता! Cautious Owl ने बैरियर को स्कैन किया और सुरक्षित पार किया!", stallOwl: "⚠️ रुकावट! Cautious Owl ने लेजर देखा और बिना Sonar Scan के आगे बढ़ने से मना कर दिया!", emptyError: "❌ कृपया कम से कम 1 लॉजिक ब्लॉक जोड़ें!" }
-            };
-            function changeLanguage() { currentLang = document.getElementById('languageSelect').value; }
-            function selectDrone(type) {
-                currentDrone = type;
-                const btnF = document.getElementById('btnFalcon');
-                const btnO = document.getElementById('btnOwl');
-                const icon = document.getElementById('droneIcon');
-                const tag = document.getElementById('droneAITag');
-                if(type === 'falcon') {
-                    btnF.className = "w-full p-3 bg-slate-800 border-2 border-purple-500 rounded-xl text-left flex items-center justify-between transition";
-                    btnO.className = "w-full p-3 bg-slate-900 border border-slate-800 rounded-xl text-left flex items-center justify-between transition";
-                    icon.className = "fa-solid fa-helicopter text-4xl text-purple-400";
-                    tag.innerText = "Brave AI";
-                    tag.className = "text-[9px] font-bold bg-slate-950 px-2 py-0.5 rounded-full border border-purple-500/40 text-purple-300 mt-1";
-                } else {
-                    btnO.className = "w-full p-3 bg-slate-800 border-2 border-cyan-500 rounded-xl text-left flex items-center justify-between transition";
-                    btnF.className = "w-full p-3 bg-slate-900 border border-slate-800 rounded-xl text-left flex items-center justify-between transition";
-                    icon.className = "fa-solid fa-paper-plane text-4xl text-cyan-400";
-                    tag.innerText = "Cautious AI";
-                    tag.className = "text-[9px] font-bold bg-slate-950 px-2 py-0.5 rounded-full border border-cyan-500/40 text-cyan-300 mt-1";
+            const canvas = document.getElementById('glyphCanvas');
+            const ctx = canvas.getContext('2d');
+            let isDrawing = false;
+            let glyphs = [];
+            let glyphCounter = 0;
+
+            // Biometric Tracking Variables
+            let startTime = 0;
+            let lastX = 0, lastY = 0;
+            let totalTime = 0;
+            let strokePoints = 0;
+            let totalDistance = 0;
+            let angleChanges = 0;
+            let lastAngle = null;
+
+            ctx.strokeStyle = "#a855f7";
+            ctx.lineWidth = 4;
+            ctx.lineCap = "round";
+            ctx.lineJoin = "round";
+
+            function startDrawing(e) {
+                isDrawing = true;
+                const pos = getPos(e);
+                ctx.beginPath();
+                ctx.moveTo(pos.x, pos.y);
+                
+                // Reset Biometric Trackers
+                startTime = Date.now();
+                lastX = pos.x;
+                lastY = pos.y;
+                strokePoints = 0;
+                totalDistance = 0;
+                angleChanges = 0;
+                lastAngle = null;
+            }
+
+            function draw(e) {
+                if (!isDrawing) return;
+                e.preventDefault();
+                const pos = getPos(e);
+                ctx.lineTo(pos.x, pos.y);
+                ctx.stroke();
+
+                // --- BIOMETRIC DATA COLLECTION ---
+                const dx = pos.x - lastX;
+                const dy = pos.y - lastY;
+                const distance = Math.sqrt(dx*dx + dy*dy);
+                totalDistance += distance;
+                strokePoints++;
+
+                // Calculate Angle
+                if (distance > 2) { // Only consider movement if it's significant
+                    const angle = Math.atan2(dy, dx) * (180 / Math.PI);
+                    if (lastAngle !== null) {
+                        let angleDiff = Math.abs(angle - lastAngle);
+                        if (angleDiff > 180) angleDiff = 360 - angleDiff;
+                        if (angleDiff > 15) { // Count significant angle changes
+                            angleChanges++;
+                        }
+                    }
+                    lastAngle = angle;
                 }
-                resetDronePos();
+
+                lastX = pos.x;
+                lastY = pos.y;
             }
-            function addBlock(text) { sequence.push(text); renderSequence(); }
-            function renderSequence() {
-                const list = document.getElementById('sequenceList');
-                list.innerHTML = '';
-                if(sequence.length === 0) { list.innerHTML = '<p class="text-xs text-slate-600 italic">Click blocks to chain logic sequence...</p>'; return; }
-                sequence.forEach((item, index) => {
-                    const b = document.createElement('span');
-                    b.className = "bg-purple-500/20 text-purple-300 border border-purple-500/40 text-xs px-2.5 py-1 rounded-lg font-bold flex items-center gap-1.5";
-                    b.innerHTML = `${index + 1}. ${item} <i onclick="removeBlock(${index})" class="fa-solid fa-xmark text-[10px] ml-1 cursor-pointer hover:text-rose-400"></i>`;
-                    list.appendChild(b);
-                });
-            }
-            function removeBlock(index) { sequence.splice(index, 1); renderSequence(); }
-            function clearSequence() { sequence = []; renderSequence(); resetDronePos(); }
-            function resetDronePos() {
-                document.getElementById('droneSprite').style.left = '32px';
-                document.getElementById('statusFeedback').className = "text-xs font-bold text-slate-400";
-                document.getElementById('statusFeedback').innerText = "Status: Ready for deployment";
-            }
-            function runAISwarm() {
-                const sprite = document.getElementById('droneSprite');
-                const feedback = document.getElementById('statusFeedback');
-                const t = translations[currentLang] || translations["en"];
-                if(sequence.length === 0) { feedback.innerText = t.emptyError; feedback.className = "text-xs font-bold text-rose-400"; return; }
-                const hasShield = sequence.includes("Activate Energy Shield");
-                const hasSonar = sequence.includes("Sonar Scan Barrier");
-                if(currentDrone === 'falcon') {
-                    if(hasShield) { sprite.style.left = '80%'; feedback.innerText = t.successFalcon; feedback.className = "text-xs font-bold text-emerald-400"; confetti({ particleCount: 110, spread: 75, origin: { y: 0.6 } }); }
-                    else { sprite.style.left = '45%'; feedback.innerText = t.crashFalcon; feedback.className = "text-xs font-bold text-rose-400"; }
-                } else if(currentDrone === 'owl') {
-                    if(hasSonar) { sprite.style.left = '80%'; feedback.innerText = t.successOwl; feedback.className = "text-xs font-bold text-emerald-400"; confetti({ particleCount: 110, spread: 75, origin: { y: 0.6 } }); }
-                    else { sprite.style.left = '35%'; feedback.innerText = t.stallOwl; feedback.className = "text-xs font-bold text-amber-400"; }
+
+            function stopDrawing() { 
+                if(isDrawing) {
+                    totalTime = Date.now() - startTime;
+                    isDrawing = false;
                 }
+            }
+
+            function getPos(e) {
+                const rect = canvas.getBoundingClientRect();
+                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+                return { x: clientX - rect.left, y: clientY - rect.top };
+            }
+
+            canvas.addEventListener('mousedown', startDrawing);
+            canvas.addEventListener('mousemove', draw);
+            canvas.addEventListener('mouseup', stopDrawing);
+            canvas.addEventListener('mouseout', stopDrawing);
+            canvas.addEventListener('touchstart', startDrawing);
+            canvas.addEventListener('touchmove', draw);
+            canvas.addEventListener('touchend', stopDrawing);
+
+            function clearCanvas() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+            }
+
+            // Generates a hash based on SHAPE + BEHAVIOR (Speed, Angle, Time)
+            function generateBiometricHash() {
+                const shapeData = canvas.toDataURL();
+                let shapeHash = 0;
+                for (let i = 0; i < shapeData.length; i++) {
+                    const char = shapeData.charCodeAt(i);
+                    shapeHash = ((shapeHash << 5) - shapeHash) + char;
+                    shapeHash = shapeHash & shapeHash;
+                }
+
+                // Behavioral factors
+                const speed = (totalDistance / (totalTime || 1)).toFixed(2); // pixels per ms
+                const behavioralString = `SPD:${speed}|ANG:${angleChanges}|PTS:${strokePoints}|TIME:${totalTime}`;
+                
+                let behaviorHash = 0;
+                for (let i = 0; i < behavioralString.length; i++) {
+                    const char = behavioralString.charCodeAt(i);
+                    behaviorHash = ((behaviorHash << 5) - behaviorHash) + char;
+                    behaviorHash = behaviorHash & behaviorHash;
+                }
+
+                // Combine both hashes
+                const finalHash = "BM-" + Math.abs(shapeHash).toString(16).toUpperCase().substring(0, 6) + 
+                                  "-" + Math.abs(behaviorHash).toString(16).toUpperCase().substring(0, 6);
+                
+                return { finalHash, speed, angleChanges, totalTime, strokePoints };
+            }
+
+            function registerBiometricGlyph() {
+                const blank = document.createElement('canvas');
+                blank.width = canvas.width;
+                blank.height = canvas.height;
+                if (canvas.toDataURL() === blank.toDataURL()) {
+                    logSecurity("❌ Please draw a symbol first! Canvas is empty.", "rose");
+                    return;
+                }
+
+                const bioData = generateBiometricHash();
+                const id = "BIO-GLYPH-" + (++glyphCounter);
+                
+                glyphs.push({ id: id, hash: bioData.finalHash, speed: bioData.speed, angles: bioData.angleChanges, time: bioData.totalTime });
+                
+                const list = document.getElementById('glyphList');
+                if (glyphs.length === 1) list.innerHTML = '';
+
+                const item = document.createElement('div');
+                item.className = "bg-slate-950 border border-purple-500/30 p-3 rounded-xl space-y-1 text-[10px] font-mono";
+                item.innerHTML = `
+                    <div class="flex justify-between items-center">
+                        <span class="text-purple-300 font-bold">${id}</span>
+                        <i class="fa-solid fa-fingerprint text-emerald-400"></i>
+                    </div>
+                    <div class="text-slate-400">HASH: <span class="text-cyan-300">${bioData.finalHash}</span></div>
+                    <div class="text-slate-500">Speed: ${bioData.speed} px/ms | Angle Changes: ${bioData.angleChanges} | Time: ${bioData.totalTime}ms</div>
+                `;
+                list.appendChild(item);
+
+                logSecurity(`[SYSTEM]: Biometric Glyph Registered! ID: ${id}`, 'purple');
+                logSecurity(`[HASH]: Shape+Behavior Key: ${bioData.finalHash}`, 'cyan');
+                logSecurity(`[BEHAVIOR]: Speed: ${bioData.speed}, Angles: ${bioData.angleChanges}`, 'emerald');
+
+                confetti({ particleCount: 50, spread: 60, origin: { y: 0.7 } });
+                clearCanvas();
+            }
+
+            function simulateHack() {
+                const log = document.getElementById('securityLog');
+                log.innerHTML = '';
+                logSecurity(`⚠️ [ATTACK]: Hacker copied the exact shape of the drawing...`, 'rose');
+                logSecurity(`🔑 [TRYING]: Attempting to match visual pattern only...`, 'amber');
+                
+                setTimeout(() => {
+                    logSecurity(`❌ [DENIED]: Shape matched, but Behavioral Biometrics FAILED!`, 'rose');
+                    logSecurity(`🛡️ [RESULT]: Hacker's speed and angle were different. Database is 100% secure!`, 'emerald');
+                }, 1000);
+            }
+
+            function simulateValidAccess() {
+                if (glyphs.length === 0) {
+                    logSecurity(`❌ [ERROR]: No biometric language registered! Please draw a glyph first.`, 'rose');
+                    return;
+                }
+
+                const log = document.getElementById('securityLog');
+                log.innerHTML = '';
+                logSecurity(`🔑 [ACCESS]: Verifying your unique hand movement...`, 'cyan');
+                
+                setTimeout(() => {
+                    const lastGlyph = glyphs[glyphs.length - 1];
+                    logSecurity(`✅ [SHAPE MATCHED]: Glyph ${lastGlyph.id} visual pattern verified.`, 'emerald');
+                    logSecurity(`✅ [BEHAVIOR MATCHED]: Speed & Angle verified as authentic.`, 'emerald');
+                    logSecurity(`🔓 [UNLOCKED]: Database access granted using your Biometric Language!`, 'emerald');
+                    confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+                }, 1000);
+            }
+
+            function logSecurity(text, color) {
+                const log = document.getElementById('securityLog');
+                const p = document.createElement('p');
+                if (color === 'rose') p.className = "text-rose-400";
+                else if (color === 'emerald') p.className = "text-emerald-400";
+                else if (color === 'purple') p.className = "text-purple-300";
+                else if (color === 'cyan') p.className = "text-cyan-300";
+                else if (color === 'amber') p.className = "text-amber-400";
+                else p.className = "text-slate-400";
+                p.innerText = text;
+                log.appendChild(p);
+                log.scrollTop = log.scrollHeight;
             }
         </script>
     </body>
     </html>
     """
     
-    components.html(HTML_TEMPLATE, height=850, scrolling=True)
+    components.html(HTML_TEMPLATE, height=900, scrolling=True)
 
 def render_homework_test():
     st.title("📝 Interactive Homework & Test")
