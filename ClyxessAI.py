@@ -6122,7 +6122,6 @@ with st.sidebar:
         "🧩 Kids Logic Lab", 
         "🖥️ Real World Project",  
         "🎭 Peer Roleplay Modes",
-        "📋 AI Daily Timetable",
         "📝 Interactive Homework & Test",
         "👨‍👩‍👦 Parent Dashboard", 
         "👨‍💻 Coding Lab",  
@@ -6167,8 +6166,6 @@ if mode == "📷 Vision Lab":
     render_vision_lab(); st.stop()
 if mode == "🎭 Peer Roleplay Modes":
     render_roleplay(); st.stop()
-if mode == "📋 AI Daily Timetable":
-    render_timetable(); st.stop()
 if mode == "📝 Interactive Homework & Test":
     render_homework_test(); st.stop()
 if mode == "🎮 Play & Learn":
