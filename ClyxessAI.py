@@ -6339,7 +6339,7 @@ if mode == "🎨 Creative AI Image Generator":
     render_image_generator(); st.stop() 
 if mode == "🧩 Kids Logic Lab":
     render_kids_logic_lab(); st.stop() 
-if mode == "🧠 AI Autononous Behavior":
+if mode == "🧠 AI Autonomous Behavior":
     render_ai_autonomous_behavior(); st.stop()       
 if mode == "📷 Vision Lab":
     render_vision_lab(); st.stop()
