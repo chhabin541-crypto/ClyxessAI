@@ -2149,323 +2149,538 @@ def render_roleplay():
 
 
 def render_cyber_security():
+    import os
+    import math
+    import time
+    import json
+    import hmac
+    import hashlib
+    import secrets
+    import sqlite3
+    import threading
+    from dataclasses import dataclass, asdict
+    from collections import defaultdict, deque
+    from typing import Any, Dict, List, Optional, Tuple
     import streamlit as st
-    import streamlit.components.v1 as components
 
-    HTML_TEMPLATE = """
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>AI Biometric Cipher Matrix</title>
-        <script src="https://cdn.tailwindcss.com"></script>
-        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-        <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-        <style>
-            canvas { touch-action: none; }
-            .glow-btn { box-shadow: 0 0 10px rgba(168, 85, 247, 0.5); }
-            .glow-btn:hover { box-shadow: 0 0 20px rgba(168, 85, 247, 0.8); }
-        </style>
-    </head>
-    <body class="bg-slate-950 text-slate-100 min-h-screen p-4 font-sans">
-        <div class="max-w-6xl mx-auto space-y-6">
-            <header class="bg-slate-900 border border-slate-800 p-5 rounded-3xl flex flex-col md:flex-row justify-between items-center shadow-2xl gap-4">
-                <div class="flex items-center space-x-3">
-                    <div class="p-3 bg-purple-500/10 border border-purple-500/30 rounded-2xl text-purple-400">
-                        <i class="fa-solid fa-fingerprint text-3xl"></i>
-                    </div>
-                    <div>
-                        <h1 class="text-xl font-bold text-white tracking-wide">AI Biometric <span class="text-purple-400">Cipher Matrix</span></h1>
-                        <p class="text-xs text-slate-400">Invent Un-Hackable Language Using Your Unique Hand Movement</p>
-                    </div>
-                </div>
-                <div class="flex items-center space-x-2">
-                    <span class="text-[10px] font-bold px-3 py-1 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 rounded-full">
-                        <i class="fa-solid fa-shield-halved text-emerald-400 mr-1"></i> Behavioral Biometrics Active
-                    </span>
-                </div>
-            </header>
+    # ========================================================
+    # 1. ALLOWED LANGUAGES
+    # ========================================================
+    SUPPORTED_LANGUAGES = {
+        "English": "en",
+        "Hindi": "hi",
+        "Chinese": "zh",
+        "Japanese": "ja",
+        "Russian": "ru",
+    }
 
-            <div class="bg-slate-900 border border-slate-800 p-4 rounded-3xl grid grid-cols-1 md:grid-cols-2 gap-4 shadow-xl">
-                <div class="flex flex-col space-y-1">
-                    <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider"><i class="fa-solid fa-graduation-cap text-amber-400"></i> Age / Class Level</label>
-                    <select id="levelSelect" class="bg-slate-950 text-amber-400 text-xs font-bold p-3 rounded-2xl border border-slate-800 focus:outline-none cursor-pointer">
-                        <option>Class 6-8 (Basic Behavioral Hash)</option>
-                        <option selected>Class 9-10 (Speed, Angle & Time Analysis)</option>
-                        <option>Class 11-12 (Multi-Factor Biometric Security)</option>
-                    </select>
-                </div>
-                <div class="flex flex-col space-y-1">
-                    <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider"><i class="fa-solid fa-earth-asia text-emerald-400"></i> Interface Language</label>
-                    <select id="langSelect" class="bg-slate-950 text-emerald-400 text-xs font-bold p-3 rounded-2xl border border-slate-800 focus:outline-none cursor-pointer">
-                        <option>English</option>
-                        <option>हिंदी (Hindi)</option>
-                        <option>தமிழ் (Tamil)</option>
-                        <option>తెలుగు (Telugu)</option>
-                        <option>বাংলা (Bengali)</option>
-                    </select>
-                </div>
-            </div>
+    # ========================================================
+    # 2. SECURITY CONFIG
+    # ========================================================
+    class CyberConfig:
+        APP_NAME = "ClyxessChat AI Cyber Engine"
+        SECRET_KEY = os.environ.get("CLYXESS_SECRET_KEY", "CHANGE_THIS_IN_PRODUCTION")
+        TOKEN_TTL_SECONDS = 60
+        MAX_FAILED_ATTEMPTS = 5
+        RATE_LIMIT_WINDOW_SECONDS = 60
+        RATE_LIMIT_MAX_REQUESTS = 30
+        DEFAULT_BEHAVIOR_TOLERANCE = 0.35
+        MIN_STROKE_POINTS = 3
 
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <!-- Left: Drawing Pad -->
-                <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 space-y-4 shadow-xl">
-                    <h2 class="text-sm font-bold text-white flex items-center gap-2 border-b border-slate-800 pb-2">
-                        <i class="fa-solid fa-pen-fancy text-purple-400"></i> Step 1: Draw Your Secret Symbol
-                    </h2>
-                    <div class="relative bg-slate-950 border-2 border-dashed border-purple-500/50 rounded-2xl p-2 flex justify-center items-center h-[300px]">
-                        <canvas id="glyphCanvas" width="300" height="280" class="cursor-crosshair bg-slate-900 rounded-xl"></canvas>
-                    </div>
-                    <p class="text-[10px] text-slate-500 text-center">Draw your symbol slowly or quickly. The AI will record your <b>speed</b> and <b>movement angle</b> to create a unique biometric key.</p>
-                    <div class="flex space-x-2">
-                        <button onclick="clearCanvas()" class="w-1/3 py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold rounded-xl transition">Clear</button>
-                        <button onclick="registerBiometricGlyph()" class="w-2/3 py-3 bg-purple-500 hover:bg-purple-400 text-slate-950 text-xs font-bold rounded-xl shadow-lg shadow-purple-500/20 transition flex items-center justify-center gap-2 glow-btn">
-                            <i class="fa-solid fa-fingerprint"></i> Register Biometric Glyph
-                        </button>
-                    </div>
-                </div>
+    # ========================================================
+    # 3. BASIC CRYPTOGRAPHY UTILITIES
+    # ========================================================
+    class CryptoEngine:
+        @staticmethod
+        def sha256(value: str) -> str:
+            return hashlib.sha256(value.encode("utf-8")).hexdigest()
 
-                <!-- Right: Database & Security -->
-                <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 flex flex-col justify-between space-y-4 shadow-xl">
-                    <div>
-                        <h2 class="text-sm font-bold text-white flex items-center gap-2 border-b border-slate-800 pb-2">
-                            <i class="fa-solid fa-database text-emerald-400"></i> Step 2: Your Secret Biometric Database
-                        </h2>
-                        <div id="glyphList" class="mt-4 space-y-2 max-h-[200px] overflow-y-auto pr-2">
-                            <p class="text-xs text-slate-500 italic text-center py-4">No biometrics recorded yet. Draw and click 'Register'.</p>
-                        </div>
-                    </div>
-                    
-                    <div class="bg-slate-950 border border-slate-800 rounded-2xl p-4 space-y-3">
-                        <h3 class="text-xs font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1"><i class="fa-solid fa-shield-virus"></i> Step 3: Database Security Test</h3>
-                        <p class="text-[10px] text-slate-400">Only your unique hand movement can unlock the secure database. A hacker might copy the shape, but not your speed or angle.</p>
-                        
-                        <div class="flex flex-col space-y-2">
-                            <button onclick="simulateHack()" class="w-full py-2.5 bg-rose-500/10 border border-rose-500/40 hover:bg-rose-500/20 text-rose-300 text-xs font-bold rounded-xl transition flex items-center justify-center gap-2">
-                                <i class="fa-solid fa-user-ninja"></i> Hacker Attempt (Copy Shape)
-                            </button>
-                            <button onclick="simulateValidAccess()" class="w-full py-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-bold rounded-xl transition flex items-center justify-center gap-2">
-                                <i class="fa-solid fa-key"></i> Authentic Access (My Biometrics)
-                            </button>
-                        </div>
-                        <div id="securityLog" class="bg-slate-900 border border-slate-800 rounded-xl p-3 h-[80px] overflow-y-auto font-mono text-[10px] space-y-1">
-                            <p class="text-slate-500">System ready. Awaiting biometric definition...</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        @staticmethod
+        def sha3_256(value: str) -> str:
+            return hashlib.sha3_256(value.encode("utf-8")).hexdigest()
 
-        <script>
-            const canvas = document.getElementById('glyphCanvas');
-            const ctx = canvas.getContext('2d');
-            let isDrawing = false;
-            let glyphs = [];
-            let glyphCounter = 0;
+        @staticmethod
+        def hmac_sha256(secret: str, message: str) -> str:
+            return hmac.new(secret.encode("utf-8"), message.encode("utf-8"), hashlib.sha256).hexdigest()
 
-            // Biometric Tracking Variables
-            let startTime = 0;
-            let lastX = 0, lastY = 0;
-            let totalTime = 0;
-            let strokePoints = 0;
-            let totalDistance = 0;
-            let angleChanges = 0;
-            let lastAngle = null;
+        @staticmethod
+        def secure_compare(a: str, b: str) -> bool:
+            return hmac.compare_digest(str(a), str(b))
 
-            ctx.strokeStyle = "#a855f7";
-            ctx.lineWidth = 4;
-            ctx.lineCap = "round";
-            ctx.lineJoin = "round";
+        @staticmethod
+        def random_nonce(length: int = 32) -> str:
+            return secrets.token_urlsafe(length)
 
-            function startDrawing(e) {
-                isDrawing = true;
-                const pos = getPos(e);
-                ctx.beginPath();
-                ctx.moveTo(pos.x, pos.y);
-                
-                // Reset Biometric Trackers
-                startTime = Date.now();
-                lastX = pos.x;
-                lastY = pos.y;
-                strokePoints = 0;
-                totalDistance = 0;
-                angleChanges = 0;
-                lastAngle = null;
+    # ========================================================
+    # 4. BIOMETRIC DATA MODEL
+    # ========================================================
+    @dataclass
+    class BehavioralProfile:
+        avg_velocity: float
+        avg_acceleration: float
+        total_distance: float
+        total_time_sec: float
+        stroke_count: int
+        direction_changes: int
+        min_velocity: float
+        max_velocity: float
+        created_at: float
+
+    # ========================================================
+    # 5. CLYXESS CYBER ENGINE
+    # ========================================================
+    class ClyxessCyberEngine:
+        def __init__(self, secret_key: Optional[str] = None, database_path: str = "clyxess_cyber.db"):
+            self.secret_key = secret_key or os.environ.get("CLYXESS_SECRET_KEY", CyberConfig.SECRET_KEY)
+            self.database_path = database_path
+            self.crypto = CryptoEngine()
+            self._rate_lock = threading.Lock()
+            self.rate_tracker = defaultdict(deque)
+            self.used_tokens = set()
+            self.behavior_profiles = {}
+            self._initialize_database()
+
+        def _get_db(self):
+            connection = sqlite3.connect(self.database_path, check_same_thread=False)
+            connection.row_factory = sqlite3.Row
+            return connection
+
+        def _initialize_database(self):
+            db = self._get_db()
+            try:
+                db.execute("""CREATE TABLE IF NOT EXISTS security_audit (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id TEXT, event_type TEXT, severity TEXT, event_data TEXT, created_at REAL)""")
+                db.execute("""CREATE TABLE IF NOT EXISTS security_tokens (token_hash TEXT PRIMARY KEY, user_id TEXT, created_at REAL, expires_at REAL, used INTEGER DEFAULT 0)""")
+                db.execute("""CREATE TABLE IF NOT EXISTS behavioral_profiles (user_id TEXT PRIMARY KEY, profile_json TEXT, updated_at REAL)""")
+                db.execute("""CREATE TABLE IF NOT EXISTS firewall_rules (id INTEGER PRIMARY KEY AUTOINCREMENT, rule_name TEXT, source TEXT, action TEXT, enabled INTEGER DEFAULT 1, created_at REAL)""")
+                db.commit()
+            finally:
+                db.close()
+
+        def audit(self, user_id: str, event_type: str, severity: str = "INFO", data: Optional[Dict[str, Any]] = None):
+            db = self._get_db()
+            try:
+                db.execute("""INSERT INTO security_audit (user_id, event_type, severity, event_data, created_at) VALUES (?, ?, ?, ?, ?)""", (user_id, event_type, severity, json.dumps(data or {}, ensure_ascii=False), time.time()))
+                db.commit()
+            finally:
+                db.close()
+
+        def check_rate_limit(self, identity: str) -> bool:
+            now = time.time()
+            with self._rate_lock:
+                queue = self.rate_tracker[identity]
+                while queue and (now - queue[0] > CyberConfig.RATE_LIMIT_WINDOW_SECONDS):
+                    queue.popleft()
+                if len(queue) >= CyberConfig.RATE_LIMIT_MAX_REQUESTS:
+                    self.audit(identity, "RATE_LIMIT_BLOCK", "WARNING")
+                    return False
+                queue.append(now)
+                return True
+
+        def analyze_biometric_physics(self, stroke_points: List[Dict[str, Any]]) -> Dict[str, Any]:
+            if len(stroke_points) < 2:
+                return {"error": "INSUFFICIENT_POINTS"}
+            processed_points = []
+            total_distance = 0.0
+            total_time_sec = 0.0
+            velocities = []
+            accelerations = []
+            for i in range(1, len(stroke_points)):
+                p1 = stroke_points[i - 1]
+                p2 = stroke_points[i]
+                try:
+                    x1 = float(p1["x"]); y1 = float(p1["y"])
+                    x2 = float(p2["x"]); y2 = float(p2["y"])
+                    t1 = float(p1["timestamp_ms"]); t2 = float(p2["timestamp_ms"])
+                except (KeyError, TypeError, ValueError):
+                    continue
+                dt_ms = t2 - t1
+                if dt_ms <= 0: continue
+                dt = dt_ms / 1000.0
+                dx = x2 - x1; dy = y2 - y1
+                distance = math.hypot(dx, dy)
+                velocity = distance / dt
+                previous_velocity = velocities[-1] if velocities else 0.0
+                acceleration = (velocity - previous_velocity) / dt
+                velocities.append(velocity)
+                accelerations.append(acceleration)
+                total_distance += distance
+                total_time_sec += dt
+                processed_points.append({"x": x2, "y": y2, "time_delta_ms": round(dt_ms, 3), "distance": round(distance, 3), "velocity": round(velocity, 3), "acceleration": round(acceleration, 3)})
+            if not velocities:
+                return {"error": "INVALID_TIMING_DATA"}
+            avg_velocity = total_distance / total_time_sec if total_time_sec > 0 else 0
+            avg_acceleration = sum(abs(x) for x in accelerations) / len(accelerations) if accelerations else 0
+            return {
+                "avg_velocity": round(avg_velocity, 3),
+                "avg_acceleration": round(avg_acceleration, 3),
+                "total_distance": round(total_distance, 3),
+                "total_time_sec": round(total_time_sec, 3),
+                "min_velocity": round(min(velocities), 3),
+                "max_velocity": round(max(velocities), 3),
+                "point_count": len(processed_points),
+                "points": processed_points
             }
 
-            function draw(e) {
-                if (!isDrawing) return;
-                e.preventDefault();
-                const pos = getPos(e);
-                ctx.lineTo(pos.x, pos.y);
-                ctx.stroke();
+        def analyze_gesture_geometry(self, stroke_points: List[Dict[str, Any]]) -> Dict[str, Any]:
+            if len(stroke_points) < 3:
+                return {"error": "TOO_FEW_POINTS"}
+            xs = [float(p["x"]) for p in stroke_points]
+            ys = [float(p["y"]) for p in stroke_points]
+            width = max(xs) - min(xs)
+            height = max(ys) - min(ys)
+            angles = []
+            for i in range(1, len(stroke_points)):
+                p1 = stroke_points[i - 1]; p2 = stroke_points[i]
+                dx = float(p2["x"]) - float(p1["x"]); dy = float(p2["y"]) - float(p1["y"])
+                if dx == 0 and dy == 0: continue
+                angle = math.degrees(math.atan2(dy, dx))
+                angles.append(angle)
+            direction_changes = 0
+            for i in range(1, len(angles)):
+                difference = abs(angles[i] - angles[i - 1])
+                difference = min(difference, 360 - difference)
+                if difference > 30:
+                    direction_changes += 1
+            start = stroke_points[0]; end = stroke_points[-1]
+            closure_distance = math.hypot(float(start["x"]) - float(end["x"]), float(start["y"]) - float(end["y"]))
+            return {
+                "width": round(width, 3), "height": round(height, 3),
+                "closure_distance": round(closure_distance, 3),
+                "direction_changes": direction_changes,
+                "angle_count": len(angles),
+                "geometry_type": self._classify_geometry(width, height, closure_distance)
+            }
 
-                // --- BIOMETRIC DATA COLLECTION ---
-                const dx = pos.x - lastX;
-                const dy = pos.y - lastY;
-                const distance = Math.sqrt(dx*dx + dy*dy);
-                totalDistance += distance;
-                strokePoints++;
+        def _classify_geometry(self, width: float, height: float, closure_distance: float) -> str:
+            max_dimension = max(width, height, 1)
+            if closure_distance < (max_dimension * 0.15): return "CLOSED_GESTURE"
+            if width > height * 2: return "HORIZONTAL_SWEEP"
+            if height > width * 2: return "VERTICAL_SWEEP"
+            if width > 0 and height > 0: return "DIAGONAL_OR_COMPLEX"
+            return "UNKNOWN"
 
-                // Calculate Angle
-                if (distance > 2) { // Only consider movement if it's significant
-                    const angle = Math.atan2(dy, dx) * (180 / Math.PI);
-                    if (lastAngle !== null) {
-                        let angleDiff = Math.abs(angle - lastAngle);
-                        if (angleDiff > 180) angleDiff = 360 - angleDiff;
-                        if (angleDiff > 15) { // Count significant angle changes
-                            angleChanges++;
-                        }
-                    }
-                    lastAngle = angle;
+        def compile_visual_dsl(self, stroke_points: List[Dict[str, Any]]) -> str:
+            geometry = self.analyze_gesture_geometry(stroke_points)
+            if "error" in geometry: return "COMMAND: LOGIC_TOO_SHORT"
+            shape = geometry["geometry_type"]
+            if shape == "CLOSED_GESTURE": return "COMMAND: VERIFY_CRYPTOGRAPHIC_COMMITMENT"
+            if shape == "HORIZONTAL_SWEEP": return "COMMAND: SIMULATE_NETWORK_FIREWALL_RULE"
+            if shape == "VERTICAL_SWEEP": return "COMMAND: SIMULATE_DATA_ENCRYPTION"
+            if shape == "DIAGONAL_OR_COMPLEX": return "COMMAND: SIMULATE_ZERO_TRUST_LOCK"
+            return "COMMAND: OBSERVE_AND_LOG"
+
+        def generate_commitment(self, stroke_points: List[Dict[str, Any]]) -> Dict[str, Any]:
+            canonical = json.dumps(stroke_points, sort_keys=True, separators=(",", ":"))
+            nonce = self.crypto.random_nonce(24)
+            commitment_payload = canonical + ":" + nonce
+            commitment = self.crypto.sha256(commitment_payload)
+            return {"commitment": commitment, "nonce": nonce, "algorithm": "SHA-256", "educational_note": "This is a commitment simulation, not a full zero-knowledge proof."}
+
+        def verify_commitment(self, stroke_points: List[Dict[str, Any]], nonce: str, commitment: str) -> bool:
+            canonical = json.dumps(stroke_points, sort_keys=True, separators=(",", ":"))
+            expected = self.crypto.sha256(canonical + ":" + nonce)
+            return self.crypto.secure_compare(expected, commitment)
+
+        def generate_security_proof(self, stroke_points: List[Dict[str, Any]]) -> Dict[str, Any]:
+            physics = self.analyze_biometric_physics(stroke_points)
+            geometry = self.analyze_gesture_geometry(stroke_points)
+            commitment = self.generate_commitment(stroke_points)
+            dsl = self.compile_visual_dsl(stroke_points)
+            return {
+                "physics": physics, "geometry": geometry, "commitment": commitment, "dsl_command": dsl,
+                "hashes": {
+                    "sha256": self.crypto.sha256(json.dumps(stroke_points, sort_keys=True)),
+                    "sha3_256": self.crypto.sha3_256(json.dumps(stroke_points, sort_keys=True))
                 }
-
-                lastX = pos.x;
-                lastY = pos.y;
             }
 
-            function stopDrawing() { 
-                if(isDrawing) {
-                    totalTime = Date.now() - startTime;
-                    isDrawing = false;
-                }
+        def create_behavior_profile(self, analysis: Dict[str, Any]) -> 'BehavioralProfile':
+            return BehavioralProfile(
+                avg_velocity=float(analysis.get("avg_velocity", 0)),
+                avg_acceleration=float(analysis.get("avg_acceleration", 0)),
+                total_distance=float(analysis.get("total_distance", 0)),
+                total_time_sec=float(analysis.get("total_time_sec", 0)),
+                stroke_count=int(analysis.get("point_count", 0)),
+                direction_changes=0,
+                min_velocity=float(analysis.get("min_velocity", 0)),
+                max_velocity=float(analysis.get("max_velocity", 0)),
+                created_at=time.time()
+            )
+
+        def store_behavior_profile(self, user_id: str, profile: 'BehavioralProfile'):
+            db = self._get_db()
+            try:
+                db.execute("""INSERT INTO behavioral_profiles (user_id, profile_json, updated_at) VALUES (?, ?, ?) ON CONFLICT(user_id) DO UPDATE SET profile_json = excluded.profile_json, updated_at = excluded.updated_at""", (user_id, json.dumps(asdict(profile)), time.time()))
+                db.commit()
+            finally:
+                db.close()
+
+        def load_behavior_profile(self, user_id: str) -> Optional['BehavioralProfile']:
+            db = self._get_db()
+            try:
+                row = db.execute("""SELECT profile_json FROM behavioral_profiles WHERE user_id = ?""", (user_id,)).fetchone()
+                if not row: return None
+                data = json.loads(row["profile_json"])
+                return BehavioralProfile(**data)
+            finally:
+                db.close()
+
+        def verify_behavior(self, stored_profile: 'BehavioralProfile', incoming_analysis: Dict[str, Any], tolerance: float = 0.35) -> Dict[str, Any]:
+            current_velocity = float(incoming_analysis.get("avg_velocity", 0))
+            current_acceleration = float(incoming_analysis.get("avg_acceleration", 0))
+            current_distance = float(incoming_analysis.get("total_distance", 0))
+            current_time = float(incoming_analysis.get("total_time_sec", 0))
+            def similarity(expected, actual):
+                denominator = max(abs(expected), 1e-9)
+                difference = abs(expected - actual)
+                ratio = difference / denominator
+                return max(0.0, 1.0 - ratio)
+            velocity_score = similarity(stored_profile.avg_velocity, current_velocity)
+            acceleration_score = similarity(stored_profile.avg_acceleration, current_acceleration)
+            distance_score = similarity(stored_profile.total_distance, current_distance)
+            time_score = similarity(stored_profile.total_time_sec, current_time)
+            overall_score = (velocity_score * 0.35 + acceleration_score * 0.20 + distance_score * 0.20 + time_score * 0.25)
+            verified = overall_score >= (1.0 - tolerance)
+            return {
+                "verified": verified, "score": round(overall_score, 4), "score_percent": round(overall_score * 100, 2),
+                "signals": {"velocity": round(velocity_score * 100, 2), "acceleration": round(acceleration_score * 100, 2), "distance": round(distance_score * 100, 2), "timing": round(time_score * 100, 2)},
+                "classification": ("BEHAVIOR_MATCH" if verified else "BEHAVIOR_MISMATCH")
             }
 
-            function getPos(e) {
-                const rect = canvas.getBoundingClientRect();
-                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-                return { x: clientX - rect.left, y: clientY - rect.top };
+        def generate_polymorphic_token(self, user_id: str, purpose: str = "cipher_access") -> Dict[str, Any]:
+            now = int(time.time())
+            nonce = secrets.token_urlsafe(24)
+            payload = f"{user_id}:{purpose}:{now}:{nonce}"
+            signature = self.crypto.hmac_sha256(self.secret_key, payload)
+            raw_token = f"{payload}:{signature}"
+            token = secrets.token_urlsafe(48) + "." + self.crypto.sha3_256(raw_token)
+            token_hash = self.crypto.sha256(token)
+            expires_at = now + CyberConfig.TOKEN_TTL_SECONDS
+            db = self._get_db()
+            try:
+                db.execute("""INSERT INTO security_tokens (token_hash, user_id, created_at, expires_at, used) VALUES (?, ?, ?, ?, 0)""", (token_hash, user_id, now, expires_at))
+                db.commit()
+            finally:
+                db.close()
+            return {"token": token, "created_at": now, "expires_at": expires_at, "ttl_seconds": CyberConfig.TOKEN_TTL_SECONDS, "status": "ACTIVE_SINGLE_USE", "purpose": purpose}
+
+        def consume_token(self, token: str, user_id: str) -> Dict[str, Any]:
+            token_hash = self.crypto.sha256(token)
+            now = time.time()
+            db = self._get_db()
+            try:
+                row = db.execute("""SELECT * FROM security_tokens WHERE token_hash = ? AND user_id = ?""", (token_hash, user_id)).fetchone()
+                if not row: return {"valid": False, "reason": "TOKEN_NOT_FOUND"}
+                if row["used"]:
+                    self.audit(user_id, "REPLAY_ATTEMPT", "HIGH")
+                    return {"valid": False, "reason": "TOKEN_ALREADY_USED"}
+                if now > row["expires_at"]: return {"valid": False, "reason": "TOKEN_EXPIRED"}
+                db.execute("""UPDATE security_tokens SET used = 1 WHERE token_hash = ?""", (token_hash,))
+                db.commit()
+                self.audit(user_id, "ONE_TIME_TOKEN_CONSUMED", "INFO")
+                return {"valid": True, "reason": "TOKEN_ACCEPTED"}
+            finally:
+                db.close()
+
+        def add_firewall_rule(self, rule_name: str, source: str, action: str):
+            allowed_actions = {"ALLOW", "DENY", "LOG"}
+            action = action.upper()
+            if action not in allowed_actions: raise ValueError("Unsupported firewall action")
+            db = self._get_db()
+            try:
+                db.execute("""INSERT INTO firewall_rules (rule_name, source, action, enabled, created_at) VALUES (?, ?, ?, 1, ?)""", (rule_name, source, action, time.time()))
+                db.commit()
+            finally:
+                db.close()
+
+        def simulate_firewall(self, source: str) -> Dict[str, Any]:
+            db = self._get_db()
+            try:
+                rules = db.execute("""SELECT * FROM firewall_rules WHERE enabled = 1 ORDER BY id DESC""").fetchall()
+            finally:
+                db.close()
+            for rule in rules:
+                if rule["source"] == source or rule["source"] == "*":
+                    return {"source": source, "matched_rule": rule["rule_name"], "action": rule["action"]}
+            return {"source": source, "matched_rule": None, "action": "LOG", "reason": "No explicit rule matched"}
+
+        def zero_trust_decision(self, identity_verified: bool, device_verified: bool, behavior_verified: bool, requested_resource: str, allowed_resources: List[str]) -> Dict[str, Any]:
+            checks = {"identity": identity_verified, "device": device_verified, "behavior": behavior_verified, "resource_permission": requested_resource in allowed_resources}
+            granted = all(checks.values())
+            return {"access": "GRANTED" if granted else "DENIED", "checks": checks, "principle": "VERIFY_EACH_REQUEST"}
+
+        def analyze_security_logs(self, logs: List[Dict[str, Any]]) -> Dict[str, Any]:
+            suspicious = []
+            failed_logins = 0; replay_events = 0; rate_limit_events = 0
+            for log in logs:
+                event = str(log.get("event_type", "")).upper()
+                if "LOGIN_FAILED" in event: failed_logins += 1
+                if "REPLAY" in event:
+                    replay_events += 1
+                    suspicious.append(log)
+                if "RATE_LIMIT" in event:
+                    rate_limit_events += 1
+                    suspicious.append(log)
+            risk_score = min(100, failed_logins * 5 + replay_events * 20 + rate_limit_events * 10)
+            if risk_score >= 70: classification = "HIGH_RISK"
+            elif risk_score >= 30: classification = "MEDIUM_RISK"
+            else: classification = "LOW_RISK"
+            return {"risk_score": risk_score, "classification": classification, "failed_logins": failed_logins, "replay_events": replay_events, "rate_limit_events": rate_limit_events, "suspicious_events": suspicious}
+
+        def privacy_score(self, collects_raw_biometrics: bool, stores_device_data: bool, stores_minimum_data: bool, encryption_enabled: bool, user_can_delete_data: bool) -> Dict[str, Any]:
+            score = 0
+            if not collects_raw_biometrics: score += 25
+            if not stores_device_data: score += 15
+            if stores_minimum_data: score += 20
+            if encryption_enabled: score += 20
+            if user_can_delete_data: score += 20
+            return {"privacy_score": score, "max_score": 100, "classification": ("STRONG" if score >= 80 else "DEVELOPING" if score >= 50 else "NEEDS_IMPROVEMENT")}
+
+        def ai_security_triage(self, logs: List[Dict[str, Any]]) -> Dict[str, Any]:
+            analysis = self.analyze_security_logs(logs)
+            recommendations = []
+            if analysis["replay_events"] > 0: recommendations.append("Investigate replay attempts.")
+            if analysis["rate_limit_events"] > 0: recommendations.append("Review repeated request patterns.")
+            if analysis["failed_logins"] >= 5: recommendations.append("Review authentication failures.")
+            if not recommendations: recommendations.append("No obvious high-risk pattern detected in this simulation.")
+            return {"engine": "Clyxess AI Security Triage", "analysis": analysis, "recommended_actions": recommendations, "human_review_required": True}
+
+        def simulate_bb84(self, number_of_bits: int = 16, eavesdropper: bool = False) -> Dict[str, Any]:
+            if number_of_bits < 1: number_of_bits = 1
+            alice_bits = [secrets.randbelow(2) for _ in range(number_of_bits)]
+            alice_bases = [secrets.randbelow(2) for _ in range(number_of_bits)]
+            bob_bases = [secrets.randbelow(2) for _ in range(number_of_bits)]
+            bob_bits = []
+            errors = 0; compared = 0
+            for i in range(number_of_bits):
+                bit = alice_bits[i]
+                if eavesdropper:
+                    eve_basis = secrets.randbelow(2)
+                    if eve_basis != alice_bases[i]: bit = secrets.randbelow(2)
+                if bob_bases[i] == alice_bases[i]: bob_bits.append(bit)
+                else: bob_bits.append(secrets.randbelow(2))
+            sifted_key = []
+            for i in range(number_of_bits):
+                if alice_bases[i] == bob_bases[i]:
+                    compared += 1
+                    if alice_bits[i] != bob_bits[i]: errors += 1
+                    sifted_key.append(bob_bits[i])
+            error_rate = errors / compared if compared else 0
+            return {"bits_sent": number_of_bits, "sifted_key_length": len(sifted_key), "eavesdropper_simulated": eavesdropper, "sample_error_rate": round(error_rate, 4), "educational_result": ("Potential interception signal detected" if eavesdropper and error_rate > 0 else "No interception signal detected in this sample")}
+
+        def red_blue_security_game(self, firewall_enabled: bool, strong_authentication: bool, rate_limiting: bool, audit_logging: bool, encrypted_storage: bool) -> Dict[str, Any]:
+            controls = {"firewall": firewall_enabled, "strong_authentication": strong_authentication, "rate_limiting": rate_limiting, "audit_logging": audit_logging, "encrypted_storage": encrypted_storage}
+            defense_points = sum(20 for value in controls.values() if value)
+            missing = [key for key, value in controls.items() if not value]
+            return {"defense_score": defense_points, "max_score": 100, "enabled_controls": controls, "missing_controls": missing, "simulation_only": True, "lesson": "Students identify weaknesses and improve defensive controls."}
+
+        def cyber_architect_score(self, authentication: int, cryptography: int, privacy: int, network_security: int, monitoring: int, recovery: int) -> Dict[str, Any]:
+            values = [authentication, cryptography, privacy, network_security, monitoring, recovery]
+            values = [max(0, min(100, int(x))) for x in values]
+            score = round(sum(values) / len(values), 2)
+            if score >= 90: level = "CYBER ARCHITECT"
+            elif score >= 75: level = "SECURITY ENGINEER"
+            elif score >= 50: level = "SECURITY BUILDER"
+            else: level = "SECURITY EXPLORER"
+            return {"score": score, "level": level, "components": {"authentication": values[0], "cryptography": values[1], "privacy": values[2], "network_security": values[3], "monitoring": values[4], "recovery": values[5]}}
+
+        def process_cipher(self, user_id: str, stroke_points: List[Dict[str, Any]]) -> Dict[str, Any]:
+            if not self.check_rate_limit(user_id):
+                return {"status": "BLOCKED", "reason": "RATE_LIMIT_EXCEEDED"}
+            if len(stroke_points) < CyberConfig.MIN_STROKE_POINTS:
+                return {"status": "ERROR", "reason": "INSUFFICIENT_STROKE_POINTS"}
+            physics = self.analyze_biometric_physics(stroke_points)
+            geometry = self.analyze_gesture_geometry(stroke_points)
+            dsl = self.compile_visual_dsl(stroke_points)
+            proof = self.generate_security_proof(stroke_points)
+            profile = self.create_behavior_profile(physics)
+            stored = self.load_behavior_profile(user_id)
+            if stored:
+                behavior_result = self.verify_behavior(stored, physics)
+            else:
+                behavior_result = {"verified": False, "first_profile": True, "score": None, "message": "No previous behavioral profile exists."}
+            self.store_behavior_profile(user_id, profile)
+            token = self.generate_polymorphic_token(user_id)
+            self.audit(user_id, "CIPHER_PROCESSED", "INFO", {"dsl": dsl, "geometry": geometry.get("geometry_type"), "behavior_verified": behavior_result.get("verified", False)})
+            return {
+                "status": "SUCCESS", "user_id": user_id, "biometric_physics": physics, "geometry": geometry,
+                "dsl_command": dsl, "cryptographic_proof": proof, "behavior_analysis": behavior_result,
+                "one_time_access": token, "security_notice": "Educational security engine. Production authentication should use WebAuthn/FIDO2/passkeys."
             }
 
-            canvas.addEventListener('mousedown', startDrawing);
-            canvas.addEventListener('mousemove', draw);
-            canvas.addEventListener('mouseup', stopDrawing);
-            canvas.addEventListener('mouseout', stopDrawing);
-            canvas.addEventListener('touchstart', startDrawing);
-            canvas.addEventListener('touchmove', draw);
-            canvas.addEventListener('touchend', stopDrawing);
+    # ========================================================
+    # STREAMLIT UI FRONTEND
+    # ========================================================
+    st.markdown("### 🛡️ Clyxess AI Cyber & Biometric Engine")
+    st.caption("Educational defensive security engine. Not for production use.")
 
-            function clearCanvas() {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-            }
+    # Initialize engine
+    if "cyber_engine" not in st.session_state:
+        st.session_state.cyber_engine = ClyxessCyberEngine(database_path="clyxess_cyber_streamlit.db")
+    engine = st.session_state.cyber_engine
 
-            // Generates a hash based on SHAPE + BEHAVIOR (Speed, Angle, Time)
-            function generateBiometricHash() {
-                const shapeData = canvas.toDataURL();
-                let shapeHash = 0;
-                for (let i = 0; i < shapeData.length; i++) {
-                    const char = shapeData.charCodeAt(i);
-                    shapeHash = ((shapeHash << 5) - shapeHash) + char;
-                    shapeHash = shapeHash & shapeHash;
-                }
+    tab1, tab2, tab3, tab4 = st.tabs(["🔬 Biometric Test", "🧱 Firewall Simulator", "📊 Log Forensics", "⚛️ Quantum BB84"])
 
-                // Behavioral factors
-                const speed = (totalDistance / (totalTime || 1)).toFixed(2); // pixels per ms
-                const behavioralString = `SPD:${speed}|ANG:${angleChanges}|PTS:${strokePoints}|TIME:${totalTime}`;
-                
-                let behaviorHash = 0;
-                for (let i = 0; i < behavioralString.length; i++) {
-                    const char = behavioralString.charCodeAt(i);
-                    behaviorHash = ((behaviorHash << 5) - behaviorHash) + char;
-                    behaviorHash = behaviorHash & behaviorHash;
-                }
+    with tab1:
+        st.subheader("Biometric Drawing Simulation")
+        st.write("Simulate drawing strokes to test the engine.")
+        
+        # Dummy strokes
+        dummy_strokes = [
+            {"x": 10, "y": 10, "timestamp_ms": 100},
+            {"x": 50, "y": 50, "timestamp_ms": 250},
+            {"x": 100, "y": 30, "timestamp_ms": 400},
+            {"x": 150, "y": 80, "timestamp_ms": 600}
+        ]
+        
+        user_id_input = st.text_input("User ID", value="student_01")
+        
+        if st.button("🚀 Process Cipher Drawing"):
+            with st.spinner("Analyzing biometrics..."):
+                result = engine.process_cipher(user_id_input, dummy_strokes)
+                st.json(result)
 
-                // Combine both hashes
-                const finalHash = "BM-" + Math.abs(shapeHash).toString(16).toUpperCase().substring(0, 6) + 
-                                  "-" + Math.abs(behaviorHash).toString(16).toUpperCase().substring(0, 6);
-                
-                return { finalHash, speed, angleChanges, totalTime, strokePoints };
-            }
+    with tab2:
+        st.subheader("Firewall Rule Simulator")
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            rule_name = st.text_input("Rule Name", value="Block_Unknown_IP")
+        with col2:
+            source_ip = st.text_input("Source IP", value="192.168.1.100")
+        with col3:
+            action = st.selectbox("Action", ["ALLOW", "DENY", "LOG"])
 
-            function registerBiometricGlyph() {
-                const blank = document.createElement('canvas');
-                blank.width = canvas.width;
-                blank.height = canvas.height;
-                if (canvas.toDataURL() === blank.toDataURL()) {
-                    logSecurity("❌ Please draw a symbol first! Canvas is empty.", "rose");
-                    return;
-                }
+        if st.button("Add Firewall Rule"):
+            try:
+                engine.add_firewall_rule(rule_name, source_ip, action)
+                st.success("Rule added successfully!")
+            except Exception as e:
+                st.error(f"Error: {e}")
 
-                const bioData = generateBiometricHash();
-                const id = "BIO-GLYPH-" + (++glyphCounter);
-                
-                glyphs.push({ id: id, hash: bioData.finalHash, speed: bioData.speed, angles: bioData.angleChanges, time: bioData.totalTime });
-                
-                const list = document.getElementById('glyphList');
-                if (glyphs.length === 1) list.innerHTML = '';
+        test_ip = st.text_input("Test Source IP", value="192.168.1.100")
+        if st.button("Simulate Firewall Request"):
+            result = engine.simulate_firewall(test_ip)
+            st.json(result)
 
-                const item = document.createElement('div');
-                item.className = "bg-slate-950 border border-purple-500/30 p-3 rounded-xl space-y-1 text-[10px] font-mono";
-                item.innerHTML = `
-                    <div class="flex justify-between items-center">
-                        <span class="text-purple-300 font-bold">${id}</span>
-                        <i class="fa-solid fa-fingerprint text-emerald-400"></i>
-                    </div>
-                    <div class="text-slate-400">HASH: <span class="text-cyan-300">${bioData.finalHash}</span></div>
-                    <div class="text-slate-500">Speed: ${bioData.speed} px/ms | Angle Changes: ${bioData.angleChanges} | Time: ${bioData.totalTime}ms</div>
-                `;
-                list.appendChild(item);
+    with tab3:
+        st.subheader("AI Security Log Triage")
+        sample_logs = [
+            {"event_type": "LOGIN_FAILED", "user_id": "user_1"},
+            {"event_type": "REPLAY_ATTEMPT", "user_id": "user_2"},
+            {"event_type": "LOGIN_FAILED", "user_id": "user_1"},
+            {"event_type": "RATE_LIMIT_BLOCK", "user_id": "user_3"}
+        ]
+        if st.button("Analyze Sample Logs"):
+            result = engine.ai_security_triage(sample_logs)
+            st.json(result)
 
-                logSecurity(`[SYSTEM]: Biometric Glyph Registered! ID: ${id}`, 'purple');
-                logSecurity(`[HASH]: Shape+Behavior Key: ${bioData.finalHash}`, 'cyan');
-                logSecurity(`[BEHAVIOR]: Speed: ${bioData.speed}, Angles: ${bioData.angleChanges}`, 'emerald');
-
-                confetti({ particleCount: 50, spread: 60, origin: { y: 0.7 } });
-                clearCanvas();
-            }
-
-            function simulateHack() {
-                const log = document.getElementById('securityLog');
-                log.innerHTML = '';
-                logSecurity(`⚠️ [ATTACK]: Hacker copied the exact shape of the drawing...`, 'rose');
-                logSecurity(`🔑 [TRYING]: Attempting to match visual pattern only...`, 'amber');
-                
-                setTimeout(() => {
-                    logSecurity(`❌ [DENIED]: Shape matched, but Behavioral Biometrics FAILED!`, 'rose');
-                    logSecurity(`🛡️ [RESULT]: Hacker's speed and angle were different. Database is 100% secure!`, 'emerald');
-                }, 1000);
-            }
-
-            function simulateValidAccess() {
-                if (glyphs.length === 0) {
-                    logSecurity(`❌ [ERROR]: No biometric language registered! Please draw a glyph first.`, 'rose');
-                    return;
-                }
-
-                const log = document.getElementById('securityLog');
-                log.innerHTML = '';
-                logSecurity(`🔑 [ACCESS]: Verifying your unique hand movement...`, 'cyan');
-                
-                setTimeout(() => {
-                    const lastGlyph = glyphs[glyphs.length - 1];
-                    logSecurity(`✅ [SHAPE MATCHED]: Glyph ${lastGlyph.id} visual pattern verified.`, 'emerald');
-                    logSecurity(`✅ [BEHAVIOR MATCHED]: Speed & Angle verified as authentic.`, 'emerald');
-                    logSecurity(`🔓 [UNLOCKED]: Database access granted using your Biometric Language!`, 'emerald');
-                    confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
-                }, 1000);
-            }
-
-            function logSecurity(text, color) {
-                const log = document.getElementById('securityLog');
-                const p = document.createElement('p');
-                if (color === 'rose') p.className = "text-rose-400";
-                else if (color === 'emerald') p.className = "text-emerald-400";
-                else if (color === 'purple') p.className = "text-purple-300";
-                else if (color === 'cyan') p.className = "text-cyan-300";
-                else if (color === 'amber') p.className = "text-amber-400";
-                else p.className = "text-slate-400";
-                p.innerText = text;
-                log.appendChild(p);
-                log.scrollTop = log.scrollHeight;
-            }
-        </script>
-    </body>
-    </html>
-    """
-    
-    components.html(HTML_TEMPLATE, height=900, scrolling=True)
+    with tab4:
+        st.subheader("Quantum BB84 Key Distribution Simulator")
+        bits = st.slider("Number of bits", 4, 64, 16)
+        eavesdropper = st.checkbox("Simulate Eavesdropper (Eve)")
+        if st.button("Run BB84 Simulation"):
+            result = engine.simulate_bb84(bits, eavesdropper)
+            st.json(result)
 
 def render_homework_test():
     st.title("📝 Interactive Homework & Test")
