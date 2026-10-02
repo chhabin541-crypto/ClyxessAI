@@ -3823,105 +3823,128 @@ def render_art_machinedesign():
     HTML = """
 <!DOCTYPE html>
 <html><head>
-<meta charset="UTF-8"><script src="https://cdn.tailwindcss.com"></script>
+<meta charset="UTF-8">
+<script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+  *{box-sizing:border-box;}
+  body{margin:0; overflow:hidden; background:#080a14; font-family:Inter,sans-serif;}
+ .mode-btn{padding:8px 18px; border-radius:24px; font-weight:800; font-size:12px; border:1px solid #ffffff20; cursor:pointer; transition:0.2s;}
+ .active-kids{background:#ffcc00!important; color:black!important; border-color:#ffcc00!important;}
+ .active-adult{background:#00ffff!important; color:black!important; border-color:#00ffff!important;}
+ .card{background:#12162a; border:1px solid #ffffff12; border-radius:14px;}
+  canvas{border-radius:10px;}
+</style>
 </head>
-<body style="background:#060913; color:white; margin:0; padding:6px; font-family:sans-serif; overflow:hidden;">
-<div style="display:flex; flex-direction:column; height:100vh; gap:6px;">
+<body class="text-white p-2 h-screen flex flex-col gap-2">
 
-  <div style="background:linear-gradient(to right,#0f142e,#1e0f2e); border:1px solid #00ffff30; border-radius:12px; padding:6px 12px; display:flex; justify-content:space-between; align-items:center; gap:8px;">
-    <div style="display:flex; align-items:center; gap:10px;">
-      <div style="background:#ffcc00; color:black; width:28px; height:28px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-weight:900;">C</div>
+  <!-- TOP CLEAN HEADER -->
+  <div class="card flex justify-between items-center px-4 py-2.5 shrink-0">
+    <div class="flex items-center gap-3">
+      <div style="background:#ffcc00; color:black; width:32px; height:32px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-weight:900;">C</div>
       <div>
-        <div id="headerTitle" style="font-size:12px; font-weight:900; line-height:1.1;">🚁 Create Your Future Design - Helicopter Bnao, Aeroplane Bnao • Create Curiosity</div>
-        <div id="headerSub" style="font-size:8px; color:#aaa;">PowerPoint Advance • Blank se Start • Khud Banao • No Readymade • Drag Drop • Share & Download</div>
+        <div id="headerTitle" style="font-size:13px; font-weight:900;">🚁 Create Your Future Design - Helicopter Bnao, Aeroplane Bnao</div>
+        <div style="font-size:9px; color:#9aa0b5;">Create Curiosity • No Readymade • Blank PowerPoint Advance</div>
       </div>
     </div>
-    <div style="display:flex; gap:6px; align-items:center;">
-      <select id="langSel" onchange="changeLang()" style="background:#111; color:#00ffff; border:1px solid #00ffff; border-radius:20px; padding:4px 8px; font-size:10px;">
-        <option value="hinglish">Hinglish</option><option value="en">English</option><option value="hi">हिंदी</option><option value="ta">தமிழ்</option><option value="te">తెలుగు</option><option value="kn">ಕನ್ನಡ</option><option value="ml">മലയാളം</option><option value="bn">বাংলা</option><option value="or">ଓଡ଼ିଆ</option><option value="ru">Русский</option><option value="zh">中文</option><option value="ja">日本語</option>
+    <div class="flex items-center gap-2">
+      <select id="langSel" onchange="changeLang()" style="background:#0b0e1e; color:#00ffff; border:1px solid #00ffff; border-radius:20px; padding:6px 10px; font-size:11px;">
+        <option value="hinglish">Hinglish</option><option value="en">English</option><option value="hi">हिंदी</option>
       </select>
-      <button id="btnKids" onclick="setMain('kids')" style="background:#ffcc00; color:black; padding:5px 14px; border-radius:20px; font-weight:900; font-size:11px;">👶 KIDS 5-12</button>
-      <button id="btnPro" onclick="setMain('pro')" style="background:#222; color:white; padding:5px 14px; border-radius:20px; font-weight:900; font-size:11px; border:1px solid #00ffff;">🚀 ADULT 13-18+</button>
-      <button onclick="shareDesign()" style="background:#00ffff; color:black; padding:5px 14px; border-radius:20px; font-weight:900; font-size:11px;">🔗 Share</button>
-      <button onclick="downloadDesign()" style="background:white; color:black; padding:5px 14px; border-radius:20px; font-weight:900; font-size:11px;">⬇️ Download</button>
+      <button id="btnKids" onclick="setMain('kids')" class="mode-btn active-kids">👶 KIDS 5-12</button>
+      <button id="btnPro" onclick="setMain('pro')" class="mode-btn bg-[#1e2238]">🚀 ADULT 13-18+</button>
+      <div style="width:1px; height:24px; background:#ffffff20; margin:0 4px;"></div>
+      <button onclick="shareDesign()" style="background:#00ffff; color:black; padding:7px 14px; border-radius:20px; font-weight:900; font-size:11px;">🔗 Share</button>
+      <button onclick="downloadDesign()" style="background:white; color:black; padding:7px 14px; border-radius:20px; font-weight:900; font-size:11px;">⬇️ Download</button>
     </div>
   </div>
 
-  <div style="display:flex; gap:8px; flex:1; overflow:hidden;">
-    <div id="kidsUI" style="display:flex; gap:8px; width:100%;">
-      <div style="width:175px; background:#15182e; border-radius:12px; padding:10px; display:flex; flex-direction:column; gap:6px; overflow-y:auto;">
-        <div style="display:flex; gap:4px;">
-          <button onclick="setKA('5-7')" id="k5" style="flex:1; background:#ffcc00; color:black; padding:5px; border-radius:8px; font-size:10px; font-weight:900;">5-7</button>
-          <button onclick="setKA('8-10')" id="k8" style="flex:1; background:#222; padding:5px; border-radius:8px; font-size:10px;">8-10</button>
-          <button onclick="setKA('11-12')" id="k11" style="flex:1; background:#222; padding:5px; border-radius:8px; font-size:10px;">11-12</button>
+  <!-- CONTENT AREA - NO OVERLAP -->
+  <div class="flex-1 overflow-hidden">
+
+    <!-- KIDS SECTION - BY DEFAULT VISIBLE -->
+    <div id="kidsUI" style="display:flex; gap:10px; height:100%;">
+      <div class="card w-[180px] p-3 flex flex-col gap-3 shrink-0">
+        <div class="flex gap-1">
+          <button id="k5" onclick="setKA('5-7')" class="flex-1 bg-[#ffcc00] text-black py-1.5 rounded-lg text-[10px] font-black">5-7</button>
+          <button id="k8" onclick="setKA('8-10')" class="flex-1 bg-[#1e2238] py-1.5 rounded-lg text-[10px]">8-10</button>
+          <button id="k11" onclick="setKA('11-12')" class="flex-1 bg-[#1e2238] py-1.5 rounded-lg text-[10px]">11-12</button>
         </div>
-        <b style="font-size:11px; margin-top:6px; color:#ffcc00;">📦 POWERPOINT SHAPES</b>
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-top:4px;">
-          <div draggable="true" ondragstart="dragK(event,'rect')" style="background:#2a2f6a; padding:12px; border-radius:8px; text-align:center; cursor:grab; border:1px solid #ffffff20;"><div style="font-size:18px;">⬜</div><div style="font-size:8px;">Body</div></div>
-          <div draggable="true" ondragstart="dragK(event,'circle')" style="background:#2a2f6a; padding:12px; border-radius:8px; text-align:center; cursor:grab; border:1px solid #ffffff20;"><div style="font-size:18px;">⭕</div><div style="font-size:8px;">Wheel</div></div>
-          <div draggable="true" ondragstart="dragK(event,'tri')" style="background:#2a2f6a; padding:12px; border-radius:8px; text-align:center; cursor:grab; border:1px solid #ffffff20;"><div style="font-size:18px;">🔺</div><div style="font-size:8px;">Nose</div></div>
-          <div draggable="true" ondragstart="dragK(event,'line')" style="background:#2a2f6a; padding:12px; border-radius:8px; text-align:center; cursor:grab; border:1px solid #ffffff20;"><div style="font-size:18px;">📏</div><div style="font-size:8px;">Wing</div></div>
+        <div>
+          <div class="text-[11px] font-bold text-[#ffcc00] mb-2">📦 DRAG SHAPES</div>
+          <div class="grid grid-cols-2 gap-2">
+            <div draggable="true" ondragstart="dragK(event,'rect')" class="bg-[#242a4d] p-3 rounded-xl text-center cursor-grab hover:bg-[#2e3666] border border-white/10"><div class="text-[20px]">⬜</div><div class="text-[8px] mt-1">Body</div></div>
+            <div draggable="true" ondragstart="dragK(event,'circle')" class="bg-[#242a4d] p-3 rounded-xl text-center cursor-grab hover:bg-[#2e3666] border border-white/10"><div class="text-[20px]">⭕</div><div class="text-[8px] mt-1">Wheel</div></div>
+            <div draggable="true" ondragstart="dragK(event,'tri')" class="bg-[#242a4d] p-3 rounded-xl text-center cursor-grab hover:bg-[#2e3666] border border-white/10"><div class="text-[20px]">🔺</div><div class="text-[8px] mt-1">Nose</div></div>
+            <div draggable="true" ondragstart="dragK(event,'line')" class="bg-[#242a4d] p-3 rounded-xl text-center cursor-grab hover:bg-[#2e3666] border border-white/10"><div class="text-[20px]">📏</div><div class="text-[8px] mt-1">Wing</div></div>
+          </div>
         </div>
-        <div style="margin-top:8px; display:flex; flex-direction:column; gap:4px;">
-          <b style="font-size:10px;">ADVANCE PPT TOOLS</b>
-          <button onclick="kTool='pen'" style="background:#6c5cff; padding:7px; border-radius:8px; font-size:10px;">✏️ Free Pen</button>
-          <button onclick="kTool='text'" style="background:#222a4a; padding:7px; border-radius:8px; font-size:10px;">🔤 Add Text</button>
-          <button onclick="kTool='select'" style="background:#222a4a; padding:7px; border-radius:8px; font-size:10px;">🖱️ Move/Select</button>
-          <button onclick="bringFront()" style="background:#222a4a; padding:7px; border-radius:8px; font-size:10px;">⬆️ Bring Front</button>
+        <div class="flex flex-col gap-2 mt-2">
+          <button onclick="kTool='pen'" class="bg-[#6c5cff] py-2 rounded-lg text-[11px]">✏️ Pen</button>
+          <button onclick="kTool='text'" class="bg-[#1e2238] py-2 rounded-lg text-[11px] border border-white/10">🔤 Text</button>
         </div>
-        <div style="margin-top:auto; display:flex; flex-direction:column; gap:4px;">
-          <button onclick="addSlide()" style="background:#00ffff; color:black; padding:8px; border-radius:8px; font-size:11px; font-weight:900;">📑 + Add PPT Slide</button>
-          <button onclick="clearK()" style="background:#ff0040; padding:8px; border-radius:8px; font-size:11px;">🗑️ Clear</button>
+        <div class="mt-auto flex flex-col gap-2">
+          <button onclick="clearK()" class="bg-[#ff2440] py-2 rounded-lg text-[11px] font-bold">🗑️ Clear Canvas</button>
         </div>
       </div>
-      <div style="flex:1; background:#e8e8ee; border-radius:12px; padding:6px; display:flex; flex-direction:column;">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-          <span id="kTitle" style="color:black; font-size:11px; font-weight:900;">👶 Blank Canvas - PowerPoint Advance - Khud se Helicopter Bnao</span>
-          <div style="display:flex; gap:4px;"><span style="color:#666; font-size:9px;">Slides:</span><div id="kSlideBar" style="display:flex; gap:4px;"></div></div>
+
+      <div class="flex-1 card p-2 flex flex-col bg-[#f2f2f6] overflow-hidden">
+        <div class="flex justify-between items-center px-1 pb-1">
+          <span id="kTitle" class="text-black text-[11px] font-black">👶 Kids Mode - Blank Canvas - Khud se Helicopter Bnao</span>
+          <span class="text-[9px] text-gray-500">Drag & Drop PowerPoint</span>
         </div>
-        <canvas id="kCanvas" width="900" height="550" style="flex:1; background:white; border-radius:8px; margin-top:4px; border:1px solid #aaa;"></canvas>
+        <canvas id="kCanvas" width="1000" height="620" style="width:100%; flex:1; background:white; border:1px solid #d0d0d8;"></canvas>
       </div>
-      <div style="width:150px; background:#15182e; border-radius:12px; padding:10px;">
-        <b style="font-size:10px;">🎨 Paint</b><div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-top:6px;">
-          <div onclick="kColor='#ff0000'" style="height:24px; background:red; border-radius:6px; cursor:pointer;"></div><div onclick="kColor='#00aaff'" style="height:24px; background:#00aaff; border-radius:6px; cursor:pointer;"></div>
-          <div onclick="kColor='#00ff00'" style="height:24px; background:lime; border-radius:6px; cursor:pointer;"></div><div onclick="kColor='#000000'" style="height:24px; background:black; border:1px solid #444; border-radius:6px; cursor:pointer;"></div>
+
+      <div class="card w-[150px] p-3 shrink-0 flex flex-col gap-3">
+        <div class="text-[11px] font-bold">🎨 Color</div>
+        <div class="grid grid-cols-3 gap-2">
+          <div onclick="kColor='#ff0000'" style="height:28px; background:red; border-radius:8px; cursor:pointer;"></div>
+          <div onclick="kColor='#00aaff'" style="height:28px; background:#00aaff; border-radius:8px; cursor:pointer;"></div>
+          <div onclick="kColor='#00ff00'" style="height:28px; background:lime; border-radius:8px; cursor:pointer;"></div>
+          <div onclick="kColor='#ffcc00'" style="height:28px; background:#ffcc00; border-radius:8px; cursor:pointer;"></div>
+          <div onclick="kColor='#000000'" style="height:28px; background:black; border:1px solid #444; border-radius:8px; cursor:pointer;"></div>
+          <div onclick="kColor='#8b5cf6'" style="height:28px; background:#8b5cf6; border-radius:8px; cursor:pointer;"></div>
         </div>
-        <div style="margin-top:8px;"><span style="font-size:10px;">Size</span><input id="kSize" type="range" min="10" max="150" value="60" style="width:100%;" oninput="kSizeVal=this.value"></div>
+        <div><div class="text-[10px]">Size</div><input type="range" min="20" max="150" value="60" style="width:100%" oninput="kSizeVal=this.value"></div>
+        <div class="bg-black/50 p-2.5 rounded-lg text-[9px] text-gray-400 leading-4">PowerPoint jaisa<br>Shape drag karo<br>Jod ke machine banao<br>No readymade</div>
       </div>
     </div>
 
-    <div id="proUI" style="display:none; width:100%; gap:8px;">
-      <div style="width:190px; background:#e6e8ec; color:black; border-radius:10px; padding:8px; overflow-y:auto; border:1px solid #999; display:flex; flex-direction:column; gap:4px;">
-        <b style="font-size:11px;">🧱 BLANK 3D PRIMITIVES</b>
-        <div draggable="true" ondragstart="dragP(event,'box3d')" style="background:white; border:1px solid #bbb; padding:8px; border-radius:6px; cursor:grab; font-size:11px;">🧱 Box - Fuselage</div>
-        <div draggable="true" ondragstart="dragP(event,'cyl3d')" style="background:white; border:1px solid #bbb; padding:8px; border-radius:6px; cursor:grab; font-size:11px;">🛢️ Cylinder - Engine</div>
-        <div draggable="true" ondragstart="dragP(event,'plane3d')" style="background:white; border:1px solid #bbb; padding:8px; border-radius:6px; cursor:grab; font-size:11px;">🪽 Plane - Wing</div>
-        <div draggable="true" ondragstart="dragP(event,'sphere3d')" style="background:white; border:1px solid #bbb; padding:8px; border-radius:6px; cursor:grab; font-size:11px;">⚪ Sphere - Cockpit</div>
-        <div style="margin-top:8px; border-top:1px solid #bbb; padding-top:8px;"><b style="font-size:10px;">Age</b><br><button id="p13" onclick="setPA('13-15')" style="background:#00ffff; padding:4px 8px; border-radius:10px; font-size:10px; font-weight:900; margin-top:4px;">13-15</button><button id="p15" onclick="setPA('15-18')" style="background:#fff; border:1px solid #999; padding:4px 8px; border-radius:10px; font-size:10px; margin-left:4px;">15-18+</button></div>
-        <div style="margin-top:auto;"><button onclick="addSlidePro()" style="width:100%; background:#00ffff; color:black; padding:8px; border-radius:8px; font-size:11px; font-weight:900;">📑 + Slide</button></div>
-      </div>
-      <div style="flex:1; display:flex; flex-direction:column; gap:8px;">
-        <div style="flex:1; background:white; border-radius:10px; padding:6px; display:flex; flex-direction:column; border:1px solid #aaa;">
-          <div style="color:black; font-size:11px; font-weight:900; display:flex; justify-content:space-between;"><span id="p2Title">📐 2D Blueprint - Blank PowerPoint - Helicopter/Aeroplane ka Outline Banao</span><div id="pSlideBar" style="display:flex; gap:4px;"></div></div>
-          <canvas id="pCanvas2D" width="800" height="280" style="flex:1; background:#fffef5; border-radius:8px; margin-top:4px; border:1px dashed #aaa;"></canvas>
-        </div>
-        <div style="flex:1.2; background:#0e0e12; border-radius:10px; padding:6px; display:flex; flex-direction:column; border:1px solid #00ffff40;">
-          <div style="color:white; font-size:11px; font-weight:900;">🌐 3D Blank Factory - Jod ke Future Machine Banao</div>
-          <div id="threeP" style="flex:1; background:black; border-radius:8px; margin-top:4px;"></div>
+    <!-- ADULT SECTION - HIDDEN BY DEFAULT - NO OVERLAP -->
+    <div id="proUI" style="display:none; gap:10px; height:100%;">
+      <div class="card w-[200px] p-3 shrink-0 flex flex-col gap-2 bg-[#eef0f5] text-black overflow-y-auto">
+        <b class="text-[12px]">🧱 BLANK 3D PARTS</b>
+        <div class="text-[9px] text-gray-500 mb-1">Drag to 3D Factory</div>
+        <div draggable="true" ondragstart="dragP(event,'box3d')" class="bg-white border border-gray-300 p-2.5 rounded-lg cursor-grab text-[11px] hover:bg-gray-50">🧱 Box - Fuselage Body</div>
+        <div draggable="true" ondragstart="dragP(event,'cyl3d')" class="bg-white border border-gray-300 p-2.5 rounded-lg cursor-grab text-[11px] hover:bg-gray-50">🛢️ Cylinder - Engine / Wheel</div>
+        <div draggable="true" ondragstart="dragP(event,'plane3d')" class="bg-white border border-gray-300 p-2.5 rounded-lg cursor-grab text-[11px] hover:bg-gray-50">🪽 Plane - Wing / Blade</div>
+        <div draggable="true" ondragstart="dragP(event,'sphere3d')" class="bg-white border border-gray-300 p-2.5 rounded-lg cursor-grab text-[11px] hover:bg-gray-50">⚪ Sphere - Cockpit Nose</div>
+        <div class="mt-4 pt-3 border-t border-gray-300">
+          <b class="text-[10px]">Age Level</b><br>
+          <button id="p13" onclick="setPA('13-15')" class="bg-[#00ffff] px-3 py-1.5 rounded-full text-[10px] font-black mt-1">13-15</button>
+          <button id="p15" onclick="setPA('15-18')" class="bg-white border border-gray-400 px-3 py-1.5 rounded-full text-[10px] ml-1">15-18+</button>
         </div>
       </div>
-      <div style="width:170px; background:#11131c; border-radius:10px; padding:10px; color:white; display:flex; flex-direction:column; gap:6px;">
-        <b style="font-size:11px; color:#00ffff;">Share & Download</b>
-        <button onclick="shareDesign()" style="background:#00ffff; color:black; padding:8px; border-radius:8px; font-weight:900; font-size:11px;">🔗 Share Design</button>
-        <button onclick="downloadDesign()" style="background:white; color:black; padding:8px; border-radius:8px; font-weight:900; font-size:11px;">⬇️ Download PNG</button>
-        <button onclick="downloadPDF()" style="background:#ffcc00; color:black; padding:8px; border-radius:8px; font-weight:900; font-size:11px;">📄 Download PDF</button>
-        <div style="margin-top:auto;">
-          <div style="font-size:10px;">Color <input id="pCol" type="color" value="#ffcc00" style="width:100%; height:28px;"></div>
-          <div style="font-size:10px; margin-top:6px;">Size <input id="pSize" type="range" min="10" max="200" value="80" style="width:100%;"></div>
+
+      <div class="flex-1 flex flex-col gap-2 overflow-hidden">
+        <div id="threeP" style="flex:1; background:#05070a; border-radius:14px; border:1px solid #00ffff22; position:relative;">
+          <div style="position:absolute; top:10px; left:12px; background:#000000aa; padding:6px 12px; border-radius:20px; font-size:11px; font-weight:700; z-index:10;">🌐 3D Blank Factory - Jod ke Future Machine Banao - Drag Shape Here</div>
         </div>
+      </div>
+
+      <div class="card w-[170px] p-3 shrink-0 flex flex-col gap-3">
+        <b class="text-[12px] text-[#00ffff]">Share & Download</b>
+        <button onclick="shareDesign()" class="bg-[#00ffff] text-black py-2.5 rounded-xl font-black text-[12px]">🔗 Share Design</button>
+        <button onclick="downloadDesign()" class="bg-white text-black py-2.5 rounded-xl font-black text-[12px]">⬇️ Download PNG</button>
+        <button onclick="downloadPDF()" class="bg-[#ffcc00] text-black py-2.5 rounded-xl font-black text-[12px]">📄 Blueprint PDF</button>
+        <div class="mt-4">
+          <div class="text-[10px] mb-1">Color</div><input id="pCol" type="color" value="#ffcc00" style="width:100%; height:32px; border-radius:8px; border:none;">
+          <div class="text-[10px] mt-3 mb-1">Size</div><input id="pSize" type="range" min="10" max="200" value="80" style="width:100%;">
+        </div>
+        <div class="bg-black/60 p-2.5 rounded-xl text-[9px] text-gray-400 mt-auto">By default Kids khula hai. Adult dabayega tab ye 3D ayega. Clean display.</div>
       </div>
     </div>
 
@@ -3929,72 +3952,78 @@ def render_art_machinedesign():
 </div>
 
 <script>
-const translations={
-  hinglish:{title:"🚁 Create Your Future Design - Helicopter Bnao, Aeroplane Bnao • Create Curiosity", sub:"PowerPoint Advance • Blank se Start • Khud Banao • No Readymade • Drag Drop • Share & Download"},
-  en:{title:"🚁 Create Your Future Design - Build Helicopter, Aeroplane • Create Curiosity", sub:"PowerPoint Advanced • Start Blank • Build Yourself • Share & Download"},
-  hi:{title:"🚁 अपना भविष्य का डिज़ाइन बनाओ - हेलीकॉप्टर बनाओ, हवाई जहाज बनाओ • जिज्ञासा बनाओ", sub:"पावरपॉइंट एडवांस • खाली से शुरू • खुद बनाओ • शेयर और डाउनलोड"},
-  ta:{title:"🚁 உங்கள் எதிர்கால வடிவமைப்பை உருவாக்குங்கள் - ஹெலிகாப்டர், விமானம்", sub:"பவர்பாயிண்ட் அட்வான்ஸ் • பகிர் & பதிவிறக்கம்"},
-  te:{title:"🚁 మీ భవిష్యత్ డిజైన్ సృష్టించండి - హెలికాప్టర్, విమానం", sub:"పవర్ పాయింట్ అడ్వాన్స్ • షేర్ & డౌన్‌లోడ్"},
-  kn:{title:"🚁 ನಿಮ್ಮ ಭವಿಷ್ಯದ ವಿನ್ಯಾಸವನ್ನು ರಚಿಸಿ - ಹೆಲಿಕಾಪ್ಟರ್, ವಿಮಾನ", sub:"ಪವರ್‌ಪಾಯಿಂಟ್ ಅಡ್ವಾನ್ಸ್ • ಶೇರ್ & ಡೌನ್‌ಲೋಡ್"},
-  ml:{title:"🚁 നിങ്ങളുടെ ഭാവി ഡിസൈൻ സൃഷ്ടിക്കുക - ഹെലികോപ്റ്റർ, വിമാനം", sub:"പവർപോയിന്റ് അഡ്വാൻസ് • ഷെയർ & ഡൗൺലോഡ്"},
-  bn:{title:"🚁 আপনার ভবিষ্যৎ ডিজাইন তৈরি করুন - হেলিকপ্টার, বিমান বানাও", sub:"পাওয়ারপয়েন্ট অ্যাডভান্স • শেয়ার ও ডাউনলোড"},
-  or:{title:"🚁 ଆପଣଙ୍କ ଭବିଷ୍ୟତ ଡିଜାଇନ ତିଆରି କରନ୍ତୁ - ହେଲିକପ୍ଟର, ବିମାନ", sub:"ପାୱାରପଏଣ୍ଟ ଆଡଭାନ୍ସ • ଶେୟାର & ଡାଉନଲୋଡ"},
-  ru:{title:"🚁 Создай Будущий Дизайн - Вертолет, Самолет • Любопытство", sub:"PowerPoint Advanced • Поделиться и Скачать"},
-  zh:{title:"🚁 创造你的未来设计 - 直升机, 飞机 • 创造好奇心", sub:"PowerPoint 高级 • 分享与下载"},
-  ja:{title:"🚁 未来のデザインを作成 - ヘリコプター、飛行機 • 好奇心", sub:"PowerPoint 高度 • 共有とダウンロード"}
-};
-function changeLang(){const l=document.getElementById('langSel').value; const t=translations[l]||translations.hinglish; document.getElementById('headerTitle').innerText=t.title; document.getElementById('headerSub').innerText=t.sub;}
-
 let mainMode='kids', kColor='#ff0000', kTool='pen', kSizeVal=60, dragType=null;
+
 function setMain(m){
   mainMode=m;
   document.getElementById('kidsUI').style.display=m==='kids'?'flex':'none';
   document.getElementById('proUI').style.display=m==='pro'?'flex':'none';
-  document.getElementById('mKids').style.background=m==='kids'?'#ffcc00':'#222';
-  document.getElementById('mPro').style.background=m==='pro'?'#00ffff':'#222';
-  document.getElementById('mKids').style.color=m==='kids'?'black':'white';
-  document.getElementById('mPro').style.color=m==='pro'?'black':'white';
+  document.getElementById('btnKids').className=m==='kids'?'mode-btn active-kids':'mode-btn bg-[#1e2238] text-white';
+  document.getElementById('btnPro').className=m==='pro'?'mode-btn active-adult':'mode-btn bg-[#1e2238] text-white';
   if(m==='pro') initPro();
 }
-function setKA(a){['5-7','8-10','11-12'].forEach(x=>{const el=document.getElementById('k'+x.split('-')[0]); if(el){el.style.background=x===a?'#ffcc00':'#222'; el.style.color=x===a?'black':'white';}}); document.getElementById('kTitle').innerText=a==='5-7'?'👶 5-7 • Blank • Drag Shape se Helicopter Bnao': a==='8-10'?'📚 8-10 • Story + Design • Aeroplane Bnao':'📐 11-12 • Blueprint PowerPoint Advance';}
-function setPA(a){document.getElementById('p13').style.background=a==='13-15'?'#00ffff':'#fff'; document.getElementById('p15').style.background=a==='15-18'?'#00ffff':'#fff';}
+function setKA(a){
+  ['5-7','8-10','11-12'].forEach(x=>{
+    const el=document.getElementById('k'+x.split('-')[0]);
+    if(el){ el.className = x===a? 'flex-1 bg-[#ffcc00] text-black py-1.5 rounded-lg text-[10px] font-black' : 'flex-1 bg-[#1e2238] py-1.5 rounded-lg text-[10px]'; }
+  });
+}
+function setPA(a){
+  document.getElementById('p13').className=a==='13-15'?'bg-[#00ffff] px-3 py-1.5 rounded-full text-[10px] font-black mt-1':'bg-white border border-gray-400 px-3 py-1.5 rounded-full text-[10px] mt-1';
+  document.getElementById('p15').className=a==='15-18'?'bg-[#00ffff] px-3 py-1.5 rounded-full text-[10px] font-black ml-1':'bg-white border border-gray-400 px-3 py-1.5 rounded-full text-[10px] ml-1';
+}
+function changeLang(){
+  const l=document.getElementById('langSel').value;
+  document.getElementById('headerTitle').innerText = l==='hi'? '🚁 अपना भविष्य का डिज़ाइन बनाओ - हेलीकॉप्टर बनाओ, हवाई जहाज बनाओ' : '🚁 Create Your Future Design - Helicopter Bnao, Aeroplane Bnao';
+}
 
-const kcv=document.getElementById('kCanvas'), kctx=kcv.getContext('2d'); let kObjects=[], kSlides=[], kSelected=null;
-function clearK(){kctx.fillStyle='white'; kctx.fillRect(0,0,kcv.width,kcv.height); kObjects=[]; drawK();}
-function drawK(){kctx.fillStyle='white'; kctx.fillRect(0,0,kcv.width,kcv.height); kObjects.forEach(o=>{kctx.fillStyle=o.color; kctx.strokeStyle='#222'; kctx.lineWidth=2; if(o.type==='rect') kctx.fillRect(o.x-o.w/2,o.y-o.h/2,o.w,o.h); if(o.type==='circle'){kctx.beginPath(); kctx.arc(o.x,o.y,o.w/2,0,Math.PI*2); kctx.fill(); kctx.stroke();} if(o.type==='tri'){kctx.beginPath(); kctx.moveTo(o.x,o.y-o.h/2); kctx.lineTo(o.x-o.w/2,o.y+o.h/2); kctx.lineTo(o.x+o.w/2,o.y+o.h/2); kctx.closePath(); kctx.fill(); kctx.stroke();} if(o.type==='line'){kctx.beginPath(); kctx.moveTo(o.x-o.w/2,o.y); kctx.lineTo(o.x+o.w/2,o.y); kctx.strokeStyle=o.color; kctx.lineWidth=4; kctx.stroke();} if(o.type==='text'){kctx.font=o.w+'px sans-serif'; kctx.fillStyle=o.color; kctx.fillText(o.text||'My Helicopter',o.x,o.y);} });}
+const kcv=document.getElementById('kCanvas'), kctx=kcv.getContext('2d'); let kObjects=[];
+function clearK(){ kctx.fillStyle='white'; kctx.fillRect(0,0,kcv.width,kcv.height); kObjects=[]; drawK(); }
+function drawK(){
+  kctx.fillStyle='white'; kctx.fillRect(0,0,kcv.width,kcv.height);
+  kObjects.forEach(o=>{
+    kctx.fillStyle=o.color; kctx.strokeStyle='#222'; kctx.lineWidth=2;
+    if(o.type==='rect') kctx.fillRect(o.x-o.w/2,o.y-o.h/2,o.w,o.h);
+    if(o.type==='circle'){kctx.beginPath(); kctx.arc(o.x,o.y,o.w/2,0,Math.PI*2); kctx.fill(); kctx.stroke();}
+    if(o.type==='tri'){kctx.beginPath(); kctx.moveTo(o.x,o.y-o.h/2); kctx.lineTo(o.x-o.w/2,o.y+o.h/2); kctx.lineTo(o.x+o.w/2,o.y+o.h/2); kctx.closePath(); kctx.fill(); kctx.stroke();}
+    if(o.type==='line'){kctx.beginPath(); kctx.moveTo(o.x-o.w/2,o.y); kctx.lineTo(o.x+o.w/2,o.y); kctx.strokeStyle=o.color; kctx.lineWidth=4; kctx.stroke();}
+    if(o.type==='text'){kctx.font=o.w+'px sans-serif'; kctx.fillStyle=o.color; kctx.fillText(o.text||'My Helicopter',o.x,o.y);}
+  });
+}
 function dragK(e,t){dragType=t; e.dataTransfer.setData('text',t);}
 kcv.addEventListener('dragover',e=>e.preventDefault());
-kcv.addEventListener('drop',e=>{e.preventDefault(); const r=kcv.getBoundingClientRect(); const x=(e.clientX-r.left)*(kcv.width/r.width), y=(e.clientY-r.top)*(kcv.height/r.height); const t=e.dataTransfer.getData('text')||dragType; if(t==='text'){const txt=prompt('Kya likhna hai?','My Future Helicopter'); if(txt) kObjects.push({type:'text',x:x,y:y,w:kSizeVal,color:kColor,text:txt});} else kObjects.push({type:t,x:x,y:y,w:kSizeVal,h:kSizeVal/2,color:kColor}); drawK();});
+kcv.addEventListener('drop',e=>{
+  e.preventDefault(); const r=kcv.getBoundingClientRect();
+  const x=(e.clientX-r.left)*(kcv.width/r.width), y=(e.clientY-r.top)*(kcv.height/r.height);
+  const t=e.dataTransfer.getData('text')||dragType;
+  if(t==='text'){const txt=prompt('Kya likhna hai?','My Future Helicopter'); if(txt) kObjects.push({type:'text',x:x,y:y,w:kSizeVal,color:kColor,text:txt});}
+  else kObjects.push({type:t,x:x,y:y,w:kSizeVal,h:kSizeVal/2,color:kColor});
+  drawK();
+});
 clearK();
 let kDown=false;
 kcv.addEventListener('mousedown',e=>{if(kTool!=='pen') return; kDown=true; kctx.beginPath(); kctx.moveTo(e.offsetX,e.offsetY);});
 kcv.addEventListener('mousemove',e=>{if(!kDown||kTool!=='pen')return; kctx.strokeStyle=kColor; kctx.lineWidth=3; kctx.lineCap='round'; kctx.lineTo(e.offsetX,e.offsetY); kctx.stroke();});
 window.addEventListener('mouseup',()=>kDown=false);
-function addSlide(){const url=kcv.toDataURL(); kSlides.push(url); const bar=document.getElementById('kSlideBar'); bar.innerHTML=''; kSlides.forEach((s,i)=>{bar.innerHTML+=`<img src="${s}" style="width:36px; height:24px; border:1px solid #333; border-radius:4px;">`;}); clearK();}
-function bringFront(){if(kObjects.length>0){const last=kObjects.pop(); kObjects.unshift(last); drawK();}}
 
-const p2d=document.getElementById('pCanvas2D'), p2ctx=p2d.getContext('2d'); let p2Objs=[];
-function clearP2D2(){p2ctx.fillStyle='#fffef5'; p2ctx.fillRect(0,0,p2d.width,p2d.height); p2Objs=[];}
-clearP2D2();
 function dragP(e,t){dragType=t; e.dataTransfer.setData('text',t);}
-p2d.addEventListener('dragover',e=>e.preventDefault());
-p2d.addEventListener('drop',e=>{e.preventDefault(); const r=p2d.getBoundingClientRect(); const x=(e.clientX-r.left)*(p2d.width/r.width), y=(e.clientY-r.top)*(p2d.height/r.height); const t=e.dataTransfer.getData('text')||dragType; if(['rect','circle','tri','line'].includes(t)){p2Objs.push({type:t,x:x,y:y,w:80,h:40,color:document.getElementById('pCol').value}); drawP2();}});
-function drawP2(){p2ctx.fillStyle='#fffef5'; p2ctx.fillRect(0,0,p2d.width,p2d.height); p2Objs.forEach(o=>{p2ctx.fillStyle=o.color; p2ctx.strokeStyle='#222'; p2ctx.lineWidth=2; if(o.type==='rect') p2ctx.fillRect(o.x-o.w/2,o.y-o.h/2,o.w,o.h); if(o.type==='circle'){p2ctx.beginPath(); p2ctx.arc(o.x,o.y,o.w/2,0,Math.PI*2); p2ctx.fill(); p2ctx.stroke();} if(o.type==='tri'){p2ctx.beginPath(); p2ctx.moveTo(o.x,o.y-o.h/2); p2ctx.lineTo(o.x-o.w/2,o.y+o.h/2); p2ctx.lineTo(o.x+o.w/2,o.y+o.h/2); p2ctx.closePath(); p2ctx.fill(); p2ctx.stroke();} });}
-
-let scene,camera,renderer,controls,group, proInit=false, assembly3D=[];
+let scene,camera,renderer,controls,group, proInit=false;
 function initPro(){
   if(proInit) return; proInit=true;
-  scene=new THREE.Scene(); scene.background=new THREE.Color(0x000000);
-  camera=new THREE.PerspectiveCamera(50,1,0.1,1000); camera.position.set(4,3,5);
-  renderer=new THREE.WebGLRenderer({antialias:true}); renderer.setSize(600,360); document.getElementById('threeP').appendChild(renderer.domElement);
+  scene=new THREE.Scene(); scene.background=new THREE.Color(0x05070a);
+  camera=new THREE.PerspectiveCamera(50, 900/500, 0.1, 1000); camera.position.set(4,3,5);
+  renderer=new THREE.WebGLRenderer({antialias:true});
+  const container=document.getElementById('threeP');
+  renderer.setSize(container.clientWidth, container.clientHeight);
+  container.appendChild(renderer.domElement);
   controls=new THREE.OrbitControls(camera, renderer.domElement); controls.enableDamping=true;
   scene.add(new THREE.DirectionalLight(0xffffff,1)); scene.add(new THREE.AmbientLight(0xffffff,0.7));
-  group=new THREE.Group(); scene.add(group); const grid=new THREE.GridHelper(10,20,0x333333,0x111111); scene.add(grid);
+  group=new THREE.Group(); scene.add(group);
+  const grid=new THREE.GridHelper(12,24,0x1a2a3a,0x0e1520); scene.add(grid);
   (function anim(){requestAnimationFrame(anim); controls.update(); renderer.render(scene,camera);})();
+  container.addEventListener('dragover',e=>e.preventDefault());
+  container.addEventListener('drop',e=>{e.preventDefault(); const t=e.dataTransfer.getData('text')||dragType; add3D(t);});
 }
-const threeDiv=document.getElementById('threeP');
-threeDiv.addEventListener('dragover',e=>e.preventDefault());
-threeDiv.addEventListener('drop',e=>{e.preventDefault(); const t=e.dataTransfer.getData('text')||dragType; add3D(t);});
 function add3D(t){
   const col=document.getElementById('pCol').value; const s=parseFloat(document.getElementById('pSize').value)*0.01;
   let mesh; const mat=new THREE.MeshStandardMaterial({color:col});
@@ -4002,34 +4031,34 @@ function add3D(t){
   if(t==='cyl3d'){mesh=new THREE.Mesh(new THREE.CylinderGeometry(s*0.5,s*0.5,s*1.5,20), mat); mesh.rotation.z=Math.PI/2;}
   if(t==='sphere3d') mesh=new THREE.Mesh(new THREE.SphereGeometry(s*0.6,16,16), mat);
   if(t==='plane3d') mesh=new THREE.Mesh(new THREE.BoxGeometry(s*2,0.05,s*0.8), mat);
-  if(!mesh) return; mesh.position.set((Math.random()-0.5)*2, s, (Math.random()-0.5)*2); group.add(mesh); assembly3D.push(mesh);
+  if(!mesh) return; mesh.position.set((Math.random()-0.5)*2, s, (Math.random()-0.5)*2); group.add(mesh);
 }
 
 function downloadDesign(){
-  const canvas = mainMode==='kids'? document.getElementById('kCanvas') : document.getElementById('pCanvas2D');
+  const canvas=document.getElementById('kCanvas');
   const link=document.createElement('a'); link.download='My_Future_Design_'+Date.now()+'.png'; link.href=canvas.toDataURL(); link.click();
 }
 function downloadPDF(){
-  const {jsPDF}=window.jspdf; const doc=new jsPDF(); const canvas=mainMode==='kids'?document.getElementById('kCanvas'):document.getElementById('pCanvas2D');
-  const img=canvas.toDataURL('image/png'); doc.text('Create Your Future Design - My Helicopter / Aeroplane',10,10); doc.addImage(img,'PNG',10,20,180,100); doc.save('Future_Design_Blueprint.pdf');
+  const {jsPDF}=window.jspdf; const doc=new jsPDF();
+  const img=document.getElementById('kCanvas').toDataURL('image/png');
+  doc.text('Create Your Future Design - My Helicopter / Aeroplane',10,10);
+  doc.addImage(img,'PNG',10,20,180,100); doc.save('Future_Design_Blueprint.pdf');
 }
 async function shareDesign(){
-  const canvas=mainMode==='kids'?document.getElementById('kCanvas'):document.getElementById('pCanvas2D');
+  const canvas=document.getElementById('kCanvas');
   const dataUrl=canvas.toDataURL();
   if(navigator.share){
     try{
       const blob=await (await fetch(dataUrl)).blob(); const file=new File([blob],'future_design.png',{type:'image/png'});
-      await navigator.share({title:'My Future Helicopter Design', text:'Dekho maine khud se helicopter/aeroplane design kiya! 🚁✈️ Create Curiosity - CLYXESS', files:[file]});
-    }catch(e){alert('Share link ready! Download karke share kar do.');}
-  } else {
-    alert('Design ready! Download button se save karke WhatsApp pe share kar do.');
-  }
+      await navigator.share({title:'My Future Design', text:'Dekho maine khud se helicopter/aeroplane design kiya! 🚁', files:[file]});
+    }catch(e){ alert('Download karke share kar do!'); }
+  } else { alert('Download button se save karke WhatsApp pe share kar do.'); }
 }
-function addSlidePro(){const url=p2d.toDataURL(); const bar=document.getElementById('pSlideBar'); bar.innerHTML+=`<img src="${url}" style="width:36px; height:22px; border:1px solid #333; border-radius:4px;">`;}
+
 setMain('kids'); setKA('5-7');
 </script></body></html>
     """
-    components.html(HTML, height=820, scrolling=False)    
+    components.html(HTML, height=820, scrolling=False)   
     
 def render_kids_logic_lab():
     # ============================================================
