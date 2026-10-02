@@ -3831,7 +3831,6 @@ def render_art_machinedesign():
 <body style="background:#060913; color:white; margin:0; padding:6px; font-family:sans-serif; overflow:hidden;">
 <div style="display:flex; flex-direction:column; height:100vh; gap:6px;">
 
-  <!-- CHHOTA SA HEADER - LANGUAGE + TITLE - CREATE CURIOSITY -->
   <div style="background:linear-gradient(to right,#0f142e,#1e0f2e); border:1px solid #00ffff30; border-radius:12px; padding:6px 12px; display:flex; justify-content:space-between; align-items:center; gap:8px;">
     <div style="display:flex; align-items:center; gap:10px;">
       <div style="background:#ffcc00; color:black; width:28px; height:28px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-weight:900;">C</div>
@@ -3852,8 +3851,6 @@ def render_art_machinedesign():
   </div>
 
   <div style="display:flex; gap:8px; flex:1; overflow:hidden;">
-
-    <!-- KIDS MODE - BLANK PPT ADVANCE -->
     <div id="kidsUI" style="display:flex; gap:8px; width:100%;">
       <div style="width:175px; background:#15182e; border-radius:12px; padding:10px; display:flex; flex-direction:column; gap:6px; overflow-y:auto;">
         <div style="display:flex; gap:4px;">
@@ -3885,7 +3882,7 @@ def render_art_machinedesign():
           <span id="kTitle" style="color:black; font-size:11px; font-weight:900;">👶 Blank Canvas - PowerPoint Advance - Khud se Helicopter Bnao</span>
           <div style="display:flex; gap:4px;"><span style="color:#666; font-size:9px;">Slides:</span><div id="kSlideBar" style="display:flex; gap:4px;"></div></div>
         </div>
-        <canvas id="kCanvas" width="900" height="550" style="flex:1; background:white; border-radius:8px; margin-top:4px; border:1px solid #aaa; box-shadow:0 4px 12px #0003;"></canvas>
+        <canvas id="kCanvas" width="900" height="550" style="flex:1; background:white; border-radius:8px; margin-top:4px; border:1px solid #aaa;"></canvas>
       </div>
       <div style="width:150px; background:#15182e; border-radius:12px; padding:10px;">
         <b style="font-size:10px;">🎨 Paint</b><div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-top:6px;">
@@ -3893,11 +3890,9 @@ def render_art_machinedesign():
           <div onclick="kColor='#00ff00'" style="height:24px; background:lime; border-radius:6px; cursor:pointer;"></div><div onclick="kColor='#000000'" style="height:24px; background:black; border:1px solid #444; border-radius:6px; cursor:pointer;"></div>
         </div>
         <div style="margin-top:8px;"><span style="font-size:10px;">Size</span><input id="kSize" type="range" min="10" max="150" value="60" style="width:100%;" oninput="kSizeVal=this.value"></div>
-        <div style="margin-top:10px; background:black; padding:8px; border-radius:8px; font-size:9px; color:#aaa;" id="kInfo">PowerPoint jaisa<br>Drag Drop<br>Khud banao<br>Koi readymade nahi</div>
       </div>
     </div>
 
-    <!-- PRO MODE - ADVANCE FACTORY -->
     <div id="proUI" style="display:none; width:100%; gap:8px;">
       <div style="width:190px; background:#e6e8ec; color:black; border-radius:10px; padding:8px; overflow-y:auto; border:1px solid #999; display:flex; flex-direction:column; gap:4px;">
         <b style="font-size:11px;">🧱 BLANK 3D PRIMITIVES</b>
@@ -3923,9 +3918,6 @@ def render_art_machinedesign():
         <button onclick="shareDesign()" style="background:#00ffff; color:black; padding:8px; border-radius:8px; font-weight:900; font-size:11px;">🔗 Share Design</button>
         <button onclick="downloadDesign()" style="background:white; color:black; padding:8px; border-radius:8px; font-weight:900; font-size:11px;">⬇️ Download PNG</button>
         <button onclick="downloadPDF()" style="background:#ffcc00; color:black; padding:8px; border-radius:8px; font-weight:900; font-size:11px;">📄 Download PDF</button>
-        <div style="margin-top:8px; font-size:9px; color:#aaa; background:black; padding:8px; border-radius:8px;">
-          Computer me save hoga<br>• PNG - Image<br>• PDF - Blueprint<br>• Share - Link copy<br>PowerPoint advance jaisa
-        </div>
         <div style="margin-top:auto;">
           <div style="font-size:10px;">Color <input id="pCol" type="color" value="#ffcc00" style="width:100%; height:28px;"></div>
           <div style="font-size:10px; margin-top:6px;">Size <input id="pSize" type="range" min="10" max="200" value="80" style="width:100%;"></div>
@@ -3967,22 +3959,20 @@ function setMain(m){
 function setKA(a){['5-7','8-10','11-12'].forEach(x=>{const el=document.getElementById('k'+x.split('-')[0]); if(el){el.style.background=x===a?'#ffcc00':'#222'; el.style.color=x===a?'black':'white';}}); document.getElementById('kTitle').innerText=a==='5-7'?'👶 5-7 • Blank • Drag Shape se Helicopter Bnao': a==='8-10'?'📚 8-10 • Story + Design • Aeroplane Bnao':'📐 11-12 • Blueprint PowerPoint Advance';}
 function setPA(a){document.getElementById('p13').style.background=a==='13-15'?'#00ffff':'#fff'; document.getElementById('p15').style.background=a==='15-18'?'#00ffff':'#fff';}
 
-// KIDS CANVAS - BLANK ADVANCE PPT
 const kcv=document.getElementById('kCanvas'), kctx=kcv.getContext('2d'); let kObjects=[], kSlides=[], kSelected=null;
 function clearK(){kctx.fillStyle='white'; kctx.fillRect(0,0,kcv.width,kcv.height); kObjects=[]; drawK();}
 function drawK(){kctx.fillStyle='white'; kctx.fillRect(0,0,kcv.width,kcv.height); kObjects.forEach(o=>{kctx.fillStyle=o.color; kctx.strokeStyle='#222'; kctx.lineWidth=2; if(o.type==='rect') kctx.fillRect(o.x-o.w/2,o.y-o.h/2,o.w,o.h); if(o.type==='circle'){kctx.beginPath(); kctx.arc(o.x,o.y,o.w/2,0,Math.PI*2); kctx.fill(); kctx.stroke();} if(o.type==='tri'){kctx.beginPath(); kctx.moveTo(o.x,o.y-o.h/2); kctx.lineTo(o.x-o.w/2,o.y+o.h/2); kctx.lineTo(o.x+o.w/2,o.y+o.h/2); kctx.closePath(); kctx.fill(); kctx.stroke();} if(o.type==='line'){kctx.beginPath(); kctx.moveTo(o.x-o.w/2,o.y); kctx.lineTo(o.x+o.w/2,o.y); kctx.strokeStyle=o.color; kctx.lineWidth=4; kctx.stroke();} if(o.type==='text'){kctx.font=o.w+'px sans-serif'; kctx.fillStyle=o.color; kctx.fillText(o.text||'My Helicopter',o.x,o.y);} });}
 function dragK(e,t){dragType=t; e.dataTransfer.setData('text',t);}
 kcv.addEventListener('dragover',e=>e.preventDefault());
-kcv.addEventListener('drop',e=>{e.preventDefault(); const r=kcv.getBoundingClientRect(); const x=(e.clientX-r.left)*(kcv.width/r.width), y=(e.clientY-r.top)*(kcv.height/r.height); const t=e.dataTransfer.getData('text')||dragType; if(t==='text'){const txt=prompt('Kya likhna hai? (Helicopter name)','My Future Helicopter'); if(txt) kObjects.push({type:'text',x:x,y:y,w:kSizeVal,color:kColor,text:txt});} else kObjects.push({type:t,x:x,y:y,w:kSizeVal,h:kSizeVal/2,color:kColor}); drawK();});
+kcv.addEventListener('drop',e=>{e.preventDefault(); const r=kcv.getBoundingClientRect(); const x=(e.clientX-r.left)*(kcv.width/r.width), y=(e.clientY-r.top)*(kcv.height/r.height); const t=e.dataTransfer.getData('text')||dragType; if(t==='text'){const txt=prompt('Kya likhna hai?','My Future Helicopter'); if(txt) kObjects.push({type:'text',x:x,y:y,w:kSizeVal,color:kColor,text:txt});} else kObjects.push({type:t,x:x,y:y,w:kSizeVal,h:kSizeVal/2,color:kColor}); drawK();});
 clearK();
-let kDown=false, kStart=null;
-kcv.addEventListener('mousedown',e=>{if(kTool!=='pen') return; kDown=true; kStart={x:e.offsetX,y:e.offsetY}; kctx.beginPath(); kctx.moveTo(kStart.x,kStart.y);});
+let kDown=false;
+kcv.addEventListener('mousedown',e=>{if(kTool!=='pen') return; kDown=true; kctx.beginPath(); kctx.moveTo(e.offsetX,e.offsetY);});
 kcv.addEventListener('mousemove',e=>{if(!kDown||kTool!=='pen')return; kctx.strokeStyle=kColor; kctx.lineWidth=3; kctx.lineCap='round'; kctx.lineTo(e.offsetX,e.offsetY); kctx.stroke();});
 window.addEventListener('mouseup',()=>kDown=false);
 function addSlide(){const url=kcv.toDataURL(); kSlides.push(url); const bar=document.getElementById('kSlideBar'); bar.innerHTML=''; kSlides.forEach((s,i)=>{bar.innerHTML+=`<img src="${s}" style="width:36px; height:24px; border:1px solid #333; border-radius:4px;">`;}); clearK();}
 function bringFront(){if(kObjects.length>0){const last=kObjects.pop(); kObjects.unshift(last); drawK();}}
 
-// PRO - 2D + 3D
 const p2d=document.getElementById('pCanvas2D'), p2ctx=p2d.getContext('2d'); let p2Objs=[];
 function clearP2D2(){p2ctx.fillStyle='#fffef5'; p2ctx.fillRect(0,0,p2d.width,p2d.height); p2Objs=[];}
 clearP2D2();
@@ -3991,7 +3981,6 @@ p2d.addEventListener('dragover',e=>e.preventDefault());
 p2d.addEventListener('drop',e=>{e.preventDefault(); const r=p2d.getBoundingClientRect(); const x=(e.clientX-r.left)*(p2d.width/r.width), y=(e.clientY-r.top)*(p2d.height/r.height); const t=e.dataTransfer.getData('text')||dragType; if(['rect','circle','tri','line'].includes(t)){p2Objs.push({type:t,x:x,y:y,w:80,h:40,color:document.getElementById('pCol').value}); drawP2();}});
 function drawP2(){p2ctx.fillStyle='#fffef5'; p2ctx.fillRect(0,0,p2d.width,p2d.height); p2Objs.forEach(o=>{p2ctx.fillStyle=o.color; p2ctx.strokeStyle='#222'; p2ctx.lineWidth=2; if(o.type==='rect') p2ctx.fillRect(o.x-o.w/2,o.y-o.h/2,o.w,o.h); if(o.type==='circle'){p2ctx.beginPath(); p2ctx.arc(o.x,o.y,o.w/2,0,Math.PI*2); p2ctx.fill(); p2ctx.stroke();} if(o.type==='tri'){p2ctx.beginPath(); p2ctx.moveTo(o.x,o.y-o.h/2); p2ctx.lineTo(o.x-o.w/2,o.y+o.h/2); p2ctx.lineTo(o.x+o.w/2,o.y+o.h/2); p2ctx.closePath(); p2ctx.fill(); p2ctx.stroke();} });}
 
-// 3D
 let scene,camera,renderer,controls,group, proInit=false, assembly3D=[];
 function initPro(){
   if(proInit) return; proInit=true;
@@ -4016,7 +4005,6 @@ function add3D(t){
   if(!mesh) return; mesh.position.set((Math.random()-0.5)*2, s, (Math.random()-0.5)*2); group.add(mesh); assembly3D.push(mesh);
 }
 
-// SHARE & DOWNLOAD - ADVANCE POWERPOINT FEATURE
 function downloadDesign(){
   const canvas = mainMode==='kids'? document.getElementById('kCanvas') : document.getElementById('pCanvas2D');
   const link=document.createElement('a'); link.download='My_Future_Design_'+Date.now()+'.png'; link.href=canvas.toDataURL(); link.click();
@@ -4032,16 +4020,16 @@ async function shareDesign(){
     try{
       const blob=await (await fetch(dataUrl)).blob(); const file=new File([blob],'future_design.png',{type:'image/png'});
       await navigator.share({title:'My Future Helicopter Design', text:'Dekho maine khud se helicopter/aeroplane design kiya! 🚁✈️ Create Curiosity - CLYXESS', files:[file]});
-    }catch(e){navigator.clipboard.writeText('Maine apna future design banaya! Helicopter/Aeroplane - CLYXESS Factory'); alert('Share link copied! Design ready to share.');}
+    }catch(e){alert('Share link ready! Download karke share kar do.');}
   } else {
-    navigator.clipboard.writeText(dataUrl); alert('Design copied! Ab WhatsApp/Instagram pe share kar sakte ho. Computer me Download button se save bhi kar sakte ho.');
+    alert('Design ready! Download button se save karke WhatsApp pe share kar do.');
   }
 }
 function addSlidePro(){const url=p2d.toDataURL(); const bar=document.getElementById('pSlideBar'); bar.innerHTML+=`<img src="${url}" style="width:36px; height:22px; border:1px solid #333; border-radius:4px;">`;}
 setMain('kids'); setKA('5-7');
 </script></body></html>
     """
-    components.html(HTML, height=820, scrolling=False, key="final_blank_ppt_advance_share_download_v16")    
+    components.html(HTML, height=820, scrolling=False)    
     
 def render_kids_logic_lab():
     # ============================================================
