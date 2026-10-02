@@ -6808,7 +6808,7 @@ with st.sidebar:
         "🚀 Physics Lab",  
         "🔢 Math Lab",  
         "💸 Learn Finance", 
-        "📈 Learn Data Science",  
+        "📈 Machine + Learn Data Science",  
         "🔐 Login / Sign Up"
     ])
     st.markdown("---")
