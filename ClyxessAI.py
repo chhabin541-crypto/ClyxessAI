@@ -6837,7 +6837,7 @@ if mode == "👨‍👩‍👦 Parent Dashboard":
     render_parent_dashboard(); st.stop()
 if mode == "🎨 Creative AI Image Generator":
     render_image_generator(); st.stop() 
- if mode == "🎨 Art + Machine Design":
+if mode == "🎨 Art + Machine Design":
     render_art_machinedesign(); st.stop()       
 if mode == "🧩 Kids Logic Lab":
     render_kids_logic_lab(); st.stop() 
