@@ -3818,7 +3818,7 @@ def render_math_lab(client):
         st.session_state.math_game_q_id += 1
         st.rerun()  
         
-def render_art_machinedesign()
+def render_art_machinedesign():
     import streamlit.components.v1 as components
     HTML = """
 <!DOCTYPE html><html><head>
