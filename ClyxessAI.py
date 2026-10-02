@@ -3816,107 +3816,119 @@ def render_math_lab(client):
         st.session_state.math_current_question = None
         st.session_state.math_game_answered = False
         st.session_state.math_game_q_id += 1
-        st.rerun()  
+        st.rerun()   
         
 def render_art_machinedesign():
     import streamlit.components.v1 as components
     HTML = """
-<!DOCTYPE html><html><head>
+<!DOCTYPE html>
+<html><head>
 <meta charset="UTF-8"><script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
-<body style="background:#080a12; color:white; margin:0; padding:6px; font-family:sans-serif; overflow:hidden;">
-<div style="display:flex; flex-direction:column; height:100vh;">
+<body style="background:#060913; color:white; margin:0; padding:6px; font-family:sans-serif; overflow:hidden;">
+<div style="display:flex; flex-direction:column; height:100vh; gap:6px;">
 
-  <div style="display:flex; justify-content:space-between; background:#14141e; border:1px solid #333; border-radius:12px; padding:8px 12px; align-items:center;">
-    <div><b style="font-size:13px;">CLYXESS BLANK FACTORY • No Readymade • Khud Banao • PowerPoint Style</b><br><span style="font-size:9px; color:#888;">Sirf Shape + Line + Pen - Baccha khud jod ke machine banayega</span></div>
-    <div style="display:flex; gap:8px;">
-      <button id="mKids" onclick="setMain('kids')" style="background:#ffcc00; color:black; padding:6px 16px; border-radius:20px; font-weight:900; font-size:12px;">👶 KIDS MODE [5-12]</button>
-      <button id="mPro" onclick="setMain('pro')" style="background:#222; color:white; padding:6px 16px; border-radius:20px; font-weight:900; font-size:12px; border:1px solid #00ffff;">🚀 ADULT MODE [13-18+]</button>
+  <!-- CHHOTA SA HEADER - LANGUAGE + TITLE - CREATE CURIOSITY -->
+  <div style="background:linear-gradient(to right,#0f142e,#1e0f2e); border:1px solid #00ffff30; border-radius:12px; padding:6px 12px; display:flex; justify-content:space-between; align-items:center; gap:8px;">
+    <div style="display:flex; align-items:center; gap:10px;">
+      <div style="background:#ffcc00; color:black; width:28px; height:28px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-weight:900;">C</div>
+      <div>
+        <div id="headerTitle" style="font-size:12px; font-weight:900; line-height:1.1;">🚁 Create Your Future Design - Helicopter Bnao, Aeroplane Bnao • Create Curiosity</div>
+        <div id="headerSub" style="font-size:8px; color:#aaa;">PowerPoint Advance • Blank se Start • Khud Banao • No Readymade • Drag Drop • Share & Download</div>
+      </div>
+    </div>
+    <div style="display:flex; gap:6px; align-items:center;">
+      <select id="langSel" onchange="changeLang()" style="background:#111; color:#00ffff; border:1px solid #00ffff; border-radius:20px; padding:4px 8px; font-size:10px;">
+        <option value="hinglish">Hinglish</option><option value="en">English</option><option value="hi">हिंदी</option><option value="ta">தமிழ்</option><option value="te">తెలుగు</option><option value="kn">ಕನ್ನಡ</option><option value="ml">മലയാളം</option><option value="bn">বাংলা</option><option value="or">ଓଡ଼ିଆ</option><option value="ru">Русский</option><option value="zh">中文</option><option value="ja">日本語</option>
+      </select>
+      <button id="btnKids" onclick="setMain('kids')" style="background:#ffcc00; color:black; padding:5px 14px; border-radius:20px; font-weight:900; font-size:11px;">👶 KIDS 5-12</button>
+      <button id="btnPro" onclick="setMain('pro')" style="background:#222; color:white; padding:5px 14px; border-radius:20px; font-weight:900; font-size:11px; border:1px solid #00ffff;">🚀 ADULT 13-18+</button>
+      <button onclick="shareDesign()" style="background:#00ffff; color:black; padding:5px 14px; border-radius:20px; font-weight:900; font-size:11px;">🔗 Share</button>
+      <button onclick="downloadDesign()" style="background:white; color:black; padding:5px 14px; border-radius:20px; font-weight:900; font-size:11px;">⬇️ Download</button>
     </div>
   </div>
 
-  <div style="display:flex; gap:8px; margin-top:8px; flex:1; overflow:hidden;">
+  <div style="display:flex; gap:8px; flex:1; overflow:hidden;">
 
-    <!-- KIDS - BLANK POWERPOINT -->
+    <!-- KIDS MODE - BLANK PPT ADVANCE -->
     <div id="kidsUI" style="display:flex; gap:8px; width:100%;">
-      <div style="width:170px; background:#16182a; border-radius:12px; padding:10px; display:flex; flex-direction:column; gap:6px;">
+      <div style="width:175px; background:#15182e; border-radius:12px; padding:10px; display:flex; flex-direction:column; gap:6px; overflow-y:auto;">
         <div style="display:flex; gap:4px;">
-          <button onclick="setKA('5-7')" id="k5" style="flex:1; background:#ffcc00; color:black; padding:6px; border-radius:8px; font-size:10px; font-weight:900;">5-7</button>
-          <button onclick="setKA('8-10')" id="k8" style="flex:1; background:#222; padding:6px; border-radius:8px; font-size:10px;">8-10</button>
-          <button onclick="setKA('11-12')" id="k11" style="flex:1; background:#222; padding:6px; border-radius:8px; font-size:10px;">11-12</button>
+          <button onclick="setKA('5-7')" id="k5" style="flex:1; background:#ffcc00; color:black; padding:5px; border-radius:8px; font-size:10px; font-weight:900;">5-7</button>
+          <button onclick="setKA('8-10')" id="k8" style="flex:1; background:#222; padding:5px; border-radius:8px; font-size:10px;">8-10</button>
+          <button onclick="setKA('11-12')" id="k11" style="flex:1; background:#222; padding:5px; border-radius:8px; font-size:10px;">11-12</button>
         </div>
-        <b style="font-size:11px; margin-top:8px; color:#ffcc00;">📦 SHAPES - Drag karo</b>
+        <b style="font-size:11px; margin-top:6px; color:#ffcc00;">📦 POWERPOINT SHAPES</b>
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-top:4px;">
-          <div draggable="true" ondragstart="dragK(event,'rect')" style="background:#2a2f6a; padding:12px; border-radius:8px; text-align:center; cursor:grab; font-size:18px;">⬜</div>
-          <div draggable="true" ondragstart="dragK(event,'circle')" style="background:#2a2f6a; padding:12px; border-radius:8px; text-align:center; cursor:grab; font-size:18px;">⭕</div>
-          <div draggable="true" ondragstart="dragK(event,'tri')" style="background:#2a2f6a; padding:12px; border-radius:8px; text-align:center; cursor:grab; font-size:18px;">🔺</div>
-          <div draggable="true" ondragstart="dragK(event,'line')" style="background:#2a2f6a; padding:12px; border-radius:8px; text-align:center; cursor:grab; font-size:18px;">📏</div>
-          <div draggable="true" ondragstart="dragK(event,'star')" style="background:#2a2f6a; padding:12px; border-radius:8px; text-align:center; cursor:grab; font-size:18px;">⭐</div>
-          <div draggable="true" ondragstart="dragK(event,'dot')" style="background:#2a2f6a; padding:12px; border-radius:8px; text-align:center; cursor:grab; font-size:18px;">•</div>
+          <div draggable="true" ondragstart="dragK(event,'rect')" style="background:#2a2f6a; padding:12px; border-radius:8px; text-align:center; cursor:grab; border:1px solid #ffffff20;"><div style="font-size:18px;">⬜</div><div style="font-size:8px;">Body</div></div>
+          <div draggable="true" ondragstart="dragK(event,'circle')" style="background:#2a2f6a; padding:12px; border-radius:8px; text-align:center; cursor:grab; border:1px solid #ffffff20;"><div style="font-size:18px;">⭕</div><div style="font-size:8px;">Wheel</div></div>
+          <div draggable="true" ondragstart="dragK(event,'tri')" style="background:#2a2f6a; padding:12px; border-radius:8px; text-align:center; cursor:grab; border:1px solid #ffffff20;"><div style="font-size:18px;">🔺</div><div style="font-size:8px;">Nose</div></div>
+          <div draggable="true" ondragstart="dragK(event,'line')" style="background:#2a2f6a; padding:12px; border-radius:8px; text-align:center; cursor:grab; border:1px solid #ffffff20;"><div style="font-size:18px;">📏</div><div style="font-size:8px;">Wing</div></div>
         </div>
-        <div style="margin-top:8px;"><b style="font-size:10px;">✏️ Free Pen</b><button onclick="kTool='pen'" id="kPen" style="width:100%; background:#6c5cff; padding:8px; border-radius:8px; font-size:11px; margin-top:4px;">Pen ON</button><button onclick="kTool='select'" id="kSel" style="width:100%; background:#222; padding:8px; border-radius:8px; font-size:11px; margin-top:4px;">Select/Move</button></div>
-        <button onclick="clearK()" style="margin-top:auto; background:#ff0040; padding:8px; border-radius:8px; font-size:11px;">🗑️ Clear All</button>
-      </div>
-      <div style="flex:1; background:white; border-radius:12px; padding:6px; display:flex; flex-direction:column;">
-        <div style="color:black; font-size:11px; font-weight:900; display:flex; justify-content:space-between;"><span id="kTitle">👶 5-7 • Blank Canvas • Khud se banao</span><span style="font-size:9px;">PowerPoint jaisa - Drag, Drop, Draw</span></div>
-        <canvas id="kCanvas" width="900" height="600" style="flex:1; background:#fffef5; border-radius:8px; margin-top:4px; border:2px dashed #aaa; touch-action:none;"></canvas>
-      </div>
-      <div style="width:140px; background:#16182a; border-radius:12px; padding:10px;">
-        <b style="font-size:10px;">🎨 Rang</b><div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-top:6px;">
-          <div onclick="kColor='#ff0000'" style="height:26px; background:red; border-radius:6px; cursor:pointer;"></div><div onclick="kColor='#00aaff'" style="height:26px; background:#00aaff; border-radius:6px; cursor:pointer;"></div>
-          <div onclick="kColor='#00ff00'" style="height:26px; background:lime; border-radius:6px; cursor:pointer;"></div><div onclick="kColor='#000000'" style="height:26px; background:black; border-radius:6px; border:1px solid #444; cursor:pointer;"></div>
+        <div style="margin-top:8px; display:flex; flex-direction:column; gap:4px;">
+          <b style="font-size:10px;">ADVANCE PPT TOOLS</b>
+          <button onclick="kTool='pen'" style="background:#6c5cff; padding:7px; border-radius:8px; font-size:10px;">✏️ Free Pen</button>
+          <button onclick="kTool='text'" style="background:#222a4a; padding:7px; border-radius:8px; font-size:10px;">🔤 Add Text</button>
+          <button onclick="kTool='select'" style="background:#222a4a; padding:7px; border-radius:8px; font-size:10px;">🖱️ Move/Select</button>
+          <button onclick="bringFront()" style="background:#222a4a; padding:7px; border-radius:8px; font-size:10px;">⬆️ Bring Front</button>
         </div>
-        <div style="margin-top:10px;"><b style="font-size:10px;">Size</b><input id="kSize" type="range" min="5" max="100" value="40" style="width:100%;" oninput="kSizeVal=this.value"></div>
-        <div style="margin-top:10px; background:black; padding:8px; border-radius:8px; font-size:9px; color:#aaa;">Koi readymade nahi.<br>Shape drag karke<br>khud jod ke<br>car/helicopter/plane<br>banao.</div>
+        <div style="margin-top:auto; display:flex; flex-direction:column; gap:4px;">
+          <button onclick="addSlide()" style="background:#00ffff; color:black; padding:8px; border-radius:8px; font-size:11px; font-weight:900;">📑 + Add PPT Slide</button>
+          <button onclick="clearK()" style="background:#ff0040; padding:8px; border-radius:8px; font-size:11px;">🗑️ Clear</button>
+        </div>
+      </div>
+      <div style="flex:1; background:#e8e8ee; border-radius:12px; padding:6px; display:flex; flex-direction:column;">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <span id="kTitle" style="color:black; font-size:11px; font-weight:900;">👶 Blank Canvas - PowerPoint Advance - Khud se Helicopter Bnao</span>
+          <div style="display:flex; gap:4px;"><span style="color:#666; font-size:9px;">Slides:</span><div id="kSlideBar" style="display:flex; gap:4px;"></div></div>
+        </div>
+        <canvas id="kCanvas" width="900" height="550" style="flex:1; background:white; border-radius:8px; margin-top:4px; border:1px solid #aaa; box-shadow:0 4px 12px #0003;"></canvas>
+      </div>
+      <div style="width:150px; background:#15182e; border-radius:12px; padding:10px;">
+        <b style="font-size:10px;">🎨 Paint</b><div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-top:6px;">
+          <div onclick="kColor='#ff0000'" style="height:24px; background:red; border-radius:6px; cursor:pointer;"></div><div onclick="kColor='#00aaff'" style="height:24px; background:#00aaff; border-radius:6px; cursor:pointer;"></div>
+          <div onclick="kColor='#00ff00'" style="height:24px; background:lime; border-radius:6px; cursor:pointer;"></div><div onclick="kColor='#000000'" style="height:24px; background:black; border:1px solid #444; border-radius:6px; cursor:pointer;"></div>
+        </div>
+        <div style="margin-top:8px;"><span style="font-size:10px;">Size</span><input id="kSize" type="range" min="10" max="150" value="60" style="width:100%;" oninput="kSizeVal=this.value"></div>
+        <div style="margin-top:10px; background:black; padding:8px; border-radius:8px; font-size:9px; color:#aaa;" id="kInfo">PowerPoint jaisa<br>Drag Drop<br>Khud banao<br>Koi readymade nahi</div>
       </div>
     </div>
 
-    <!-- ADULT - BLANK POWERPOINT + 3D -->
+    <!-- PRO MODE - ADVANCE FACTORY -->
     <div id="proUI" style="display:none; width:100%; gap:8px;">
-      <div style="width:200px; background:#e6e8ec; color:black; border-radius:10px; display:flex; flex-direction:column; overflow:hidden; border:1px solid #999;">
-        <div style="background:#d0d2d8; padding:6px 10px; font-size:11px; font-weight:900;">🔧 PRIMITIVE SHAPES - Sansar</div>
-        <div style="padding:8px; overflow-y:auto; flex:1; font-size:10px; display:flex; flex-direction:column; gap:4px;">
-          <b>2D PowerPoint Shapes (Drag to Canvas)</b>
-          <div draggable="true" ondragstart="dragP(event,'rect')" style="background:white; border:1px solid #bbb; padding:8px; border-radius:6px; cursor:grab;">⬜ Rectangle - Body</div>
-          <div draggable="true" ondragstart="dragP(event,'circle')" style="background:white; border:1px solid #bbb; padding:8px; border-radius:6px; cursor:grab;">⭕ Circle - Wheel</div>
-          <div draggable="true" ondragstart="dragP(event,'tri')" style="background:white; border:1px solid #bbb; padding:8px; border-radius:6px; cursor:grab;">🔺 Triangle - Nose</div>
-          <div draggable="true" ondragstart="dragP(event,'line')" style="background:white; border:1px solid #bbb; padding:8px; border-radius:6px; cursor:grab;">📏 Line - Support/Truss</div>
-          <b style="margin-top:10px;">3D Primitives (Drag to 3D)</b>
-          <div draggable="true" ondragstart="dragP(event,'box3d')" style="background:#dbeafe; border:1px solid #93c5fd; padding:8px; border-radius:6px; cursor:grab;">🧱 Box 3D - Fuselage</div>
-          <div draggable="true" ondragstart="dragP(event,'cyl3d')" style="background:#dbeafe; border:1px solid #93c5fd; padding:8px; border-radius:6px; cursor:grab;">🛢️ Cylinder - Engine/Wheel</div>
-          <div draggable="true" ondragstart="dragP(event,'sphere3d')" style="background:#dbeafe; border:1px solid #93c5fd; padding:8px; border-radius:6px; cursor:grab;">⚪ Sphere - Nose/Cockpit</div>
-          <div draggable="true" ondragstart="dragP(event,'plane3d')" style="background:#dbeafe; border:1px solid #93c5fd; padding:8px; border-radius:6px; cursor:grab;">🪽 Plane - Wing/Blade</div>
-          <div style="margin-top:10px; border-top:1px solid #bbb; padding-top:8px;">
-            <b>Age</b><br><button onclick="setPA('13-15')" id="p13" style="background:#00ffff; padding:4px 8px; border-radius:10px; font-size:9px; font-weight:900; margin-top:4px;">13-15</button><button onclick="setPA('15-18')" id="p15" style="background:#fff; border:1px solid #999; padding:4px 8px; border-radius:10px; font-size:9px; margin-left:4px;">15-18+</button>
-          </div>
-        </div>
+      <div style="width:190px; background:#e6e8ec; color:black; border-radius:10px; padding:8px; overflow-y:auto; border:1px solid #999; display:flex; flex-direction:column; gap:4px;">
+        <b style="font-size:11px;">🧱 BLANK 3D PRIMITIVES</b>
+        <div draggable="true" ondragstart="dragP(event,'box3d')" style="background:white; border:1px solid #bbb; padding:8px; border-radius:6px; cursor:grab; font-size:11px;">🧱 Box - Fuselage</div>
+        <div draggable="true" ondragstart="dragP(event,'cyl3d')" style="background:white; border:1px solid #bbb; padding:8px; border-radius:6px; cursor:grab; font-size:11px;">🛢️ Cylinder - Engine</div>
+        <div draggable="true" ondragstart="dragP(event,'plane3d')" style="background:white; border:1px solid #bbb; padding:8px; border-radius:6px; cursor:grab; font-size:11px;">🪽 Plane - Wing</div>
+        <div draggable="true" ondragstart="dragP(event,'sphere3d')" style="background:white; border:1px solid #bbb; padding:8px; border-radius:6px; cursor:grab; font-size:11px;">⚪ Sphere - Cockpit</div>
+        <div style="margin-top:8px; border-top:1px solid #bbb; padding-top:8px;"><b style="font-size:10px;">Age</b><br><button id="p13" onclick="setPA('13-15')" style="background:#00ffff; padding:4px 8px; border-radius:10px; font-size:10px; font-weight:900; margin-top:4px;">13-15</button><button id="p15" onclick="setPA('15-18')" style="background:#fff; border:1px solid #999; padding:4px 8px; border-radius:10px; font-size:10px; margin-left:4px;">15-18+</button></div>
+        <div style="margin-top:auto;"><button onclick="addSlidePro()" style="width:100%; background:#00ffff; color:black; padding:8px; border-radius:8px; font-size:11px; font-weight:900;">📑 + Slide</button></div>
       </div>
-
       <div style="flex:1; display:flex; flex-direction:column; gap:8px;">
         <div style="flex:1; background:white; border-radius:10px; padding:6px; display:flex; flex-direction:column; border:1px solid #aaa;">
-          <div style="color:black; font-size:11px; font-weight:900; display:flex; justify-content:space-between;"><span>📐 2D BLANK - PowerPoint Jaisa - Khud se Outline Banao</span><button onclick="clearP2D()" style="border:1px solid #000; padding:2px 8px; border-radius:10px; font-size:10px;">Clear</button></div>
-          <canvas id="pCanvas2D" width="800" height="300" style="flex:1; background:#fffef5; border-radius:8px; margin-top:4px; border:1px dashed #aaa;"></canvas>
+          <div style="color:black; font-size:11px; font-weight:900; display:flex; justify-content:space-between;"><span id="p2Title">📐 2D Blueprint - Blank PowerPoint - Helicopter/Aeroplane ka Outline Banao</span><div id="pSlideBar" style="display:flex; gap:4px;"></div></div>
+          <canvas id="pCanvas2D" width="800" height="280" style="flex:1; background:#fffef5; border-radius:8px; margin-top:4px; border:1px dashed #aaa;"></canvas>
         </div>
-        <div style="flex:1; background:#0e0e12; border-radius:10px; padding:6px; display:flex; flex-direction:column; border:1px solid #00ffff40;">
-          <div style="color:white; font-size:11px; font-weight:900; display:flex; justify-content:space-between;"><span id="p3Title">🌐 3D BLANK - Khali Jagah - Shape Jod ke Helicopter/Plane Banao</span><span style="font-size:9px; color:#888;">Drag 3D shape yahan drop karo | Mouse se ghumao</span></div>
+        <div style="flex:1.2; background:#0e0e12; border-radius:10px; padding:6px; display:flex; flex-direction:column; border:1px solid #00ffff40;">
+          <div style="color:white; font-size:11px; font-weight:900;">🌐 3D Blank Factory - Jod ke Future Machine Banao</div>
           <div id="threeP" style="flex:1; background:black; border-radius:8px; margin-top:4px;"></div>
         </div>
       </div>
-
-      <div style="width:180px; background:#11131c; border-radius:10px; padding:10px; color:white;">
-        <b style="font-size:11px; color:#00ffff;">⚙️ Properties</b>
-        <div style="margin-top:8px; font-size:10px;">
-          <div>Selected: <span id="pSel">None</span></div>
-          <div style="margin-top:8px;">Size: <input id="pSize" type="range" min="10" max="200" value="80" style="width:100%;" oninput="updateP()"><span id="pSizeV">80</span></div>
-          <div style="margin-top:8px;">Color: <input id="pCol" type="color" value="#ffcc00" style="width:100%; height:28px;" oninput="updateP()"></div>
-          <div style="margin-top:8px; display:flex; gap:4px;">
-            <button onclick="delP()" style="flex:1; background:#ff0040; padding:6px; border-radius:6px; font-size:10px;">Delete</button>
-            <button onclick="dupP()" style="flex:1; background:#333; padding:6px; border-radius:6px; font-size:10px;">Duplicate</button>
-          </div>
-          <div style="margin-top:12px; background:black; padding:8px; border-radius:8px; font-size:9px; color:#aaa;">PowerPoint jaisa:<br>• Shape drag karo<br>• Size badlo<br>• Color bharo<br>• Jod ke machine banao<br>• Koi readymade nahi</div>
-          <button onclick="saveBlank()" style="width:100%; background:linear-gradient(to right,#00ffff,#ff00ff); color:black; padding:10px; border-radius:8px; margin-top:10px; font-weight:900; font-size:11px;">💾 Save My Design</button>
+      <div style="width:170px; background:#11131c; border-radius:10px; padding:10px; color:white; display:flex; flex-direction:column; gap:6px;">
+        <b style="font-size:11px; color:#00ffff;">Share & Download</b>
+        <button onclick="shareDesign()" style="background:#00ffff; color:black; padding:8px; border-radius:8px; font-weight:900; font-size:11px;">🔗 Share Design</button>
+        <button onclick="downloadDesign()" style="background:white; color:black; padding:8px; border-radius:8px; font-weight:900; font-size:11px;">⬇️ Download PNG</button>
+        <button onclick="downloadPDF()" style="background:#ffcc00; color:black; padding:8px; border-radius:8px; font-weight:900; font-size:11px;">📄 Download PDF</button>
+        <div style="margin-top:8px; font-size:9px; color:#aaa; background:black; padding:8px; border-radius:8px;">
+          Computer me save hoga<br>• PNG - Image<br>• PDF - Blueprint<br>• Share - Link copy<br>PowerPoint advance jaisa
+        </div>
+        <div style="margin-top:auto;">
+          <div style="font-size:10px;">Color <input id="pCol" type="color" value="#ffcc00" style="width:100%; height:28px;"></div>
+          <div style="font-size:10px; margin-top:6px;">Size <input id="pSize" type="range" min="10" max="200" value="80" style="width:100%;"></div>
         </div>
       </div>
     </div>
@@ -3925,9 +3937,23 @@ def render_art_machinedesign():
 </div>
 
 <script>
-let mainMode='kids', kidsAge='5-7', proAge='13-15', kColor='#ff0000', kTool='pen', kSizeVal=40, dragType=null;
+const translations={
+  hinglish:{title:"🚁 Create Your Future Design - Helicopter Bnao, Aeroplane Bnao • Create Curiosity", sub:"PowerPoint Advance • Blank se Start • Khud Banao • No Readymade • Drag Drop • Share & Download"},
+  en:{title:"🚁 Create Your Future Design - Build Helicopter, Aeroplane • Create Curiosity", sub:"PowerPoint Advanced • Start Blank • Build Yourself • Share & Download"},
+  hi:{title:"🚁 अपना भविष्य का डिज़ाइन बनाओ - हेलीकॉप्टर बनाओ, हवाई जहाज बनाओ • जिज्ञासा बनाओ", sub:"पावरपॉइंट एडवांस • खाली से शुरू • खुद बनाओ • शेयर और डाउनलोड"},
+  ta:{title:"🚁 உங்கள் எதிர்கால வடிவமைப்பை உருவாக்குங்கள் - ஹெலிகாப்டர், விமானம்", sub:"பவர்பாயிண்ட் அட்வான்ஸ் • பகிர் & பதிவிறக்கம்"},
+  te:{title:"🚁 మీ భవిష్యత్ డిజైన్ సృష్టించండి - హెలికాప్టర్, విమానం", sub:"పవర్ పాయింట్ అడ్వాన్స్ • షేర్ & డౌన్‌లోడ్"},
+  kn:{title:"🚁 ನಿಮ್ಮ ಭವಿಷ್ಯದ ವಿನ್ಯಾಸವನ್ನು ರಚಿಸಿ - ಹೆಲಿಕಾಪ್ಟರ್, ವಿಮಾನ", sub:"ಪವರ್‌ಪಾಯಿಂಟ್ ಅಡ್ವಾನ್ಸ್ • ಶೇರ್ & ಡೌನ್‌ಲೋಡ್"},
+  ml:{title:"🚁 നിങ്ങളുടെ ഭാവി ഡിസൈൻ സൃഷ്ടിക്കുക - ഹെലികോപ്റ്റർ, വിമാനം", sub:"പവർപോയിന്റ് അഡ്വാൻസ് • ഷെയർ & ഡൗൺലോഡ്"},
+  bn:{title:"🚁 আপনার ভবিষ্যৎ ডিজাইন তৈরি করুন - হেলিকপ্টার, বিমান বানাও", sub:"পাওয়ারপয়েন্ট অ্যাডভান্স • শেয়ার ও ডাউনলোড"},
+  or:{title:"🚁 ଆପଣଙ୍କ ଭବିଷ୍ୟତ ଡିଜାଇନ ତିଆରି କରନ୍ତୁ - ହେଲିକପ୍ଟର, ବିମାନ", sub:"ପାୱାରପଏଣ୍ଟ ଆଡଭାନ୍ସ • ଶେୟାର & ଡାଉନଲୋଡ"},
+  ru:{title:"🚁 Создай Будущий Дизайн - Вертолет, Самолет • Любопытство", sub:"PowerPoint Advanced • Поделиться и Скачать"},
+  zh:{title:"🚁 创造你的未来设计 - 直升机, 飞机 • 创造好奇心", sub:"PowerPoint 高级 • 分享与下载"},
+  ja:{title:"🚁 未来のデザインを作成 - ヘリコプター、飛行機 • 好奇心", sub:"PowerPoint 高度 • 共有とダウンロード"}
+};
+function changeLang(){const l=document.getElementById('langSel').value; const t=translations[l]||translations.hinglish; document.getElementById('headerTitle').innerText=t.title; document.getElementById('headerSub').innerText=t.sub;}
 
-// MAIN
+let mainMode='kids', kColor='#ff0000', kTool='pen', kSizeVal=60, dragType=null;
 function setMain(m){
   mainMode=m;
   document.getElementById('kidsUI').style.display=m==='kids'?'flex':'none';
@@ -3938,97 +3964,84 @@ function setMain(m){
   document.getElementById('mPro').style.color=m==='pro'?'black':'white';
   if(m==='pro') initPro();
 }
-function setKA(a){
-  kidsAge=a; ['5-7','8-10','11-12'].forEach(x=>{const el=document.getElementById('k'+x.split('-')[0]); if(el){el.style.background=x===a?'#ffcc00':'#222'; el.style.color=x===a?'black':'white';}});
-}
-function setPA(a){proAge=a; document.getElementById('p13').style.background=a==='13-15'?'#00ffff':'#fff'; document.getElementById('p15').style.background=a==='15-18'?'#00ffff':'#fff';}
+function setKA(a){['5-7','8-10','11-12'].forEach(x=>{const el=document.getElementById('k'+x.split('-')[0]); if(el){el.style.background=x===a?'#ffcc00':'#222'; el.style.color=x===a?'black':'white';}}); document.getElementById('kTitle').innerText=a==='5-7'?'👶 5-7 • Blank • Drag Shape se Helicopter Bnao': a==='8-10'?'📚 8-10 • Story + Design • Aeroplane Bnao':'📐 11-12 • Blueprint PowerPoint Advance';}
+function setPA(a){document.getElementById('p13').style.background=a==='13-15'?'#00ffff':'#fff'; document.getElementById('p15').style.background=a==='15-18'?'#00ffff':'#fff';}
 
-// KIDS CANVAS - BLANK
-const kcv=document.getElementById('kCanvas'), kctx=kcv.getContext('2d'); let kObjects=[], kSel=null, kDrag=false, kStart=null;
-function clearK(){kctx.fillStyle='#fffef5'; kctx.fillRect(0,0,kcv.width,kcv.height); kObjects=[];}
-clearK();
-function dragK(e,t){dragType=t;}
+// KIDS CANVAS - BLANK ADVANCE PPT
+const kcv=document.getElementById('kCanvas'), kctx=kcv.getContext('2d'); let kObjects=[], kSlides=[], kSelected=null;
+function clearK(){kctx.fillStyle='white'; kctx.fillRect(0,0,kcv.width,kcv.height); kObjects=[]; drawK();}
+function drawK(){kctx.fillStyle='white'; kctx.fillRect(0,0,kcv.width,kcv.height); kObjects.forEach(o=>{kctx.fillStyle=o.color; kctx.strokeStyle='#222'; kctx.lineWidth=2; if(o.type==='rect') kctx.fillRect(o.x-o.w/2,o.y-o.h/2,o.w,o.h); if(o.type==='circle'){kctx.beginPath(); kctx.arc(o.x,o.y,o.w/2,0,Math.PI*2); kctx.fill(); kctx.stroke();} if(o.type==='tri'){kctx.beginPath(); kctx.moveTo(o.x,o.y-o.h/2); kctx.lineTo(o.x-o.w/2,o.y+o.h/2); kctx.lineTo(o.x+o.w/2,o.y+o.h/2); kctx.closePath(); kctx.fill(); kctx.stroke();} if(o.type==='line'){kctx.beginPath(); kctx.moveTo(o.x-o.w/2,o.y); kctx.lineTo(o.x+o.w/2,o.y); kctx.strokeStyle=o.color; kctx.lineWidth=4; kctx.stroke();} if(o.type==='text'){kctx.font=o.w+'px sans-serif'; kctx.fillStyle=o.color; kctx.fillText(o.text||'My Helicopter',o.x,o.y);} });}
+function dragK(e,t){dragType=t; e.dataTransfer.setData('text',t);}
 kcv.addEventListener('dragover',e=>e.preventDefault());
-kcv.addEventListener('drop',e=>{e.preventDefault(); const r=kcv.getBoundingClientRect(); const x=(e.clientX-r.left)*(kcv.width/r.width), y=(e.clientY-r.top)*(kcv.height/r.height); addKObj(dragType,x,y);});
-function addKObj(t,x,y){
-  const obj={type:t,x:x,y:y,w:kSizeVal,h:kSizeVal,color:kColor};
-  kObjects.push(obj); drawK();
-}
-function drawK(){
-  kctx.fillStyle='#fffef5'; kctx.fillRect(0,0,kcv.width,kcv.height);
-  kObjects.forEach(o=>{
-    kctx.fillStyle=o.color; kctx.strokeStyle='#222'; kctx.lineWidth=2;
-    if(o.type==='rect') kctx.fillRect(o.x-o.w/2,o.y-o.h/2,o.w,o.h);
-    if(o.type==='circle'){kctx.beginPath(); kctx.arc(o.x,o.y,o.w/2,0,Math.PI*2); kctx.fill(); kctx.stroke();}
-    if(o.type==='tri'){kctx.beginPath(); kctx.moveTo(o.x,o.y-o.h/2); kctx.lineTo(o.x-o.w/2,o.y+o.h/2); kctx.lineTo(o.x+o.w/2,o.y+o.h/2); kctx.closePath(); kctx.fill(); kctx.stroke();}
-    if(o.type==='star'){kctx.font=(o.w)+'px serif'; kctx.fillText('⭐',o.x-o.w/2,o.y+o.w/3);}
-    if(o.type==='line'){kctx.beginPath(); kctx.moveTo(o.x-o.w/2,o.y); kctx.lineTo(o.x+o.w/2,o.y); kctx.strokeStyle=o.color; kctx.lineWidth=4; kctx.stroke();}
-    if(o.type==='dot'){kctx.beginPath(); kctx.arc(o.x,o.y,5,0,Math.PI*2); kctx.fill();}
-  });
-}
-// Free pen
-let kPenDown=false, kPenStart=null;
-kcv.addEventListener('mousedown',e=>{if(kTool!=='pen') return; kPenDown=true; kPenStart={x:e.offsetX,y:e.offsetY}; kctx.beginPath(); kctx.moveTo(kPenStart.x,kPenStart.y);});
-kcv.addEventListener('mousemove',e=>{if(!kPenDown || kTool!=='pen') return; kctx.strokeStyle=kColor; kctx.lineWidth=kidsAge==='5-7'?14:3; kctx.lineCap='round'; kctx.lineTo(e.offsetX,e.offsetY); kctx.stroke();});
-window.addEventListener('mouseup',()=>kPenDown=false);
+kcv.addEventListener('drop',e=>{e.preventDefault(); const r=kcv.getBoundingClientRect(); const x=(e.clientX-r.left)*(kcv.width/r.width), y=(e.clientY-r.top)*(kcv.height/r.height); const t=e.dataTransfer.getData('text')||dragType; if(t==='text'){const txt=prompt('Kya likhna hai? (Helicopter name)','My Future Helicopter'); if(txt) kObjects.push({type:'text',x:x,y:y,w:kSizeVal,color:kColor,text:txt});} else kObjects.push({type:t,x:x,y:y,w:kSizeVal,h:kSizeVal/2,color:kColor}); drawK();});
+clearK();
+let kDown=false, kStart=null;
+kcv.addEventListener('mousedown',e=>{if(kTool!=='pen') return; kDown=true; kStart={x:e.offsetX,y:e.offsetY}; kctx.beginPath(); kctx.moveTo(kStart.x,kStart.y);});
+kcv.addEventListener('mousemove',e=>{if(!kDown||kTool!=='pen')return; kctx.strokeStyle=kColor; kctx.lineWidth=3; kctx.lineCap='round'; kctx.lineTo(e.offsetX,e.offsetY); kctx.stroke();});
+window.addEventListener('mouseup',()=>kDown=false);
+function addSlide(){const url=kcv.toDataURL(); kSlides.push(url); const bar=document.getElementById('kSlideBar'); bar.innerHTML=''; kSlides.forEach((s,i)=>{bar.innerHTML+=`<img src="${s}" style="width:36px; height:24px; border:1px solid #333; border-radius:4px;">`;}); clearK();}
+function bringFront(){if(kObjects.length>0){const last=kObjects.pop(); kObjects.unshift(last); drawK();}}
 
-// PRO - 2D + 3D BLANK
-const p2d=document.getElementById('pCanvas2D'), p2ctx=p2d.getContext('2d'); let p2Objects=[];
-function clearP2D(){p2ctx.fillStyle='#fffef5'; p2ctx.fillRect(0,0,p2d.width,p2d.height); p2Objects=[];}
-clearP2D();
-function dragP(e,t){dragType=t;}
+// PRO - 2D + 3D
+const p2d=document.getElementById('pCanvas2D'), p2ctx=p2d.getContext('2d'); let p2Objs=[];
+function clearP2D2(){p2ctx.fillStyle='#fffef5'; p2ctx.fillRect(0,0,p2d.width,p2d.height); p2Objs=[];}
+clearP2D2();
+function dragP(e,t){dragType=t; e.dataTransfer.setData('text',t);}
 p2d.addEventListener('dragover',e=>e.preventDefault());
-p2d.addEventListener('drop',e=>{e.preventDefault(); const r=p2d.getBoundingClientRect(); const x=(e.clientX-r.left)*(p2d.width/r.width), y=(e.clientY-r.top)*(p2d.height/r.height); if(['rect','circle','tri','line'].includes(dragType)){p2Objects.push({type:dragType,x:x,y:y,w:80,h:50,color:document.getElementById('pCol').value}); drawP2D();} });
-function drawP2D(){
-  p2ctx.fillStyle='#fffef5'; p2ctx.fillRect(0,0,p2d.width,p2d.height);
-  p2Objects.forEach(o=>{p2ctx.fillStyle=o.color; p2ctx.strokeStyle='#222'; p2ctx.lineWidth=2;
-    if(o.type==='rect') p2ctx.fillRect(o.x-o.w/2,o.y-o.h/2,o.w,o.h);
-    if(o.type==='circle'){p2ctx.beginPath(); p2ctx.arc(o.x,o.y,o.w/2,0,Math.PI*2); p2ctx.fill(); p2ctx.stroke();}
-    if(o.type==='tri'){p2ctx.beginPath(); p2ctx.moveTo(o.x,o.y-o.h/2); p2ctx.lineTo(o.x-o.w/2,o.y+o.h/2); p2ctx.lineTo(o.x+o.w/2,o.y+o.h/2); p2ctx.closePath(); p2ctx.fill(); p2ctx.stroke();}
-    if(o.type==='line'){p2ctx.beginPath(); p2ctx.moveTo(o.x-o.w/2,o.y); p2ctx.lineTo(o.x+o.w/2,o.y); p2ctx.strokeStyle=o.color; p2ctx.lineWidth=3; p2ctx.stroke();}
-  });
-}
+p2d.addEventListener('drop',e=>{e.preventDefault(); const r=p2d.getBoundingClientRect(); const x=(e.clientX-r.left)*(p2d.width/r.width), y=(e.clientY-r.top)*(p2d.height/r.height); const t=e.dataTransfer.getData('text')||dragType; if(['rect','circle','tri','line'].includes(t)){p2Objs.push({type:t,x:x,y:y,w:80,h:40,color:document.getElementById('pCol').value}); drawP2();}});
+function drawP2(){p2ctx.fillStyle='#fffef5'; p2ctx.fillRect(0,0,p2d.width,p2d.height); p2Objs.forEach(o=>{p2ctx.fillStyle=o.color; p2ctx.strokeStyle='#222'; p2ctx.lineWidth=2; if(o.type==='rect') p2ctx.fillRect(o.x-o.w/2,o.y-o.h/2,o.w,o.h); if(o.type==='circle'){p2ctx.beginPath(); p2ctx.arc(o.x,o.y,o.w/2,0,Math.PI*2); p2ctx.fill(); p2ctx.stroke();} if(o.type==='tri'){p2ctx.beginPath(); p2ctx.moveTo(o.x,o.y-o.h/2); p2ctx.lineTo(o.x-o.w/2,o.y+o.h/2); p2ctx.lineTo(o.x+o.w/2,o.y+o.h/2); p2ctx.closePath(); p2ctx.fill(); p2ctx.stroke();} });}
 
-// PRO 3D - BLANK
-let scene,camera,renderer,controls,group, selected3D=null, proInit=false, assembly3D=[];
+// 3D
+let scene,camera,renderer,controls,group, proInit=false, assembly3D=[];
 function initPro(){
   if(proInit) return; proInit=true;
   scene=new THREE.Scene(); scene.background=new THREE.Color(0x000000);
   camera=new THREE.PerspectiveCamera(50,1,0.1,1000); camera.position.set(4,3,5);
-  renderer=new THREE.WebGLRenderer({antialias:true}); renderer.setSize(700,400); document.getElementById('threeP').appendChild(renderer.domElement);
+  renderer=new THREE.WebGLRenderer({antialias:true}); renderer.setSize(600,360); document.getElementById('threeP').appendChild(renderer.domElement);
   controls=new THREE.OrbitControls(camera, renderer.domElement); controls.enableDamping=true;
   scene.add(new THREE.DirectionalLight(0xffffff,1)); scene.add(new THREE.AmbientLight(0xffffff,0.7));
-  group=new THREE.Group(); scene.add(group); const grid=new THREE.GridHelper(10,20,0x444444,0x222222); scene.add(grid);
+  group=new THREE.Group(); scene.add(group); const grid=new THREE.GridHelper(10,20,0x333333,0x111111); scene.add(grid);
   (function anim(){requestAnimationFrame(anim); controls.update(); renderer.render(scene,camera);})();
 }
 const threeDiv=document.getElementById('threeP');
 threeDiv.addEventListener('dragover',e=>e.preventDefault());
-threeDiv.addEventListener('drop',e=>{e.preventDefault(); const t=e.dataTransfer.getData('text')||dragType; if(['box3d','cyl3d','sphere3d','plane3d'].includes(t)) add3D(t);});
-
+threeDiv.addEventListener('drop',e=>{e.preventDefault(); const t=e.dataTransfer.getData('text')||dragType; add3D(t);});
 function add3D(t){
-  const col=document.getElementById('pCol').value; const size=parseFloat(document.getElementById('pSize').value)*0.01;
+  const col=document.getElementById('pCol').value; const s=parseFloat(document.getElementById('pSize').value)*0.01;
   let mesh; const mat=new THREE.MeshStandardMaterial({color:col});
-  if(t==='box3d') mesh=new THREE.Mesh(new THREE.BoxGeometry(size*2,size,size), mat);
-  if(t==='cyl3d'){mesh=new THREE.Mesh(new THREE.CylinderGeometry(size*0.5,size*0.5,size*1.5,20), mat); mesh.rotation.z=Math.PI/2;}
-  if(t==='sphere3d') mesh=new THREE.Mesh(new THREE.SphereGeometry(size*0.6,20,20), mat);
-  if(t==='plane3d') mesh=new THREE.Mesh(new THREE.BoxGeometry(size*2,0.05,size*0.8), mat);
-  mesh.position.set((Math.random()-0.5)*2, size, (Math.random()-0.5)*2); mesh.userData={type:t};
-  group.add(mesh); assembly3D.push(mesh); select3D(mesh);
+  if(t==='box3d') mesh=new THREE.Mesh(new THREE.BoxGeometry(s*2,s,s), mat);
+  if(t==='cyl3d'){mesh=new THREE.Mesh(new THREE.CylinderGeometry(s*0.5,s*0.5,s*1.5,20), mat); mesh.rotation.z=Math.PI/2;}
+  if(t==='sphere3d') mesh=new THREE.Mesh(new THREE.SphereGeometry(s*0.6,16,16), mat);
+  if(t==='plane3d') mesh=new THREE.Mesh(new THREE.BoxGeometry(s*2,0.05,s*0.8), mat);
+  if(!mesh) return; mesh.position.set((Math.random()-0.5)*2, s, (Math.random()-0.5)*2); group.add(mesh); assembly3D.push(mesh);
 }
-function select3D(m){selected3D=m; document.getElementById('pSel').innerText=m.userData.type;}
-function updateP(){
-  if(!selected3D) return; const s=parseFloat(document.getElementById('pSize').value)*0.01; const c=document.getElementById('pCol').value;
-  document.getElementById('pSizeV').innerText=document.getElementById('pSize').value; selected3D.scale.set(s,s,s);
-  if(selected3D.material) selected3D.material.color.set(c);
-}
-function delP(){if(selected3D){group.remove(selected3D); selected3D=null; document.getElementById('pSel').innerText='None';}}
-function dupP(){if(selected3D){const clone=selected3D.clone(); clone.position.x+=0.5; group.add(clone); assembly3D.push(clone);}}
-function saveBlank(){alert('Design Saved! Bacche ne khud se banaya - '+kObjects.length+' shapes 2D + '+assembly3D.length+' parts 3D. PowerPoint jaisa blank se start kiya.');}
 
+// SHARE & DOWNLOAD - ADVANCE POWERPOINT FEATURE
+function downloadDesign(){
+  const canvas = mainMode==='kids'? document.getElementById('kCanvas') : document.getElementById('pCanvas2D');
+  const link=document.createElement('a'); link.download='My_Future_Design_'+Date.now()+'.png'; link.href=canvas.toDataURL(); link.click();
+}
+function downloadPDF(){
+  const {jsPDF}=window.jspdf; const doc=new jsPDF(); const canvas=mainMode==='kids'?document.getElementById('kCanvas'):document.getElementById('pCanvas2D');
+  const img=canvas.toDataURL('image/png'); doc.text('Create Your Future Design - My Helicopter / Aeroplane',10,10); doc.addImage(img,'PNG',10,20,180,100); doc.save('Future_Design_Blueprint.pdf');
+}
+async function shareDesign(){
+  const canvas=mainMode==='kids'?document.getElementById('kCanvas'):document.getElementById('pCanvas2D');
+  const dataUrl=canvas.toDataURL();
+  if(navigator.share){
+    try{
+      const blob=await (await fetch(dataUrl)).blob(); const file=new File([blob],'future_design.png',{type:'image/png'});
+      await navigator.share({title:'My Future Helicopter Design', text:'Dekho maine khud se helicopter/aeroplane design kiya! 🚁✈️ Create Curiosity - CLYXESS', files:[file]});
+    }catch(e){navigator.clipboard.writeText('Maine apna future design banaya! Helicopter/Aeroplane - CLYXESS Factory'); alert('Share link copied! Design ready to share.');}
+  } else {
+    navigator.clipboard.writeText(dataUrl); alert('Design copied! Ab WhatsApp/Instagram pe share kar sakte ho. Computer me Download button se save bhi kar sakte ho.');
+  }
+}
+function addSlidePro(){const url=p2d.toDataURL(); const bar=document.getElementById('pSlideBar'); bar.innerHTML+=`<img src="${url}" style="width:36px; height:22px; border:1px solid #333; border-radius:4px;">`;}
 setMain('kids'); setKA('5-7');
 </script></body></html>
     """
-    components.html(HTML, height=800, scrolling=False, key="blank_powerpoint_no_readymade_final_v12")      
+    components.html(HTML, height=820, scrolling=False, key="final_blank_ppt_advance_share_download_v16")    
     
 def render_kids_logic_lab():
     # ============================================================
