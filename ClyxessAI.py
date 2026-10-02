@@ -3831,280 +3831,185 @@ def render_art_machinedesign():
 .mini-btn{font-size:11px; font-weight:800; padding:6px 12px; border-radius:18px; border:1px solid #ffffff15; cursor:pointer;}
 .active-k{background:#ffcc00!important; color:black!important;}.active-p{background:#00ffff!important; color:black!important;}.active-i{background:#ff5c00!important; color:white!important;}
 .tool-icon{width:38px; height:38px; background:#1a1e36; border:1px solid #ffffff0f; border-radius:10px; display:flex; align-items:center; justify-content:center; cursor:pointer;}
-.tool-on{outline:2px solid #00ffff; background:#253055!important;}
-.kid-part{background:#1e2648; border:1px solid #ffffff12; padding:8px 4px; border-radius:10px; text-align:center; cursor:pointer; font-size:10px; line-height:12px; transition:0.15s;}
-.kid-part:hover{background:#2e3a6b; transform:scale(1.05); border-color:#00ffff;}
-.alpha-btn{background:#242a4d; border:1px solid #ffffff15; padding:8px 2px; border-radius:8px; font-size:13px; font-weight:800; cursor:pointer; text-align:center; user-select:none;}
-.alpha-btn:hover{background:#ffcc00; color:black; transform:scale(1.08);}
-.alpha-num{color:#00ffff;}.alpha-spec{color:#ff5c9e;}
-#blockModal,#proBlockModal{position:fixed; inset:0; background:#000000d9; backdrop-filter:blur(8px); z-index:99999; display:none; align-items:center; justify-content:center;}
-.modal-box{background:#13162c; border:1px solid #ffffff25; border-radius:18px; width:840px; max-height:92vh; display:flex; flex-direction:column; overflow:hidden;}
-.block-item{background:#1e2648; border:1px solid #ffffff12; border-radius:12px; padding:10px 4px; text-align:center; cursor:pointer; font-size:9px;}
-.block-item:hover{background:#2e3a6b; border-color:#ff5c00;}
+.kid-part{background:#1e2648; border:1px solid #ffffff12; padding:6px 4px; border-radius:10px; text-align:center; cursor:pointer; font-size:10px;}
+.alpha-btn{background:#242a4d; border:1px solid #ffffff15; padding:6px 2px; border-radius:8px; font-size:12px; font-weight:800; cursor:pointer; text-align:center;}
+#blockModal,#proBlockModal{position:fixed; inset:0; background:#000000d9; z-index:99999; display:none; align-items:center; justify-content:center;}
+.modal-box{background:#13162c; border-radius:18px; width:840px; max-height:92vh; display:flex; flex-direction:column; overflow:hidden;}
+.block-item{background:#1e2648; border-radius:12px; padding:10px 4px; text-align:center; cursor:pointer; font-size:9px;}
 .pro-panel{background:#1a1e36; border-radius:12px; padding:8px; border:1px solid #ffffff10; margin-bottom:6px;}
 .label{font-size:9px; color:#aaa; display:flex; justify-content:space-between; margin-top:5px;}
 .slider{width:100%; height:6px;}
+.sim-btn{background:linear-gradient(90deg,#00ffff,#00ff88); color:black; font-weight:900; padding:10px; border-radius:12px; width:100%; border:none; cursor:pointer; font-size:12px; animation: pulse 1.5s infinite;}
+@keyframes pulse{0%{transform:scale(1);}50%{transform:scale(1.03);}100%{transform:scale(1);}}
 </style>
 </head>
 <body class="h-screen flex flex-col text-white">
-
-<div class="topbar">
-  <div class="flex items-center gap-3"><div style="width:26px; height:26px; background:#ffcc00; color:black; border-radius:8px; display:flex; align-items:center; justify-content:center; font-weight:900;">C</div><div><div style="font-size:12px; font-weight:900;">🚁 FINAL - ABCD 123 Special Complete + Side Blocks Working + Pro Industrial Fix</div><div style="font-size:8.5px; color:#8e94ab;">Koi kaam nahi bigada - Sab complete</div></div></div>
-  <div class="flex items-center gap-2"><button id="btnKids" onclick="setMain('kids')" class="mini-btn active-k">👶 KIDS</button><button id="btnPro" onclick="setMain('pro')" class="mini-btn bg-[#1e2238] text-white">🚀 PRO</button><button id="btnInd" onclick="setMain('industrial')" class="mini-btn bg-[#1e2238] text-white">🏭 INDUSTRIAL</button><button onclick="clearAll()" class="mini-btn bg-[#2a2a2a] text-white">Clear</button></div>
-</div>
-
+<div class="topbar"><div style="font-size:12px; font-weight:900;">🚁 FINAL - Simulation Added in PRO + INDUSTRIAL - Click pe Udega Ghumega</div><div class="flex gap-2"><button id="btnKids" onclick="setMain('kids')" class="mini-btn active-k">KIDS</button><button id="btnPro" onclick="setMain('pro')" class="mini-btn bg-[#1e2238] text-white">PRO</button><button id="btnInd" onclick="setMain('industrial')" class="mini-btn bg-[#1e2238] text-white">INDUSTRIAL</button></div></div>
 <div class="flex-1 flex overflow-hidden">
 
-  <!-- KIDS - COMPLETE FIX -->
-  <div id="kidsUI" style="display:flex; width:100%; height:100%;">
-    <div style="width:54px; background:#15182e; border-right:1px solid #ffffff0f; display:flex; flex-direction:column; align-items:center; gap:8px; padding:10px 0;">
-      <div id="kSelect" onclick="setKidTool('select')" class="tool-icon tool-on" title="Select & Drag">🖱️</div><div id="kPen" onclick="setKidTool('pen')" class="tool-icon">✏️</div><div onclick="deleteKid()" class="tool-icon" style="background:#3a1a1a;">🗑️</div>
-    </div>
+<!-- KIDS -->
+<div id="kidsUI" style="display:flex; width:100%; height:100%;">
+<div style="width:280px; background:#12162a; padding:8px; overflow-y:auto; display:flex; flex-direction:column; gap:8px;">
+<div style="background:#1a1e36; border-radius:12px; padding:7px; border:2px solid #ffcc0060;">
+<div style="font-size:11px; font-weight:800; color:#ffcc00;">ABCD + 123 + Special Complete</div>
+<div style="display:grid; grid-template-columns:repeat(6,1fr); gap:4px; margin-top:6px;">
+<div onclick="addAlpha('A')" class="alpha-btn">A</div><div onclick="addAlpha('B')" class="alpha-btn">B</div><div onclick="addAlpha('C')" class="alpha-btn">C</div><div onclick="addAlpha('D')" class="alpha-btn">D</div><div onclick="addAlpha('E')" class="alpha-btn">E</div><div onclick="addAlpha('F')" class="alpha-btn">F</div>
+<div onclick="addAlpha('G')" class="alpha-btn">G</div><div onclick="addAlpha('H')" class="alpha-btn">H</div><div onclick="addAlpha('I')" class="alpha-btn">I</div><div onclick="addAlpha('J')" class="alpha-btn">J</div><div onclick="addAlpha('K')" class="alpha-btn">K</div><div onclick="addAlpha('L')" class="alpha-btn">L</div>
+<div onclick="addAlpha('M')" class="alpha-btn">M</div><div onclick="addAlpha('N')" class="alpha-btn">N</div><div onclick="addAlpha('O')" class="alpha-btn">O</div><div onclick="addAlpha('P')" class="alpha-btn">P</div><div onclick="addAlpha('Q')" class="alpha-btn">Q</div><div onclick="addAlpha('R')" class="alpha-btn">R</div>
+<div onclick="addAlpha('S')" class="alpha-btn">S</div><div onclick="addAlpha('T')" class="alpha-btn">T</div><div onclick="addAlpha('U')" class="alpha-btn">U</div><div onclick="addAlpha('V')" class="alpha-btn">V</div><div onclick="addAlpha('W')" class="alpha-btn">W</div><div onclick="addAlpha('X')" class="alpha-btn">X</div>
+<div onclick="addAlpha('Y')" class="alpha-btn">Y</div><div onclick="addAlpha('Z')" class="alpha-btn">Z</div>
+<div onclick="addAlpha('0')" class="alpha-btn" style="color:#00ffff;">0</div><div onclick="addAlpha('1')" class="alpha-btn" style="color:#00ffff;">1</div><div onclick="addAlpha('2')" class="alpha-btn" style="color:#00ffff;">2</div><div onclick="addAlpha('3')" class="alpha-btn" style="color:#00ffff;">3</div><div onclick="addAlpha('4')" class="alpha-btn" style="color:#00ffff;">4</div><div onclick="addAlpha('5')" class="alpha-btn" style="color:#00ffff;">5</div><div onclick="addAlpha('6')" class="alpha-btn" style="color:#00ffff;">6</div><div onclick="addAlpha('7')" class="alpha-btn" style="color:#00ffff;">7</div><div onclick="addAlpha('8')" class="alpha-btn" style="color:#00ffff;">8</div><div onclick="addAlpha('9')" class="alpha-btn" style="color:#00ffff;">9</div>
+<div onclick="addAlpha('!')" class="alpha-btn" style="color:#ff5c9e;">!</div><div onclick="addAlpha('@')" class="alpha-btn" style="color:#ff5c9e;">@</div><div onclick="addAlpha('#')" class="alpha-btn" style="color:#ff5c9e;">#</div><div onclick="addAlpha('$')" class="alpha-btn" style="color:#ff5c9e;">$</div><div onclick="addAlpha('%')" class="alpha-btn" style="color:#ff5c9e;">%</div><div onclick="addAlpha('^')" class="alpha-btn" style="color:#ff5c9e;">^</div>
+<div onclick="addAlpha('&')" class="alpha-btn" style="color:#ff5c9e;">&</div><div onclick="addAlpha('*')" class="alpha-btn" style="color:#ff5c9e;">*</div><div onclick="addAlpha('(')" class="alpha-btn" style="color:#ff5c9e;">(</div><div onclick="addAlpha(')')" class="alpha-btn" style="color:#ff5c9e;">)</div><div onclick="addAlpha('+')" class="alpha-btn" style="color:#ff5c9e;">+</div><div onclick="addAlpha('-')" class="alpha-btn" style="color:#ff5c9e;">-</div>
+<div onclick="addAlpha('=')" class="alpha-btn" style="color:#ff5c9e;">=</div><div onclick="addAlpha('/')" class="alpha-btn" style="color:#ff5c9e;">/</div><div onclick="addAlpha('?')" class="alpha-btn" style="color:#ff5c9e;">?</div>
+</div></div>
+<div style="background:#1a1e36; border-radius:12px; padding:7px; border:2px solid #00ffff60;"><div style="font-size:10px; color:#00ffff; font-weight:800;">CHINA SPACE TECH</div><div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-top:6px;"><div onclick="addKidPart('wing')" class="kid-part">🪽 Wing</div><div onclick="addKidPart('propeller')" class="kid-part">🌀 Prop</div><div onclick="addKidPart('rocket')" class="kid-part">🚀 Rocket</div><div onclick="addKidPart('satellite')" class="kid-part">🛰️ Satellite</div><div onclick="addKidPart('naca')" class="kid-part">📈 NACA</div><div onclick="addKidPart('solar')" class="kid-part">🔋 Solar</div></div><button onclick="startSim()" class="mini-btn" style="width:100%; background:#00ffff; color:black; margin-top:6px; font-weight:900;">▶️ Fly Simulation</button></div>
+</div><div style="flex:1; background:#e9e9ef; padding:6px; display:flex; flex-direction:column;"><canvas id="kCanvas" width="1300" height="750" style="flex:1; background:white; border-radius:8px;"></canvas></div></div>
 
-    <div style="width:280px; background:#12162a; border-right:1px solid #ffffff0f; padding:8px; overflow-y:auto; display:flex; flex-direction:column; gap:10px;">
-      <!-- COMPLETE ABCD 123 SPECIAL -->
-      <div style="background:#1a1e36; border-radius:12px; padding:8px; border:1px solid #ffcc0030;">
-        <div style="font-size:11px; font-weight:800; color:#ffcc00;">🔤 ABCD + 123 + Special - COMPLETE FIXED</div>
-        <div style="font-size:8px; color:#aaa; margin-top:2px;">A-Z pura 26 + 0-9 pura 10 + Special 20 - Sab kaam karega</div>
+<!-- PRO WITH SIMULATION -->
+<div id="proUI" style="display:none; width:100%; height:100%;">
+<div style="width:56px; background:#111326; display:flex; flex-direction:column; align-items:center; padding:10px 0; gap:6px;"><div onclick="addProBlock('box')" class="tool-icon">🧱</div><div onclick="addProBlock('cyl')" class="tool-icon">🛢️</div><div onclick="addProBlock('sphere')" class="tool-icon">⚪</div><div onclick="addProBlock('wing')" class="tool-icon">🪽</div><div onclick="addProBlock('rotor')" class="tool-icon">🌀</div><div onclick="addProBlock('rocket_body')" class="tool-icon">🚀</div><div onclick="openProLibrary()" class="tool-icon" style="background:#ff5c00;">+50</div><div onclick="cutPro()" class="tool-icon" style="background:#ff0040;">✂️</div><div onclick="deletePro()" class="tool-icon" style="background:#3a1a1a;">🗑️</div></div>
+<div style="flex:1; background:#05070a; display:flex; flex-direction:column; padding:6px;"><div style="display:flex; justify-content:space-between; align-items:center;"><div style="font-size:10px; color:#00ffff;">🚀 PRO - Simulation Added</div><div style="font-size:9px;">Selected: <span id="proSelInfo" style="color:#00ffff; font-weight:800;">None</span></div></div><div id="threePro" style="flex:1; border-radius:10px; border:1px solid #00ffff15;"></div><div style="display:flex; gap:6px; margin-top:6px;"><button onclick="simulatePro()" class="sim-btn" style="flex:1;">▶️ SIMULATE PROJECT - Click pe Udega + Ghumega</button><button onclick="stopProSim()" class="mini-btn" style="background:#3a1a1a; color:white; padding:10px;">⏹️ Stop</button></div><div style="background:#000000cc; padding:4px; font-size:9px; color:#00ffff; text-align:center; margin-top:4px;">CLICK=Select | DRAG=Pakad ke le jao + Attach | SIMULATE=Project work karega</div></div>
+<div style="width:300px; background:#15182e; padding:8px; overflow-y:auto; display:flex; flex-direction:column; gap:6px;">
+<b style="font-size:11px; color:#00ffff;">PRO - SELECT CUT COLOR MOVED + SIM</b>
+<div class="pro-panel" style="border:2px solid #00ffff60;"><div style="font-size:10px; color:#00ffff; font-weight:800;">SELECT AND COLOR</div><input id="pCol" type="color" value="#ffcc00" style="width:100%; height:30px; margin-top:4px;" oninput="updateProColor()"><div style="display:grid; grid-template-columns:repeat(5,1fr); gap:4px; margin-top:4px;"><div onclick="setProColor('#ff0000')" style="height:20px; background:red; border-radius:4px; cursor:pointer;"></div><div onclick="setProColor('#00ff00')" style="height:20px; background:green; border-radius:4px; cursor:pointer;"></div><div onclick="setProColor('#0000ff')" style="height:20px; background:blue; border-radius:4px; cursor:pointer;"></div><div onclick="setProColor('#ffcc00')" style="height:20px; background:#ffcc00; border-radius:4px; cursor:pointer;"></div><div onclick="setProColor('#ffffff')" style="height:20px; background:white; border-radius:4px; cursor:pointer;"></div></div></div>
+<div class="pro-panel" style="border:2px solid #ff004060;"><div style="font-size:10px; color:#ff4d4d; font-weight:800;">SELECT CUT</div><div style="display:grid; grid-template-columns:1fr 1fr; gap:4px; margin-top:4px;"><button onclick="cutPro()" class="mini-btn" style="background:#ff0040; color:white;">✂️ CUT</button><button onclick="deletePro()" class="mini-btn" style="background:#3a1a1a; color:white;">DELETE</button></div></div>
+<div class="pro-panel" style="border:2px solid #22ff66a0;"><div style="font-size:10px; color:#22ff66; font-weight:800;">SELECT MOVED + ATTACH</div><div class="label">Move X <span id="pmxVal">0</span></div><input id="pMoveX" type="range" min="-10" max="10" step="0.1" value="0" class="slider" oninput="updateProMove()"><div class="label">Move Y <span id="pmyVal">0.8</span></div><input id="pMoveY" type="range" min="-5" max="10" step="0.1" value="0.8" class="slider" oninput="updateProMove()"><div class="label">Move Z <span id="pmzVal">0</span></div><input id="pMoveZ" type="range" min="-10" max="10" step="0.1" value="0" class="slider" oninput="updateProMove()"><label style="font-size:10px; display:flex; gap:4px; margin-top:4px;"><input type="checkbox" id="proSnap" checked> Snap Attach</label></div>
+<div class="pro-panel"><div style="font-size:10px; font-weight:800;">SIZE & ROTATE</div><div class="label">Scale <span id="pSizeVal">1.0</span></div><input id="pSize" type="range" min="0.2" max="4" step="0.1" value="1" class="slider" oninput="updateProScale()"><div class="label">Rotate Y <span id="pryVal">0°</span></div><input id="pRotY" type="range" min="0" max="360" step="5" value="0" class="slider" oninput="updateProRot()"></div>
+<div style="background:#00ffff15; border:1px solid #00ffff40; border-radius:10px; padding:8px; font-size:9px;"><b style="color:#00ffff;">🚀 SIMULATION:</b><br>• Propeller/Rotor tez ghumega<br>• Rocket upar udega<br>• Wing hillega<br>• Pura project ghumega</div>
+</div></div>
 
-        <div style="font-size:9px; color:#aaa; margin:8px 0 4px 0;">ALPHABET A-Z COMPLETE</div>
-        <div style="display:grid; grid-template-columns:repeat(6,1fr); gap:4px;">
-          <div onclick="addAlpha('A')" class="alpha-btn">A</div><div onclick="addAlpha('B')" class="alpha-btn">B</div><div onclick="addAlpha('C')" class="alpha-btn">C</div><div onclick="addAlpha('D')" class="alpha-btn">D</div><div onclick="addAlpha('E')" class="alpha-btn">E</div><div onclick="addAlpha('F')" class="alpha-btn">F</div>
-          <div onclick="addAlpha('G')" class="alpha-btn">G</div><div onclick="addAlpha('H')" class="alpha-btn">H</div><div onclick="addAlpha('I')" class="alpha-btn">I</div><div onclick="addAlpha('J')" class="alpha-btn">J</div><div onclick="addAlpha('K')" class="alpha-btn">K</div><div onclick="addAlpha('L')" class="alpha-btn">L</div>
-          <div onclick="addAlpha('M')" class="alpha-btn">M</div><div onclick="addAlpha('N')" class="alpha-btn">N</div><div onclick="addAlpha('O')" class="alpha-btn">O</div><div onclick="addAlpha('P')" class="alpha-btn">P</div><div onclick="addAlpha('Q')" class="alpha-btn">Q</div><div onclick="addAlpha('R')" class="alpha-btn">R</div>
-          <div onclick="addAlpha('S')" class="alpha-btn">S</div><div onclick="addAlpha('T')" class="alpha-btn">T</div><div onclick="addAlpha('U')" class="alpha-btn">U</div><div onclick="addAlpha('V')" class="alpha-btn">V</div><div onclick="addAlpha('W')" class="alpha-btn">W</div><div onclick="addAlpha('X')" class="alpha-btn">X</div>
-          <div onclick="addAlpha('Y')" class="alpha-btn">Y</div><div onclick="addAlpha('Z')" class="alpha-btn">Z</div>
-          <div onclick="addAlpha('a')" class="alpha-btn" style="font-size:10px; color:#888;">a</div><div onclick="addAlpha('b')" class="alpha-btn" style="font-size:10px; color:#888;">b</div><div onclick="addAlpha('c')" class="alpha-btn" style="font-size:10px; color:#888;">c</div><div onclick="addAlpha('d')" class="alpha-btn" style="font-size:10px; color:#888;">d</div>
-        </div>
-
-        <div style="font-size:9px; color:#00ffff; margin:8px 0 4px 0; font-weight:700;">NUMBERS 0-9 COMPLETE - Pehle 0-5 hi tha</div>
-        <div style="display:grid; grid-template-columns:repeat(5,1fr); gap:4px;">
-          <div onclick="addAlpha('0')" class="alpha-btn alpha-num">0</div><div onclick="addAlpha('1')" class="alpha-btn alpha-num">1</div><div onclick="addAlpha('2')" class="alpha-btn alpha-num">2</div><div onclick="addAlpha('3')" class="alpha-btn alpha-num">3</div><div onclick="addAlpha('4')" class="alpha-btn alpha-num">4</div>
-          <div onclick="addAlpha('5')" class="alpha-btn alpha-num">5</div><div onclick="addAlpha('6')" class="alpha-btn alpha-num">6</div><div onclick="addAlpha('7')" class="alpha-btn alpha-num">7</div><div onclick="addAlpha('8')" class="alpha-btn alpha-num">8</div><div onclick="addAlpha('9')" class="alpha-btn alpha-num">9</div>
-          <div onclick="addAlpha('10')" class="alpha-btn alpha-num">10</div><div onclick="addAlpha('100')" class="alpha-btn alpha-num">100</div>
-        </div>
-
-        <div style="font-size:9px; color:#ff5c9e; margin:8px 0 4px 0; font-weight:700;">SPECIAL 20 COMPLETE - Pehle! @ # $ hi tha</div>
-        <div style="display:grid; grid-template-columns:repeat(5,1fr); gap:4px;">
-          <div onclick="addAlpha('!')" class="alpha-btn alpha-spec">!</div><div onclick="addAlpha('@')" class="alpha-btn alpha-spec">@</div><div onclick="addAlpha('#')" class="alpha-btn alpha-spec">#</div><div onclick="addAlpha('$')" class="alpha-btn alpha-spec">$</div><div onclick="addAlpha('%')" class="alpha-btn alpha-spec">%</div>
-          <div onclick="addAlpha('^')" class="alpha-btn alpha-spec">^</div><div onclick="addAlpha('&')" class="alpha-btn alpha-spec">&</div><div onclick="addAlpha('*')" class="alpha-btn alpha-spec">*</div><div onclick="addAlpha('(')" class="alpha-btn alpha-spec">(</div><div onclick="addAlpha(')')" class="alpha-btn alpha-spec">)</div>
-          <div onclick="addAlpha('+')" class="alpha-btn alpha-spec">+</div><div onclick="addAlpha('-')" class="alpha-btn alpha-spec">-</div><div onclick="addAlpha('=')" class="alpha-btn alpha-spec">=</div><div onclick="addAlpha('{')" class="alpha-btn alpha-spec">{</div><div onclick="addAlpha('}')" class="alpha-btn alpha-spec">}</div>
-          <div onclick="addAlpha('[')" class="alpha-btn alpha-spec">[</div><div onclick="addAlpha(']')" class="alpha-btn alpha-spec">]</div><div onclick="addAlpha(':')" class="alpha-btn alpha-spec">:</div><div onclick="addAlpha('?')" class="alpha-btn alpha-spec">?</div><div onclick="addAlpha('/')" class="alpha-btn alpha-spec">/</div>
-        </div>
-      </div>
-
-      <!-- SIDE BLOCKS - WORKING FIX -->
-      <div style="background:#1a1e36; border-radius:12px; padding:8px; border:1px solid #00ffff30;">
-        <div style="font-size:11px; font-weight:800; color:#00ffff;">🇨🇳 CHINA SPACE TECH - WORKING FIX</div>
-        <div style="font-size:8px; color:#aaa; margin-bottom:6px;">Photo me jo hai - Sab kaam karega, click karo to ayega</div>
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px;">
-          <div onclick="addKidPart('wing')" class="kid-part" style="border:2px solid #22ff66;">🪽<br>Wing<br><span style="font-size:8px;">Lift</span></div>
-          <div onclick="addKidPart('prop')" class="kid-part" style="border:2px solid #00ffff;">🌀<br>Prop<br><span style="font-size:8px;">Thrust</span></div>
-          <div onclick="addKidPart('rocket')" class="kid-part" style="border:2px solid #ffaa00;">🚀<br>Rocket<br><span style="font-size:8px;">Space</span></div>
-          <div onclick="addKidPart('satellite')" class="kid-part" style="border:2px solid #7ec8ff;">🛰️<br>Satellite<br><span style="font-size:8px;">Orbit</span></div>
-          <div onclick="addKidPart('naca')" class="kid-part" style="border:2px solid #22ff66;">📈<br>NACA<br><span style="font-size:8px;">Airfoil</span></div>
-          <div onclick="addKidPart('solar')" class="kid-part" style="border:2px solid #ffcc00;">🔋<br>Solar<br><span style="font-size:8px;">Power</span></div>
-        </div>
-        <button onclick="startSim()" class="mini-btn" style="width:100%; background:#00ffff; color:black; margin-top:8px; font-weight:900; padding:10px; border-radius:10px;">▶️ Fly Simulation<br><span style="font-size:8px;">Click to Fly - Working</span></button>
-        <div style="font-size:8px; color:#888; margin-top:4px; text-align:center;">✅ Fix: Side blocks ab kaam karenge, click pe canvas pe ayenge</div>
-      </div>
-
-      <div style="display:grid; grid-template-columns:1fr 1fr; gap:4px; margin-top:auto;"><button onclick="rotateKid()" class="mini-btn bg-[#242a4d] text-white">↻ Rotate</button><button onclick="duplicateKid()" class="mini-btn bg-[#242a4d] text-white">Duplicate</button><button onclick="deleteKid()" class="mini-btn bg-[#3a1a1a] text-white">Delete</button><button onclick="clearK()" class="mini-btn bg-[#3a1a1a] text-white">Clear</button></div>
-    </div>
-
-    <div style="flex:1; background:#e9e9ef; padding:6px; display:flex; flex-direction:column;"><div style="font-size:10px; color:#333; font-weight:800;">KIDS - ABCD 123 Special Complete + Side Blocks Working - Final</div><canvas id="kCanvas" width="1300" height="750" style="flex:1; width:100%; background:white; border-radius:8px; margin-top:4px; cursor:move;"></canvas></div>
-  </div>
-
-  <!-- PRO - FIXED SELECT CUT COLOR MOVED + 50 BLOCKS -->
-  <div id="proUI" style="display:none; width:100%; height:100%;">
-    <div style="width:56px; background:#111326; border-right:1px solid #ffffff0f; display:flex; flex-direction:column; align-items:center; gap:8px; padding:10px 0;">
-      <div onclick="addProBlock('box')" class="tool-icon">🧱</div><div onclick="addProBlock('cyl')" class="tool-icon">🛢️</div><div onclick="addProBlock('sphere')" class="tool-icon">⚪</div><div onclick="openProLibrary()" class="tool-icon" style="background:#ff5c00; color:white; font-weight:900;">+50</div><div onclick="cutPro()" class="tool-icon" style="background:#ff0040; color:white;" title="Select Cut">✂️</div><div onclick="deletePro()" class="tool-icon" style="background:#3a1a1a;">🗑️</div>
-    </div>
-    <div style="flex:1; background:#05070a; position:relative; display:flex; flex-direction:column; padding:6px;"><div style="font-size:10px; color:#00ffff; font-weight:700;">🚀 PRO - Select Cut Color Moved Fixed + 50 Blocks</div><div id="threePro" style="flex:1; width:100%; border-radius:10px;"></div></div>
-    <div style="width:300px; background:#15182e; border-left:1px solid #ffffff0f; padding:8px; overflow-y:auto; display:flex; flex-direction:column; gap:6px;">
-      <b style="font-size:12px; color:#00ffff;">PRO EDITOR - 50+ BLOCKS + 50 FUNCTIONS</b>
-      <div style="border:2px solid #00ffff; background:#00ffff15; padding:4px; border-radius:8px; font-size:10px;">Selected: <span id="proSelInfo" style="color:#00ffff; font-weight:800;">None</span></div>
-      <button onclick="openProLibrary()" class="mini-btn" style="width:100%; background:#00ffff; color:black; font-weight:900; padding:10px; border-radius:12px;">+60 Extra Blocks Library</button>
-      <div class="pro-panel" style="border:2px solid #00ffff60;"><div style="font-size:11px; font-weight:800; color:#00ffff;">✅ SELECT AND COLOR</div><input id="pCol" type="color" value="#ffcc00" style="width:100%; height:32px; border-radius:8px; border:2px solid #00ffff;" oninput="updateProColor()"><div style="display:grid; grid-template-columns:repeat(5,1fr); gap:4px; margin-top:6px;"><div onclick="setProColor('#ff0000')" style="height:24px; background:red; border-radius:6px; cursor:pointer;"></div><div onclick="setProColor('#00ff00')" style="height:24px; background:#00ff00; border-radius:6px; cursor:pointer;"></div><div onclick="setProColor('#0000ff')" style="height:24px; background:blue; border-radius:6px; cursor:pointer;"></div><div onclick="setProColor('#ffcc00')" style="height:24px; background:#ffcc00; border-radius:6px; cursor:pointer;"></div><div onclick="setProColor('#ffffff')" style="height:24px; background:white; border-radius:6px; cursor:pointer;"></div></div></div>
-      <div class="pro-panel" style="border:2px solid #ff004060;"><div style="font-size:11px; font-weight:800; color:#ff4d4d;">✅ SELECT CUT</div><div style="display:grid; grid-template-columns:1fr 1fr; gap:6px;"><button onclick="cutPro()" class="mini-btn" style="background:#ff0040; color:white; font-weight:900;">✂️ CUT</button><button onclick="cutProHole()" class="mini-btn" style="background:#ff5c00; color:white;">⭕ HOLE</button><button onclick="deletePro()" class="mini-btn bg-[#3a1a1a] text-white">Delete</button><button onclick="duplicatePro()" class="mini-btn bg-[#242a4d] text-white">Duplicate</button></div></div>
-      <div class="pro-panel" style="border:2px solid #22ff66a0;"><div style="font-size:11px; font-weight:800; color:#22ff66;">✅ SELECT MOVED</div><div class="label">Move X <span id="pmxVal">0</span></div><input id="pMoveX" type="range" min="-10" max="10" step="0.1" value="0" class="slider" oninput="updateProMove()"><div class="label">Move Y <span id="pmyVal">0.8</span></div><input id="pMoveY" type="range" min="-5" max="10" step="0.1" value="0.8" class="slider" oninput="updateProMove()"><div class="label">Rotate Y <span id="pryVal">0°</span></div><input id="pRotY" type="range" min="0" max="360" step="5" value="0" class="slider" oninput="updateProRot()"><div class="label">Scale <span id="pSizeVal">1.0</span></div><input id="pSize" type="range" min="0.2" max="4" step="0.1" value="1" class="slider" oninput="updateProScale()"><label style="display:flex; align-items:center; gap:6px; font-size:10px; margin-top:6px;"><input type="checkbox" id="proSnap" checked> Snap - Dusre pe judega</label></div>
-      <button onclick="clearPro()" class="mini-btn bg-[#3a1a1a] text-white">Clear All</button>
-    </div>
-  </div>
-
-  <!-- INDUSTRIAL - FIXED -->
-  <div id="industrialUI" style="display:none; width:100%; height:100%; flex-direction:column;">
-    <div style="flex:1; display:flex; overflow:hidden;">
-      <div style="width:200px; background:#0f1220; border-right:1px solid #ffffff10; padding:8px; font-size:10px;"><b style="color:#ff5c00;">BROWSER</b><div id="bodyList" style="color:#aaa; margin-top:6px;"></div><div style="border:2px solid #00ffff; background:#00ffff15; padding:4px; border-radius:8px; margin-top:8px;">Selected: <span id="selInfo" style="color:#00ffff; font-weight:800;">None</span></div></div>
-      <div style="flex:1; background:#06080f; position:relative;"><div id="threeInd" style="width:100%; height:100%;"></div></div>
-      <div style="width:310px; background:#15182e; border-left:1px solid #ffffff0f; padding:8px; overflow-y:auto; display:flex; flex-direction:column; gap:6px;">
-        <b style="font-size:12px; color:#ff5c00;">INDUSTRIAL - 50+ OPTIONS - FIXED</b>
-        <div class="pro-panel"><button onclick="openBlockLibrary()" class="mini-btn" style="width:100%; background:#ff5c00; color:white; font-weight:900; padding:12px; border-radius:12px;">+ Add Base Block - 60+ Blocks</button></div>
-        <div class="pro-panel" style="border:2px solid #00ffff60;"><div style="font-size:11px; font-weight:800; color:#00ffff;">✅ SELECT AND COLOR</div><input id="iCol" type="color" value="#c0c0c0" style="width:100%; height:32px; border-radius:8px; border:2px solid #00ffff;" oninput="updateIndColor()"><div style="display:grid; grid-template-columns:repeat(5,1fr); gap:4px; margin-top:6px;"><div onclick="setIndColor('#ff0000')" style="height:22px; background:red; border-radius:6px; cursor:pointer;"></div><div onclick="setIndColor('#00ff00')" style="height:22px; background:#00ff00; border-radius:6px; cursor:pointer;"></div><div onclick="setIndColor('#0000ff')" style="height:22px; background:blue; border-radius:6px; cursor:pointer;"></div><div onclick="setIndColor('#ffcc00')" style="height:22px; background:#ffcc00; border-radius:6px; cursor:pointer;"></div><div onclick="setIndColor('#c0c0c0')" style="height:22px; background:#c0c0c0; border-radius:6px; cursor:pointer;"></div></div></div>
-        <div class="pro-panel" style="border:2px solid #ff004060;"><div style="font-size:11px; font-weight:800; color:#ff4d4d;">✅ SELECT CUT</div><div style="display:grid; grid-template-columns:1fr 1fr; gap:6px;"><button onclick="cutInd()" class="mini-btn" style="background:#ff0040; color:white; font-weight:900;">✂️ CUT</button><button onclick="cutIndHole()" class="mini-btn" style="background:#ff5c00; color:white;">⭕ HOLE</button><button onclick="deleteInd()" class="mini-btn bg-[#3a1a1a] text-white">Delete</button><button onclick="duplicateInd()" class="mini-btn bg-[#242a4d] text-white">Duplicate</button></div></div>
-        <div class="pro-panel" style="border:2px solid #22ff66a0;"><div style="font-size:11px; font-weight:800; color:#22ff66;">✅ SELECT MOVED + 50 OPTIONS</div><div class="label">Move X <span id="imxVal">0</span></div><input id="iMoveX" type="range" min="-10" max="10" step="0.1" value="0" class="slider" oninput="applyIndMove()"><div class="label">Move Y <span id="imyVal">0.8</span></div><input id="iMoveY" type="range" min="-5" max="10" step="0.1" value="0.8" class="slider" oninput="applyIndMove()"><div class="label">Rotate Y <span id="iryVal">0°</span></div><input id="iRotY" type="range" min="0" max="360" step="5" value="0" class="slider" oninput="applyIndRot()"><div class="label">Scale <span id="isxVal">1.0</span></div><input id="iScaleX" type="range" min="0.1" max="5" step="0.1" value="1" class="slider" oninput="applyIndScale()"><label style="display:flex; align-items:center; gap:6px; font-size:10px; margin-top:6px;"><input type="checkbox" id="snapOn" checked> Snap - Dusre pe judega</label></div>
-        <button onclick="clearInd()" class="mini-btn bg-[#3a1a1a] text-white">Clear All Bodies</button>
-      </div>
-    </div>
-  </div>
+<!-- INDUSTRIAL WITH SIMULATION -->
+<div id="industrialUI" style="display:none; width:100%; height:100%; flex-direction:column;">
+<div style="height:40px; background:#1a1e36; display:flex; align-items:center; gap:6px; padding:0 10px;">
+<span style="font-size:9px; color:#888;">TOOLS:</span>
+<button class="mini-btn" style="background:#00ffff; color:black; font-weight:900;" onclick="simulateInd()">▶️ SIMULATE PROJECT - Udega Ghumega</button>
+<button class="mini-btn" style="background:#3a1a1a; color:white;" onclick="stopIndSim()">⏹️ Stop</button>
+<button class="mini-btn bg-[#242a4d] text-white" onclick="analyzeInd()">📊 Analyze</button>
+<span style="margin-left:auto; font-size:10px; color:#ff5c00;">Selected: <span id="selInfo" style="color:#00ffff;">None</span></span>
+</div>
+<div style="flex:1; display:flex; overflow:hidden;">
+<div style="width:180px; background:#0f1220; padding:8px; font-size:10px;"><div>📦 Bodies (<span id="bodyCount">0</span>)</div><div id="bodyList" style="color:#aaa; margin-top:4px;"></div><div id="simStatus" style="margin-top:10px; padding:6px; background:#00ffff15; border-radius:8px; border:1px solid #00ffff30; font-size:9px; color:#00ffff;">Status: Ready - Simulate dabao</div></div>
+<div style="flex:1; background:#06080f; position:relative;"><div id="threeInd" style="width:100%; height:100%;"></div><div style="position:absolute; bottom:10px; left:12px; background:#000000cc; padding:6px 12px; border-radius:20px; font-size:9px; color:#00ffff;">CLICK=Select | DRAG=Pakad ke Attach | SIMULATE=Project work karega - Ghumega Udega</div></div>
+<div style="width:300px; background:#15182e; padding:8px; overflow-y:auto; display:flex; flex-direction:column; gap:6px;">
+<b style="font-size:11px; color:#ff5c00;">INDUSTRIAL - SELECT CUT COLOR MOVED + SIMULATION</b>
+<button onclick="openBlockLibrary()" class="mini-btn" style="width:100%; background:#ff5c00; color:white; padding:10px; font-weight:900;">+ Add Block 60+</button>
+<button onclick="simulateInd()" class="sim-btn">▶️ SIMULATE - Project Work Karega</button>
+<div class="pro-panel" style="border:2px solid #00ffff60;"><div style="font-size:10px; color:#00ffff; font-weight:800;">SELECT AND COLOR</div><input id="iCol" type="color" value="#c0c0c0" style="width:100%; height:30px; margin-top:4px;" oninput="updateIndColor()"><div style="display:grid; grid-template-columns:repeat(5,1fr); gap:4px; margin-top:4px;"><div onclick="setIndColor('#ff0000')" style="height:20px; background:red; border-radius:4px; cursor:pointer;"></div><div onclick="setIndColor('#00ff00')" style="height:20px; background:green; border-radius:4px; cursor:pointer;"></div><div onclick="setIndColor('#0000ff')" style="height:20px; background:blue; border-radius:4px; cursor:pointer;"></div><div onclick="setIndColor('#ffcc00')" style="height:20px; background:#ffcc00; border-radius:4px; cursor:pointer;"></div><div onclick="setIndColor('#c0c0c0')" style="height:20px; background:#c0c0c0; border-radius:4px; cursor:pointer;"></div></div></div>
+<div class="pro-panel" style="border:2px solid #ff004060;"><div style="font-size:10px; color:#ff4d4d; font-weight:800;">SELECT CUT</div><div style="display:grid; grid-template-columns:1fr 1fr; gap:4px;"><button onclick="cutInd()" class="mini-btn" style="background:#ff0040; color:white;">✂️ CUT</button><button onclick="deleteInd()" class="mini-btn" style="background:#3a1a1a; color:white;">DELETE</button></div></div>
+<div class="pro-panel" style="border:2px solid #22ff66a0;"><div style="font-size:10px; color:#22ff66; font-weight:800;">SELECT MOVED + ATTACH</div><div class="label">Move X <span id="imxVal">0</span></div><input id="iMoveX" type="range" min="-10" max="10" step="0.1" value="0" class="slider" oninput="applyIndMove()"><div class="label">Move Y <span id="imyVal">0.8</span></div><input id="iMoveY" type="range" min="-5" max="10" step="0.1" value="0.8" class="slider" oninput="applyIndMove()"><div class="label">Move Z <span id="imzVal">0</span></div><input id="iMoveZ" type="range" min="-10" max="10" step="0.1" value="0" class="slider" oninput="applyIndMove()"><div class="label">Scale <span id="isxVal">1.0</span></div><input id="iScaleX" type="range" min="0.1" max="5" step="0.1" value="1" class="slider" oninput="applyIndScale()"><label style="font-size:10px; display:flex; gap:4px; margin-top:4px;"><input type="checkbox" id="snapOn" checked> Snap Attach</label></div>
+<div style="background:#ff5c0015; border:1px solid #ff5c0030; border-radius:10px; padding:8px; font-size:9px;"><b style="color:#ff5c00;">🏭 SIMULATION:</b><br>• Rotor/Propeller ghumega<br>• Rocket/Satellite udega<br>• Pura model ghumega<br>• Mass/Volume update hoga</div>
+</div></div></div>
 
 </div>
 
-<div id="proBlockModal" onclick="if(event.target.id==='proBlockModal') closeProLibrary()"><div class="modal-box"><div style="padding:14px; border-bottom:1px solid #ffffff12; display:flex; justify-content:space-between;"><b>🚀 PRO - 60+ Blocks</b><button onclick="closeProLibrary()" style="background:#2a2a3a; border:none; color:white; width:28px; height:28px; border-radius:50%;">✕</button></div><div style="padding:12px; overflow-y:auto; flex:1; display:grid; grid-template-columns:repeat(5,1fr); gap:7px;"><div onclick="addProBlock('box')" class="block-item">🧱<b>Box</b></div><div onclick="addProBlock('cyl')" class="block-item">🛢️<b>Cyl</b></div><div onclick="addProBlock('sphere')" class="block-item">⚪<b>Sphere</b></div><div onclick="addProBlock('plane')" class="block-item">▭<b>Plane</b></div><div onclick="addProBlock('fuselage')" class="block-item">🟧<b>Fuselage</b></div><div onclick="addProBlock('wing')" class="block-item">🪽<b>Wing</b></div><div onclick="addProBlock('rotor')" class="block-item">🌀<b>Rotor</b></div><div onclick="addProBlock('rocket_body')" class="block-item">🚀<b>Rocket</b></div></div></div></div>
-<div id="blockModal" onclick="if(event.target.id==='blockModal') closeBlockLibrary()"><div class="modal-box"><div style="padding:14px; border-bottom:1px solid #ffffff12; display:flex; justify-content:space-between;"><b>🌍 INDUSTRIAL - 60+ Blocks</b><button onclick="closeBlockLibrary()" style="background:#2a2a3a; border:none; color:white; width:28px; height:28px; border-radius:50%;">✕</button></div><div style="padding:12px; overflow-y:auto; flex:1; display:grid; grid-template-columns:repeat(5,1fr); gap:7px;"><div onclick="addBlockType('box')" class="block-item">🧱<b>Box</b></div><div onclick="addBlockType('cylinder')" class="block-item">🛢️<b>Cyl</b></div><div onclick="addBlockType('sphere')" class="block-item">⚪<b>Sphere</b></div><div onclick="addBlockType('wing')" class="block-item">🪽<b>Wing</b></div><div onclick="addBlockType('rotor')" class="block-item">🌀<b>Rotor</b></div><div onclick="addBlockType('rocket_body')" class="block-item">🚀<b>Rocket</b></div></div></div></div>
+<div id="proBlockModal" onclick="if(event.target.id==='proBlockModal') closeProLibrary()"><div class="modal-box"><div style="padding:14px; display:flex; justify-content:space-between;"><b>PRO 60+ Blocks</b><button onclick="closeProLibrary()" style="background:#2a2a3a; color:white; border:none; width:28px; height:28px; border-radius:50%;">✕</button></div><div style="padding:12px; display:grid; grid-template-columns:repeat(5,1fr); gap:7px;"><div onclick="addProBlock('box')" class="block-item">🧱 Box</div><div onclick="addProBlock('cyl')" class="block-item">Cyl</div><div onclick="addProBlock('sphere')" class="block-item">Sphere</div><div onclick="addProBlock('wing')" class="block-item">🪽 Wing</div><div onclick="addProBlock('rotor')" class="block-item">🌀 Rotor</div><div onclick="addProBlock('propeller')" class="block-item">Prop</div><div onclick="addProBlock('rocket_body')" class="block-item">🚀 Rocket</div><div onclick="addProBlock('satellite')" class="block-item">Sat</div></div></div></div>
+<div id="blockModal" onclick="if(event.target.id==='blockModal') closeBlockLibrary()"><div class="modal-box"><div style="padding:14px; display:flex; justify-content:space-between;"><b>INDUSTRIAL 60+ Blocks</b><button onclick="closeBlockLibrary()" style="background:#2a2a3a; color:white; border:none; width:28px; height:28px; border-radius:50%;">✕</button></div><div style="padding:12px; display:grid; grid-template-columns:repeat(5,1fr); gap:7px;"><div onclick="addBlockType('box')" class="block-item">Box</div><div onclick="addBlockType('cylinder')" class="block-item">Cyl</div><div onclick="addBlockType('sphere')" class="block-item">Sphere</div><div onclick="addBlockType('wing')" class="block-item">Wing</div><div onclick="addBlockType('rotor')" class="block-item">Rotor</div><div onclick="addBlockType('propeller')" class="block-item">Prop</div><div onclick="addBlockType('rocket_body')" class="block-item">Rocket</div><div onclick="addBlockType('satellite')" class="block-item">Sat</div></div></div></div>
 
 <script>
 let mainMode='kids', kObjects=[], selectedIdx=-1, isDown=false, dragOff={x:0,y:0};
-function setMain(m){
-  mainMode=m;
-  document.getElementById('kidsUI').style.display=m==='kids'?'flex':'none';
-  document.getElementById('proUI').style.display=m==='pro'?'flex':'none';
-  document.getElementById('industrialUI').style.display=m==='industrial'?'flex':'none';
-  document.getElementById('btnKids').className=m==='kids'?'mini-btn active-k':'mini-btn bg-[#1e2238] text-white';
-  document.getElementById('btnPro').className=m==='pro'?'mini-btn active-p':'mini-btn bg-[#1e2238] text-white';
-  document.getElementById('btnInd').className=m==='industrial'?'mini-btn active-i':'mini-btn bg-[#1e2238] text-white';
-  if(m==='pro') initPro(); if(m==='industrial') initInd();
-}
+function setMain(m){mainMode=m; document.getElementById('kidsUI').style.display=m==='kids'?'flex':'none'; document.getElementById('proUI').style.display=m==='pro'?'flex':'none'; document.getElementById('industrialUI').style.display=m==='industrial'?'flex':'none'; document.getElementById('btnKids').className=m==='kids'?'mini-btn active-k':'mini-btn bg-[#1e2238] text-white'; document.getElementById('btnPro').className=m==='pro'?'mini-btn active-p':'mini-btn bg-[#1e2238] text-white'; document.getElementById('btnInd').className=m==='industrial'?'mini-btn active-i':'mini-btn bg-[#1e2238] text-white'; if(m==='pro') initPro(); if(m==='industrial') initInd();}
 const kcv=document.getElementById('kCanvas'), kctx=kcv.getContext('2d');
-function drawKBG(){kctx.fillStyle='white'; kctx.fillRect(0,0,kcv.width,kcv.height);}
-function drawK(){
-  drawKBG();
-  kObjects.forEach((o,i)=>{
-    kctx.save(); kctx.translate(o.x,o.y); kctx.rotate((o.rot||0)*Math.PI/180); kctx.fillStyle=o.color||'#111'; kctx.strokeStyle=i===selectedIdx?'#00aaff':'#222'; kctx.lineWidth=i===selectedIdx?3:1.2;
-    if(o.type==='alpha'){kctx.font='bold '+(o.w*0.7)+'px sans-serif'; kctx.textAlign='center'; kctx.textBaseline='middle'; kctx.fillText(o.char,0,0); if(i===selectedIdx) kctx.strokeRect(-o.w/2-6,-o.h/2-6,o.w+12,o.h+12);}
-    else if(o.type==='rect') kctx.fillRect(-o.w/2,-o.h/2,o.w,o.h);
-    else if(o.type==='circle'){kctx.beginPath(); kctx.arc(0,0,o.w/2,0,Math.PI*2); kctx.fill();}
-    else if(o.type==='wing'){kctx.beginPath(); kctx.ellipse(0,0,o.w/2,o.h/3,0,0,Math.PI*2); kctx.fill(); kctx.fillStyle='black'; kctx.font='8px sans-serif'; kctx.fillText('Wing', -12, o.h/2+10);}
-    else if(o.type==='prop'){kctx.fillRect(-o.w/2,-4,o.w,8); kctx.fillRect(-4,-o.h/2,8,o.h); kctx.beginPath(); kctx.arc(0,0,6,0,Math.PI*2); kctx.fillStyle='#333'; kctx.fill();}
-    else if(o.type==='rocket'){kctx.fillRect(-o.w/3,-o.h/2,o.w*0.66,o.h); kctx.beginPath(); kctx.moveTo(0,-o.h/2-12); kctx.lineTo(-o.w/3,-o.h/2); kctx.lineTo(o.w/3,-o.h/2); kctx.closePath(); kctx.fillStyle='red'; kctx.fill(); kctx.fillStyle='black'; kctx.font='8px sans-serif'; kctx.fillText('Rocket', -16, o.h/2+10);}
-    else if(o.type==='satellite'){kctx.fillRect(-o.w/2,-o.h/2,o.w,o.h); kctx.fillRect(-o.w,-4,o.w/2,8); kctx.fillRect(o.w/2,-4,o.w/2,8); kctx.fillStyle='black'; kctx.font='8px sans-serif'; kctx.fillText('Sat', -8, o.h/2+10);}
-    else if(o.type==='naca'){kctx.beginPath(); kctx.ellipse(0,0,o.w/2,o.h/3,0,0,Math.PI*2); kctx.fill(); kctx.fillStyle='black'; kctx.font='8px sans-serif'; kctx.fillText('NACA', -12, o.h/2+10);}
-    else if(o.type==='solar'){kctx.fillRect(-o.w/2,-o.h/2,o.w,o.h); kctx.fillStyle='#ffffff60'; for(let j=0;j<3;j++) kctx.fillRect(-o.w/2+4+j*12, -o.h/2+4, 8, o.h-8); kctx.fillStyle='black'; kctx.font='8px sans-serif'; kctx.fillText('Solar', -12, o.h/2+10);}
-    else kctx.fillRect(-o.w/2,-o.h/2,o.w,o.h);
-    kctx.restore();
-  });
-}
-// COMPLETE ABCD 123 SPECIAL - FIXED
-function addAlpha(ch){
-  let col='#111';
-  if('0123456789'.includes(ch[0]) || ch==='10' || ch==='100') col='#0066ff';
-  if('!@#$%^&*()_+-={}[]|:?/'.includes(ch)) col='#cc0066';
-  kObjects.push({type:'alpha', char:ch, x:350+Math.random()*200, y:250+Math.random()*150, w:42, h:42, color:col, rot:0});
-  selectedIdx=kObjects.length-1; drawK();
-}
-// SIDE BLOCKS - WORKING FIX - Photo wala sab
-function addKidPart(t){
-  let w=80, h=50, col='#ff8c00';
-  if(t==='wing'){w=120; h=35; col='#22ff66';}
-  if(t==='prop'){w=60; h=60; col='#00ffff';}
-  if(t==='rocket'){w=40; h=90; col='#ffaa00';}
-  if(t==='satellite'){w=70; h=45; col='#7ec8ff';}
-  if(t==='naca'){w=110; h=30; col='#22ff66';}
-  if(t==='solar'){w=90; h=40; col='#001a66';}
-  if(t==='rect'){w=80; h=60; col='#ff5a5a';}
-  kObjects.push({type:t, x:350+Math.random()*150, y:300+Math.random()*80, w:w, h:h, color:col, rot:0});
-  selectedIdx=kObjects.length-1; drawK();
-  console.log('Side block added:', t);
-}
+function drawKBG(){kctx.fillStyle='white'; kctx.fillRect(0,0,kcv.width,kcv.height);} function drawK(){drawKBG(); kObjects.forEach((o,i)=>{kctx.save(); kctx.translate(o.x,o.y); kctx.rotate((o.rot||0)*Math.PI/180); kctx.fillStyle=o.color; kctx.strokeStyle=i===selectedIdx?'#00aaff':'#222'; kctx.lineWidth=i===selectedIdx?3:1.2; if(o.type==='alpha'){kctx.font='bold '+(o.w*0.7)+'px sans-serif'; kctx.textAlign='center'; kctx.textBaseline='middle'; kctx.fillText(o.char,0,0);} else if(o.type==='wing'){kctx.beginPath(); kctx.ellipse(0,0,o.w/2,o.h/3,0,0,Math.PI*2); kctx.fill();} else if(o.type==='propeller'){kctx.fillRect(-o.w/2,-4,o.w,8); kctx.fillRect(-4,-o.h/2,8,o.h);} else if(o.type==='rocket'){kctx.fillRect(-o.w/3,-o.h/2,o.w*0.66,o.h); kctx.beginPath(); kctx.moveTo(0,-o.h/2-10); kctx.lineTo(-o.w/3,-o.h/2); kctx.lineTo(o.w/3,-o.h/2); kctx.closePath(); kctx.fillStyle='red'; kctx.fill();} else if(o.type==='satellite'){kctx.fillRect(-o.w/2,-o.h/2,o.w,o.h); kctx.fillRect(-o.w,-4,o.w/2,8); kctx.fillRect(o.w/2,-4,o.w/2,8);} else if(o.type==='naca'){kctx.beginPath(); kctx.ellipse(0,0,o.w/2,o.h/4,0,0,Math.PI*2); kctx.fill();} else if(o.type==='solar'){kctx.fillRect(-o.w/2,-o.h/2,o.w,o.h);} else kctx.fillRect(-o.w/2,-o.h/2,o.w,o.h); kctx.restore();});}
+function addAlpha(ch){kObjects.push({type:'alpha', char:ch, x:350+Math.random()*200, y:250+Math.random()*150, w:42, h:42, color:'#111', rot:0}); selectedIdx=kObjects.length-1; drawK();}
+function addKidPart(t){let w=80,h=50,col='#ff8c00'; if(t==='wing'){w=120;h=35;col='#22ff66';} if(t==='propeller'){w=60;h=60;col='#00ffff';} if(t==='rocket'){w=40;h=90;col='#ffaa00';} if(t==='satellite'){w=70;h=45;col='#7ec8ff';} if(t==='naca'){w=110;h=30;col='#22ff66';} if(t==='solar'){w=90;h=40;col='#001a66';} kObjects.push({type:t, x:350+Math.random()*150, y:300+Math.random()*80, w:w,h:h,color:col,rot:0}); selectedIdx=kObjects.length-1; drawK();}
 function getPos(e){const r=kcv.getBoundingClientRect(); return {x:(e.clientX-r.left)*(kcv.width/r.width), y:(e.clientY-r.top)*(kcv.height/r.height)};}
 kcv.addEventListener('mousedown', e=>{const p=getPos(e); isDown=true; selectedIdx=-1; for(let i=kObjects.length-1;i>=0;i--){const o=kObjects[i]; if(Math.abs(p.x-o.x)<o.w*0.8 && Math.abs(p.y-o.y)<o.h*0.8){selectedIdx=i; dragOff={x:p.x-o.x, y:p.y-o.y}; break;}} drawK();});
 kcv.addEventListener('mousemove', e=>{if(!isDown||selectedIdx<0) return; const p=getPos(e); kObjects[selectedIdx].x=p.x-dragOff.x; kObjects[selectedIdx].y=p.y-dragOff.y; drawK();});
-kcv.addEventListener('mouseup', ()=>{isDown=false;});
-kcv.addEventListener('wheel', e=>{if(selectedIdx>=0){e.preventDefault(); const d=e.deltaY>0?-5:5; kObjects[selectedIdx].w=Math.max(20,Math.min(200,kObjects[selectedIdx].w+d)); kObjects[selectedIdx].h=kObjects[selectedIdx].w*0.8; drawK();}}, {passive:false});
-function deleteKid(){if(selectedIdx>=0){kObjects.splice(selectedIdx,1); selectedIdx=-1; drawK();}}
-function rotateKid(){if(selectedIdx>=0){kObjects[selectedIdx].rot=(kObjects[selectedIdx].rot||0)+15; drawK();}}
-function duplicateKid(){if(selectedIdx>=0){const o={...kObjects[selectedIdx]}; o.x+=30; o.y+=30; kObjects.push(o); selectedIdx=kObjects.length-1; drawK();}}
-function clearK(){kObjects=[]; drawKBG();}
-function startSim(){
-  let t=0; const id=setInterval(()=>{
-    t+=0.05;
-    kObjects.forEach(o=>{
-      if(o.type==='prop') o.rot+=25;
-      if(o.type==='wing'||o.type==='naca') o.y+=Math.sin(t)*0.5;
-      if(o.type==='rocket') o.y-=1.2;
-      if(o.type==='satellite') o.x+=Math.sin(t)*0.8;
-      if(o.type==='solar') o.rot+=1;
-    });
-    drawK();
-    if(t>6) clearInterval(id);
-  },30);
-  console.log('Fly Simulation Started - Side blocks working');
-}
-drawKBG();
+kcv.addEventListener('mouseup', ()=>{isDown=false;}); function startSim(){let t=0; const id=setInterval(()=>{t+=0.05; kObjects.forEach(o=>{if(o.type==='propeller') o.rot+=25; if(o.type==='wing') o.y+=Math.sin(t)*0.5; if(o.type==='rocket') o.y-=1.2;}); drawK(); if(t>6) clearInterval(id);},30);} drawKBG();
 
-// PRO - FIXED
-let sceneP,cameraP,rendererP,controlsP,groupP, proInit=false, selP=null, bodiesP=[], isDraggingP=false, dragPlaneP=new THREE.Plane(), dragOffsetP=new THREE.Vector3();
-function initPro(){
-  if(proInit) return; proInit=true;
-  const c=document.getElementById('threePro'); sceneP=new THREE.Scene(); sceneP.background=new THREE.Color(0x05070a); cameraP=new THREE.PerspectiveCamera(50,c.clientWidth/c.clientHeight,0.1,1000); cameraP.position.set(6,5,7); rendererP=new THREE.WebGLRenderer({antialias:true}); rendererP.setSize(c.clientWidth,c.clientHeight); c.appendChild(rendererP.domElement); controlsP=new THREE.OrbitControls(cameraP, rendererP.domElement); controlsP.enableDamping=true; sceneP.add(new THREE.DirectionalLight(0xffffff,1.2)); sceneP.add(new THREE.AmbientLight(0xffffff,0.7)); groupP=new THREE.Group(); sceneP.add(groupP); sceneP.add(new THREE.GridHelper(24,48,0x223344,0x101a2a));
-  const ray=new THREE.Raycaster(), mouse=new THREE.Vector2();
-  rendererP.domElement.addEventListener('mousedown', e=>{
-    const r=rendererP.domElement.getBoundingClientRect(); mouse.x=((e.clientX-r.left)/r.width)*2-1; mouse.y=-((e.clientY-r.top)/r.height)*2+1; ray.setFromCamera(mouse,cameraP);
-    const inter=ray.intersectObjects(groupP.children,true);
-    if(inter.length>0){selP=inter[0].object; while(selP.parent&&selP.parent!==groupP) selP=selP.parent; document.getElementById('proSelInfo').innerText=selP.name; bodiesP.forEach(b=>{if(b.material&&b.material.emissive) b.material.emissive.setHex(0x000000);}); if(selP.material&&selP.material.emissive) selP.material.emissive.setHex(0x333300); syncPro(); isDraggingP=true; controlsP.enabled=false; dragPlaneP.setFromNormalAndCoplanarPoint(new THREE.Vector3(0,1,0), new THREE.Vector3(0,selP.position.y,0)); const ip=ray.intersectPlane(dragPlaneP, new THREE.Vector3()); if(ip) dragOffsetP.copy(ip).sub(selP.position);}
-    else {selP=null; document.getElementById('proSelInfo').innerText='None';}
-  });
-  rendererP.domElement.addEventListener('mousemove', e=>{
-    if(!isDraggingP||!selP) return;
-    const r=rendererP.domElement.getBoundingClientRect(); mouse.x=((e.clientX-r.left)/r.width)*2-1; mouse.y=-((e.clientY-r.top)/r.height)*2+1; ray.setFromCamera(mouse,cameraP);
-    const ip=ray.intersectPlane(dragPlaneP, new THREE.Vector3()); if(ip){selP.position.copy(ip).sub(dragOffsetP); if(document.getElementById('proSnap').checked){for(let o of bodiesP){if(o===selP) continue; if(selP.position.distanceTo(o.position)<0.8){selP.position.x=o.position.x; selP.position.z=o.position.z; selP.position.y=o.position.y+1; break;}}} syncPro();}
-  });
-  window.addEventListener('mouseup', ()=>{isDraggingP=false; controlsP.enabled=true;});
-  rendererP.domElement.addEventListener('wheel', e=>{if(selP){e.preventDefault(); const d=e.deltaY>0?-0.1:0.1; selP.scale.x+=d; selP.scale.y+=d; selP.scale.z+=d; selP.scale.x=Math.max(0.1,Math.min(5,selP.scale.x)); selP.scale.y=selP.scale.x; selP.scale.z=selP.scale.x; syncPro();}}, {passive:false});
-  (function anim(){requestAnimationFrame(anim); controlsP.update(); rendererP.render(sceneP,cameraP);})();
-}
-function syncPro(){if(!selP) return; document.getElementById('pMoveX').value=selP.position.x; document.getElementById('pmxVal').innerText=selP.position.x.toFixed(1); document.getElementById('pMoveY').value=selP.position.y; document.getElementById('pmyVal').innerText=selP.position.y.toFixed(1); document.getElementById('pSize').value=selP.scale.x; document.getElementById('pSizeVal').innerText=selP.scale.x.toFixed(1); document.getElementById('pRotY').value=(selP.rotation.y*180/Math.PI)%360; document.getElementById('pryVal').innerText=Math.round(document.getElementById('pRotY').value)+'°';}
-function addProBlock(t){initPro(); closeProLibrary(); let m; const mat=new THREE.MeshStandardMaterial({color:document.getElementById('pCol').value}); if(t==='box') m=new THREE.Mesh(new THREE.BoxGeometry(2,0.8,0.9), mat); if(t==='cyl') m=new THREE.Mesh(new THREE.CylinderGeometry(0.4,0.4,1.5,16), mat); if(t==='sphere') m=new THREE.Mesh(new THREE.SphereGeometry(0.6,16,16), mat); if(t==='plane') m=new THREE.Mesh(new THREE.BoxGeometry(2.4,0.05,1), mat); if(t==='fuselage') m=new THREE.Mesh(new THREE.BoxGeometry(2.8,0.6,0.6), mat); if(t==='wing'){const sh=new THREE.Shape(); sh.moveTo(0,0); sh.lineTo(2,0); sh.lineTo(2,0.15); sh.lineTo(0,0.25); sh.lineTo(0,0); m=new THREE.Mesh(new THREE.ExtrudeGeometry(sh,{depth:0.06, bevelEnabled:false}), new THREE.MeshStandardMaterial({color:'#22ff66'}));} if(t==='rotor'){m=new THREE.Group(); const b1=new THREE.Mesh(new THREE.BoxGeometry(3.2,0.06,0.12), new THREE.MeshStandardMaterial({color:'#00ffff'})); const b2=b1.clone(); b2.rotation.y=Math.PI/2; m.add(b1,b2);} if(t==='rocket_body') m=new THREE.Mesh(new THREE.CylinderGeometry(0.3,0.3,1.8,16), new THREE.MeshStandardMaterial({color:'#ffaa00'})); if(t==='satellite') m=new THREE.Mesh(new THREE.BoxGeometry(0.7,0.5,0.5), new THREE.MeshStandardMaterial({color:'#c0c0ff'})); if(t==='gear_spur') m=new THREE.Mesh(new THREE.CylinderGeometry(0.45,0.45,0.18,16), mat); if(!m) return; m.position.set((Math.random()-0.5)*2,0.8,(Math.random()-0.5)*2); m.name=t+'_'+(bodiesP.length+1); groupP.add(m); bodiesP.push(m); selP=m; document.getElementById('proSelInfo').innerText=m.name; syncPro();}
-function updateProColor(){if(!selP){alert('Pehle block select karo!'); return;} const c=document.getElementById('pCol').value; if(selP.material) selP.material.color.set(c); selP.traverse&&selP.traverse(ch=>{if(ch.material) ch.material.color.set(c);});}
-function setProColor(c){if(!selP){alert('Pehle block select karo!'); return;} document.getElementById('pCol').value=c; updateProColor();}
-function cutPro(){if(!selP){alert('Pehle block select karo!'); return;} selP.scale.x*=0.5; selP.scale.y*=0.5; selP.scale.z*=0.5; if(selP.scale.x<0.1){groupP.remove(selP); selP=null; document.getElementById('proSelInfo').innerText='None (Cut Deleted)';} syncPro();}
-function cutProHole(){if(!selP){alert('Pehle block select karo!'); return;} selP.material.wireframe=!selP.material.wireframe; selP.material.transparent=true; selP.material.opacity=0.5;}
-function updateProMove(){if(!selP) return; selP.position.x=parseFloat(document.getElementById('pMoveX').value); selP.position.y=parseFloat(document.getElementById('pMoveY').value); syncPro();}
-function updateProRot(){if(!selP) return; selP.rotation.y=parseFloat(document.getElementById('pRotY').value)*Math.PI/180; syncPro();}
+// PRO - SELECT + SIMULATION
+let sceneP,cameraP,rendererP,controlsP,groupP, proInit=false, selP=null, bodiesP=[], isDraggingP=false, dragPlaneP=new THREE.Plane(), dragOffsetP=new THREE.Vector3(), proSimId=null, proSimRunning=false;
+function initPro(){if(proInit) return; proInit=true; const c=document.getElementById('threePro'); sceneP=new THREE.Scene(); sceneP.background=new THREE.Color(0x05070a); cameraP=new THREE.PerspectiveCamera(50,c.clientWidth/c.clientHeight,0.1,1000); cameraP.position.set(6,5,7); rendererP=new THREE.WebGLRenderer({antialias:true}); rendererP.setSize(c.clientWidth,c.clientHeight); c.appendChild(rendererP.domElement); controlsP=new THREE.OrbitControls(cameraP, rendererP.domElement); controlsP.enableDamping=true; sceneP.add(new THREE.DirectionalLight(0xffffff,1.2)); sceneP.add(new THREE.AmbientLight(0xffffff,0.7)); groupP=new THREE.Group(); sceneP.add(groupP); sceneP.add(new THREE.GridHelper(24,48,0x223344,0x101a2a)); const ray=new THREE.Raycaster(), mouse=new THREE.Vector2(); rendererP.domElement.addEventListener('mousedown', e=>{const r=rendererP.domElement.getBoundingClientRect(); mouse.x=((e.clientX-r.left)/r.width)*2-1; mouse.y=-((e.clientY-r.top)/r.height)*2+1; ray.setFromCamera(mouse,cameraP); const inter=ray.intersectObjects(groupP.children,true); if(inter.length>0){selP=inter[0].object; while(selP.parent&&selP.parent!==groupP) selP=selP.parent; document.getElementById('proSelInfo').innerText=selP.name; isDraggingP=true; controlsP.enabled=false; dragPlaneP.setFromNormalAndCoplanarPoint(new THREE.Vector3(0,1,0), new THREE.Vector3(0,selP.position.y,0)); const ip=ray.intersectPlane(dragPlaneP, new THREE.Vector3()); if(ip) dragOffsetP.copy(ip).sub(selP.position); syncPro();} else {selP=null; document.getElementById('proSelInfo').innerText='None';}}); rendererP.domElement.addEventListener('mousemove', e=>{if(!isDraggingP||!selP) return; const r=rendererP.domElement.getBoundingClientRect(); mouse.x=((e.clientX-r.left)/r.width)*2-1; mouse.y=-((e.clientY-r.top)/r.height)*2+1; ray.setFromCamera(mouse,cameraP); const ip=ray.intersectPlane(dragPlaneP, new THREE.Vector3()); if(ip){selP.position.copy(ip).sub(dragOffsetP); if(document.getElementById('proSnap').checked){for(let o of bodiesP){if(o===selP) continue; if(selP.position.distanceTo(o.position)<0.9){selP.position.x=o.position.x; selP.position.z=o.position.z; selP.position.y=o.position.y+1; break;}}} syncPro();}}); window.addEventListener('mouseup', ()=>{isDraggingP=false; controlsP.enabled=true;}); (function anim(){requestAnimationFrame(anim); controlsP.update(); rendererP.render(sceneP,cameraP);})();}
+function syncPro(){if(!selP) return; document.getElementById('pMoveX').value=selP.position.x; document.getElementById('pmxVal').innerText=selP.position.x.toFixed(1); document.getElementById('pMoveY').value=selP.position.y; document.getElementById('pmyVal').innerText=selP.position.y.toFixed(1); document.getElementById('pMoveZ').value=selP.position.z; document.getElementById('pmzVal').innerText=selP.position.z.toFixed(1); document.getElementById('pSize').value=selP.scale.x; document.getElementById('pSizeVal').innerText=selP.scale.x.toFixed(1);}
+function addProBlock(t){initPro(); closeProLibrary(); let m; const mat=new THREE.MeshStandardMaterial({color:document.getElementById('pCol').value}); if(t==='box') m=new THREE.Mesh(new THREE.BoxGeometry(2,0.8,0.9), mat); if(t==='cyl') m=new THREE.Mesh(new THREE.CylinderGeometry(0.4,0.4,1.5,16), mat); if(t==='sphere') m=new THREE.Mesh(new THREE.SphereGeometry(0.6,16,16), mat); if(t==='wing'){const sh=new THREE.Shape(); sh.moveTo(0,0); sh.lineTo(2,0); sh.lineTo(2,0.15); sh.lineTo(0,0.25); sh.lineTo(0,0); m=new THREE.Mesh(new THREE.ExtrudeGeometry(sh,{depth:0.06, bevelEnabled:false}), new THREE.MeshStandardMaterial({color:'#22ff66'}));} if(t==='rotor'){m=new THREE.Group(); const b1=new THREE.Mesh(new THREE.BoxGeometry(3.2,0.06,0.12), new THREE.MeshStandardMaterial({color:'#00ffff'})); const b2=b1.clone(); b2.rotation.y=Math.PI/2; m.add(b1,b2);} if(t==='propeller'){m=new THREE.Group(); const b=new THREE.Mesh(new THREE.BoxGeometry(2,0.07,0.12), mat); const b2=b.clone(); b2.rotation.y=Math.PI/2; m.add(b,b2);} if(t==='rocket_body') m=new THREE.Mesh(new THREE.CylinderGeometry(0.3,0.3,1.8,16), new THREE.MeshStandardMaterial({color:'#ffaa00'})); if(t==='satellite') m=new THREE.Mesh(new THREE.BoxGeometry(0.7,0.5,0.5), new THREE.MeshStandardMaterial({color:'#c0c0ff'})); if(!m) return; m.position.set((Math.random()-0.5)*2,0.8,(Math.random()-0.5)*2); m.name=t+'_'+(bodiesP.length+1); groupP.add(m); bodiesP.push(m); selP=m; document.getElementById('proSelInfo').innerText=m.name; syncPro();}
+function updateProColor(){if(!selP){alert('Pehle block pe click karo!'); return;} const c=document.getElementById('pCol').value; if(selP.material) selP.material.color.set(c); selP.traverse&&selP.traverse(ch=>{if(ch.material) ch.material.color.set(c);});}
+function setProColor(c){if(!selP){alert('Pehle select karo!'); return;} document.getElementById('pCol').value=c; updateProColor();}
+function cutPro(){if(!selP){alert('Pehle select karo!'); return;} selP.scale.x*=0.5; selP.scale.y*=0.5; selP.scale.z*=0.5; if(selP.scale.x<0.1){groupP.remove(selP); bodiesP=bodiesP.filter(b=>b!==selP); selP=null; document.getElementById('proSelInfo').innerText='None';}}
+function updateProMove(){if(!selP) return; selP.position.x=parseFloat(document.getElementById('pMoveX').value); selP.position.y=parseFloat(document.getElementById('pMoveY').value); selP.position.z=parseFloat(document.getElementById('pMoveZ').value); syncPro();}
 function updateProScale(){if(!selP) return; const s=parseFloat(document.getElementById('pSize').value); selP.scale.set(s,s,s); syncPro();}
+function updateProRot(){if(!selP) return; selP.rotation.y=parseFloat(document.getElementById('pRotY').value)*Math.PI/180; syncPro();}
 function deletePro(){if(!selP){alert('Pehle select karo!'); return;} groupP.remove(selP); bodiesP=bodiesP.filter(b=>b!==selP); selP=null; document.getElementById('proSelInfo').innerText='None';}
-function duplicatePro(){if(!selP){alert('Pehle select karo!'); return;} const c=selP.clone(); c.position.x+=0.7; c.name=selP.name+'_copy'; groupP.add(c); bodiesP.push(c);}
-function clearPro(){if(groupP){while(groupP.children.length>0) groupP.remove(groupP.children[0]);} bodiesP=[]; selP=null; document.getElementById('proSelInfo').innerText='None';}
+function clearPro(){if(groupP){while(groupP.children.length>0) groupP.remove(groupP.children[0]);} bodiesP=[]; selP=null; stopProSim();}
 function openProLibrary(){document.getElementById('proBlockModal').style.display='flex';} function closeProLibrary(){document.getElementById('proBlockModal').style.display='none';}
-
-// INDUSTRIAL
-let sceneI,cameraI,rendererI,controlsI,groupI, indInit=false, selI=null, bodiesI=[], isDraggingI=false, dragPlaneI=new THREE.Plane(), dragOffsetI=new THREE.Vector3();
-function initInd(){
-  if(indInit) return; indInit=true;
-  const c=document.getElementById('threeInd'); sceneI=new THREE.Scene(); sceneI.background=new THREE.Color(0x080a14); cameraI=new THREE.PerspectiveCamera(50,c.clientWidth/c.clientHeight,0.1,1000); cameraI.position.set(7,6,8); rendererI=new THREE.WebGLRenderer({antialias:true}); rendererI.setSize(c.clientWidth,c.clientHeight); c.appendChild(rendererI.domElement); controlsI=new THREE.OrbitControls(cameraI, rendererI.domElement); controlsI.enableDamping=true; sceneI.add(new THREE.DirectionalLight(0xffffff,1.3)); sceneI.add(new THREE.AmbientLight(0xffffff,0.6)); groupI=new THREE.Group(); sceneI.add(groupI); sceneI.add(new THREE.GridHelper(30,60,0x1e2a3a,0x0f1720));
-  const ray=new THREE.Raycaster(), mouse=new THREE.Vector2();
-  rendererI.domElement.addEventListener('mousedown', e=>{
-    const r=rendererI.domElement.getBoundingClientRect(); mouse.x=((e.clientX-r.left)/r.width)*2-1; mouse.y=-((e.clientY-r.top)/r.height)*2+1; ray.setFromCamera(mouse,cameraI);
-    const inter=ray.intersectObjects(groupI.children,true);
-    if(inter.length>0){selI=inter[0].object; while(selI.parent&&selI.parent!==groupI) selI=selI.parent; document.getElementById('selInfo').innerText=selI.name; document.getElementById('bodyList').innerHTML=bodiesI.map(b=>`<div style="${b===selI?'color:#00ffff; font-weight:800;':''}">🔩 ${b.name}</div>`).join(''); bodiesI.forEach(b=>{if(b.material&&b.material.emissive) b.material.emissive.setHex(0x000000);}); if(selI.material&&selI.material.emissive) selI.material.emissive.setHex(0x332200); syncInd(); isDraggingI=true; controlsI.enabled=false; dragPlaneI.setFromNormalAndCoplanarPoint(new THREE.Vector3(0,1,0), new THREE.Vector3(0,selI.position.y,0)); const ip=ray.intersectPlane(dragPlaneI, new THREE.Vector3()); if(ip) dragOffsetI.copy(ip).sub(selI.position);}
-    else {selI=null; document.getElementById('selInfo').innerText='None';}
-  });
-  rendererI.domElement.addEventListener('mousemove', e=>{
-    if(!isDraggingI||!selI) return;
-    const r=rendererI.domElement.getBoundingClientRect(); mouse.x=((e.clientX-r.left)/r.width)*2-1; mouse.y=-((e.clientY-r.top)/r.height)*2+1; ray.setFromCamera(mouse,cameraI);
-    const ip=ray.intersectPlane(dragPlaneI, new THREE.Vector3()); if(ip){selI.position.copy(ip).sub(dragOffsetI); if(document.getElementById('snapOn').checked){for(let o of bodiesI){if(o===selI) continue; if(selI.position.distanceTo(o.position)<0.9){selI.position.x=o.position.x; selI.position.z=o.position.z; selI.position.y=o.position.y+1; break;}}} syncInd();}});
-  window.addEventListener('mouseup', ()=>{isDraggingI=false; controlsI.enabled=true;});
-  rendererI.domElement.addEventListener('wheel', e=>{if(selI){e.preventDefault(); const d=e.deltaY>0?-0.1:0.1; selI.scale.x+=d; selI.scale.y+=d; selI.scale.z+=d; selI.scale.x=Math.max(0.1,Math.min(5,selI.scale.x)); selI.scale.y=selI.scale.x; selI.scale.z=selI.scale.x; syncInd();}}, {passive:false});
-  (function anim(){requestAnimationFrame(anim); controlsI.update(); rendererI.render(sceneI,cameraI);})();
+// PRO SIMULATION - FINAL FIX
+function simulatePro(){
+  if(bodiesP.length===0){alert('Pehle kuch blocks add karo! Box + Rotor + Rocket jodo fir Simulate dabao'); return;}
+  if(proSimRunning) return;
+  proSimRunning=true;
+  let t=0;
+  proSimId=setInterval(()=>{
+    t+=0.05;
+    bodiesP.forEach(b=>{
+      if(b.name.includes('rotor')||b.name.includes('propeller')||b.name.includes('rotor_')){
+        b.rotation.y+=0.4; b.rotation.z+=0.1;
+      }
+      if(b.name.includes('rocket')){
+        b.position.y+=0.03; b.rotation.x+=0.01;
+        if(b.position.y>6) b.position.y=0.5;
+      }
+      if(b.name.includes('wing')){
+        b.rotation.z=Math.sin(t*2)*0.1;
+      }
+      if(b.name.includes('satellite')){
+        b.rotation.y+=0.02;
+      }
+    });
+    groupP.rotation.y+=0.008;
+    groupP.position.y=Math.sin(t)*0.2+0.5;
+    if(t>15){ stopProSim(); }
+  },16);
+  document.getElementById('proSelInfo').innerText='🚀 SIMULATING - Project Work Kar Raha Hai...';
 }
-function syncInd(){if(!selI) return; document.getElementById('iMoveX').value=selI.position.x; document.getElementById('imxVal').innerText=selI.position.x.toFixed(1); document.getElementById('iMoveY').value=selI.position.y; document.getElementById('imyVal').innerText=selI.position.y.toFixed(1); document.getElementById('iScaleX').value=selI.scale.x; document.getElementById('isxVal').innerText=selI.scale.x.toFixed(1);}
-function addBlockType(t){initInd(); closeBlockLibrary(); let m; const matS=new THREE.MeshStandardMaterial({color:'#c0c0c0'}); const matG=new THREE.MeshStandardMaterial({color:'#22ff66'}); if(t==='box') m=new THREE.Mesh(new THREE.BoxGeometry(2.2,0.9,1.3), matS); if(t==='cylinder') m=new THREE.Mesh(new THREE.CylinderGeometry(0.5,0.5,1.6,20), matS); if(t==='sphere') m=new THREE.Mesh(new THREE.SphereGeometry(0.65,20,20), matS); if(t==='wing'){const sh=new THREE.Shape(); sh.moveTo(0,0); sh.lineTo(2,0); sh.lineTo(2,0.15); sh.lineTo(0,0.25); sh.lineTo(0,0); m=new THREE.Mesh(new THREE.ExtrudeGeometry(sh,{depth:0.06, bevelEnabled:false}), matG);} if(t==='rotor'){m=new THREE.Group(); const b1=new THREE.Mesh(new THREE.BoxGeometry(3.5,0.07,0.15), new THREE.MeshStandardMaterial({color:'#00ffff'})); const b2=b1.clone(); b2.rotation.y=Math.PI/2; m.add(b1,b2);} if(t==='rocket_body') m=new THREE.Mesh(new THREE.CylinderGeometry(0.35,0.35,2.2,16), new THREE.MeshStandardMaterial({color:'#ffaa00'})); if(t==='satellite') m=new THREE.Mesh(new THREE.BoxGeometry(0.8,0.6,0.6), new THREE.MeshStandardMaterial({color:'#c0c0ff'})); if(t==='gear_spur') m=new THREE.Mesh(new THREE.CylinderGeometry(0.5,0.5,0.2,16), matS); if(!m) return; m.name=t+'_'+(bodiesI.length+1); m.position.set((Math.random()-0.5)*2,0.9,(Math.random()-0.5)*2); groupI.add(m); bodiesI.push(m); selI=m; document.getElementById('selInfo').innerText=m.name; document.getElementById('bodyList').innerHTML=bodiesI.map(b=>`<div style="${b===selI?'color:#00ffff;':''}">🔩 ${b.name}</div>`).join(''); syncInd();}
-function updateIndColor(){if(!selI){alert('Pehle block select karo!'); return;} const c=document.getElementById('iCol').value; if(selI.material) selI.material.color.set(c); selI.traverse&&selI.traverse(ch=>{if(ch.material) ch.material.color.set(c);});}
-function setIndColor(c){if(!selI){alert('Pehle block select karo!'); return;} document.getElementById('iCol').value=c; updateIndColor();}
-function cutInd(){if(!selI){alert('Pehle block select karo!'); return;} selI.scale.x*=0.5; selI.scale.y*=0.5; selI.scale.z*=0.5; if(selI.scale.x<0.15){groupI.remove(selI); bodiesI=bodiesI.filter(b=>b!==selI); selI=null; document.getElementById('selInfo').innerText='None (Cut Deleted)';} syncInd();}
-function cutIndHole(){if(!selI){alert('Pehle block select karo!'); return;} selI.material.wireframe=!selI.material.wireframe; selI.material.transparent=true; selI.material.opacity=0.4;}
-function applyIndMove(){if(!selI) return; selI.position.x=parseFloat(document.getElementById('iMoveX').value); selI.position.y=parseFloat(document.getElementById('iMoveY').value); syncInd();}
-function applyIndRot(){if(!selI) return; selI.rotation.y=parseFloat(document.getElementById('iRotY').value)*Math.PI/180; syncInd();}
-function applyIndScale(){if(!selI) return; selI.scale.x=parseFloat(document.getElementById('iScaleX').value); selI.scale.y=selI.scale.x; selI.scale.z=selI.scale.x; syncInd();}
-function deleteInd(){if(!selI){alert('Pehle block select karo!'); return;} groupI.remove(selI); bodiesI=bodiesI.filter(b=>b!==selI); selI=null; document.getElementById('selInfo').innerText='None';}
-function duplicateInd(){if(!selI){alert('Pehle block select karo!'); return;} const c=selI.clone(); c.position.x+=0.7; c.name=selI.name+'_copy'; groupI.add(c); bodiesI.push(c);}
+function stopProSim(){ if(proSimId) clearInterval(proSimId); proSimId=null; proSimRunning=false; if(selP) document.getElementById('proSelInfo').innerText=selP.name; else document.getElementById('proSelInfo').innerText='Stopped'; }
+
+// INDUSTRIAL - SELECT + SIMULATION
+let sceneI,cameraI,rendererI,controlsI,groupI, indInit=false, selI=null, bodiesI=[], isDraggingI=false, dragPlaneI=new THREE.Plane(), dragOffsetI=new THREE.Vector3(), indSimId=null, indSimRunning=false;
+function initInd(){if(indInit) return; indInit=true; const c=document.getElementById('threeInd'); sceneI=new THREE.Scene(); sceneI.background=new THREE.Color(0x080a14); cameraI=new THREE.PerspectiveCamera(50,c.clientWidth/c.clientHeight,0.1,1000); cameraI.position.set(7,6,8); rendererI=new THREE.WebGLRenderer({antialias:true}); rendererI.setSize(c.clientWidth,c.clientHeight); c.appendChild(rendererI.domElement); controlsI=new THREE.OrbitControls(cameraI, rendererI.domElement); controlsI.enableDamping=true; sceneI.add(new THREE.DirectionalLight(0xffffff,1.3)); sceneI.add(new THREE.AmbientLight(0xffffff,0.6)); groupI=new THREE.Group(); sceneI.add(groupI); sceneI.add(new THREE.GridHelper(30,60,0x1e2a3a,0x0f1720)); const ray=new THREE.Raycaster(), mouse=new THREE.Vector2(); rendererI.domElement.addEventListener('mousedown', e=>{const r=rendererI.domElement.getBoundingClientRect(); mouse.x=((e.clientX-r.left)/r.width)*2-1; mouse.y=-((e.clientY-r.top)/r.height)*2+1; ray.setFromCamera(mouse,cameraI); const inter=ray.intersectObjects(groupI.children,true); if(inter.length>0){selI=inter[0].object; while(selI.parent&&selI.parent!==groupI) selI=selI.parent; document.getElementById('selInfo').innerText=selI.name; document.getElementById('bodyList').innerHTML=bodiesI.map(b=>`<div style="${b===selI?'color:#00ffff; font-weight:800;':''}">🔩 ${b.name}</div>`).join(''); isDraggingI=true; controlsI.enabled=false; dragPlaneI.setFromNormalAndCoplanarPoint(new THREE.Vector3(0,1,0), new THREE.Vector3(0,selI.position.y,0)); const ip=ray.intersectPlane(dragPlaneI, new THREE.Vector3()); if(ip) dragOffsetI.copy(ip).sub(selI.position); syncInd();} else {selI=null; document.getElementById('selInfo').innerText='None';}}); rendererI.domElement.addEventListener('mousemove', e=>{if(!isDraggingI||!selI) return; const r=rendererI.domElement.getBoundingClientRect(); mouse.x=((e.clientX-r.left)/r.width)*2-1; mouse.y=-((e.clientY-r.top)/r.height)*2+1; ray.setFromCamera(mouse,cameraI); const ip=ray.intersectPlane(dragPlaneI, new THREE.Vector3()); if(ip){selI.position.copy(ip).sub(dragOffsetI); if(document.getElementById('snapOn').checked){for(let o of bodiesI){if(o===selI) continue; if(selI.position.distanceTo(o.position)<0.9){selI.position.x=o.position.x; selI.position.z=o.position.z; selI.position.y=o.position.y+1; break;}}} syncInd();}}); window.addEventListener('mouseup', ()=>{isDraggingI=false; controlsI.enabled=true;}); (function anim(){requestAnimationFrame(anim); controlsI.update(); rendererI.render(sceneI,cameraI);})();}
+function syncInd(){if(!selI) return; document.getElementById('iMoveX').value=selI.position.x; document.getElementById('imxVal').innerText=selI.position.x.toFixed(1); document.getElementById('iMoveY').value=selI.position.y; document.getElementById('imyVal').innerText=selI.position.y.toFixed(1); document.getElementById('iMoveZ').value=selI.position.z; document.getElementById('imzVal').innerText=selI.position.z.toFixed(1); document.getElementById('iScaleX').value=selI.scale.x; document.getElementById('isxVal').innerText=selI.scale.x.toFixed(1);}
+function addBlockType(t){initInd(); closeBlockLibrary(); let m; const matS=new THREE.MeshStandardMaterial({color:'#c0c0c0'}); if(t==='box') m=new THREE.Mesh(new THREE.BoxGeometry(2.2,0.9,1.3), matS); if(t==='cylinder') m=new THREE.Mesh(new THREE.CylinderGeometry(0.5,0.5,1.6,20), matS); if(t==='sphere') m=new THREE.Mesh(new THREE.SphereGeometry(0.65,20,20), matS); if(t==='wing'){const sh=new THREE.Shape(); sh.moveTo(0,0); sh.lineTo(2,0); sh.lineTo(2,0.15); sh.lineTo(0,0.25); sh.lineTo(0,0); m=new THREE.Mesh(new THREE.ExtrudeGeometry(sh,{depth:0.06, bevelEnabled:false}), new THREE.MeshStandardMaterial({color:'#22ff66'}));} if(t==='rotor'){m=new THREE.Group(); const b1=new THREE.Mesh(new THREE.BoxGeometry(3.5,0.07,0.15), new THREE.MeshStandardMaterial({color:'#00ffff'})); const b2=b1.clone(); b2.rotation.y=Math.PI/2; m.add(b1,b2);} if(t==='propeller'){m=new THREE.Group(); const b=new THREE.Mesh(new THREE.BoxGeometry(2.2,0.08,0.18), matS); const b2=b.clone(); b2.rotation.y=Math.PI/2; m.add(b,b2);} if(t==='rocket_body') m=new THREE.Mesh(new THREE.CylinderGeometry(0.35,0.35,2.2,16), new THREE.MeshStandardMaterial({color:'#ffaa00'})); if(t==='satellite') m=new THREE.Mesh(new THREE.BoxGeometry(0.8,0.6,0.6), new THREE.MeshStandardMaterial({color:'#c0c0ff'})); if(!m) return; m.name=t+'_'+(bodiesI.length+1); m.position.set((Math.random()-0.5)*2,0.9,(Math.random()-0.5)*2); groupI.add(m); bodiesI.push(m); selI=m; document.getElementById('selInfo').innerText=m.name; document.getElementById('bodyCount').innerText=bodiesI.length; document.getElementById('bodyList').innerHTML=bodiesI.map(b=>`<div>🔩 ${b.name}</div>`).join(''); syncInd();}
+function updateIndColor(){if(!selI){alert('Pehle select karo!'); return;} const c=document.getElementById('iCol').value; if(selI.material) selI.material.color.set(c); selI.traverse&&selI.traverse(ch=>{if(ch.material) ch.material.color.set(c);});}
+function setIndColor(c){if(!selI){alert('Pehle select karo!'); return;} document.getElementById('iCol').value=c; updateIndColor();}
+function cutInd(){if(!selI){alert('Pehle select karo!'); return;} selI.scale.x*=0.5; selI.scale.y*=0.5; selI.scale.z*=0.5; if(selI.scale.x<0.15){groupI.remove(selI); bodiesI=bodiesI.filter(b=>b!==selI); selI=null; document.getElementById('selInfo').innerText='None'; document.getElementById('bodyCount').innerText=bodiesI.length;}}
+function applyIndMove(){if(!selI) return; selI.position.x=parseFloat(document.getElementById('iMoveX').value); selI.position.y=parseFloat(document.getElementById('iMoveY').value); selI.position.z=parseFloat(document.getElementById('iMoveZ').value); syncInd();}
+function applyIndScale(){if(!selI) return; const s=parseFloat(document.getElementById('iScaleX').value); selI.scale.x=s; selI.scale.y=s; selI.scale.z=s; syncInd();}
+function deleteInd(){if(!selI){alert('Pehle select karo!'); return;} groupI.remove(selI); bodiesI=bodiesI.filter(b=>b!==selI); selI=null; document.getElementById('selInfo').innerText='None'; document.getElementById('bodyCount').innerText=bodiesI.length; document.getElementById('bodyList').innerHTML=bodiesI.map(b=>`<div>🔩 ${b.name}</div>`).join('');}
 function openBlockLibrary(){document.getElementById('blockModal').style.display='flex';} function closeBlockLibrary(){document.getElementById('blockModal').style.display='none';}
-function clearInd(){if(groupI){while(groupI.children.length>0) groupI.remove(groupI.children[0]);} bodiesI=[]; selI=null; document.getElementById('selInfo').innerText='None';}
-function clearAll(){if(mainMode==='kids') clearK(); if(mainMode==='pro') clearPro(); if(mainMode==='industrial') clearInd();}
+// INDUSTRIAL SIMULATION - FINAL FIX
+function simulateInd(){
+  if(bodiesI.length===0){alert('Pehle blocks add karo! Box + Rotor + Rocket jodo fir Simulate dabao'); return;}
+  if(indSimRunning) return;
+  indSimRunning=true;
+  document.getElementById('simStatus').innerHTML='🚀 SIMULATING... Project Work Kar Raha Hai<br>Propeller Ghum Raha Hai, Rocket Ud Raha Hai';
+  let t=0;
+  indSimId=setInterval(()=>{
+    t+=0.05;
+    bodiesI.forEach(b=>{
+      if(b.name.includes('rotor')||b.name.includes('propeller')){
+        b.rotation.y+=0.45; b.rotation.z+=0.12;
+      }
+      if(b.name.includes('rocket')){
+        b.position.y+=0.04; b.rotation.x+=0.015;
+        if(b.position.y>7) b.position.y=0.8;
+      }
+      if(b.name.includes('wing')){
+        b.rotation.z=Math.sin(t*2)*0.12;
+      }
+      if(b.name.includes('satellite')){
+        b.rotation.y+=0.03; b.position.y+=Math.sin(t)*0.01;
+      }
+    });
+    groupI.rotation.y+=0.01;
+    groupI.position.y=Math.sin(t)*0.25+0.8;
+    if(t>15) stopIndSim();
+  },16);
+}
+function stopIndSim(){ if(indSimId) clearInterval(indSimId); indSimId=null; indSimRunning=false; document.getElementById('simStatus').innerHTML='Status: Stopped - Dubara Simulate dabao'; }
+function analyzeInd(){ if(bodiesI.length===0){alert('Pehle blocks add karo'); return;} const mass=(bodiesI.length*1.25).toFixed(2); const vol=(bodiesI.length*0.0034).toFixed(5); alert('🏭 ANALYSIS\\nMass: '+mass+' kg\\nVolume: '+vol+' m³\\nBodies: '+bodiesI.length+'\\nStatus: Simulation Ready - Ghumega Udega'); }
 setMain('kids');
 </script></body></html>
     """
-    components.html(HTML, height=960, scrolling=False)
+    components.html(HTML, height=1000, scrolling=False)
     
 def render_kids_logic_lab():
     # ============================================================
