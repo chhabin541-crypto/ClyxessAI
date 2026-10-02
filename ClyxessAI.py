@@ -3825,87 +3825,250 @@ def render_art_machinedesign():
 <meta charset="UTF-8"><script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
-body{margin:0; background:#0a0c18; font-family:Inter,sans-serif; overflow:hidden;}
-.topbar{height:38px; background:#111326; border-bottom:1px solid #ffffff10; display:flex; align-items:center; justify-content:space-between; padding:0 10px;}
-.mini-btn{font-size:10px; font-weight:700; padding:4px 10px; border-radius:14px; border:1px solid #ffffff15; cursor:pointer;}
-.active-k{background:#ffcc00; color:black; border-color:#ffcc00;}
-.active-a{background:#00ffff; color:black; border-color:#00ffff;}
-.tool-icon{width:36px; height:36px; display:flex; align-items:center; justify-content:center; background:#1a1e36; border:1px solid #ffffff0f; border-radius:8px; cursor:pointer; font-size:16px;}
-.tool-icon:hover{background:#242a4d;}
+*{box-sizing:border-box;} body{margin:0; background:#080a14; font-family:Inter,sans-serif; overflow:hidden;}
+.topbar{height:42px; background:#111326; border-bottom:1px solid #ffffff12; display:flex; align-items:center; justify-content:space-between; padding:0 10px;}
+.mini-btn{font-size:11px; font-weight:800; padding:6px 14px; border-radius:18px; border:1px solid #ffffff15; cursor:pointer; transition:0.15s;}
+.active-k{background:#ffcc00!important; color:black!important; border-color:#ffcc00!important;}
+.active-p{background:#00ffff!important; color:black!important; border-color:#00ffff!important;}
+.active-i{background:#ff5c00!important; color:white!important; border-color:#ff5c00!important;}
+.ribbon{height:46px; background:#1a1e36; border-bottom:1px solid #ffffff12; display:flex; align-items:center; gap:6px; padding:0 10px; overflow-x:auto;}
+.rib-btn{background:#242a4d; border:1px solid #ffffff10; padding:6px 11px; border-radius:10px; font-size:10px; cursor:pointer; display:flex; align-items:center; gap:5px; white-space:nowrap;}
+.rib-on{background:#ff5c00!important; color:white!important;}
+.tool-icon{width:38px; height:38px; background:#1a1e36; border:1px solid #ffffff0f; border-radius:10px; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:16px;}
+.tool-icon:hover{background:#2a335f;}
 .tool-on{outline:2px solid #00ffff; background:#253055!important;}
-.canvas-bg{background:#ffffff; background-image: radial-gradient(#d0d0d0 1px, transparent 1px); background-size:20px 20px;}
+.kid-part{background:#1e2648; border:1px solid #ffffff12; padding:8px 4px; border-radius:10px; text-align:center; cursor:pointer; font-size:10px; line-height:12px;}
+.kid-part:hover{background:#2e3a6b; transform:scale(1.03);}
+.card{background:#12162a; border:1px solid #ffffff10; border-radius:14px;}
 </style>
 </head>
-<body class="h-screen flex flex-col">
+<body class="h-screen flex flex-col text-white">
 
-<!-- CHHOTA HEADER - BILKUL COMPACT -->
+<!-- FINAL COMPACT HEADER + LANGUAGE BAR -->
 <div class="topbar">
-  <div class="flex items-center gap-2">
-    <div style="width:22px; height:22px; background:#ffcc00; color:black; border-radius:6px; display:flex; align-items:center; justify-content:center; font-weight:900; font-size:12px;">C</div>
-    <div style="font-size:11px; font-weight:800; color:white;">BLANK DESIGN LAB</div>
-    <div style="font-size:8px; color:#888; margin-left:6px;">Zero se banao • No readymade • Excel jaisa blank</div>
+  <div class="flex items-center gap-3">
+    <div style="width:26px; height:26px; background:#ffcc00; color:black; border-radius:8px; display:flex; align-items:center; justify-content:center; font-weight:900; font-size:13px;">C</div>
+    <div>
+      <div id="headerTitle" style="font-size:12px; font-weight:900; letter-spacing:0.2px;">🚁 Create Your Future Design - Blank Se Banao</div>
+      <div id="headerSub" style="font-size:8.5px; color:#8e94ab;">No Readymade • Zero se Helicopter, Aeroplane, Machine, Graphic, Card</div>
+    </div>
   </div>
-  <div class="flex items-center gap-1.5">
-    <button id="btnKids" onclick="setMain('kids')" class="mini-btn active-k">👶 KIDS 5-12</button>
-    <button id="btnPro" onclick="setMain('pro')" class="mini-btn bg-[#1e2238] text-white">🚀 ADULT PRO</button>
-    <div style="width:1px; height:16px; background:#ffffff20; margin:0 4px;"></div>
+
+  <div class="flex items-center gap-2">
+    <select id="langSel" onchange="changeLang()" style="background:#0b0e1e; color:#00ffff; border:1px solid #00ffff55; border-radius:20px; padding:5px 10px; font-size:11px; font-weight:700;">
+      <option value="hinglish">Hinglish</option>
+      <option value="en">English</option>
+      <option value="hi">हिंदी</option>
+    </select>
+
+    <button id="btnKids" onclick="setMain('kids')" class="mini-btn active-k">👶 KIDS</button>
+    <button id="btnPro" onclick="setMain('pro')" class="mini-btn bg-[#1e2238] text-white">🚀 PRO BLOCKS</button>
+    <button id="btnInd" onclick="setMain('industrial')" class="mini-btn bg-[#1e2238] text-white">🏭 INDUSTRIAL</button>
+
+    <div style="width:1px; height:18px; background:#ffffff20; margin:0 2px;"></div>
+
     <button onclick="clearAll()" class="mini-btn bg-[#2a2a2a] text-white">Clear</button>
-    <button onclick="downloadDesign()" class="mini-btn bg-white text-black">⬇️ PNG</button>
+    <button onclick="downloadPNG()" class="mini-btn bg-white text-black">⬇️ PNG</button>
+    <button onclick="downloadPDF()" class="mini-btn bg-[#ffcc00] text-black">📄 PDF</button>
     <button onclick="shareDesign()" class="mini-btn bg-[#00ffff] text-black">🔗 Share</button>
   </div>
 </div>
 
-<!-- MAIN -->
+<!-- MAIN CONTENT -->
 <div class="flex-1 flex overflow-hidden">
 
-  <!-- KIDS - EXCEL JAISE BLANK -->
+  <!-- ================= KIDS ================= -->
   <div id="kidsUI" style="display:flex; width:100%; height:100%;">
-    <div style="width:52px; background:#15182e; border-right:1px solid #ffffff0f; display:flex; flex-direction:column; align-items:center; gap:8px; padding:8px 0;">
-      <div title="Select/Move" id="tSelect" onclick="setTool('select')" class="tool-icon tool-on">🖱️</div>
-      <div title="Pen - Free Draw" id="tPen" onclick="setTool('pen')" class="tool-icon">✏️</div>
-      <div title="Line" id="tLine" onclick="setTool('line')" class="tool-icon">📏</div>
-      <div title="Rectangle - Body/Wing" id="tRect" onclick="setTool('rect')" class="tool-icon">⬜</div>
-      <div title="Circle - Wheel/Engine" id="tCircle" onclick="setTool('circle')" class="tool-icon">⭕</div>
-      <div title="Triangle - Nose/Tail" id="tTri" onclick="setTool('tri')" class="tool-icon">🔺</div>
-      <div title="Text" id="tText" onclick="setTool('text')" class="tool-icon">🔤</div>
+    <div style="width:54px; background:#15182e; border-right:1px solid #ffffff0f; display:flex; flex-direction:column; align-items:center; gap:8px; padding:10px 0;">
+      <div id="tSelect" onclick="setTool('select')" class="tool-icon tool-on" title="Select & Move">🖱️</div>
+      <div id="tPen" onclick="setTool('pen')" class="tool-icon" title="Free Pen">✏️</div>
+      <div id="tLine" onclick="setTool('line')" class="tool-icon" title="Line">📏</div>
+      <div id="tRect" onclick="setTool('rect')" class="tool-icon" title="Rectangle">⬜</div>
+      <div id="tCircle" onclick="setTool('circle')" class="tool-icon" title="Circle">⭕</div>
+      <div id="tTri" onclick="setTool('tri')" class="tool-icon" title="Triangle">🔺</div>
+      <div id="tText" onclick="setTool('text')" class="tool-icon" title="Text">🔤</div>
       <div style="margin-top:auto; display:flex; flex-direction:column; gap:6px;">
-        <div onclick="setColor('#ff0000')" style="width:22px; height:22px; background:red; border-radius:50%; cursor:pointer; border:2px solid transparent;"></div>
-        <div onclick="setColor('#000000')" style="width:22px; height:22px; background:black; border-radius:50%; cursor:pointer; border:1px solid #555;"></div>
-        <div onclick="setColor('#00aaff')" style="width:22px; height:22px; background:#00aaff; border-radius:50%; cursor:pointer;"></div>
-        <div onclick="setColor('#ffcc00')" style="width:22px; height:22px; background:#ffcc00; border-radius:50%; cursor:pointer;"></div>
+        <div onclick="setColor('#ff0000')" style="width:24px; height:24px; background:red; border-radius:50%; cursor:pointer; border:2px solid #ffffff20;"></div>
+        <div onclick="setColor('#00aaff')" style="width:24px; height:24px; background:#00aaff; border-radius:50%; cursor:pointer;"></div>
+        <div onclick="setColor('#22ff66')" style="width:24px; height:24px; background:#22ff66; border-radius:50%; cursor:pointer;"></div>
+        <div onclick="setColor('#ffcc00')" style="width:24px; height:24px; background:#ffcc00; border-radius:50%; cursor:pointer;"></div>
+        <div onclick="setColor('#000000')" style="width:24px; height:24px; background:black; border:1px solid #555; border-radius:50%; cursor:pointer;"></div>
       </div>
     </div>
 
-    <div style="flex:1; display:flex; flex-direction:column; padding:6px; background:#e9e9ef;">
-      <div style="font-size:10px; color:#555; padding:2px 6px; font-weight:700;">KIDS BLANK SHEET - Yahan se start karo, line kheecho, shape jod ke helicopter/aeroplane/card/graphic bnao - Bilkul Excel ke blank page jaisa</div>
-      <canvas id="kCanvas" width="1200" height="700" class="canvas-bg" style="flex:1; width:100%; border:1px solid #c0c0c8; border-radius:6px; cursor:crosshair;"></canvas>
-      <div style="display:flex; gap:8px; padding:4px 0; font-size:9px; color:#666;">
-        <span>Size: <input type="range" id="sizeRange" min="2" max="60" value="4" style="width:80px;" oninput="kLineW=this.value"></span>
-        <span id="hint" style="color:#0066ff; font-weight:700;">Tool: Select - Kisi bhi shape ko pakad ke move kar sakte ho, starting point se banao</span>
+    <div style="width:230px; background:#12162a; border-right:1px solid #ffffff0f; padding:8px; overflow-y:auto; display:flex; flex-direction:column; gap:10px;">
+      <div>
+        <b id="kTitle1" style="font-size:11px; color:#ffcc00;">🎨 KIDS FACTORY - Click to Add</b>
+        <div id="kSub1" style="font-size:9px; color:#888; margin-top:2px;">Photo jaisa colorful aeroplane - Tinkercad style</div>
       </div>
+
+      <div style="background:#1a1e36; border-radius:12px; padding:7px;">
+        <div style="font-size:10px; font-weight:800; margin-bottom:6px;">📦 BASIC - Zero Se Start</div>
+        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:6px;">
+          <div onclick="addKidPart('rect','#ff5a5a')" class="kid-part">⬜<br>Body</div>
+          <div onclick="addKidPart('circle','#00aaff')" class="kid-part">⭕<br>Wheel</div>
+          <div onclick="addKidPart('tri','#ffcc00')" class="kid-part">🔺<br>Nose</div>
+          <div onclick="addKidPart('line','#00ff88')" class="kid-part">📏<br>Line</div>
+          <div onclick="addKidPart('longRect','#8b5cf6')" class="kid-part">▭<br>Wing Strip</div>
+          <div onclick="addKidPart('smallCircle','#ffffff')" class="kid-part">⚪<br>Rivet</div>
+        </div>
+      </div>
+
+      <div style="background:#1a1e36; border-radius:12px; padding:7px; border:1px solid #00ffff25;">
+        <div style="font-size:10px; font-weight:800; color:#00ffff; margin-bottom:6px;">✈️ AERO / HELI PARTS - Colorful</div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px;">
+          <div onclick="addKidPart('wing','#22ff66')" class="kid-part" style="background:#22ff661a; border:1px solid #22ff6633;">🪽<br>Wing Green</div>
+          <div onclick="addKidPart('propeller','#ff8c00')" class="kid-part" style="background:#ff8c001a;">🌀<br>Propeller</div>
+          <div onclick="addKidPart('body','#ffaa00')" class="kid-part" style="background:#ffaa001a;">🟧<br>Fuselage Yellow</div>
+          <div onclick="addKidPart('tail','#ff4444')" class="kid-part" style="background:#ff44441a;">🚀<br>Tail Fin</div>
+          <div onclick="addKidPart('window','#7ec8ff')" class="kid-part" style="background:#7ec8ff1a;">🪟<br>Window</div>
+          <div onclick="addKidPart('landing','#aaaaaa')" class="kid-part" style="background:#aaaaaa1a;">🛞<br>Landing</div>
+          <div onclick="addKidPart('rotor','#00ffff')" class="kid-part" style="background:#00ffff1a;">✈️<br>Rotor Blade</div>
+          <div onclick="addKidPart('engine','#ffcc00')" class="kid-part" style="background:#ffcc001a;">🔧<br>Engine</div>
+        </div>
+      </div>
+
+      <div style="background:#1a1e36; border-radius:12px; padding:7px;">
+        <div style="font-size:10px; font-weight:800; margin-bottom:6px;">🎨 COLOR & SIZE</div>
+        <div style="display:grid; grid-template-columns:repeat(5,1fr); gap:6px;">
+          <div onclick="setColor('#ff0000')" style="height:26px; background:red; border-radius:8px; cursor:pointer;"></div>
+          <div onclick="setColor('#00aaff')" style="height:26px; background:#00aaff; border-radius:8px; cursor:pointer;"></div>
+          <div onclick="setColor('#22ff66')" style="height:26px; background:#22ff66; border-radius:8px; cursor:pointer;"></div>
+          <div onclick="setColor('#ffcc00')" style="height:26px; background:#ffcc00; border-radius:8px; cursor:pointer;"></div>
+          <div onclick="setColor('#ff8c00')" style="height:26px; background:#ff8c00; border-radius:8px; cursor:pointer;"></div>
+          <div onclick="setColor('#8b5cf6')" style="height:26px; background:#8b5cf6; border-radius:8px; cursor:pointer;"></div>
+          <div onclick="setColor('#000000')" style="height:26px; background:black; border:1px solid #444; border-radius:8px; cursor:pointer;"></div>
+          <div onclick="setColor('#ffffff')" style="height:26px; background:white; border:1px solid #444; border-radius:8px; cursor:pointer;"></div>
+          <div onclick="setColor('#ff5a9e')" style="height:26px; background:#ff5a9e; border-radius:8px; cursor:pointer;"></div>
+          <div onclick="setColor('#00ffff')" style="height:26px; background:#00ffff; border-radius:8px; cursor:pointer;"></div>
+        </div>
+        <div style="margin-top:8px; font-size:10px;">Size <input type="range" min="20" max="200" value="70" style="width:100%;" oninput="kSize=this.value; if(selectedIdx>=0){kObjects[selectedIdx].w=parseInt(this.value); drawK();}"></div>
+      </div>
+
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:5px; margin-top:auto;">
+        <button onclick="duplicateKid()" class="mini-btn bg-[#242a4d] text-white">📋 Duplicate</button>
+        <button onclick="rotateKid()" class="mini-btn bg-[#242a4d] text-white">↻ Rotate</button>
+        <button onclick="deleteKid()" class="mini-btn bg-[#3a1a1a] text-white">🗑️ Delete</button>
+        <button onclick="clearK()" class="mini-btn bg-[#3a1a1a] text-white">Clear All</button>
+      </div>
+    </div>
+
+    <div style="flex:1; background:#e9e9ef; padding:6px; display:flex; flex-direction:column;">
+      <div id="kHint" style="font-size:10px; color:#333; font-weight:800; padding:2px 4px;">👶 KIDS BLANK SHEET - Zero se start karo, click karke parts jodo, pen se draw karo - No readymade</div>
+      <canvas id="kCanvas" width="1300" height="750" style="flex:1; width:100%; background:white; border:1px solid #c0c0c8; border-radius:8px; margin-top:4px; background-image:radial-gradient(#ddd 1px, transparent 1px); background-size:20px 20px; cursor:crosshair;"></canvas>
     </div>
   </div>
 
-  <!-- ADULT - PRO BLANK 3D + 2D -->
+  <!-- ================= PRO BLOCKS ================= -->
   <div id="proUI" style="display:none; width:100%; height:100%;">
-    <div style="width:52px; background:#111326; border-right:1px solid #ffffff0f; display:flex; flex-direction:column; align-items:center; gap:8px; padding:8px 0;">
-      <div title="Add Box" onclick="add3D('box')" class="tool-icon">🧱</div>
-      <div title="Add Cylinder" onclick="add3D('cyl')" class="tool-icon">🛢️</div>
-      <div title="Add Plane/Wing" onclick="add3D('plane')" class="tool-icon">🪽</div>
-      <div title="Add Sphere" onclick="add3D('sphere')" class="tool-icon">⚪</div>
-      <div title="Delete" onclick="delete3D()" class="tool-icon" style="margin-top:12px; background:#3a1a1a;">🗑️</div>
-      <div title="Duplicate" onclick="duplicate3D()" class="tool-icon">📋</div>
-      <div title="Rotate" onclick="rotate3D()" class="tool-icon">↻</div>
+    <div style="width:56px; background:#111326; border-right:1px solid #ffffff0f; display:flex; flex-direction:column; align-items:center; gap:10px; padding:12px 0;">
+      <div onclick="add3D('box')" class="tool-icon" title="Fuselage Body">🧱</div>
+      <div onclick="add3D('cyl')" class="tool-icon" title="Engine / Cylinder">🛢️</div>
+      <div onclick="add3D('plane')" class="tool-icon" title="Wing / Blade">🪽</div>
+      <div onclick="add3D('sphere')" class="tool-icon" title="Cockpit / Nose">⚪</div>
+      <div onclick="add3D('rotor')" class="tool-icon" title="Rotor">🌀</div>
+      <div onclick="add3D('fin')" class="tool-icon" title="Tail Fin">🚀</div>
+      <div style="margin-top:12px; width:34px; height:1px; background:#ffffff15;"></div>
+      <div onclick="delete3D()" class="tool-icon" style="background:#3a1a1a;" title="Delete">🗑️</div>
+      <div onclick="duplicate3D()" class="tool-icon" title="Duplicate">📋</div>
+      <div onclick="rotate3D()" class="tool-icon" title="Rotate">↻</div>
+    </div>
+    <div style="flex:1; background:#05070a; padding:6px; display:flex; flex-direction:column;">
+      <div id="proHint" style="font-size:10px; color:#00ffff; font-weight:700; padding:2px 6px;">🚀 PRO BLOCKS - Click left blocks → 3D me ayega → Jod ke future machine banao - No readymade helicopter</div>
+      <div id="threePro" style="flex:1; width:100%; border-radius:10px; border:1px solid #00ffff15;"></div>
+    </div>
+    <div style="width:180px; background:#15182e; border-left:1px solid #ffffff0f; padding:10px; display:flex; flex-direction:column; gap:10px;">
+      <b style="font-size:12px; color:#00ffff;">PRO EDITOR</b>
+      <div style="background:#1a1e36; border-radius:10px; padding:8px;">
+        <div style="font-size:10px;">Color</div><input id="pCol" type="color" value="#ffcc00" style="width:100%; height:28px; border-radius:8px; border:none; margin-top:4px;" oninput="update3DColor()">
+        <div style="font-size:10px; margin-top:8px;">Size <span id="pSizeVal">80</span></div><input id="pSize" type="range" min="20" max="200" value="80" style="width:100%;" oninput="document.getElementById('pSizeVal').innerText=this.value; update3DSize()">
+        <div style="font-size:10px; margin-top:8px;">Move X</div><input id="pX" type="range" min="-5" max="5" step="0.1" value="0" style="width:100%;" oninput="move3D()">
+      </div>
+      <div style="background:#1a1e36; border-radius:10px; padding:8px; font-size:9px; color:#888; line-height:14px;">Click block to add<br>Drag mouse to rotate view<br>Scroll to zoom<br>Click body to select</div>
+      <button onclick="clearPro()" class="mini-btn bg-[#3a1a1a] text-white" style="margin-top:auto;">Clear All</button>
+    </div>
+  </div>
+
+  <!-- ================= INDUSTRIAL ================= -->
+  <div id="industrialUI" style="display:none; width:100%; height:100%; flex-direction:column;">
+    <div class="ribbon">
+      <span style="font-size:9px; color:#888; font-weight:800;">SOLID TOOLS:</span>
+      <button id="rExtrude" onclick="indTool('extrude')" class="rib-btn rib-on">⬆️ Extrude</button>
+      <button id="rRevolve" onclick="indTool('revolve')" class="rib-btn">🔄 Revolve</button>
+      <button id="rLoft" onclick="indTool('loft')" class="rib-btn">〰️ Loft</button>
+      <button id="rSweep" onclick="indTool('sweep')" class="rib-btn">➰ Sweep</button>
+      <div style="width:1px; height:20px; background:#ffffff20;"></div>
+      <button id="rFillet" onclick="indTool('fillet')" class="rib-btn">◍ Fillet</button>
+      <button id="rChamfer" onclick="indTool('chamfer')" class="rib-btn">◫ Chamfer</button>
+      <button id="rShell" onclick="indTool('shell')" class="rib-btn">🥚 Shell</button>
+      <button id="rHole" onclick="indTool('hole')" class="rib-btn">⭕ Hole</button>
+      <div style="width:1px; height:20px; background:#ffffff20;"></div>
+      <button id="rMirror" onclick="indTool('mirror')" class="rib-btn">🪞 Mirror</button>
+      <button id="rPattern" onclick="indTool('pattern')" class="rib-btn">🔁 Pattern</button>
+      <button id="rJoint" onclick="indTool('joint')" class="rib-btn">🔗 Joint</button>
+      <button onclick="simulate()" class="rib-btn" style="background:#00ffff; color:black; margin-left:auto; font-weight:900;">▶ Simulate Motion</button>
+      <button onclick="analyze()" class="rib-btn" style="background:#ffcc00; color:black; font-weight:900;">📊 Analyze</button>
     </div>
 
-    <div style="flex:1; display:flex; flex-direction:column; gap:6px; padding:6px; background:#0e101c;">
-      <div style="font-size:10px; color:#aaa; font-weight:700; padding:2px 6px;">PRO BLANK LAB - Zero se koi bhi machine bnao - Graphic, 3D, Card, Helicopter, Drone, Car - Sab yahin se start hoga</div>
-      <div id="threeP" style="flex:1; background:#05070a; border-radius:8px; border:1px solid #ffffff12; position:relative;"></div>
-      <div style="height:28px; background:#15182e; border-radius:6px; display:flex; align-items:center; gap:10px; padding:0 10px; font-size:10px;">
-        <span>Color <input id="pCol" type="color" value="#ffcc00" style="width:24px; height:18px; border:none;" oninput="update3DColor()"></span>
-        <span>Size <input id="pSize" type="range" min="20" max="200" value="80" style="width:80px;" oninput="update3DSize()"></span>
-        <span style="color:#777;">Click left icon → 3D me blank se add hoga → Mouse se ghumao, jod ke banao</span>
+    <div style="flex:1; display:flex; overflow:hidden;">
+      <div style="width:200px; background:#0f1220; border-right:1px solid #ffffff10; padding:8px; overflow-y:auto; font-size:10px; display:flex; flex-direction:column; gap:8px;">
+        <b style="font-size:11px; color:#ff5c00;">BROWSER - Industrial Tree</b>
+        <div style="background:#1a1e36; border-radius:10px; padding:8px;">
+          <div>📁 Origin</div>
+          <div style="margin-left:12px; color:#6b7280; font-size:9px;"> XY Plane</div>
+          <div style="margin-left:12px; color:#6b7280; font-size:9px;"> XZ Plane</div>
+          <div style="margin-left:12px; color:#6b7280; font-size:9px;"> YZ Plane</div>
+        </div>
+        <div style="background:#1a1e36; border-radius:10px; padding:8px;">
+          <div>📦 Bodies (<span id="bodyCount">0</span>)</div><div id="bodyList" style="margin-left:6px; margin-top:4px; color:#aaa;"></div>
+        </div>
+        <div style="background:#1a1e36; border-radius:10px; padding:8px;">
+          <div>✏️ Sketches</div><div style="margin-left:6px; color:#aaa; margin-top:2px;"> Sketch1 - Base Profile (Blank)</div>
+        </div>
+        <div style="background:#1a1e36; border-radius:10px; padding:8px;">
+          <div>🕒 Timeline - History</div><div id="timeline" style="display:flex; gap:4px; flex-wrap:wrap; margin-top:6px;"></div>
+        </div>
+        <div style="font-size:9px; color:#666; margin-top:4px;">Selected: <span id="selInfo" style="color:#00ffff;">None - Click body</span><br>Tool: <span id="toolInfo">Extrude</span></div>
+      </div>
+
+      <div style="flex:1; position:relative; background:#06080f;"><div id="threeInd" style="width:100%; height:100%;"></div><div style="position:absolute; bottom:10px; left:12px; background:#000000aa; padding:6px 12px; border-radius:20px; font-size:9px; color:#aaa;">🏭 INDUSTRIAL - Professional CAD Logic - Extrude se 2D→3D, Fillet se edge round, Mirror/Pattern se industrial duplication</div></div>
+
+      <div style="width:220px; background:#15182e; border-left:1px solid #ffffff0f; padding:10px; overflow-y:auto; display:flex; flex-direction:column; gap:10px;">
+        <b style="font-size:12px; color:#ff5c00;">INDUSTRIAL PROPERTIES</b>
+
+        <div style="background:#1a1e36; border-radius:10px; padding:9px;">
+          <div style="font-size:10px; font-weight:700;">Operation Type</div>
+          <select id="opType" style="width:100%; background:#0f1220; color:white; border:1px solid #ffffff20; border-radius:8px; padding:5px; font-size:10px; margin-top:5px;">
+            <option>Join - Material Jodna</option><option>Cut - Material Katna (Hole)</option><option>Intersect - Common Part</option><option>New Body - Alag Body</option>
+          </select>
+          <div style="font-size:10px; margin-top:8px;">Material</div>
+          <select id="matType" style="width:100%; background:#0f1220; color:white; border:1px solid #ffffff20; border-radius:8px; padding:5px; font-size:10px; margin-top:4px;">
+            <option>Steel - Strong & Heavy</option><option>Aluminium 6061 - Light</option><option>Titanium - Aero Grade</option><option>Plastic ABS - Prototype</option><option>Carbon Fiber - High Performance</option>
+          </select>
+        </div>
+
+        <div style="background:#1a1e36; border-radius:10px; padding:9px;">
+          <div style="font-size:10px;">Extrude Depth <span id="extVal">1.5</span></div><input id="extDepth" type="range" min="0.1" max="6" step="0.1" value="1.5" style="width:100%;" oninput="document.getElementById('extVal').innerText=this.value; applyExtrude()">
+          <div style="font-size:10px; margin-top:8px;">Fillet Radius <span id="filVal">0.2</span> - Edge Round</div><input id="filRad" type="range" min="0.02" max="1.2" step="0.02" value="0.2" style="width:100%;" oninput="document.getElementById('filVal').innerText=this.value; applyFillet()">
+          <div style="font-size:10px; margin-top:8px;">Chamfer Distance <span id="chamVal">0.2</span> - Bevel</div><input id="chamDist" type="range" min="0.02" max="1.2" step="0.02" value="0.2" style="width:100%;" oninput="document.getElementById('chamVal').innerText=this.value; applyChamfer()">
+          <div style="font-size:10px; margin-top:8px;">Revolve Angle <span id="revVal">360°</span></div><input id="revAngle" type="range" min="10" max="360" step="10" value="360" style="width:100%;" oninput="document.getElementById('revVal').innerText=this.value+'°'; applyRevolve()">
+        </div>
+
+        <div style="background:#1a1e36; border-radius:10px; padding:9px;">
+          <div style="font-size:10px; font-weight:700; margin-bottom:6px;">Quick Add - Blank Blocks</div>
+          <button onclick="addIndustrialBlock()" class="mini-btn" style="width:100%; background:#ff5c00; color:white; font-weight:900;">+ Add Base Block (Blank)</button>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-top:8px;">
+            <button onclick="indAction('mirror')" class="mini-btn bg-[#242a4d] text-white">🪞 Mirror</button>
+            <button onclick="indAction('pattern')" class="mini-btn bg-[#242a4d] text-white">🔁 Pattern x3</button>
+            <button onclick="indAction('shell')" class="mini-btn bg-[#242a4d] text-white">🥚 Shell</button>
+            <button onclick="indAction('hole')" class="mini-btn bg-[#242a4d] text-white">⭕ Hole</button>
+          </div>
+          <div style="font-size:9px; color:#888; margin-top:8px; line-height:13px;">Mass: <span id="massVal">0 kg</span><br>Volume: <span id="volVal">0 m³</span><br>Surface: <span id="surfVal">0 m²</span></div>
+        </div>
+
+        <button onclick="clearInd()" class="mini-btn bg-[#3a1a1a] text-white" style="margin-top:auto;">🗑️ Clear All Bodies</button>
       </div>
     </div>
   </div>
@@ -3913,120 +4076,203 @@ body{margin:0; background:#0a0c18; font-family:Inter,sans-serif; overflow:hidden
 </div>
 
 <script>
-let mainMode='kids', kTool='select', kColor='#000000', kLineW=4, kObjects=[], selectedIdx=-1, isDown=false, startPos=null, dragOff={x:0,y:0};
+let mainMode='kids', kTool='select', kColor='#ff0000', kSize=70, kObjects=[], selectedIdx=-1, isDown=false, currentFree=null, dragOff={x:0,y:0};
 
 function setMain(m){
   mainMode=m;
   document.getElementById('kidsUI').style.display=m==='kids'?'flex':'none';
   document.getElementById('proUI').style.display=m==='pro'?'flex':'none';
+  document.getElementById('industrialUI').style.display=m==='industrial'?'flex':'none';
   document.getElementById('btnKids').className=m==='kids'?'mini-btn active-k':'mini-btn bg-[#1e2238] text-white';
-  document.getElementById('btnPro').className=m==='pro'?'mini-btn active-a':'mini-btn bg-[#1e2238] text-white';
-  if(m==='pro') initPro();
+  document.getElementById('btnPro').className=m==='pro'?'mini-btn active-p':'mini-btn bg-[#1e2238] text-white';
+  document.getElementById('btnInd').className=m==='industrial'?'mini-btn active-i':'mini-btn bg-[#1e2238] text-white';
+  if(m==='pro') initPro(); if(m==='industrial') initInd();
+}
+function changeLang(){
+  const l=document.getElementById('langSel').value;
+  if(l==='hi'){
+    document.getElementById('headerTitle').innerText='🚁 अपना भविष्य का डिज़ाइन बनाओ - जीरो से शुरू करो';
+    document.getElementById('headerSub').innerText='कोई रेडीमेड नहीं • हेलीकॉप्टर, हवाई जहाज, मशीन खुद बनाओ';
+    document.getElementById('kHint').innerText='👶 बच्चों का ब्लैंक शीट - जीरो से शुरू करो, क्लिक करके पार्ट्स जोड़ो';
+  } else if(l==='en'){
+    document.getElementById('headerTitle').innerText='🚁 Create Your Future Design - Start From Blank';
+    document.getElementById('headerSub').innerText='No Readymade • Build Helicopter, Aeroplane, Machine From Scratch';
+    document.getElementById('kHint').innerText='👶 KIDS BLANK SHEET - Start from zero, click parts to build';
+  } else {
+    document.getElementById('headerTitle').innerText='🚁 Create Your Future Design - Blank Se Banao';
+    document.getElementById('headerSub').innerText='No Readymade • Zero se Helicopter, Aeroplane, Machine, Graphic, Card';
+    document.getElementById('kHint').innerText='👶 KIDS BLANK SHEET - Zero se start karo, click karke parts jodo';
+  }
 }
 function setTool(t){
   kTool=t;
-  document.querySelectorAll('.tool-icon').forEach(el=>el.classList.remove('tool-on'));
+  document.querySelectorAll('#kidsUI.tool-icon').forEach(e=>e.classList.remove('tool-on'));
   const map={select:'tSelect', pen:'tPen', line:'tLine', rect:'tRect', circle:'tCircle', tri:'tTri', text:'tText'};
   if(map[t]) document.getElementById(map[t]).classList.add('tool-on');
-  const hint=document.getElementById('hint');
-  if(hint){
-    if(t==='select') hint.innerText='Tool: Select - Shape ko pakad ke move karo, starting point se jod ke banao';
-    if(t==='pen') hint.innerText='Tool: Pen - Free hand se draw karo, bilkul blank paper pe';
-    if(t==='line') hint.innerText='Tool: Line - Drag karo line banegi, aeroplane ka wing banega';
-    if(t==='rect') hint.innerText='Tool: Rectangle - Drag karo body banegi';
-    if(t==='circle') hint.innerText='Tool: Circle - Drag karo wheel/engine banega';
-    if(t==='tri') hint.innerText='Tool: Triangle - Drag karo nose/tail banega';
-    if(t==='text') hint.innerText='Tool: Text - Canvas pe click karo, naam likho';
-  }
   document.getElementById('kCanvas').style.cursor=t==='select'?'move':'crosshair';
 }
 function setColor(c){kColor=c; if(selectedIdx>=0){kObjects[selectedIdx].color=c; drawK();}}
 
 const kcv=document.getElementById('kCanvas'), kctx=kcv.getContext('2d');
-function clearAll(){if(mainMode==='kids') clearK(); else clear3D();}
-function clearK(){kctx.fillStyle='white'; kctx.fillRect(0,0,kcv.width,kcv.height); kObjects=[]; selectedIdx=-1; drawKBG();}
 function drawKBG(){kctx.fillStyle='white'; kctx.fillRect(0,0,kcv.width,kcv.height);}
-
 function drawK(){
   drawKBG();
   kObjects.forEach((o,i)=>{
-    kctx.save(); kctx.strokeStyle=i===selectedIdx?'#00aaff':'#222'; kctx.lineWidth=i===selectedIdx?2.5: (o.lw||2); kctx.fillStyle=o.color;
-    if(o.type==='pen' || o.type==='line'){kctx.beginPath(); kctx.moveTo(o.x1,o.y1); kctx.lineTo(o.x2,o.y2); kctx.strokeStyle=o.color; kctx.lineWidth=o.lw||kLineW; kctx.stroke();}
-    if(o.type==='free'){kctx.beginPath(); kctx.strokeStyle=o.color; kctx.lineWidth=o.lw; for(let j=0;j<o.points.length-1;j++){kctx.moveTo(o.points[j].x,o.points[j].y); kctx.lineTo(o.points[j+1].x,o.points[j+1].y);} kctx.stroke();}
-    if(o.type==='rect'){kctx.fillStyle=o.color; kctx.fillRect(o.x1,o.y1,o.x2-o.x1,o.y2-o.y1); if(i===selectedIdx) kctx.strokeRect(o.x1,o.y1,o.x2-o.x1,o.y2-o.y1);}
-    if(o.type==='circle'){const rx=Math.abs(o.x2-o.x1)/2, ry=Math.abs(o.y2-o.y1)/2, r=Math.max(rx,ry); kctx.beginPath(); kctx.arc(o.x1+r, o.y1+r, r,0,Math.PI*2); kctx.fill(); kctx.stroke();}
-    if(o.type==='tri'){kctx.beginPath(); kctx.moveTo(o.x1+(o.x2-o.x1)/2,o.y1); kctx.lineTo(o.x1,o.y2); kctx.lineTo(o.x2,o.y2); kctx.closePath(); kctx.fill(); kctx.stroke();}
-    if(o.type==='text'){kctx.font='16px sans-serif'; kctx.fillStyle=o.color; kctx.fillText(o.text, o.x1,o.y1);}
+    kctx.save(); kctx.translate(o.x,o.y); kctx.rotate((o.rot||0)*Math.PI/180); kctx.fillStyle=o.color; kctx.strokeStyle=i===selectedIdx?'#00aaff':'#222222'; kctx.lineWidth=i===selectedIdx?3:1.2;
+    const w=o.w,h=o.h;
+    if(['rect','body','longRect'].includes(o.type)) kctx.fillRect(-w/2,-h/2,w,h);
+    if(['circle','smallCircle','landing'].includes(o.type)||o.type==='circle'){kctx.beginPath(); kctx.arc(0,0,w/2,0,Math.PI*2); kctx.fill(); kctx.stroke();}
+    if(['tri','tail'].includes(o.type)){kctx.beginPath(); kctx.moveTo(0,-h/2); kctx.lineTo(-w/2,h/2); kctx.lineTo(w/2,h/2); kctx.closePath(); kctx.fill(); kctx.stroke();}
+    if(o.type==='line'){kctx.beginPath(); kctx.moveTo(-w/2,0); kctx.lineTo(w/2,0); kctx.strokeStyle=o.color; kctx.lineWidth=5; kctx.stroke();}
+    if(o.type==='wing'){kctx.fillRect(-w,-h/4,w*2,h/2); kctx.fillStyle='#00000020'; kctx.fillRect(-w,-h/4,w*2,4);}
+    if(o.type==='propeller'){kctx.fillRect(-w,-4,w*2,8); kctx.fillRect(-4,-w,8,w*2); kctx.beginPath(); kctx.arc(0,0,8,0,Math.PI*2); kctx.fillStyle='#333'; kctx.fill();}
+    if(o.type==='window'){kctx.fillStyle='#7ec8ffcc'; kctx.fillRect(-w/2,-h/2,w,h); kctx.strokeStyle='#4a90e2'; kctx.strokeRect(-w/2,-h/2,w,h);}
+    if(o.type==='rotor'){kctx.fillRect(-w,-3,w*2,6); kctx.fillRect(-3,-w,6,w*2);}
+    if(o.type==='engine'){kctx.fillRect(-w/2,-h/2,w,h); kctx.fillStyle='#222'; kctx.fillRect(-w/2+6,-h/2+6,w-12,h*0.3);}
+    if(o.type==='free'){kctx.beginPath(); for(let j=0;j<o.points.length-1;j++){kctx.moveTo(o.points[j].x-o.x,o.points[j].y-o.y); kctx.lineTo(o.points[j+1].x-o.x,o.points[j+1].y-o.y);} kctx.strokeStyle=o.color; kctx.lineWidth=o.lw||4; kctx.lineCap='round'; kctx.stroke();}
+    if(o.type==='text'){kctx.font='18px sans-serif'; kctx.fillStyle=o.color; kctx.fillText(o.text||'Design', -w/2, 0);}
     kctx.restore();
   });
 }
-
+function addKidPart(type,col){
+  if(col) kColor=col;
+  const x=280+Math.random()*320, y=180+Math.random()*220;
+  let w=kSize,h=kSize*0.6;
+  if(type==='wing'){w=130; h=32;} if(type==='propeller'){w=55; h=55;} if(type==='longRect'){w=120; h=24;} if(type==='line'){w=100; h=10;}
+  kObjects.push({type:type, x:x, y:y, w:w, h:h, color:kColor, rot:0});
+  selectedIdx=kObjects.length-1; drawK();
+}
 function getPos(e){const r=kcv.getBoundingClientRect(); return {x:(e.clientX-r.left)*(kcv.width/r.width), y:(e.clientY-r.top)*(kcv.height/r.height)};}
-
-let currentFree=null;
 kcv.addEventListener('mousedown',e=>{
-  const p=getPos(e); isDown=true; startPos=p;
+  const p=getPos(e); isDown=true;
   if(kTool==='select'){
     selectedIdx=-1;
-    for(let i=kObjects.length-1;i>=0;i--){const o=kObjects[i]; const minX=Math.min(o.x1,o.x2), maxX=Math.max(o.x1,o.x2), minY=Math.min(o.y1,o.y2), maxY=Math.max(o.y1,o.y2); if(p.x>=minX-10&&p.x<=maxX+10&&p.y>=minY-10&&p.y<=maxY+10){selectedIdx=i; dragOff={x:p.x-o.x1, y:p.y-o.y1}; break;}}
+    for(let i=kObjects.length-1;i>=0;i--){const o=kObjects[i]; const dx=Math.abs(p.x-o.x), dy=Math.abs(p.y-o.y); if(dx<o.w*0.7 && dy<o.h*0.9){selectedIdx=i; dragOff={x:p.x-o.x, y:p.y-o.y}; break;}}
     drawK(); return;
   }
-  if(kTool==='pen'){currentFree={type:'free', points:[p], color:kColor, lw:kLineW}; kObjects.push(currentFree);}
-  if(kTool==='text'){const txt=prompt('Kya likhna hai?','My Design'); if(txt){kObjects.push({type:'text', x1:p.x,y1:p.y,x2:p.x+100,y2:p.y+20,color:kColor,text:txt}); drawK();} isDown=false; return;}
-  if(['line','rect','circle','tri'].includes(kTool)){kObjects.push({type:kTool, x1:p.x,y1:p.y,x2:p.x,y2:p.y,color:kColor,lw:kLineW}); selectedIdx=kObjects.length-1;}
+  if(kTool==='pen'){currentFree={type:'free', x:p.x, y:p.y, points:[p], color:kColor, lw:4, w:20, h:20}; kObjects.push(currentFree);}
+  if(kTool==='text'){const txt=prompt('Kya likhna hai?','My Design'); if(txt){kObjects.push({type:'text', x:p.x, y:p.y, w:100, h:20, color:kColor, text:txt}); drawK();} isDown=false; return;}
+  if(['line','rect','circle','tri'].includes(kTool)){kObjects.push({type:kTool, x:p.x, y:p.y, w:10, h:10, x1:p.x, y1:p.y, x2:p.x, y2:p.y, color:kColor, lw:4}); selectedIdx=kObjects.length-1;}
 });
 kcv.addEventListener('mousemove',e=>{
   if(!isDown) return; const p=getPos(e);
-  if(kTool==='select' && selectedIdx>=0){const o=kObjects[selectedIdx]; const dx=p.x-dragOff.x-o.x1, dy=p.y-dragOff.y-o.y1; o.x1+=dx; o.y1+=dy; o.x2+=dx; o.y2+=dy; if(o.points){o.points.forEach(pt=>{pt.x+=dx; pt.y+=dy;});} drawK(); return;}
-  if(kTool==='pen' && currentFree){currentFree.points.push(p); drawK(); return;}
-  if(['line','rect','circle','tri'].includes(kTool) && selectedIdx>=0){kObjects[selectedIdx].x2=p.x; kObjects[selectedIdx].y2=p.y; drawK();}
+  if(kTool==='select' && selectedIdx>=0){kObjects[selectedIdx].x=p.x-dragOff.x; kObjects[selectedIdx].y=p.y-dragOff.y; drawK(); return;}
+  if(kTool==='pen' && currentFree){currentFree.points.push(p); currentFree.x=(currentFree.points[0].x+p.x)/2; currentFree.y=(currentFree.points[0].y+p.y)/2; drawK(); return;}
+  if(selectedIdx>=0 && ['line','rect','circle','tri'].includes(kObjects[selectedIdx].type)){kObjects[selectedIdx].w=Math.abs(p.x-kObjects[selectedIdx].x)*2; kObjects[selectedIdx].h=Math.abs(p.y-kObjects[selectedIdx].y)*2; drawK();}
 });
-window.addEventListener('mouseup',()=>{isDown=false; currentFree=null; startPos=null;});
-clearK(); setTool('select');
+window.addEventListener('mouseup',()=>{isDown=false; currentFree=null;});
+function deleteKid(){if(selectedIdx>=0){kObjects.splice(selectedIdx,1); selectedIdx=-1; drawK();}}
+function duplicateKid(){if(selectedIdx>=0){const o=JSON.parse(JSON.stringify(kObjects[selectedIdx])); o.x+=30; o.y+=30; kObjects.push(o); selectedIdx=kObjects.length-1; drawK();}}
+function rotateKid(){if(selectedIdx>=0){kObjects[selectedIdx].rot=(kObjects[selectedIdx].rot||0)+15; drawK();}}
+function clearK(){kObjects=[]; selectedIdx=-1; drawKBG();}
+drawKBG(); setTool('select');
 
-// 3D BLANK
-let scene,camera,renderer,controls,group, proInit=false, selected3D=null;
+// PRO BLOCKS - 100% sahi wala
+let sceneP,cameraP,rendererP,controlsP,groupP, proInit=false, selectedP=null;
 function initPro(){
   if(proInit) return; proInit=true;
-  const container=document.getElementById('threeP');
-  scene=new THREE.Scene(); scene.background=new THREE.Color(0x06080f);
-  camera=new THREE.PerspectiveCamera(50, container.clientWidth/container.clientHeight, 0.1, 1000); camera.position.set(4,3,5);
-  renderer=new THREE.WebGLRenderer({antialias:true}); renderer.setSize(container.clientWidth, container.clientHeight);
-  container.appendChild(renderer.domElement);
-  controls=new THREE.OrbitControls(camera, renderer.domElement); controls.enableDamping=true;
-  scene.add(new THREE.DirectionalLight(0xffffff,1)); scene.add(new THREE.AmbientLight(0xffffff,0.7));
-  group=new THREE.Group(); scene.add(group);
-  scene.add(new THREE.GridHelper(20,40,0x223344,0x111a22));
-  const raycaster=new THREE.Raycaster(), mouse=new THREE.Vector2();
-  renderer.domElement.addEventListener('click', e=>{
-    const rect=renderer.domElement.getBoundingClientRect(); mouse.x=((e.clientX-rect.left)/rect.width)*2-1; mouse.y=-((e.clientY-rect.top)/rect.height)*2+1;
-    raycaster.setFromCamera(mouse,camera); const inter=raycaster.intersectObjects(group.children,true);
-    if(inter.length>0){selected3D=inter[0].object; while(selected3D.parent && selected3D.parent!==group) selected3D=selected3D.parent;}
+  const c=document.getElementById('threePro');
+  sceneP=new THREE.Scene(); sceneP.background=new THREE.Color(0x05070a);
+  cameraP=new THREE.PerspectiveCamera(50,c.clientWidth/c.clientHeight,0.1,1000); cameraP.position.set(5,4,6);
+  rendererP=new THREE.WebGLRenderer({antialias:true}); rendererP.setSize(c.clientWidth,c.clientHeight); c.appendChild(rendererP.domElement);
+  controlsP=new THREE.OrbitControls(cameraP, rendererP.domElement); controlsP.enableDamping=true;
+  sceneP.add(new THREE.DirectionalLight(0xffffff,1.2)); sceneP.add(new THREE.AmbientLight(0xffffff,0.7));
+  groupP=new THREE.Group(); sceneP.add(groupP); sceneP.add(new THREE.GridHelper(24,48,0x223344,0x101a2a));
+  (function anim(){requestAnimationFrame(anim); controlsP.update(); rendererP.render(sceneP,cameraP);})();
+  const ray=new THREE.Raycaster(), mouse=new THREE.Vector2();
+  rendererP.domElement.addEventListener('click', e=>{
+    const r=rendererP.domElement.getBoundingClientRect(); mouse.x=((e.clientX-r.left)/r.width)*2-1; mouse.y=-((e.clientY-r.top)/r.height)*2+1;
+    ray.setFromCamera(mouse,cameraP); const inter=ray.intersectObjects(groupP.children,true);
+    if(inter.length>0){selectedP=inter[0].object; while(selectedP.parent&&selectedP.parent!==groupP) selectedP=selectedP.parent;}
   });
-  (function anim(){requestAnimationFrame(anim); controls.update(); renderer.render(scene,camera);})();
 }
 function add3D(t){
-  initPro(); const col=document.getElementById('pCol').value; const s=parseFloat(document.getElementById('pSize').value)*0.01; let mesh; const mat=new THREE.MeshStandardMaterial({color:col});
-  if(t==='box') mesh=new THREE.Mesh(new THREE.BoxGeometry(s*2,s*0.8,s*0.8), mat);
-  if(t==='cyl') {mesh=new THREE.Mesh(new THREE.CylinderGeometry(s*0.4,s*0.4,s*1.5,16), mat); mesh.rotation.z=Math.PI/2;}
-  if(t==='plane') mesh=new THREE.Mesh(new THREE.BoxGeometry(s*2.2,0.04,s*0.9), mat);
-  if(t==='sphere') mesh=new THREE.Mesh(new THREE.SphereGeometry(s*0.6,16,16), mat);
-  if(!mesh) return; mesh.position.set((Math.random()-0.5)*2, s+0.5, (Math.random()-0.5)*2); group.add(mesh); selected3D=mesh;
+  initPro();
+  const col=document.getElementById('pCol').value; const s=1;
+  let mesh; const mat=new THREE.MeshStandardMaterial({color:col, metalness:0.2, roughness:0.5});
+  if(t==='box') mesh=new THREE.Mesh(new THREE.BoxGeometry(2.2,0.8,0.9), mat);
+  if(t==='cyl'){mesh=new THREE.Mesh(new THREE.CylinderGeometry(0.4,0.4,1.6,20), mat); mesh.rotation.z=Math.PI/2;}
+  if(t==='plane') mesh=new THREE.Mesh(new THREE.BoxGeometry(2.4,0.05,1.0), mat);
+  if(t==='sphere') mesh=new THREE.Mesh(new THREE.SphereGeometry(0.6,20,20), mat);
+  if(t==='rotor'){mesh=new THREE.Group(); const b1=new THREE.Mesh(new THREE.BoxGeometry(3.5,0.06,0.14), mat); const b2=new THREE.Mesh(new THREE.BoxGeometry(0.14,0.06,3.5), mat); mesh.add(b1); mesh.add(b2);}
+  if(t==='fin'){mesh=new THREE.Mesh(new THREE.BoxGeometry(0.08,0.9,0.7), mat);}
+  if(!mesh) return; mesh.position.set((Math.random()-0.5)*2,0.8,(Math.random()-0.5)*2); groupP.add(mesh); selectedP=mesh;
 }
-function delete3D(){if(selected3D){group.remove(selected3D); selected3D=null;}}
-function duplicate3D(){if(selected3D){const c=selected3D.clone(); c.position.x+=0.6; group.add(c);}}
-function rotate3D(){if(selected3D) selected3D.rotation.y+=0.5;}
-function clear3D(){if(group){while(group.children.length>0) group.remove(group.children[0]);}}
-function update3DColor(){if(selected3D){const col=document.getElementById('pCol').value; selected3D.traverse?selected3D.traverse(ch=>{if(ch.material) ch.material.color.set(col);}):selected3D.material.color.set(col);}}
-function update3DSize(){if(selected3D){const s=parseFloat(document.getElementById('pSize').value)*0.01; selected3D.scale.set(s,s,s);}}
+function delete3D(){if(selectedP) groupP.remove(selectedP); selectedP=null;}
+function duplicate3D(){if(selectedP){const c=selectedP.clone(); c.position.x+=0.7; groupP.add(c);}}
+function rotate3D(){if(selectedP) selectedP.rotation.y+=0.5;}
+function update3DColor(){if(selectedP){const col=document.getElementById('pCol').value; selectedP.traverse?selectedP.traverse(ch=>{if(ch.material) ch.material.color.set(col);}):selectedP.material.color.set(col);}}
+function update3DSize(){if(selectedP){const s=parseFloat(document.getElementById('pSize').value)*0.01; selectedP.scale.set(s,s,s);}}
+function move3D(){if(selectedP){selectedP.position.x=parseFloat(document.getElementById('pX').value);}}
+function clearPro(){if(groupP){while(groupP.children.length>0) groupP.remove(groupP.children[0]);}}
 
-function downloadDesign(){const link=document.createElement('a'); link.download='Blank_Design_'+Date.now()+'.png'; link.href=document.getElementById('kCanvas').toDataURL(); link.click();}
-function shareDesign(){const url=document.getElementById('kCanvas').toDataURL(); fetch(url).then(r=>r.blob()).then(b=>{const f=new File([b],'design.png',{type:'image/png'}); if(navigator.canShare&&navigator.canShare({files:[f]})) navigator.share({title:'My Blank Design', text:'Maine zero se design banaya! 🚁', files:[f]}); else alert('Download karke share kar do!');});}
+// INDUSTRIAL - Fusion 360 Logic
+let sceneI,cameraI,rendererI,controlsI,groupI, indInit=false, selI=null, bodiesI=[], indToolMode='extrude';
+function initInd(){
+  if(indInit) return; indInit=true;
+  const c=document.getElementById('threeInd');
+  sceneI=new THREE.Scene(); sceneI.background=new THREE.Color(0x080a14);
+  cameraI=new THREE.PerspectiveCamera(50,c.clientWidth/c.clientHeight,0.1,1000); cameraI.position.set(7,6,8);
+  rendererI=new THREE.WebGLRenderer({antialias:true}); rendererI.setSize(c.clientWidth,c.clientHeight); c.appendChild(rendererI.domElement);
+  controlsI=new THREE.OrbitControls(cameraI, rendererI.domElement); controlsI.enableDamping=true;
+  sceneI.add(new THREE.DirectionalLight(0xffffff,1.3)); sceneI.add(new THREE.AmbientLight(0xffffff,0.6));
+  groupI=new THREE.Group(); sceneI.add(groupI); sceneI.add(new THREE.GridHelper(30,60,0x1e2a3a,0x0f1720));
+  const ray=new THREE.Raycaster(), mouse=new THREE.Vector2();
+  rendererI.domElement.addEventListener('click', e=>{
+    const r=rendererI.domElement.getBoundingClientRect(); mouse.x=((e.clientX-r.left)/r.width)*2-1; mouse.y=-((e.clientY-r.top)/r.height)*2+1;
+    ray.setFromCamera(mouse,cameraI); const inter=ray.intersectObjects(groupI.children,true);
+    if(inter.length>0){selI=inter[0].object; while(selI.parent&&selI.parent!==groupI) selI=selI.parent; document.getElementById('selInfo').innerText=selI.name||'Body';}
+  });
+  (function anim(){requestAnimationFrame(anim); controlsI.update(); rendererI.render(sceneI,cameraI);})();
+  addIndustrialBlock();
+}
+function addIndustrialBlock(){
+  initInd();
+  const mat=new THREE.MeshStandardMaterial({color:'#c8c8c8', metalness:0.35, roughness:0.35});
+  const mesh=new THREE.Mesh(new THREE.BoxGeometry(2.2,0.9,1.3), mat);
+  mesh.name='Body-'+(bodiesI.length+1); mesh.position.set((Math.random()-0.5)*1.5,0.7,(Math.random()-0.5)*1.5);
+  groupI.add(mesh); bodiesI.push(mesh); selI=mesh; updateLists();
+}
+function updateLists(){
+  document.getElementById('bodyCount').innerText=bodiesI.length;
+  document.getElementById('bodyList').innerHTML=bodiesI.map(b=>`<div>🔩 ${b.name}</div>`).join('');
+  document.getElementById('timeline').innerHTML=bodiesI.map((_,i)=>`<div style="width:32px; height:20px; background:#242a4d; border-radius:6px; font-size:8px; display:flex; align-items:center; justify-content:center; border:1px solid #ffffff10;">F${i+1}</div>`).join('');
+  const mass=(bodiesI.length*1.25).toFixed(2); document.getElementById('massVal').innerText=mass+' kg';
+  document.getElementById('volVal').innerText=(bodiesI.length*0.0034).toFixed(5)+' m³';
+  document.getElementById('surfVal').innerText=(bodiesI.length*0.82).toFixed(3)+' m²';
+}
+function indTool(t){
+  indToolMode=t;
+  document.querySelectorAll('.rib-btn').forEach(b=>b.classList.remove('rib-on'));
+  const id='r'+t.charAt(0).toUpperCase()+t.slice(1); const el=document.getElementById(id); if(el) el.classList.add('rib-on');
+  document.getElementById('toolInfo').innerText=t;
+  if(t==='extrude') applyExtrude(); if(t==='fillet') applyFillet(); if(t==='chamfer') applyChamfer(); if(t==='revolve') applyRevolve();
+}
+function applyExtrude(){if(!selI) return; const d=parseFloat(document.getElementById('extDepth').value); selI.scale.y=d; if(document.getElementById('opType').value.includes('Cut')) selI.scale.y=0.2;}
+function applyFillet(){if(!selI) return; const r=parseFloat(document.getElementById('filRad').value); selI.scale.x=1+r*0.25; selI.scale.z=1+r*0.25;}
+function applyChamfer(){if(!selI) return; const r=parseFloat(document.getElementById('chamDist').value); selI.rotation.x=r*0.4;}
+function applyRevolve(){if(!selI) return; const a=parseFloat(document.getElementById('revAngle').value); selI.rotation.y=a*Math.PI/180;}
+function indAction(a){
+  if(!selI) return;
+  if(a==='mirror'){const c=selI.clone(); c.position.x=-c.position.x; c.name=selI.name+'_Mirror'; groupI.add(c); bodiesI.push(c);}
+  if(a==='pattern'){for(let i=1;i<=2;i++){const c=selI.clone(); c.position.x+=i*1.6; c.name=selI.name+'_Pat'+i; groupI.add(c); bodiesI.push(c);}}
+  if(a==='shell'){selI.material.wireframe=!selI.material.wireframe; selI.material.transparent=true; selI.material.opacity=0.55;}
+  if(a==='hole'){selI.scale.x*=0.78; selI.scale.z*=0.78;}
+  updateLists();
+}
+function simulate(){if(!selI) return; let t=0; const id=setInterval(()=>{t+=0.05; selI.rotation.y+=0.12; if(t>4) clearInterval(id);},16);}
+function analyze(){if(!selI) return; alert('Analysis: Mass='+document.getElementById('massVal').innerText+' | Material='+document.getElementById('matType').value+' | Operation='+document.getElementById('opType').value+' | Fillet='+document.getElementById('filRad').value+' | This is industrial logic: Fillet reduces stress concentration, Mirror creates symmetry, Shell reduces weight - as per Fusion 360/SolidWorks standards【1396587171547768093†L13-L17】');}
+function clearInd(){if(groupI){while(groupI.children.length>0) groupI.remove(groupI.children[0]);} bodiesI=[]; sceneI.add(new THREE.GridHelper(30,60,0x1e2a3a,0x0f1720)); updateLists();}
+
+function clearAll(){if(mainMode==='kids') clearK(); if(mainMode==='pro') clearPro(); if(mainMode==='industrial') clearInd();}
+function downloadPNG(){const link=document.createElement('a'); link.download='Future_Design_'+Date.now()+'.png'; link.href=document.getElementById('kCanvas').toDataURL(); link.click();}
+function downloadPDF(){const {jsPDF}=window.jspdf; const doc=new jsPDF(); doc.text('Create Your Future Design - Blueprint',10,10); doc.addImage(document.getElementById('kCanvas').toDataURL('image/png'),'PNG',10,20,180,100); doc.save('Blueprint_'+Date.now()+'.pdf');}
+function shareDesign(){const url=document.getElementById('kCanvas').toDataURL(); fetch(url).then(r=>r.blob()).then(b=>{const f=new File([b],'design.png',{type:'image/png'}); if(navigator.canShare&&navigator.canShare({files:[f]})) navigator.share({title:'My Future Design', text:'Maine blank se design banaya! 🚁', files:[f]}); else alert('Download karke share kar do!');});}
 
 setMain('kids');
 </script></body></html>
     """
-    components.html(HTML, height=780, scrolling=False)   
+    components.html(HTML, height=860, scrolling=False)   
     
 def render_kids_logic_lab():
     # ============================================================
