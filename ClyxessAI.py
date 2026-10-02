@@ -3818,247 +3818,215 @@ def render_math_lab(client):
         st.session_state.math_game_q_id += 1
         st.rerun()   
         
-def render_art_machinedesign():
+def render_art_machinedesign()
     import streamlit.components.v1 as components
     HTML = """
-<!DOCTYPE html>
-<html><head>
-<meta charset="UTF-8">
-<script src="https://cdn.tailwindcss.com"></script>
+<!DOCTYPE html><html><head>
+<meta charset="UTF-8"><script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
-  *{box-sizing:border-box;}
-  body{margin:0; overflow:hidden; background:#080a14; font-family:Inter,sans-serif;}
- .mode-btn{padding:8px 18px; border-radius:24px; font-weight:800; font-size:12px; border:1px solid #ffffff20; cursor:pointer; transition:0.2s;}
- .active-kids{background:#ffcc00!important; color:black!important; border-color:#ffcc00!important;}
- .active-adult{background:#00ffff!important; color:black!important; border-color:#00ffff!important;}
- .card{background:#12162a; border:1px solid #ffffff12; border-radius:14px;}
-  canvas{border-radius:10px;}
+body{margin:0; background:#0a0c18; font-family:Inter,sans-serif; overflow:hidden;}
+.topbar{height:38px; background:#111326; border-bottom:1px solid #ffffff10; display:flex; align-items:center; justify-content:space-between; padding:0 10px;}
+.mini-btn{font-size:10px; font-weight:700; padding:4px 10px; border-radius:14px; border:1px solid #ffffff15; cursor:pointer;}
+.active-k{background:#ffcc00; color:black; border-color:#ffcc00;}
+.active-a{background:#00ffff; color:black; border-color:#00ffff;}
+.tool-icon{width:36px; height:36px; display:flex; align-items:center; justify-content:center; background:#1a1e36; border:1px solid #ffffff0f; border-radius:8px; cursor:pointer; font-size:16px;}
+.tool-icon:hover{background:#242a4d;}
+.tool-on{outline:2px solid #00ffff; background:#253055!important;}
+.canvas-bg{background:#ffffff; background-image: radial-gradient(#d0d0d0 1px, transparent 1px); background-size:20px 20px;}
 </style>
 </head>
-<body class="text-white p-2 h-screen flex flex-col gap-2">
+<body class="h-screen flex flex-col">
 
-  <!-- TOP CLEAN HEADER -->
-  <div class="card flex justify-between items-center px-4 py-2.5 shrink-0">
-    <div class="flex items-center gap-3">
-      <div style="background:#ffcc00; color:black; width:32px; height:32px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-weight:900;">C</div>
-      <div>
-        <div id="headerTitle" style="font-size:13px; font-weight:900;">🚁 Create Your Future Design - Helicopter Bnao, Aeroplane Bnao</div>
-        <div style="font-size:9px; color:#9aa0b5;">Create Curiosity • No Readymade • Blank PowerPoint Advance</div>
-      </div>
-    </div>
-    <div class="flex items-center gap-2">
-      <select id="langSel" onchange="changeLang()" style="background:#0b0e1e; color:#00ffff; border:1px solid #00ffff; border-radius:20px; padding:6px 10px; font-size:11px;">
-        <option value="hinglish">Hinglish</option><option value="en">English</option><option value="hi">हिंदी</option>
-      </select>
-      <button id="btnKids" onclick="setMain('kids')" class="mode-btn active-kids">👶 KIDS 5-12</button>
-      <button id="btnPro" onclick="setMain('pro')" class="mode-btn bg-[#1e2238]">🚀 ADULT 13-18+</button>
-      <div style="width:1px; height:24px; background:#ffffff20; margin:0 4px;"></div>
-      <button onclick="shareDesign()" style="background:#00ffff; color:black; padding:7px 14px; border-radius:20px; font-weight:900; font-size:11px;">🔗 Share</button>
-      <button onclick="downloadDesign()" style="background:white; color:black; padding:7px 14px; border-radius:20px; font-weight:900; font-size:11px;">⬇️ Download</button>
-    </div>
+<!-- CHHOTA HEADER - BILKUL COMPACT -->
+<div class="topbar">
+  <div class="flex items-center gap-2">
+    <div style="width:22px; height:22px; background:#ffcc00; color:black; border-radius:6px; display:flex; align-items:center; justify-content:center; font-weight:900; font-size:12px;">C</div>
+    <div style="font-size:11px; font-weight:800; color:white;">BLANK DESIGN LAB</div>
+    <div style="font-size:8px; color:#888; margin-left:6px;">Zero se banao • No readymade • Excel jaisa blank</div>
   </div>
-
-  <!-- CONTENT AREA - NO OVERLAP -->
-  <div class="flex-1 overflow-hidden">
-
-    <!-- KIDS SECTION - BY DEFAULT VISIBLE -->
-    <div id="kidsUI" style="display:flex; gap:10px; height:100%;">
-      <div class="card w-[180px] p-3 flex flex-col gap-3 shrink-0">
-        <div class="flex gap-1">
-          <button id="k5" onclick="setKA('5-7')" class="flex-1 bg-[#ffcc00] text-black py-1.5 rounded-lg text-[10px] font-black">5-7</button>
-          <button id="k8" onclick="setKA('8-10')" class="flex-1 bg-[#1e2238] py-1.5 rounded-lg text-[10px]">8-10</button>
-          <button id="k11" onclick="setKA('11-12')" class="flex-1 bg-[#1e2238] py-1.5 rounded-lg text-[10px]">11-12</button>
-        </div>
-        <div>
-          <div class="text-[11px] font-bold text-[#ffcc00] mb-2">📦 DRAG SHAPES</div>
-          <div class="grid grid-cols-2 gap-2">
-            <div draggable="true" ondragstart="dragK(event,'rect')" class="bg-[#242a4d] p-3 rounded-xl text-center cursor-grab hover:bg-[#2e3666] border border-white/10"><div class="text-[20px]">⬜</div><div class="text-[8px] mt-1">Body</div></div>
-            <div draggable="true" ondragstart="dragK(event,'circle')" class="bg-[#242a4d] p-3 rounded-xl text-center cursor-grab hover:bg-[#2e3666] border border-white/10"><div class="text-[20px]">⭕</div><div class="text-[8px] mt-1">Wheel</div></div>
-            <div draggable="true" ondragstart="dragK(event,'tri')" class="bg-[#242a4d] p-3 rounded-xl text-center cursor-grab hover:bg-[#2e3666] border border-white/10"><div class="text-[20px]">🔺</div><div class="text-[8px] mt-1">Nose</div></div>
-            <div draggable="true" ondragstart="dragK(event,'line')" class="bg-[#242a4d] p-3 rounded-xl text-center cursor-grab hover:bg-[#2e3666] border border-white/10"><div class="text-[20px]">📏</div><div class="text-[8px] mt-1">Wing</div></div>
-          </div>
-        </div>
-        <div class="flex flex-col gap-2 mt-2">
-          <button onclick="kTool='pen'" class="bg-[#6c5cff] py-2 rounded-lg text-[11px]">✏️ Pen</button>
-          <button onclick="kTool='text'" class="bg-[#1e2238] py-2 rounded-lg text-[11px] border border-white/10">🔤 Text</button>
-        </div>
-        <div class="mt-auto flex flex-col gap-2">
-          <button onclick="clearK()" class="bg-[#ff2440] py-2 rounded-lg text-[11px] font-bold">🗑️ Clear Canvas</button>
-        </div>
-      </div>
-
-      <div class="flex-1 card p-2 flex flex-col bg-[#f2f2f6] overflow-hidden">
-        <div class="flex justify-between items-center px-1 pb-1">
-          <span id="kTitle" class="text-black text-[11px] font-black">👶 Kids Mode - Blank Canvas - Khud se Helicopter Bnao</span>
-          <span class="text-[9px] text-gray-500">Drag & Drop PowerPoint</span>
-        </div>
-        <canvas id="kCanvas" width="1000" height="620" style="width:100%; flex:1; background:white; border:1px solid #d0d0d8;"></canvas>
-      </div>
-
-      <div class="card w-[150px] p-3 shrink-0 flex flex-col gap-3">
-        <div class="text-[11px] font-bold">🎨 Color</div>
-        <div class="grid grid-cols-3 gap-2">
-          <div onclick="kColor='#ff0000'" style="height:28px; background:red; border-radius:8px; cursor:pointer;"></div>
-          <div onclick="kColor='#00aaff'" style="height:28px; background:#00aaff; border-radius:8px; cursor:pointer;"></div>
-          <div onclick="kColor='#00ff00'" style="height:28px; background:lime; border-radius:8px; cursor:pointer;"></div>
-          <div onclick="kColor='#ffcc00'" style="height:28px; background:#ffcc00; border-radius:8px; cursor:pointer;"></div>
-          <div onclick="kColor='#000000'" style="height:28px; background:black; border:1px solid #444; border-radius:8px; cursor:pointer;"></div>
-          <div onclick="kColor='#8b5cf6'" style="height:28px; background:#8b5cf6; border-radius:8px; cursor:pointer;"></div>
-        </div>
-        <div><div class="text-[10px]">Size</div><input type="range" min="20" max="150" value="60" style="width:100%" oninput="kSizeVal=this.value"></div>
-        <div class="bg-black/50 p-2.5 rounded-lg text-[9px] text-gray-400 leading-4">PowerPoint jaisa<br>Shape drag karo<br>Jod ke machine banao<br>No readymade</div>
-      </div>
-    </div>
-
-    <!-- ADULT SECTION - HIDDEN BY DEFAULT - NO OVERLAP -->
-    <div id="proUI" style="display:none; gap:10px; height:100%;">
-      <div class="card w-[200px] p-3 shrink-0 flex flex-col gap-2 bg-[#eef0f5] text-black overflow-y-auto">
-        <b class="text-[12px]">🧱 BLANK 3D PARTS</b>
-        <div class="text-[9px] text-gray-500 mb-1">Drag to 3D Factory</div>
-        <div draggable="true" ondragstart="dragP(event,'box3d')" class="bg-white border border-gray-300 p-2.5 rounded-lg cursor-grab text-[11px] hover:bg-gray-50">🧱 Box - Fuselage Body</div>
-        <div draggable="true" ondragstart="dragP(event,'cyl3d')" class="bg-white border border-gray-300 p-2.5 rounded-lg cursor-grab text-[11px] hover:bg-gray-50">🛢️ Cylinder - Engine / Wheel</div>
-        <div draggable="true" ondragstart="dragP(event,'plane3d')" class="bg-white border border-gray-300 p-2.5 rounded-lg cursor-grab text-[11px] hover:bg-gray-50">🪽 Plane - Wing / Blade</div>
-        <div draggable="true" ondragstart="dragP(event,'sphere3d')" class="bg-white border border-gray-300 p-2.5 rounded-lg cursor-grab text-[11px] hover:bg-gray-50">⚪ Sphere - Cockpit Nose</div>
-        <div class="mt-4 pt-3 border-t border-gray-300">
-          <b class="text-[10px]">Age Level</b><br>
-          <button id="p13" onclick="setPA('13-15')" class="bg-[#00ffff] px-3 py-1.5 rounded-full text-[10px] font-black mt-1">13-15</button>
-          <button id="p15" onclick="setPA('15-18')" class="bg-white border border-gray-400 px-3 py-1.5 rounded-full text-[10px] ml-1">15-18+</button>
-        </div>
-      </div>
-
-      <div class="flex-1 flex flex-col gap-2 overflow-hidden">
-        <div id="threeP" style="flex:1; background:#05070a; border-radius:14px; border:1px solid #00ffff22; position:relative;">
-          <div style="position:absolute; top:10px; left:12px; background:#000000aa; padding:6px 12px; border-radius:20px; font-size:11px; font-weight:700; z-index:10;">🌐 3D Blank Factory - Jod ke Future Machine Banao - Drag Shape Here</div>
-        </div>
-      </div>
-
-      <div class="card w-[170px] p-3 shrink-0 flex flex-col gap-3">
-        <b class="text-[12px] text-[#00ffff]">Share & Download</b>
-        <button onclick="shareDesign()" class="bg-[#00ffff] text-black py-2.5 rounded-xl font-black text-[12px]">🔗 Share Design</button>
-        <button onclick="downloadDesign()" class="bg-white text-black py-2.5 rounded-xl font-black text-[12px]">⬇️ Download PNG</button>
-        <button onclick="downloadPDF()" class="bg-[#ffcc00] text-black py-2.5 rounded-xl font-black text-[12px]">📄 Blueprint PDF</button>
-        <div class="mt-4">
-          <div class="text-[10px] mb-1">Color</div><input id="pCol" type="color" value="#ffcc00" style="width:100%; height:32px; border-radius:8px; border:none;">
-          <div class="text-[10px] mt-3 mb-1">Size</div><input id="pSize" type="range" min="10" max="200" value="80" style="width:100%;">
-        </div>
-        <div class="bg-black/60 p-2.5 rounded-xl text-[9px] text-gray-400 mt-auto">By default Kids khula hai. Adult dabayega tab ye 3D ayega. Clean display.</div>
-      </div>
-    </div>
-
+  <div class="flex items-center gap-1.5">
+    <button id="btnKids" onclick="setMain('kids')" class="mini-btn active-k">👶 KIDS 5-12</button>
+    <button id="btnPro" onclick="setMain('pro')" class="mini-btn bg-[#1e2238] text-white">🚀 ADULT PRO</button>
+    <div style="width:1px; height:16px; background:#ffffff20; margin:0 4px;"></div>
+    <button onclick="clearAll()" class="mini-btn bg-[#2a2a2a] text-white">Clear</button>
+    <button onclick="downloadDesign()" class="mini-btn bg-white text-black">⬇️ PNG</button>
+    <button onclick="shareDesign()" class="mini-btn bg-[#00ffff] text-black">🔗 Share</button>
   </div>
 </div>
 
+<!-- MAIN -->
+<div class="flex-1 flex overflow-hidden">
+
+  <!-- KIDS - EXCEL JAISE BLANK -->
+  <div id="kidsUI" style="display:flex; width:100%; height:100%;">
+    <div style="width:52px; background:#15182e; border-right:1px solid #ffffff0f; display:flex; flex-direction:column; align-items:center; gap:8px; padding:8px 0;">
+      <div title="Select/Move" id="tSelect" onclick="setTool('select')" class="tool-icon tool-on">🖱️</div>
+      <div title="Pen - Free Draw" id="tPen" onclick="setTool('pen')" class="tool-icon">✏️</div>
+      <div title="Line" id="tLine" onclick="setTool('line')" class="tool-icon">📏</div>
+      <div title="Rectangle - Body/Wing" id="tRect" onclick="setTool('rect')" class="tool-icon">⬜</div>
+      <div title="Circle - Wheel/Engine" id="tCircle" onclick="setTool('circle')" class="tool-icon">⭕</div>
+      <div title="Triangle - Nose/Tail" id="tTri" onclick="setTool('tri')" class="tool-icon">🔺</div>
+      <div title="Text" id="tText" onclick="setTool('text')" class="tool-icon">🔤</div>
+      <div style="margin-top:auto; display:flex; flex-direction:column; gap:6px;">
+        <div onclick="setColor('#ff0000')" style="width:22px; height:22px; background:red; border-radius:50%; cursor:pointer; border:2px solid transparent;"></div>
+        <div onclick="setColor('#000000')" style="width:22px; height:22px; background:black; border-radius:50%; cursor:pointer; border:1px solid #555;"></div>
+        <div onclick="setColor('#00aaff')" style="width:22px; height:22px; background:#00aaff; border-radius:50%; cursor:pointer;"></div>
+        <div onclick="setColor('#ffcc00')" style="width:22px; height:22px; background:#ffcc00; border-radius:50%; cursor:pointer;"></div>
+      </div>
+    </div>
+
+    <div style="flex:1; display:flex; flex-direction:column; padding:6px; background:#e9e9ef;">
+      <div style="font-size:10px; color:#555; padding:2px 6px; font-weight:700;">KIDS BLANK SHEET - Yahan se start karo, line kheecho, shape jod ke helicopter/aeroplane/card/graphic bnao - Bilkul Excel ke blank page jaisa</div>
+      <canvas id="kCanvas" width="1200" height="700" class="canvas-bg" style="flex:1; width:100%; border:1px solid #c0c0c8; border-radius:6px; cursor:crosshair;"></canvas>
+      <div style="display:flex; gap:8px; padding:4px 0; font-size:9px; color:#666;">
+        <span>Size: <input type="range" id="sizeRange" min="2" max="60" value="4" style="width:80px;" oninput="kLineW=this.value"></span>
+        <span id="hint" style="color:#0066ff; font-weight:700;">Tool: Select - Kisi bhi shape ko pakad ke move kar sakte ho, starting point se banao</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADULT - PRO BLANK 3D + 2D -->
+  <div id="proUI" style="display:none; width:100%; height:100%;">
+    <div style="width:52px; background:#111326; border-right:1px solid #ffffff0f; display:flex; flex-direction:column; align-items:center; gap:8px; padding:8px 0;">
+      <div title="Add Box" onclick="add3D('box')" class="tool-icon">🧱</div>
+      <div title="Add Cylinder" onclick="add3D('cyl')" class="tool-icon">🛢️</div>
+      <div title="Add Plane/Wing" onclick="add3D('plane')" class="tool-icon">🪽</div>
+      <div title="Add Sphere" onclick="add3D('sphere')" class="tool-icon">⚪</div>
+      <div title="Delete" onclick="delete3D()" class="tool-icon" style="margin-top:12px; background:#3a1a1a;">🗑️</div>
+      <div title="Duplicate" onclick="duplicate3D()" class="tool-icon">📋</div>
+      <div title="Rotate" onclick="rotate3D()" class="tool-icon">↻</div>
+    </div>
+
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; padding:6px; background:#0e101c;">
+      <div style="font-size:10px; color:#aaa; font-weight:700; padding:2px 6px;">PRO BLANK LAB - Zero se koi bhi machine bnao - Graphic, 3D, Card, Helicopter, Drone, Car - Sab yahin se start hoga</div>
+      <div id="threeP" style="flex:1; background:#05070a; border-radius:8px; border:1px solid #ffffff12; position:relative;"></div>
+      <div style="height:28px; background:#15182e; border-radius:6px; display:flex; align-items:center; gap:10px; padding:0 10px; font-size:10px;">
+        <span>Color <input id="pCol" type="color" value="#ffcc00" style="width:24px; height:18px; border:none;" oninput="update3DColor()"></span>
+        <span>Size <input id="pSize" type="range" min="20" max="200" value="80" style="width:80px;" oninput="update3DSize()"></span>
+        <span style="color:#777;">Click left icon → 3D me blank se add hoga → Mouse se ghumao, jod ke banao</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
 <script>
-let mainMode='kids', kColor='#ff0000', kTool='pen', kSizeVal=60, dragType=null;
+let mainMode='kids', kTool='select', kColor='#000000', kLineW=4, kObjects=[], selectedIdx=-1, isDown=false, startPos=null, dragOff={x:0,y:0};
 
 function setMain(m){
   mainMode=m;
   document.getElementById('kidsUI').style.display=m==='kids'?'flex':'none';
   document.getElementById('proUI').style.display=m==='pro'?'flex':'none';
-  document.getElementById('btnKids').className=m==='kids'?'mode-btn active-kids':'mode-btn bg-[#1e2238] text-white';
-  document.getElementById('btnPro').className=m==='pro'?'mode-btn active-adult':'mode-btn bg-[#1e2238] text-white';
+  document.getElementById('btnKids').className=m==='kids'?'mini-btn active-k':'mini-btn bg-[#1e2238] text-white';
+  document.getElementById('btnPro').className=m==='pro'?'mini-btn active-a':'mini-btn bg-[#1e2238] text-white';
   if(m==='pro') initPro();
 }
-function setKA(a){
-  ['5-7','8-10','11-12'].forEach(x=>{
-    const el=document.getElementById('k'+x.split('-')[0]);
-    if(el){ el.className = x===a? 'flex-1 bg-[#ffcc00] text-black py-1.5 rounded-lg text-[10px] font-black' : 'flex-1 bg-[#1e2238] py-1.5 rounded-lg text-[10px]'; }
-  });
+function setTool(t){
+  kTool=t;
+  document.querySelectorAll('.tool-icon').forEach(el=>el.classList.remove('tool-on'));
+  const map={select:'tSelect', pen:'tPen', line:'tLine', rect:'tRect', circle:'tCircle', tri:'tTri', text:'tText'};
+  if(map[t]) document.getElementById(map[t]).classList.add('tool-on');
+  const hint=document.getElementById('hint');
+  if(hint){
+    if(t==='select') hint.innerText='Tool: Select - Shape ko pakad ke move karo, starting point se jod ke banao';
+    if(t==='pen') hint.innerText='Tool: Pen - Free hand se draw karo, bilkul blank paper pe';
+    if(t==='line') hint.innerText='Tool: Line - Drag karo line banegi, aeroplane ka wing banega';
+    if(t==='rect') hint.innerText='Tool: Rectangle - Drag karo body banegi';
+    if(t==='circle') hint.innerText='Tool: Circle - Drag karo wheel/engine banega';
+    if(t==='tri') hint.innerText='Tool: Triangle - Drag karo nose/tail banega';
+    if(t==='text') hint.innerText='Tool: Text - Canvas pe click karo, naam likho';
+  }
+  document.getElementById('kCanvas').style.cursor=t==='select'?'move':'crosshair';
 }
-function setPA(a){
-  document.getElementById('p13').className=a==='13-15'?'bg-[#00ffff] px-3 py-1.5 rounded-full text-[10px] font-black mt-1':'bg-white border border-gray-400 px-3 py-1.5 rounded-full text-[10px] mt-1';
-  document.getElementById('p15').className=a==='15-18'?'bg-[#00ffff] px-3 py-1.5 rounded-full text-[10px] font-black ml-1':'bg-white border border-gray-400 px-3 py-1.5 rounded-full text-[10px] ml-1';
-}
-function changeLang(){
-  const l=document.getElementById('langSel').value;
-  document.getElementById('headerTitle').innerText = l==='hi'? '🚁 अपना भविष्य का डिज़ाइन बनाओ - हेलीकॉप्टर बनाओ, हवाई जहाज बनाओ' : '🚁 Create Your Future Design - Helicopter Bnao, Aeroplane Bnao';
-}
+function setColor(c){kColor=c; if(selectedIdx>=0){kObjects[selectedIdx].color=c; drawK();}}
 
-const kcv=document.getElementById('kCanvas'), kctx=kcv.getContext('2d'); let kObjects=[];
-function clearK(){ kctx.fillStyle='white'; kctx.fillRect(0,0,kcv.width,kcv.height); kObjects=[]; drawK(); }
+const kcv=document.getElementById('kCanvas'), kctx=kcv.getContext('2d');
+function clearAll(){if(mainMode==='kids') clearK(); else clear3D();}
+function clearK(){kctx.fillStyle='white'; kctx.fillRect(0,0,kcv.width,kcv.height); kObjects=[]; selectedIdx=-1; drawKBG();}
+function drawKBG(){kctx.fillStyle='white'; kctx.fillRect(0,0,kcv.width,kcv.height);}
+
 function drawK(){
-  kctx.fillStyle='white'; kctx.fillRect(0,0,kcv.width,kcv.height);
-  kObjects.forEach(o=>{
-    kctx.fillStyle=o.color; kctx.strokeStyle='#222'; kctx.lineWidth=2;
-    if(o.type==='rect') kctx.fillRect(o.x-o.w/2,o.y-o.h/2,o.w,o.h);
-    if(o.type==='circle'){kctx.beginPath(); kctx.arc(o.x,o.y,o.w/2,0,Math.PI*2); kctx.fill(); kctx.stroke();}
-    if(o.type==='tri'){kctx.beginPath(); kctx.moveTo(o.x,o.y-o.h/2); kctx.lineTo(o.x-o.w/2,o.y+o.h/2); kctx.lineTo(o.x+o.w/2,o.y+o.h/2); kctx.closePath(); kctx.fill(); kctx.stroke();}
-    if(o.type==='line'){kctx.beginPath(); kctx.moveTo(o.x-o.w/2,o.y); kctx.lineTo(o.x+o.w/2,o.y); kctx.strokeStyle=o.color; kctx.lineWidth=4; kctx.stroke();}
-    if(o.type==='text'){kctx.font=o.w+'px sans-serif'; kctx.fillStyle=o.color; kctx.fillText(o.text||'My Helicopter',o.x,o.y);}
+  drawKBG();
+  kObjects.forEach((o,i)=>{
+    kctx.save(); kctx.strokeStyle=i===selectedIdx?'#00aaff':'#222'; kctx.lineWidth=i===selectedIdx?2.5: (o.lw||2); kctx.fillStyle=o.color;
+    if(o.type==='pen' || o.type==='line'){kctx.beginPath(); kctx.moveTo(o.x1,o.y1); kctx.lineTo(o.x2,o.y2); kctx.strokeStyle=o.color; kctx.lineWidth=o.lw||kLineW; kctx.stroke();}
+    if(o.type==='free'){kctx.beginPath(); kctx.strokeStyle=o.color; kctx.lineWidth=o.lw; for(let j=0;j<o.points.length-1;j++){kctx.moveTo(o.points[j].x,o.points[j].y); kctx.lineTo(o.points[j+1].x,o.points[j+1].y);} kctx.stroke();}
+    if(o.type==='rect'){kctx.fillStyle=o.color; kctx.fillRect(o.x1,o.y1,o.x2-o.x1,o.y2-o.y1); if(i===selectedIdx) kctx.strokeRect(o.x1,o.y1,o.x2-o.x1,o.y2-o.y1);}
+    if(o.type==='circle'){const rx=Math.abs(o.x2-o.x1)/2, ry=Math.abs(o.y2-o.y1)/2, r=Math.max(rx,ry); kctx.beginPath(); kctx.arc(o.x1+r, o.y1+r, r,0,Math.PI*2); kctx.fill(); kctx.stroke();}
+    if(o.type==='tri'){kctx.beginPath(); kctx.moveTo(o.x1+(o.x2-o.x1)/2,o.y1); kctx.lineTo(o.x1,o.y2); kctx.lineTo(o.x2,o.y2); kctx.closePath(); kctx.fill(); kctx.stroke();}
+    if(o.type==='text'){kctx.font='16px sans-serif'; kctx.fillStyle=o.color; kctx.fillText(o.text, o.x1,o.y1);}
+    kctx.restore();
   });
 }
-function dragK(e,t){dragType=t; e.dataTransfer.setData('text',t);}
-kcv.addEventListener('dragover',e=>e.preventDefault());
-kcv.addEventListener('drop',e=>{
-  e.preventDefault(); const r=kcv.getBoundingClientRect();
-  const x=(e.clientX-r.left)*(kcv.width/r.width), y=(e.clientY-r.top)*(kcv.height/r.height);
-  const t=e.dataTransfer.getData('text')||dragType;
-  if(t==='text'){const txt=prompt('Kya likhna hai?','My Future Helicopter'); if(txt) kObjects.push({type:'text',x:x,y:y,w:kSizeVal,color:kColor,text:txt});}
-  else kObjects.push({type:t,x:x,y:y,w:kSizeVal,h:kSizeVal/2,color:kColor});
-  drawK();
-});
-clearK();
-let kDown=false;
-kcv.addEventListener('mousedown',e=>{if(kTool!=='pen') return; kDown=true; kctx.beginPath(); kctx.moveTo(e.offsetX,e.offsetY);});
-kcv.addEventListener('mousemove',e=>{if(!kDown||kTool!=='pen')return; kctx.strokeStyle=kColor; kctx.lineWidth=3; kctx.lineCap='round'; kctx.lineTo(e.offsetX,e.offsetY); kctx.stroke();});
-window.addEventListener('mouseup',()=>kDown=false);
 
-function dragP(e,t){dragType=t; e.dataTransfer.setData('text',t);}
-let scene,camera,renderer,controls,group, proInit=false;
+function getPos(e){const r=kcv.getBoundingClientRect(); return {x:(e.clientX-r.left)*(kcv.width/r.width), y:(e.clientY-r.top)*(kcv.height/r.height)};}
+
+let currentFree=null;
+kcv.addEventListener('mousedown',e=>{
+  const p=getPos(e); isDown=true; startPos=p;
+  if(kTool==='select'){
+    selectedIdx=-1;
+    for(let i=kObjects.length-1;i>=0;i--){const o=kObjects[i]; const minX=Math.min(o.x1,o.x2), maxX=Math.max(o.x1,o.x2), minY=Math.min(o.y1,o.y2), maxY=Math.max(o.y1,o.y2); if(p.x>=minX-10&&p.x<=maxX+10&&p.y>=minY-10&&p.y<=maxY+10){selectedIdx=i; dragOff={x:p.x-o.x1, y:p.y-o.y1}; break;}}
+    drawK(); return;
+  }
+  if(kTool==='pen'){currentFree={type:'free', points:[p], color:kColor, lw:kLineW}; kObjects.push(currentFree);}
+  if(kTool==='text'){const txt=prompt('Kya likhna hai?','My Design'); if(txt){kObjects.push({type:'text', x1:p.x,y1:p.y,x2:p.x+100,y2:p.y+20,color:kColor,text:txt}); drawK();} isDown=false; return;}
+  if(['line','rect','circle','tri'].includes(kTool)){kObjects.push({type:kTool, x1:p.x,y1:p.y,x2:p.x,y2:p.y,color:kColor,lw:kLineW}); selectedIdx=kObjects.length-1;}
+});
+kcv.addEventListener('mousemove',e=>{
+  if(!isDown) return; const p=getPos(e);
+  if(kTool==='select' && selectedIdx>=0){const o=kObjects[selectedIdx]; const dx=p.x-dragOff.x-o.x1, dy=p.y-dragOff.y-o.y1; o.x1+=dx; o.y1+=dy; o.x2+=dx; o.y2+=dy; if(o.points){o.points.forEach(pt=>{pt.x+=dx; pt.y+=dy;});} drawK(); return;}
+  if(kTool==='pen' && currentFree){currentFree.points.push(p); drawK(); return;}
+  if(['line','rect','circle','tri'].includes(kTool) && selectedIdx>=0){kObjects[selectedIdx].x2=p.x; kObjects[selectedIdx].y2=p.y; drawK();}
+});
+window.addEventListener('mouseup',()=>{isDown=false; currentFree=null; startPos=null;});
+clearK(); setTool('select');
+
+// 3D BLANK
+let scene,camera,renderer,controls,group, proInit=false, selected3D=null;
 function initPro(){
   if(proInit) return; proInit=true;
-  scene=new THREE.Scene(); scene.background=new THREE.Color(0x05070a);
-  camera=new THREE.PerspectiveCamera(50, 900/500, 0.1, 1000); camera.position.set(4,3,5);
-  renderer=new THREE.WebGLRenderer({antialias:true});
   const container=document.getElementById('threeP');
-  renderer.setSize(container.clientWidth, container.clientHeight);
+  scene=new THREE.Scene(); scene.background=new THREE.Color(0x06080f);
+  camera=new THREE.PerspectiveCamera(50, container.clientWidth/container.clientHeight, 0.1, 1000); camera.position.set(4,3,5);
+  renderer=new THREE.WebGLRenderer({antialias:true}); renderer.setSize(container.clientWidth, container.clientHeight);
   container.appendChild(renderer.domElement);
   controls=new THREE.OrbitControls(camera, renderer.domElement); controls.enableDamping=true;
   scene.add(new THREE.DirectionalLight(0xffffff,1)); scene.add(new THREE.AmbientLight(0xffffff,0.7));
   group=new THREE.Group(); scene.add(group);
-  const grid=new THREE.GridHelper(12,24,0x1a2a3a,0x0e1520); scene.add(grid);
+  scene.add(new THREE.GridHelper(20,40,0x223344,0x111a22));
+  const raycaster=new THREE.Raycaster(), mouse=new THREE.Vector2();
+  renderer.domElement.addEventListener('click', e=>{
+    const rect=renderer.domElement.getBoundingClientRect(); mouse.x=((e.clientX-rect.left)/rect.width)*2-1; mouse.y=-((e.clientY-rect.top)/rect.height)*2+1;
+    raycaster.setFromCamera(mouse,camera); const inter=raycaster.intersectObjects(group.children,true);
+    if(inter.length>0){selected3D=inter[0].object; while(selected3D.parent && selected3D.parent!==group) selected3D=selected3D.parent;}
+  });
   (function anim(){requestAnimationFrame(anim); controls.update(); renderer.render(scene,camera);})();
-  container.addEventListener('dragover',e=>e.preventDefault());
-  container.addEventListener('drop',e=>{e.preventDefault(); const t=e.dataTransfer.getData('text')||dragType; add3D(t);});
 }
 function add3D(t){
-  const col=document.getElementById('pCol').value; const s=parseFloat(document.getElementById('pSize').value)*0.01;
-  let mesh; const mat=new THREE.MeshStandardMaterial({color:col});
-  if(t==='box3d') mesh=new THREE.Mesh(new THREE.BoxGeometry(s*2,s,s), mat);
-  if(t==='cyl3d'){mesh=new THREE.Mesh(new THREE.CylinderGeometry(s*0.5,s*0.5,s*1.5,20), mat); mesh.rotation.z=Math.PI/2;}
-  if(t==='sphere3d') mesh=new THREE.Mesh(new THREE.SphereGeometry(s*0.6,16,16), mat);
-  if(t==='plane3d') mesh=new THREE.Mesh(new THREE.BoxGeometry(s*2,0.05,s*0.8), mat);
-  if(!mesh) return; mesh.position.set((Math.random()-0.5)*2, s, (Math.random()-0.5)*2); group.add(mesh);
+  initPro(); const col=document.getElementById('pCol').value; const s=parseFloat(document.getElementById('pSize').value)*0.01; let mesh; const mat=new THREE.MeshStandardMaterial({color:col});
+  if(t==='box') mesh=new THREE.Mesh(new THREE.BoxGeometry(s*2,s*0.8,s*0.8), mat);
+  if(t==='cyl') {mesh=new THREE.Mesh(new THREE.CylinderGeometry(s*0.4,s*0.4,s*1.5,16), mat); mesh.rotation.z=Math.PI/2;}
+  if(t==='plane') mesh=new THREE.Mesh(new THREE.BoxGeometry(s*2.2,0.04,s*0.9), mat);
+  if(t==='sphere') mesh=new THREE.Mesh(new THREE.SphereGeometry(s*0.6,16,16), mat);
+  if(!mesh) return; mesh.position.set((Math.random()-0.5)*2, s+0.5, (Math.random()-0.5)*2); group.add(mesh); selected3D=mesh;
 }
+function delete3D(){if(selected3D){group.remove(selected3D); selected3D=null;}}
+function duplicate3D(){if(selected3D){const c=selected3D.clone(); c.position.x+=0.6; group.add(c);}}
+function rotate3D(){if(selected3D) selected3D.rotation.y+=0.5;}
+function clear3D(){if(group){while(group.children.length>0) group.remove(group.children[0]);}}
+function update3DColor(){if(selected3D){const col=document.getElementById('pCol').value; selected3D.traverse?selected3D.traverse(ch=>{if(ch.material) ch.material.color.set(col);}):selected3D.material.color.set(col);}}
+function update3DSize(){if(selected3D){const s=parseFloat(document.getElementById('pSize').value)*0.01; selected3D.scale.set(s,s,s);}}
 
-function downloadDesign(){
-  const canvas=document.getElementById('kCanvas');
-  const link=document.createElement('a'); link.download='My_Future_Design_'+Date.now()+'.png'; link.href=canvas.toDataURL(); link.click();
-}
-function downloadPDF(){
-  const {jsPDF}=window.jspdf; const doc=new jsPDF();
-  const img=document.getElementById('kCanvas').toDataURL('image/png');
-  doc.text('Create Your Future Design - My Helicopter / Aeroplane',10,10);
-  doc.addImage(img,'PNG',10,20,180,100); doc.save('Future_Design_Blueprint.pdf');
-}
-async function shareDesign(){
-  const canvas=document.getElementById('kCanvas');
-  const dataUrl=canvas.toDataURL();
-  if(navigator.share){
-    try{
-      const blob=await (await fetch(dataUrl)).blob(); const file=new File([blob],'future_design.png',{type:'image/png'});
-      await navigator.share({title:'My Future Design', text:'Dekho maine khud se helicopter/aeroplane design kiya! 🚁', files:[file]});
-    }catch(e){ alert('Download karke share kar do!'); }
-  } else { alert('Download button se save karke WhatsApp pe share kar do.'); }
-}
+function downloadDesign(){const link=document.createElement('a'); link.download='Blank_Design_'+Date.now()+'.png'; link.href=document.getElementById('kCanvas').toDataURL(); link.click();}
+function shareDesign(){const url=document.getElementById('kCanvas').toDataURL(); fetch(url).then(r=>r.blob()).then(b=>{const f=new File([b],'design.png',{type:'image/png'}); if(navigator.canShare&&navigator.canShare({files:[f]})) navigator.share({title:'My Blank Design', text:'Maine zero se design banaya! 🚁', files:[f]}); else alert('Download karke share kar do!');});}
 
-setMain('kids'); setKA('5-7');
+setMain('kids');
 </script></body></html>
     """
-    components.html(HTML, height=820, scrolling=False)   
+    components.html(HTML, height=780, scrolling=False)   
     
 def render_kids_logic_lab():
     # ============================================================
