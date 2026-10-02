@@ -6799,7 +6799,7 @@ with st.sidebar:
         "📷 Vision Lab", 
         "🧠 Cyber Security", 
         "🧩 Kids Logic Lab", 
-        "🖥️ Real World Project",  
+        "🖥️ Art + Machine Project",  
         "🎭 Peer Roleplay Modes",
         "📝 Interactive Homework & Test",
         "👨‍👩‍👦 Parent Dashboard", 
