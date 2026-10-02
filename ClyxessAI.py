@@ -3818,387 +3818,217 @@ def render_math_lab(client):
         st.session_state.math_game_q_id += 1
         st.rerun()  
         
-def render_art_machinedesign():
+def render_art_machinedesign()
     import streamlit.components.v1 as components
     HTML = """
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<script src="https://cdn.tailwindcss.com"></script>
+<!DOCTYPE html><html><head>
+<meta charset="UTF-8"><script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-<style>
-  canvas{ touch-action:none; }
- .active-paath{ background:linear-gradient(to right,#06b6d4,#ec4899)!important; color:black!important; font-weight:900; }
-</style>
 </head>
-<body class="bg-[#040814] text-white p-2 font-sans">
-<div class="max-w-[1600px] mx-auto space-y-3">
+<body style="background:#080a12; color:white; margin:0; padding:6px; font-family:sans-serif; overflow:hidden;">
+<div style="display:flex; flex-direction:column; height:100vh;">
 
-<header class="bg-slate-900 border border-violet-500/30 p-3 rounded-2xl flex flex-col lg:flex-row justify-between items-center gap-2">
-    <div class="flex items-center gap-3">
-        <div class="text-2xl">🇮🇳🇷🇺🇨🇳🇯🇵</div>
-        <div>
-            <h1 id="mainTitle" class="text-[15px] font-black">CLYXESS FINAL CREATOR LAB - 15 Saal Tak</h1>
-            <p id="subTitle" class="text-[10px] text-slate-400">Paath 1:Rang • Paath 2:Kahani • Paath 3:Design • Paath 4:Future Engineer • 20 Machines • 3D • PPT</p>
-        </div>
+  <div style="display:flex; justify-content:space-between; background:#14141e; border:1px solid #333; border-radius:12px; padding:8px 12px; align-items:center;">
+    <div><b style="font-size:13px;">CLYXESS BLANK FACTORY • No Readymade • Khud Banao • PowerPoint Style</b><br><span style="font-size:9px; color:#888;">Sirf Shape + Line + Pen - Baccha khud jod ke machine banayega</span></div>
+    <div style="display:flex; gap:8px;">
+      <button id="mKids" onclick="setMain('kids')" style="background:#ffcc00; color:black; padding:6px 16px; border-radius:20px; font-weight:900; font-size:12px;">👶 KIDS MODE [5-12]</button>
+      <button id="mPro" onclick="setMain('pro')" style="background:#222; color:white; padding:6px 16px; border-radius:20px; font-weight:900; font-size:12px; border:1px solid #00ffff;">🚀 ADULT MODE [13-18+]</button>
     </div>
-    <div class="flex gap-2 flex-wrap">
-        <select id="ageSelect" onchange="switchAge()" class="bg-black border border-amber-400 text-amber-400 text-[11px] font-bold p-2 rounded-xl">
-            <option value="5-7">👶 5-7 Saal - Paath 1: Rang Bharo</option>
-            <option value="8-10" selected>🧒 8-10 Saal - Paath 2: Kahani Banao</option>
-            <option value="11-12">👦 11-12 Saal - Paath 3: Outline & Blueprint</option>
-            <option value="13-15">🚀 13-15 Saal - Paath 4: Assemble & 3D Future</option>
-        </select>
-        <select id="langSelect" onchange="changeLang()" class="bg-black border border-emerald-400 text-emerald-400 text-[11px] font-bold p-2 rounded-xl w-[140px]">
-            <option value="hinglish" selected>Hinglish</option>
-            <option value="en">English</option>
-            <option value="hi">हिंदी Hindi</option>
-            <option value="ta">தமிழ் Tamil</option>
-            <option value="te">తెలుగు Telugu</option>
-            <option value="kn">ಕನ್ನಡ Kannada</option>
-            <option value="ml">മലയാളം Malayalam</option>
-            <option value="bn">বাংলা Bengali</option>
-            <option value="or">ଓଡ଼ିଆ Odia</option>
-            <option value="ru">Русский Russian</option>
-            <option value="zh">中文 Chinese</option>
-            <option value="ja">日本語 Japanese</option>
-        </select>
-    </div>
-</header>
+  </div>
 
-<div class="flex gap-2 overflow-x-auto pb-1">
-    <button id="btn-p1" onclick="setPaath(1)" class="active-paath px-4 py-1.5 rounded-full text-[11px] bg-slate-800 border">Paath 1: Rang</button>
-    <button id="btn-p2" onclick="setPaath(2)" class="px-4 py-1.5 rounded-full text-[11px] bg-slate-800 border">Paath 2: Story PPT</button>
-    <button id="btn-p3" onclick="setPaath(3)" class="px-4 py-1.5 rounded-full text-[11px] bg-slate-800 border">Paath 3: Wireframe/Blueprint</button>
-    <button id="btn-p4" onclick="setPaath(4)" class="px-4 py-1.5 rounded-full text-[11px] bg-slate-800 border">Paath 4: 3D Engineer Lab</button>
-    <div class="ml-auto flex gap-2">
-        <button onclick="setView('wireframe')" class="px-2 py-1 bg-slate-800 rounded-full text-[9px]">Wireframe</button>
-        <button onclick="setView('solid')" class="px-2 py-1 bg-slate-800 rounded-full text-[9px]">Clay</button>
-        <button onclick="setView('blueprint')" class="px-2 py-1 bg-slate-800 rounded-full text-[9px]">Blueprint</button>
-        <button onclick="setView('painted')" class="px-2 py-1 bg-cyan-400 text-black rounded-full text-[9px] font-bold">Painted</button>
-    </div>
-</div>
+  <div style="display:flex; gap:8px; margin-top:8px; flex:1; overflow:hidden;">
 
-<div class="grid grid-cols-12 gap-2">
-    <!-- LEFT: CONTENT CHANGES WITH PAATH -->
-    <div class="col-span-12 lg:col-span-3 bg-slate-900 rounded-2xl p-3 border border-slate-800 h-[720px] overflow-y-auto space-y-3">
-
-        <div id="paath1Box">
-            <h2 class="text-[11px] font-black text-yellow-400" id="t-colorBazaar">🎨 COLOR BAZAAR - Rang Bharo</h2>
-            <div class="grid grid-cols-6 gap-1 mt-2">
-                <div onclick="setColor('#ff0000')" class="h-6 bg-red-500 rounded cursor-pointer"></div>
-                <div onclick="setColor('#00a8ff')" class="h-6 bg-sky-400 rounded cursor-pointer"></div>
-                <div onclick="setColor('#00ff00')" class="h-6 bg-green-500 rounded cursor-pointer"></div>
-                <div onclick="setColor('#ffcc00')" class="h-6 bg-yellow-400 rounded cursor-pointer"></div>
-                <div onclick="setColor('#8a2be2')" class="h-6 bg-purple-500 rounded cursor-pointer"></div>
-                <div onclick="setColor('#ff69b4')" class="h-6 bg-pink-400 rounded cursor-pointer"></div>
-            </div>
-            <p class="text-[9px] text-slate-400 mt-3 font-bold" id="t-template">TEMPLATE CHUNO</p>
-            <div class="grid grid-cols-2 gap-2 mt-1">
-                <button onclick="loadTemplate('rocket')" class="bg-slate-800 p-2 rounded-xl text-[10px]">🚀 Rocket</button>
-                <button onclick="loadTemplate('computer')" class="bg-slate-800 p-2 rounded-xl text-[10px]">💻 Computer</button>
-                <button onclick="loadTemplate('mouse')" class="bg-slate-800 p-2 rounded-xl text-[10px]">🖱️ Mouse</button>
-                <button onclick="loadTemplate('robot')" class="bg-slate-800 p-2 rounded-xl text-[10px]">🤖 Robot</button>
-                <button onclick="loadTemplate('helicopter')" class="bg-slate-800 p-2 rounded-xl text-[10px]">🚁 Helicopter</button>
-                <button onclick="loadTemplate('aeroplane')" class="bg-slate-800 p-2 rounded-xl text-[10px]">✈️ Plane</button>
-            </div>
-            <div class="bg-slate-950 p-2 rounded-xl mt-3 text-[10px]" id="concept1">Concept 5-7: Rang pehchan, Haath control. Bhavishya me UI/UX Designer.</div>
+    <!-- KIDS - BLANK POWERPOINT -->
+    <div id="kidsUI" style="display:flex; gap:8px; width:100%;">
+      <div style="width:170px; background:#16182a; border-radius:12px; padding:10px; display:flex; flex-direction:column; gap:6px;">
+        <div style="display:flex; gap:4px;">
+          <button onclick="setKA('5-7')" id="k5" style="flex:1; background:#ffcc00; color:black; padding:6px; border-radius:8px; font-size:10px; font-weight:900;">5-7</button>
+          <button onclick="setKA('8-10')" id="k8" style="flex:1; background:#222; padding:6px; border-radius:8px; font-size:10px;">8-10</button>
+          <button onclick="setKA('11-12')" id="k11" style="flex:1; background:#222; padding:6px; border-radius:8px; font-size:10px;">11-12</button>
         </div>
-
-        <div id="paath2Box" class="hidden">
-            <h2 class="text-[11px] font-black text-cyan-400">📑 STORY STUDIO - Kahani Banao</h2>
-            <div class="grid grid-cols-2 gap-2 mt-2">
-                <button onclick="loadTemplate('story_rocket')" class="bg-slate-800 p-2 rounded-xl text-[10px]">🚀 Mera Rocket Kahani</button>
-                <button onclick="loadTemplate('story_car')" class="bg-slate-800 p-2 rounded-xl text-[10px]">🚗 Meri Car Kahani</button>
-            </div>
-            <p class="text-[9px] text-slate-400 mt-3 font-bold">POWERPOINT SLIDES</p>
-            <div id="slideList" class="flex gap-1 overflow-x-auto mt-1"></div>
-            <button onclick="saveSlide()" class="w-full mt-2 py-2 bg-cyan-400 text-black text-xs font-black rounded-xl">💾 Slide Save Karo (PPT Jaisa)</button>
-            <div class="bg-slate-950 p-2 rounded-xl mt-3 text-[10px]" id="concept2">Concept 8-10: Soch ko kahani me badalna. Presentation Skill - Future me Startup Pitch.</div>
+        <b style="font-size:11px; margin-top:8px; color:#ffcc00;">📦 SHAPES - Drag karo</b>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-top:4px;">
+          <div draggable="true" ondragstart="dragK(event,'rect')" style="background:#2a2f6a; padding:12px; border-radius:8px; text-align:center; cursor:grab; font-size:18px;">⬜</div>
+          <div draggable="true" ondragstart="dragK(event,'circle')" style="background:#2a2f6a; padding:12px; border-radius:8px; text-align:center; cursor:grab; font-size:18px;">⭕</div>
+          <div draggable="true" ondragstart="dragK(event,'tri')" style="background:#2a2f6a; padding:12px; border-radius:8px; text-align:center; cursor:grab; font-size:18px;">🔺</div>
+          <div draggable="true" ondragstart="dragK(event,'line')" style="background:#2a2f6a; padding:12px; border-radius:8px; text-align:center; cursor:grab; font-size:18px;">📏</div>
+          <div draggable="true" ondragstart="dragK(event,'star')" style="background:#2a2f6a; padding:12px; border-radius:8px; text-align:center; cursor:grab; font-size:18px;">⭐</div>
+          <div draggable="true" ondragstart="dragK(event,'dot')" style="background:#2a2f6a; padding:12px; border-radius:8px; text-align:center; cursor:grab; font-size:18px;">•</div>
         </div>
-
-        <div id="paath3Box" class="hidden">
-            <h2 class="text-[11px] font-black text-violet-400">📐 DESIGN LAB - Outline & Blueprint</h2>
-            <p class="text-[9px] text-slate-400">Tune jo Car ki photo bheji thi waisa</p>
-            <div class="grid grid-cols-2 gap-2 mt-2">
-                <button onclick="loadMachine('sports_car')" class="bg-slate-800 p-2 rounded-xl text-[10px]">🏎️ Sports Car</button>
-                <button onclick="loadMachine('flying_car')" class="bg-slate-800 p-2 rounded-xl text-[10px]">🚗 Flying Car</button>
-                <button onclick="loadMachine('aeroplane')" class="bg-slate-800 p-2 rounded-xl text-[10px]">✈️ Plane Outline</button>
-                <button onclick="loadMachine('helicopter')" class="bg-slate-800 p-2 rounded-xl text-[10px]">🚁 Helicopter</button>
-                <button onclick="loadMachine('bike')" class="bg-slate-800 p-2 rounded-xl text-[10px]">🏍️ Bike</button>
-                <button onclick="loadMachine('boat')" class="bg-slate-800 p-2 rounded-xl text-[10px]">⛵ Boat</button>
-            </div>
-            <div class="bg-black p-2 rounded-xl mt-3">
-                <p class="text-[9px]">OUTLINE TOOLS</p>
-                <div class="flex gap-1 mt-1">
-                    <button onclick="setTool('pen')" class="px-2 py-1 bg-violet-500 rounded text-[9px]">✏️ Pen</button>
-                    <button onclick="setTool('line')" class="px-2 py-1 bg-slate-700 rounded text-[9px]">📏 Line</button>
-                    <button onclick="setTool('rect')" class="px-2 py-1 bg-slate-700 rounded text-[9px]">⬜ Rect</button>
-                    <button onclick="setTool('circle')" class="px-2 py-1 bg-slate-700 rounded text-[9px]">⭕ Circle</button>
-                </div>
-            </div>
-            <div class="bg-slate-950 p-2 rounded-xl mt-3 text-[10px]" id="concept3">Concept 11-12: Wireframe + Blueprint + Side/Top view. Real Car Designer ka kaam.</div>
+        <div style="margin-top:8px;"><b style="font-size:10px;">✏️ Free Pen</b><button onclick="kTool='pen'" id="kPen" style="width:100%; background:#6c5cff; padding:8px; border-radius:8px; font-size:11px; margin-top:4px;">Pen ON</button><button onclick="kTool='select'" id="kSel" style="width:100%; background:#222; padding:8px; border-radius:8px; font-size:11px; margin-top:4px;">Select/Move</button></div>
+        <button onclick="clearK()" style="margin-top:auto; background:#ff0040; padding:8px; border-radius:8px; font-size:11px;">🗑️ Clear All</button>
+      </div>
+      <div style="flex:1; background:white; border-radius:12px; padding:6px; display:flex; flex-direction:column;">
+        <div style="color:black; font-size:11px; font-weight:900; display:flex; justify-content:space-between;"><span id="kTitle">👶 5-7 • Blank Canvas • Khud se banao</span><span style="font-size:9px;">PowerPoint jaisa - Drag, Drop, Draw</span></div>
+        <canvas id="kCanvas" width="900" height="600" style="flex:1; background:#fffef5; border-radius:8px; margin-top:4px; border:2px dashed #aaa; touch-action:none;"></canvas>
+      </div>
+      <div style="width:140px; background:#16182a; border-radius:12px; padding:10px;">
+        <b style="font-size:10px;">🎨 Rang</b><div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-top:6px;">
+          <div onclick="kColor='#ff0000'" style="height:26px; background:red; border-radius:6px; cursor:pointer;"></div><div onclick="kColor='#00aaff'" style="height:26px; background:#00aaff; border-radius:6px; cursor:pointer;"></div>
+          <div onclick="kColor='#00ff00'" style="height:26px; background:lime; border-radius:6px; cursor:pointer;"></div><div onclick="kColor='#000000'" style="height:26px; background:black; border-radius:6px; border:1px solid #444; cursor:pointer;"></div>
         </div>
-
-        <div id="paath4Box" class="hidden">
-            <h2 class="text-[11px] font-black text-emerald-400">🚀 FUTURE ENGINEER - 20 Machines</h2>
-            <div class="grid grid-cols-2 gap-1 mt-2 max-h-[280px] overflow-y-auto">
-                <button onclick="loadMachine('sports_car')" class="bg-slate-800 p-1.5 rounded text-[9px]">🏎️ Sports Car</button>
-                <button onclick="loadMachine('flying_car')" class="bg-slate-800 p-1.5 rounded text-[9px]">🚗 Flying Car</button>
-                <button onclick="loadMachine('helicopter')" class="bg-slate-800 p-1.5 rounded text-[9px]">🚁 Helicopter</button>
-                <button onclick="loadMachine('aeroplane')" class="bg-slate-800 p-1.5 rounded text-[9px]">✈️ Aeroplane</button>
-                <button onclick="loadMachine('fighter_jet')" class="bg-slate-800 p-1.5 rounded text-[9px]">🛩️ Fighter Jet</button>
-                <button onclick="loadMachine('bike')" class="bg-slate-800 p-1.5 rounded text-[9px]">🏍️ Super Bike</button>
-                <button onclick="loadMachine('ev_car')" class="bg-slate-800 p-1.5 rounded text-[9px]">🔋 EV Car</button>
-                <button onclick="loadMachine('drone')" class="bg-slate-800 p-1.5 rounded text-[9px]">🚁 Drone</button>
-                <button onclick="loadMachine('mars_rover')" class="bg-slate-800 p-1.5 rounded text-[9px]">🤖 Mars Rover</button>
-                <button onclick="loadMachine('robot')" class="bg-slate-800 p-1.5 rounded text-[9px]">🦾 Robot Arm</button>
-                <button onclick="loadMachine('submarine')" class="bg-slate-800 p-1.5 rounded text-[9px]">🚤 Submarine</button>
-                <button onclick="loadMachine('truck')" class="bg-slate-800 p-1.5 rounded text-[9px]">🚚 Truck</button>
-                <button onclick="loadMachine('bulldozer')" class="bg-slate-800 p-1.5 rounded text-[9px]">🚜 Bulldozer</button>
-                <button onclick="loadMachine('crane')" class="bg-slate-800 p-1.5 rounded text-[9px]">🏗️ Crane</button>
-                <button onclick="loadMachine('spaceship')" class="bg-slate-800 p-1.5 rounded text-[9px]">🚀 Spaceship</button>
-                <button onclick="loadMachine('ufo')" class="bg-slate-800 p-1.5 rounded text-[9px]">👽 UFO Car</button>
-                <button onclick="loadMachine('tank')" class="bg-slate-800 p-1.5 rounded text-[9px]">🪖 Tank</button>
-                <button onclick="loadMachine('boat')" class="bg-slate-800 p-1.5 rounded text-[9px]">⛵ Speed Boat</button>
-                <button onclick="loadMachine('train')" class="bg-slate-800 p-1.5 rounded text-[9px]">🚄 Bullet Train</button>
-                <button onclick="loadMachine('custom')" class="bg-violet-900 border border-violet-400 p-1.5 rounded text-[9px] font-bold">✨ Custom Build</button>
-            </div>
-            <div class="grid grid-cols-3 gap-1 mt-2">
-                <button onclick="addCustom('wheel')" class="bg-slate-800 text-[9px] p-1 rounded">🛞 Wheel</button>
-                <button onclick="addCustom('wing')" class="bg-slate-800 text-[9px] p-1 rounded">🪽 Wing</button>
-                <button onclick="addCustom('rotor')" class="bg-slate-800 text-[9px] p-1 rounded">🌀 Rotor</button>
-                <button onclick="addCustom('chip')" class="bg-violet-900/30 border border-violet-400 text-[9px] p-1 rounded">🧠 Chip</button>
-                <button onclick="addCustom('sensor')" class="bg-emerald-900/30 border border-emerald-400 text-[9px] p-1 rounded">📡 Sensor</button>
-                <button onclick="addCustom('battery')" class="bg-amber-900/30 border border-amber-400 text-[9px] p-1 rounded">🔋 Battery</button>
-            </div>
-            <div class="flex gap-1 mt-2">
-                <input type="color" id="paintColorSenior" value="#00ffff" class="w-7 h-7 rounded">
-                <button onclick="paint3D()" class="flex-1 bg-amber-400 text-black text-[10px] font-bold rounded">🎨 Paint</button>
-                <button onclick="fixMachine()" class="flex-1 bg-rose-500 text-white text-[10px] font-bold rounded">🔧 Fix</button>
-                <button onclick="powerTest()" class="flex-1 bg-emerald-500 text-black text-[10px] font-bold rounded">⚡ ON</button>
-            </div>
-            <div class="bg-slate-950 p-2 rounded-xl mt-2 text-[10px]" id="concept4">Concept 13-15: Assemble + Chip + Sensor + Power Test. Real EV/Drone Factory Skill.</div>
-        </div>
-
-        <div id="logBox" class="bg-black font-mono text-[8px] p-2 rounded h-14 overflow-y-auto text-emerald-400">System Ready...</div>
+        <div style="margin-top:10px;"><b style="font-size:10px;">Size</b><input id="kSize" type="range" min="5" max="100" value="40" style="width:100%;" oninput="kSizeVal=this.value"></div>
+        <div style="margin-top:10px; background:black; padding:8px; border-radius:8px; font-size:9px; color:#aaa;">Koi readymade nahi.<br>Shape drag karke<br>khud jod ke<br>car/helicopter/plane<br>banao.</div>
+      </div>
     </div>
 
-    <!-- CENTER -->
-    <div class="col-span-12 lg:col-span-6 space-y-2">
-        <div class="bg-[#fffef5] rounded-2xl p-2 h-[360px] flex flex-col border-4 border-white">
-            <div class="flex justify-between items-center px-1">
-                <h3 id="canvas2DTitle" class="text-black text-[12px] font-black">🎨 2D STUDIO - Outline Banao, Rang Bharo</h3>
-                <div class="flex gap-1">
-                    <button onclick="clear2D()" class="text-black text-[10px] border px-2 py-0.5 rounded-full">Clear</button>
-                    <button onclick="undo2D()" class="text-black text-[10px] border px-2 py-0.5 rounded-full">Undo</button>
-                </div>
-            </div>
-            <canvas id="canvas2D" width="650" height="300" class="bg-white rounded-xl border border-dashed border-slate-300 flex-1 w-full mt-1"></canvas>
-            <div class="flex justify-between text-black text-[9px] font-bold mt-1 px-1">
-                <span>Brush: <input type="range" id="brushSize" min="2" max="60" value="12" class="w-16"> <span id="brushVal">12px</span></span>
-                <span id="modeLabel">Paath 1 Mode</span>
-                <span id="powerStatus" class="text-rose-500">🔴 OFF</span>
-            </div>
+    <!-- ADULT - BLANK POWERPOINT + 3D -->
+    <div id="proUI" style="display:none; width:100%; gap:8px;">
+      <div style="width:200px; background:#e6e8ec; color:black; border-radius:10px; display:flex; flex-direction:column; overflow:hidden; border:1px solid #999;">
+        <div style="background:#d0d2d8; padding:6px 10px; font-size:11px; font-weight:900;">🔧 PRIMITIVE SHAPES - Sansar</div>
+        <div style="padding:8px; overflow-y:auto; flex:1; font-size:10px; display:flex; flex-direction:column; gap:4px;">
+          <b>2D PowerPoint Shapes (Drag to Canvas)</b>
+          <div draggable="true" ondragstart="dragP(event,'rect')" style="background:white; border:1px solid #bbb; padding:8px; border-radius:6px; cursor:grab;">⬜ Rectangle - Body</div>
+          <div draggable="true" ondragstart="dragP(event,'circle')" style="background:white; border:1px solid #bbb; padding:8px; border-radius:6px; cursor:grab;">⭕ Circle - Wheel</div>
+          <div draggable="true" ondragstart="dragP(event,'tri')" style="background:white; border:1px solid #bbb; padding:8px; border-radius:6px; cursor:grab;">🔺 Triangle - Nose</div>
+          <div draggable="true" ondragstart="dragP(event,'line')" style="background:white; border:1px solid #bbb; padding:8px; border-radius:6px; cursor:grab;">📏 Line - Support/Truss</div>
+          <b style="margin-top:10px;">3D Primitives (Drag to 3D)</b>
+          <div draggable="true" ondragstart="dragP(event,'box3d')" style="background:#dbeafe; border:1px solid #93c5fd; padding:8px; border-radius:6px; cursor:grab;">🧱 Box 3D - Fuselage</div>
+          <div draggable="true" ondragstart="dragP(event,'cyl3d')" style="background:#dbeafe; border:1px solid #93c5fd; padding:8px; border-radius:6px; cursor:grab;">🛢️ Cylinder - Engine/Wheel</div>
+          <div draggable="true" ondragstart="dragP(event,'sphere3d')" style="background:#dbeafe; border:1px solid #93c5fd; padding:8px; border-radius:6px; cursor:grab;">⚪ Sphere - Nose/Cockpit</div>
+          <div draggable="true" ondragstart="dragP(event,'plane3d')" style="background:#dbeafe; border:1px solid #93c5fd; padding:8px; border-radius:6px; cursor:grab;">🪽 Plane - Wing/Blade</div>
+          <div style="margin-top:10px; border-top:1px solid #bbb; padding-top:8px;">
+            <b>Age</b><br><button onclick="setPA('13-15')" id="p13" style="background:#00ffff; padding:4px 8px; border-radius:10px; font-size:9px; font-weight:900; margin-top:4px;">13-15</button><button onclick="setPA('15-18')" id="p15" style="background:#fff; border:1px solid #999; padding:4px 8px; border-radius:10px; font-size:9px; margin-left:4px;">15-18+</button>
+          </div>
         </div>
-        <div class="bg-[#0a0a0a] rounded-2xl p-2 h-[360px] flex flex-col border border-violet-500/30 relative">
-            <h3 class="text-white text-[11px] font-black px-1">🌐 3D VIEW - Mouse se Ghumao - Har Angle - Jaise Photo me tha</h3>
-            <div id="threeContainer" class="flex-1 bg-black rounded-xl mt-1"></div>
-            <div class="absolute bottom-2 left-2 bg-black/80 px-2 py-0.5 rounded-full text-[8px]">View: <span id="viewLabel">solid</span> | Mouse Drag = 360° | Scroll = Zoom</div>
-            <div class="absolute bottom-2 right-2 flex gap-1">
-                <button onclick="setCameraView('front')" class="bg-slate-800 text-[8px] px-2 py-0.5 rounded">Front</button>
-                <button onclick="setCameraView('side')" class="bg-slate-800 text-[8px] px-2 py-0.5 rounded">Side</button>
-                <button onclick="setCameraView('top')" class="bg-slate-800 text-[8px] px-2 py-0.5 rounded">Top</button>
-                <button onclick="setCameraView('iso')" class="bg-slate-800 text-[8px] px-2 py-0.5 rounded">ISO</button>
-            </div>
+      </div>
+
+      <div style="flex:1; display:flex; flex-direction:column; gap:8px;">
+        <div style="flex:1; background:white; border-radius:10px; padding:6px; display:flex; flex-direction:column; border:1px solid #aaa;">
+          <div style="color:black; font-size:11px; font-weight:900; display:flex; justify-content:space-between;"><span>📐 2D BLANK - PowerPoint Jaisa - Khud se Outline Banao</span><button onclick="clearP2D()" style="border:1px solid #000; padding:2px 8px; border-radius:10px; font-size:10px;">Clear</button></div>
+          <canvas id="pCanvas2D" width="800" height="300" style="flex:1; background:#fffef5; border-radius:8px; margin-top:4px; border:1px dashed #aaa;"></canvas>
         </div>
+        <div style="flex:1; background:#0e0e12; border-radius:10px; padding:6px; display:flex; flex-direction:column; border:1px solid #00ffff40;">
+          <div style="color:white; font-size:11px; font-weight:900; display:flex; justify-content:space-between;"><span id="p3Title">🌐 3D BLANK - Khali Jagah - Shape Jod ke Helicopter/Plane Banao</span><span style="font-size:9px; color:#888;">Drag 3D shape yahan drop karo | Mouse se ghumao</span></div>
+          <div id="threeP" style="flex:1; background:black; border-radius:8px; margin-top:4px;"></div>
+        </div>
+      </div>
+
+      <div style="width:180px; background:#11131c; border-radius:10px; padding:10px; color:white;">
+        <b style="font-size:11px; color:#00ffff;">⚙️ Properties</b>
+        <div style="margin-top:8px; font-size:10px;">
+          <div>Selected: <span id="pSel">None</span></div>
+          <div style="margin-top:8px;">Size: <input id="pSize" type="range" min="10" max="200" value="80" style="width:100%;" oninput="updateP()"><span id="pSizeV">80</span></div>
+          <div style="margin-top:8px;">Color: <input id="pCol" type="color" value="#ffcc00" style="width:100%; height:28px;" oninput="updateP()"></div>
+          <div style="margin-top:8px; display:flex; gap:4px;">
+            <button onclick="delP()" style="flex:1; background:#ff0040; padding:6px; border-radius:6px; font-size:10px;">Delete</button>
+            <button onclick="dupP()" style="flex:1; background:#333; padding:6px; border-radius:6px; font-size:10px;">Duplicate</button>
+          </div>
+          <div style="margin-top:12px; background:black; padding:8px; border-radius:8px; font-size:9px; color:#aaa;">PowerPoint jaisa:<br>• Shape drag karo<br>• Size badlo<br>• Color bharo<br>• Jod ke machine banao<br>• Koi readymade nahi</div>
+          <button onclick="saveBlank()" style="width:100%; background:linear-gradient(to right,#00ffff,#ff00ff); color:black; padding:10px; border-radius:8px; margin-top:10px; font-weight:900; font-size:11px;">💾 Save My Design</button>
+        </div>
+      </div>
     </div>
 
-    <!-- RIGHT -->
-    <div class="col-span-12 lg:col-span-3 bg-slate-900 rounded-2xl p-3 border border-pink-500/20 space-y-2 h-[720px] overflow-y-auto">
-        <h2 class="text-[11px] font-black" id="rightTitle">🛠️ CARD DESIGN TOOLS - PowerPoint Jaisa</h2>
-        <div class="bg-slate-950 p-2 rounded-xl">
-            <p class="text-[9px] text-slate-400">BODY PAINT - Har Machine pe</p>
-            <div class="grid grid-cols-4 gap-1 mt-1">
-                <div onclick="paint3DColor(0xff1a1a)" class="h-6 bg-red-600 rounded cursor-pointer"></div>
-                <div onclick="paint3DColor(0x00ffff)" class="h-6 bg-cyan-400 rounded cursor-pointer"></div>
-                <div onclick="paint3DColor(0xffffff)" class="h-6 bg-white rounded border cursor-pointer"></div>
-                <div onclick="paint3DColor(0x111111)" class="h-6 bg-black border rounded cursor-pointer"></div>
-                <div onclick="paint3DColor(0x00ff88)" class="h-6 bg-emerald-400 rounded cursor-pointer"></div>
-                <div onclick="paint3DColor(0xffcc00)" class="h-6 bg-yellow-400 rounded cursor-pointer"></div>
-                <div onclick="paint3DColor(0x8a2be2)" class="h-6 bg-purple-500 rounded cursor-pointer"></div>
-                <div onclick="paint3DColor(0x0088ff)" class="h-6 bg-blue-600 rounded cursor-pointer"></div>
-            </div>
-            <p class="text-[9px] text-slate-400 mt-2">SLIDES / BLUEPRINTS</p>
-            <div id="previewBar" class="flex gap-1 overflow-x-auto mt-1 min-h-[40px] bg-black rounded p-1"></div>
-        </div>
-        <button onclick="saveSlide()" class="w-full py-2 bg-amber-400 text-black text-xs font-black rounded-xl">📑 PPT Slide Save</button>
-        <button onclick="exportPDF()" class="w-full py-2 bg-violet-500 text-white text-xs font-black rounded-xl">📄 Blueprint PDF (Side/Top)</button>
-        <button onclick="finalSave()" class="w-full py-2 bg-gradient-to-r from-cyan-400 to-pink-500 text-black text-xs font-black rounded-xl">💾 FINAL SAVE + BALLOON</button>
-
-        <div class="bg-gradient-to-br from-violet-900/50 to-black p-3 rounded-xl border border-violet-500/20 text-[10px] leading-4">
-            <b class="text-cyan-400" id="learnTitle">Aaj Kya Seekhega?</b>
-            <p id="learnDesc" class="mt-1 text-slate-300">Age 5-7: Rang aur shape. China me bhi pehle yehi sikhate hain - Observation strong.</p>
-        </div>
-
-        <div class="bg-black p-2 rounded-xl text-[9px] text-slate-400">
-            <b>All Features Jo Tune Bola:</b><br>
-            ✓ Helicopter, Aeroplane, Flying Car, Bike, 20 machines<br>
-            ✓ Outline banao (Pen/Line/Rect/Circle)<br>
-            ✓ Upar ki line, rang bharo<br>
-            ✓ Har angle se dekho - Mouse se 360°<br>
-            ✓ PowerPoint jaisa Slide system<br>
-            ✓ Card Designing jaisa Paint<br>
-            ✓ Custom element jod ke naya design<br>
-            ✓ 3D Model + Blueprint + Wireframe<br>
-            ✓ Age-wise concept
-        </div>
-    </div>
-</div>
+  </div>
 </div>
 
 <script>
-    const c2d=document.getElementById('canvas2D'), ctx2=c2d.getContext('2d');
-    let isDraw=false, color='#ff0000', outlineColor='#000', brush=12, currentPaath=1, currentMachine='sports_car', currentView='solid', tool='pen', slides=[], history2D=[], scene, camera, renderer, controls, carGroup;
+let mainMode='kids', kidsAge='5-7', proAge='13-15', kColor='#ff0000', kTool='pen', kSizeVal=40, dragType=null;
 
-    const translations={
-        hinglish:{ mainTitle:"CLYXESS FINAL CREATOR LAB - 15 Saal Tak", subTitle:"Paath 1:Rang • Paath 2:Kahani • Paath 3:Design • Paath 4:Future Engineer", colorBazaar:"🎨 COLOR BAZAAR - Rang Bharo", template:"TEMPLATE CHUNO", rightTitle:"🛠️ CARD DESIGN TOOLS - PowerPoint Jaisa", learn:["Age 5-7: Rang aur shape. Observation Skill.","Age 8-10: Kahani banana. Presentation Skill.","Age 11-12: Outline + Blueprint. Design Thinking.","Age 13-15: Assemble + 3D. Future Engineer Skill."] },
-        en:{ mainTitle:"CLYXESS FINAL CREATOR LAB - Up to 15 Years", subTitle:"Lesson1:Color • Lesson2:Story • Lesson3:Design • Lesson4:Future Engineer", colorBazaar:"🎨 COLOR BAZAAR", template:"CHOOSE TEMPLATE", rightTitle:"🛠️ CARD DESIGN TOOLS - Like PowerPoint", learn:["Age 5-7: Colors & Shapes. Observation.","Age 8-10: Story Making. Presentation.","Age 11-12: Outline + Blueprint. Design Thinking.","Age 13-15: Assemble + 3D. Engineer."] },
-        hi:{ mainTitle:"क्लिक्स फाइनल क्रिएटर लैब - 15 साल तक", subTitle:"पाठ 1:रंग • पाठ 2:कहानी • पाठ 3:डिज़ाइन • पाठ 4:भविष्य इंजीनियर", colorBazaar:"🎨 रंग बाजार", template:"टेम्पलेट चुनो", rightTitle:"🛠️ कार्ड डिज़ाइन टूल्स", learn:["5-7 साल: रंग और आकार।","8-10 साल: कहानी बनाना।","11-12 साल: आउटलाइन + ब्लूप्रिंट।","13-15 साल: जोड़ना + 3D।"] },
-        ta:{ mainTitle:"CLYXESS இறுதி படைப்பு ஆய்வகம்", subTitle:"பாடம் 1:வண்ணம் • பாடம் 2:கதை • பாடம் 3:வடிவமைப்பு • பாடம் 4:பொறியாளர்", colorBazaar:"🎨 வண்ண சந்தை", template:"டெம்ப்ளேட்", rightTitle:"🛠️ வடிவமைப்பு கருவிகள்", learn:["5-7: வண்ணங்கள்","8-10: கதை","11-12: அவுட்லைன்","13-15: அசெம்பிள்"] },
-        te:{ mainTitle:"CLYXESS ఫైనల్ క్రియేటర్ ల్యాబ్", subTitle:"పాఠం 1:రంగు • పాఠం 2:కథ • పాఠం 3:డిజైన్ • పాఠం 4:ఇంజనీర్", colorBazaar:"🎨 కలర్ బజార్", template:"టెంప్లేట్", rightTitle:"🛠️ డిజైన్ టూల్స్", learn:["5-7: రంగులు","8-10: కథ","11-12: అవుట్ లైన్","13-15: అసెంబుల్"] },
-        kn:{ mainTitle:"CLYXESS ಅಂತಿಮ ಸೃಷ್ಟಿ ಲ್ಯಾಬ್", subTitle:"ಪಾಠ 1:ಬಣ್ಣ • ಪಾಠ 2:ಕಥೆ • ಪಾಠ 3:ವಿನ್ಯಾಸ • ಪಾಠ 4:ಇಂಜಿನಿಯರ್", colorBazaar:"🎨 ಬಣ್ಣ ಬಜಾರ್", template:"ಟೆಂಪ್ಲೇಟ್", rightTitle:"🛠️ ಡಿಸೈನ್ ಟೂಲ್ಸ್", learn:["5-7: ಬಣ್ಣಗಳು","8-10: ಕಥೆ","11-12: ಔಟ್‌ಲೈನ್","13-15: ಅಸೆಂಬಲ್"] },
-        ml:{ mainTitle:"CLYXESS ഫൈനൽ ക്രിയേറ്റർ ലാബ്", subTitle:"പാഠം 1:നിറം • പാഠം 2:കഥ • പാഠം 3:ഡിസൈൻ • പാഠം 4:എഞ്ചിനീയർ", colorBazaar:"🎨 കളർ ബസാർ", template:"ടെംപ്ലേറ്റ്", rightTitle:"🛠️ ഡിസൈൻ ടൂൾസ്", learn:["5-7: നിറങ്ങൾ","8-10: കഥ","11-12: ഔട്ട്‌ലൈൻ","13-15: അസംബിൾ"] },
-        bn:{ mainTitle:"CLYXESS ফাইনাল ক্রিয়েটর ল্যাব", subTitle:"পাঠ 1:রঙ • পাঠ 2:গল্প • পাঠ 3:ডিজাইন • পাঠ 4:ইঞ্জিনিয়ার", colorBazaar:"🎨 রঙের বাজার", template:"টেমপ্লেট", rightTitle:"🛠️ ডিজাইন টুলস", learn:["5-7: রঙ","8-10: গল্প","11-12: আউটলাইন","13-15: অ্যাসেম্বল"] },
-        or:{ mainTitle:"CLYXESS ଫାଇନାଲ କ୍ରିଏଟର ଲାବ", subTitle:"ପାଠ 1:ରଙ୍ଗ • ପାଠ 2:କାହାଣୀ • ପାଠ 3:ଡିଜାଇନ • ପାଠ 4:ଇଞ୍ଜିନିୟର", colorBazaar:"🎨 ରଙ୍ଗ ବଜାର", template:"ଟେମ୍ପଲେଟ", rightTitle:"🛠️ ଡିଜାଇନ ଟୁଲସ", learn:["5-7: ରଙ୍ଗ","8-10: କାହାଣୀ","11-12: ଆଉଟଲାଇନ","13-15: ଆସେମ୍ବଲ"] },
-        ru:{ mainTitle:"CLYXESS ФИНАЛЬНАЯ ЛАБОРАТОРИЯ - До 15 лет", subTitle:"Урок 1:Цвет • Урок 2:История • Урок 3:Дизайн • Урок 4:Инженер", colorBazaar:"🎨 ЦВЕТНОЙ БАЗАР", template:"ВЫБЕРИ ШАБЛОН", rightTitle:"🛠️ ИНСТРУМЕНТЫ ДИЗАЙНА", learn:["5-7: Цвета","8-10: История","11-12: Контур","13-15: Сборка"] },
-        zh:{ mainTitle:"CLYXESS 最终创作者实验室 - 15岁以下", subTitle:"课程1:颜色 • 课程2:故事 • 课程3:设计 • 课程4:工程师", colorBazaar:"🎨 颜色市场", template:"选择模板", rightTitle:"🛠️ 卡片设计工具", learn:["5-7: 颜色","8-10: 故事","11-12: 轮廓","13-15: 组装"] },
-        ja:{ mainTitle:"CLYXESS ファイナルクリエイターラボ - 15歳まで", subTitle:"レッスン1:色 • レッスン2:物語 • レッスン3:デザイン • レッスン4:エンジニア", colorBazaar:"🎨 カラーバザール", template:"テンプレート選択", rightTitle:"🛠️ カードデザインツール", learn:["5-7: 色","8-10: 物語","11-12: アウトライン","13-15: 組み立て"] }
-    };
+// MAIN
+function setMain(m){
+  mainMode=m;
+  document.getElementById('kidsUI').style.display=m==='kids'?'flex':'none';
+  document.getElementById('proUI').style.display=m==='pro'?'flex':'none';
+  document.getElementById('mKids').style.background=m==='kids'?'#ffcc00':'#222';
+  document.getElementById('mPro').style.background=m==='pro'?'#00ffff':'#222';
+  document.getElementById('mKids').style.color=m==='kids'?'black':'white';
+  document.getElementById('mPro').style.color=m==='pro'?'black':'white';
+  if(m==='pro') initPro();
+}
+function setKA(a){
+  kidsAge=a; ['5-7','8-10','11-12'].forEach(x=>{const el=document.getElementById('k'+x.split('-')[0]); if(el){el.style.background=x===a?'#ffcc00':'#222'; el.style.color=x===a?'black':'white';}});
+}
+function setPA(a){proAge=a; document.getElementById('p13').style.background=a==='13-15'?'#00ffff':'#fff'; document.getElementById('p15').style.background=a==='15-18'?'#00ffff':'#fff';}
 
-    function changeLang(){
-        const lang=document.getElementById('langSelect').value;
-        const t=translations[lang] || translations['hinglish'];
-        document.getElementById('mainTitle').innerText=t.mainTitle;
-        document.getElementById('subTitle').innerText=t.subTitle;
-        document.getElementById('t-colorBazaar').innerText=t.colorBazaar;
-        document.getElementById('t-template').innerText=t.template;
-        document.getElementById('rightTitle').innerText=t.rightTitle;
-        document.getElementById('learnDesc').innerText=t.learn[currentPaath-1];
-        document.getElementById('concept1').innerText=t.learn[0];
-        document.getElementById('concept2').innerText=t.learn[1];
-        document.getElementById('concept3').innerText=t.learn[2];
-        document.getElementById('concept4').innerText=t.learn[3];
-    }
+// KIDS CANVAS - BLANK
+const kcv=document.getElementById('kCanvas'), kctx=kcv.getContext('2d'); let kObjects=[], kSel=null, kDrag=false, kStart=null;
+function clearK(){kctx.fillStyle='#fffef5'; kctx.fillRect(0,0,kcv.width,kcv.height); kObjects=[];}
+clearK();
+function dragK(e,t){dragType=t;}
+kcv.addEventListener('dragover',e=>e.preventDefault());
+kcv.addEventListener('drop',e=>{e.preventDefault(); const r=kcv.getBoundingClientRect(); const x=(e.clientX-r.left)*(kcv.width/r.width), y=(e.clientY-r.top)*(kcv.height/r.height); addKObj(dragType,x,y);});
+function addKObj(t,x,y){
+  const obj={type:t,x:x,y:y,w:kSizeVal,h:kSizeVal,color:kColor};
+  kObjects.push(obj); drawK();
+}
+function drawK(){
+  kctx.fillStyle='#fffef5'; kctx.fillRect(0,0,kcv.width,kcv.height);
+  kObjects.forEach(o=>{
+    kctx.fillStyle=o.color; kctx.strokeStyle='#222'; kctx.lineWidth=2;
+    if(o.type==='rect') kctx.fillRect(o.x-o.w/2,o.y-o.h/2,o.w,o.h);
+    if(o.type==='circle'){kctx.beginPath(); kctx.arc(o.x,o.y,o.w/2,0,Math.PI*2); kctx.fill(); kctx.stroke();}
+    if(o.type==='tri'){kctx.beginPath(); kctx.moveTo(o.x,o.y-o.h/2); kctx.lineTo(o.x-o.w/2,o.y+o.h/2); kctx.lineTo(o.x+o.w/2,o.y+o.h/2); kctx.closePath(); kctx.fill(); kctx.stroke();}
+    if(o.type==='star'){kctx.font=(o.w)+'px serif'; kctx.fillText('⭐',o.x-o.w/2,o.y+o.w/3);}
+    if(o.type==='line'){kctx.beginPath(); kctx.moveTo(o.x-o.w/2,o.y); kctx.lineTo(o.x+o.w/2,o.y); kctx.strokeStyle=o.color; kctx.lineWidth=4; kctx.stroke();}
+    if(o.type==='dot'){kctx.beginPath(); kctx.arc(o.x,o.y,5,0,Math.PI*2); kctx.fill();}
+  });
+}
+// Free pen
+let kPenDown=false, kPenStart=null;
+kcv.addEventListener('mousedown',e=>{if(kTool!=='pen') return; kPenDown=true; kPenStart={x:e.offsetX,y:e.offsetY}; kctx.beginPath(); kctx.moveTo(kPenStart.x,kPenStart.y);});
+kcv.addEventListener('mousemove',e=>{if(!kPenDown || kTool!=='pen') return; kctx.strokeStyle=kColor; kctx.lineWidth=kidsAge==='5-7'?14:3; kctx.lineCap='round'; kctx.lineTo(e.offsetX,e.offsetY); kctx.stroke();});
+window.addEventListener('mouseup',()=>kPenDown=false);
 
-    function setPaath(n){
-        currentPaath=n;
-        [1,2,3,4].forEach(i=>{
-            document.getElementById('paath'+i+'Box').classList.toggle('hidden', i!==n);
-            document.getElementById('btn-p'+i).classList.toggle('active-paath', i===n);
-        });
-        const ageMap={1:'5-7',2:'8-10',3:'11-12',4:'13-15'};
-        document.getElementById('ageSelect').value=ageMap[n];
-        switchAge();
-        log(`Paath ${n} Started`);
-    }
+// PRO - 2D + 3D BLANK
+const p2d=document.getElementById('pCanvas2D'), p2ctx=p2d.getContext('2d'); let p2Objects=[];
+function clearP2D(){p2ctx.fillStyle='#fffef5'; p2ctx.fillRect(0,0,p2d.width,p2d.height); p2Objects=[];}
+clearP2D();
+function dragP(e,t){dragType=t;}
+p2d.addEventListener('dragover',e=>e.preventDefault());
+p2d.addEventListener('drop',e=>{e.preventDefault(); const r=p2d.getBoundingClientRect(); const x=(e.clientX-r.left)*(p2d.width/r.width), y=(e.clientY-r.top)*(p2d.height/r.height); if(['rect','circle','tri','line'].includes(dragType)){p2Objects.push({type:dragType,x:x,y:y,w:80,h:50,color:document.getElementById('pCol').value}); drawP2D();} });
+function drawP2D(){
+  p2ctx.fillStyle='#fffef5'; p2ctx.fillRect(0,0,p2d.width,p2d.height);
+  p2Objects.forEach(o=>{p2ctx.fillStyle=o.color; p2ctx.strokeStyle='#222'; p2ctx.lineWidth=2;
+    if(o.type==='rect') p2ctx.fillRect(o.x-o.w/2,o.y-o.h/2,o.w,o.h);
+    if(o.type==='circle'){p2ctx.beginPath(); p2ctx.arc(o.x,o.y,o.w/2,0,Math.PI*2); p2ctx.fill(); p2ctx.stroke();}
+    if(o.type==='tri'){p2ctx.beginPath(); p2ctx.moveTo(o.x,o.y-o.h/2); p2ctx.lineTo(o.x-o.w/2,o.y+o.h/2); p2ctx.lineTo(o.x+o.w/2,o.y+o.h/2); p2ctx.closePath(); p2ctx.fill(); p2ctx.stroke();}
+    if(o.type==='line'){p2ctx.beginPath(); p2ctx.moveTo(o.x-o.w/2,o.y); p2ctx.lineTo(o.x+o.w/2,o.y); p2ctx.strokeStyle=o.color; p2ctx.lineWidth=3; p2ctx.stroke();}
+  });
+}
 
-    function switchAge(){
-        const age=document.getElementById('ageSelect').value;
-        const map={'5-7':1,'8-10':2,'11-12':3,'13-15':4};
-        if(map[age]!==currentPaath) setPaath(map[age]);
-        const labels={ '5-7':"Mode: Rang Bharo (Junior)", '8-10':"Mode: Story PPT", '11-12':"Mode: Outline + Blueprint", '13-15':"Mode: 3D Engineer" };
-        document.getElementById('modeLabel').innerText=labels[age];
-        changeLang();
-    }
+// PRO 3D - BLANK
+let scene,camera,renderer,controls,group, selected3D=null, proInit=false, assembly3D=[];
+function initPro(){
+  if(proInit) return; proInit=true;
+  scene=new THREE.Scene(); scene.background=new THREE.Color(0x000000);
+  camera=new THREE.PerspectiveCamera(50,1,0.1,1000); camera.position.set(4,3,5);
+  renderer=new THREE.WebGLRenderer({antialias:true}); renderer.setSize(700,400); document.getElementById('threeP').appendChild(renderer.domElement);
+  controls=new THREE.OrbitControls(camera, renderer.domElement); controls.enableDamping=true;
+  scene.add(new THREE.DirectionalLight(0xffffff,1)); scene.add(new THREE.AmbientLight(0xffffff,0.7));
+  group=new THREE.Group(); scene.add(group); const grid=new THREE.GridHelper(10,20,0x444444,0x222222); scene.add(grid);
+  (function anim(){requestAnimationFrame(anim); controls.update(); renderer.render(scene,camera);})();
+}
+const threeDiv=document.getElementById('threeP');
+threeDiv.addEventListener('dragover',e=>e.preventDefault());
+threeDiv.addEventListener('drop',e=>{e.preventDefault(); const t=e.dataTransfer.getData('text')||dragType; if(['box3d','cyl3d','sphere3d','plane3d'].includes(t)) add3D(t);});
 
-    function setColor(c){ color=c; }
-    function setTool(t){ tool=t; log(`Tool: ${t}`); }
-    document.getElementById('brushSize').addEventListener('input', e=>{ brush=e.target.value; document.getElementById('brushVal').innerText=brush+'px'; });
-    document.getElementById('paintColorSenior')?.addEventListener('input', e=>color=e.target.value);
+function add3D(t){
+  const col=document.getElementById('pCol').value; const size=parseFloat(document.getElementById('pSize').value)*0.01;
+  let mesh; const mat=new THREE.MeshStandardMaterial({color:col});
+  if(t==='box3d') mesh=new THREE.Mesh(new THREE.BoxGeometry(size*2,size,size), mat);
+  if(t==='cyl3d'){mesh=new THREE.Mesh(new THREE.CylinderGeometry(size*0.5,size*0.5,size*1.5,20), mat); mesh.rotation.z=Math.PI/2;}
+  if(t==='sphere3d') mesh=new THREE.Mesh(new THREE.SphereGeometry(size*0.6,20,20), mat);
+  if(t==='plane3d') mesh=new THREE.Mesh(new THREE.BoxGeometry(size*2,0.05,size*0.8), mat);
+  mesh.position.set((Math.random()-0.5)*2, size, (Math.random()-0.5)*2); mesh.userData={type:t};
+  group.add(mesh); assembly3D.push(mesh); select3D(mesh);
+}
+function select3D(m){selected3D=m; document.getElementById('pSel').innerText=m.userData.type;}
+function updateP(){
+  if(!selected3D) return; const s=parseFloat(document.getElementById('pSize').value)*0.01; const c=document.getElementById('pCol').value;
+  document.getElementById('pSizeV').innerText=document.getElementById('pSize').value; selected3D.scale.set(s,s,s);
+  if(selected3D.material) selected3D.material.color.set(c);
+}
+function delP(){if(selected3D){group.remove(selected3D); selected3D=null; document.getElementById('pSel').innerText='None';}}
+function dupP(){if(selected3D){const clone=selected3D.clone(); clone.position.x+=0.5; group.add(clone); assembly3D.push(clone);}}
+function saveBlank(){alert('Design Saved! Bacche ne khud se banaya - '+kObjects.length+' shapes 2D + '+assembly3D.length+' parts 3D. PowerPoint jaisa blank se start kiya.');}
 
-    function getPos(e){ const r=c2d.getBoundingClientRect(); const x=(e.touches?e.touches[0].clientX:e.clientX)-r.left; const y=(e.touches?e.touches[0].clientY:e.clientY)-r.top; return {x:x*(c2d.width/r.width), y:y*(c2d.height/r.height)}; }
-    let startPos=null;
-    c2d.addEventListener('mousedown', e=>{ isDraw=true; startPos=getPos(e); history2D.push(c2d.toDataURL()); if(tool==='pen'){ ctx2.beginPath(); ctx2.moveTo(startPos.x,startPos.y); } });
-    c2d.addEventListener('mousemove', e=>{ if(!isDraw)return; const p=getPos(e); if(tool==='pen'){ ctx2.strokeStyle=outlineColor; ctx2.lineWidth=brush; ctx2.lineCap='round'; ctx2.lineTo(p.x,p.y); ctx2.stroke(); } });
-    c2d.addEventListener('mouseup', e=>{ if(!isDraw)return; isDraw=false; const p=getPos(e); if(tool==='line'){ ctx2.beginPath(); ctx2.strokeStyle=outlineColor; ctx2.lineWidth=brush; ctx2.moveTo(startPos.x,startPos.y); ctx2.lineTo(p.x,p.y); ctx2.stroke(); } if(tool==='rect'){ ctx2.strokeStyle=outlineColor; ctx2.lineWidth=brush; ctx2.strokeRect(startPos.x,startPos.y,p.x-startPos.x,p.y-startPos.y); } if(tool==='circle'){ const r=Math.hypot(p.x-startPos.x,p.y-startPos.y); ctx2.beginPath(); ctx2.strokeStyle=outlineColor; ctx2.lineWidth=brush; ctx2.arc(startPos.x,startPos.y,r,0,Math.PI*2); ctx2.stroke(); } });
-    c2d.addEventListener('touchstart', e=>{ isDraw=true; startPos=getPos(e); ctx2.beginPath(); ctx2.moveTo(startPos.x,startPos.y); e.preventDefault(); });
-    c2d.addEventListener('touchmove', e=>{ if(!isDraw)return; const p=getPos(e); ctx2.strokeStyle=outlineColor; ctx2.lineWidth=brush; ctx2.lineCap='round'; ctx2.lineTo(p.x,p.y); ctx2.stroke(); e.preventDefault(); });
-    c2d.addEventListener('touchend', ()=>isDraw=false);
-
-    function clear2D(){ ctx2.clearRect(0,0,c2d.width,c2d.height); ctx2.fillStyle='#fffef5'; ctx2.fillRect(0,0,c2d.width,c2d.height); }
-    function undo2D(){ if(history2D.length>0){ const img=new Image(); img.src=history2D.pop(); img.onload=()=>ctx2.drawImage(img,0,0); } }
-    function loadTemplate(name){
-        clear2D(); ctx2.strokeStyle='#222'; ctx2.lineWidth=4; ctx2.fillStyle='#f0f0f0';
-        if(name.includes('rocket')||name.includes('story_rocket')){ ctx2.beginPath(); ctx2.moveTo(300,40); ctx2.lineTo(380,180); ctx2.lineTo(330,180); ctx2.lineTo(330,280); ctx2.lineTo(270,180); ctx2.lineTo(220,180); ctx2.closePath(); ctx2.stroke(); }
-        else if(name.includes('car')){ ctx2.strokeRect(120,120,380,110); ctx2.beginPath(); ctx2.arc(190,230,28,0,Math.PI*2); ctx2.arc(410,230,28,0,Math.PI*2); ctx2.stroke(); }
-        else if(name.includes('mouse')){ ctx2.beginPath(); ctx2.ellipse(325,170,110,70,0,0,Math.PI*2); ctx2.stroke(); }
-        else if(name.includes('robot')){ ctx2.strokeRect(250,60,150,140); ctx2.strokeRect(200,100,50,60); ctx2.strokeRect(400,100,50,60); ctx2.strokeRect(270,200,110,90); }
-        else if(name.includes('heli')||name.includes('aero')||name.includes('plane')){ ctx2.beginPath(); ctx2.moveTo(80,140); ctx2.lineTo(500,140); ctx2.lineTo(520,150); ctx2.lineTo(80,150); ctx2.closePath(); ctx2.stroke(); ctx2.beginPath(); ctx2.arc(130,120,50,0,Math.PI*2); ctx2.stroke(); }
-        else { ctx2.strokeRect(200,80,250,150); }
-        log(`Template: ${name}`);
-        loadMachine(name);
-    }
-
-    // 3D
-    function init3D(){
-        scene=new THREE.Scene(); scene.background=new THREE.Color(0x000000);
-        camera=new THREE.PerspectiveCamera(50, 600/300, 0.1, 1000); camera.position.set(3,2,4);
-        renderer=new THREE.WebGLRenderer({antialias:true}); renderer.setSize(600,300); document.getElementById('threeContainer').appendChild(renderer.domElement);
-        controls=new THREE.OrbitControls(camera, renderer.domElement); controls.enableDamping=true;
-        scene.add(new THREE.DirectionalLight(0xffffff,1).position.set(5,5,5));
-        scene.add(new THREE.AmbientLight(0xffffff,0.7));
-        carGroup=new THREE.Group(); scene.add(carGroup);
-        buildMachine('sports_car');
-        (function anim(){ requestAnimationFrame(anim); controls.update(); renderer.render(scene,camera); })();
-    }
-    function buildMachine(type){
-        while(carGroup.children.length>0) carGroup.remove(carGroup.children[0]);
-        const mat=new THREE.MeshStandardMaterial({color:0xffffff, wireframe:currentView==='wireframe', transparent:true, opacity: currentView==='blueprint'?0.15:1});
-        if(type.includes('car')||type.includes('ev')){
-            const body=new THREE.BoxGeometry(2.2,0.6,1); const m=new THREE.Mesh(body,mat); m.position.y=0.5; carGroup.add(m);
-            const top=new THREE.BoxGeometry(1.2,0.5,0.8); const m2=new THREE.Mesh(top,mat); m2.position.set(-0.1,0.9,0); carGroup.add(m2);
-            const wh=new THREE.CylinderGeometry(0.25,0.25,0.2,16); const wm=new THREE.MeshStandardMaterial({color:0x111111});
-            [-0.7,0.7].forEach(x=>{ [-0.5,0.5].forEach(z=>{ const w=new THREE.Mesh(wh,wm); w.rotation.z=Math.PI/2; w.position.set(x,0.25,z); carGroup.add(w); }); });
-        } else if(type.includes('heli')){
-            const body=new THREE.BoxGeometry(1,0.4,0.5); carGroup.add(new THREE.Mesh(body,mat));
-            const rotor=new THREE.BoxGeometry(1.8,0.05,0.1); const r=new THREE.Mesh(rotor,new THREE.MeshStandardMaterial({color:0xaaaaaa})); r.position.y=0.3; carGroup.add(r);
-        } else if(type.includes('aero')||type.includes('plane')||type.includes('jet')){
-            const body=new THREE.BoxGeometry(2,0.2,0.2); carGroup.add(new THREE.Mesh(body,mat));
-            const wing=new THREE.BoxGeometry(0.8,0.05,1.2); carGroup.add(new THREE.Mesh(wing,mat));
-        } else if(type.includes('bike')){
-            const body=new THREE.BoxGeometry(1.2,0.3,0.2); carGroup.add(new THREE.Mesh(body,mat));
-            const wh=new THREE.CylinderGeometry(0.3,0.3,0.1,16); const wm=new THREE.MeshStandardMaterial({color:0x111111});
-            const w1=new THREE.Mesh(wh,wm); w1.rotation.z=Math.PI/2; w1.position.set(-0.6,0,0); carGroup.add(w1);
-            const w2=new THREE.Mesh(wh,wm); w2.rotation.z=Math.PI/2; w2.position.set(0.6,0,0); carGroup.add(w2);
-        } else {
-            carGroup.add(new THREE.Mesh(new THREE.BoxGeometry(1,0.6,0.6),mat));
-        }
-        carGroup.userData.baseMat=mat;
-    }
-    function loadMachine(name){ currentMachine=name; buildMachine(name); log(`Machine Loaded: ${name}`); }
-    function setView(v){ currentView=v; document.getElementById('viewLabel').innerText=v; carGroup.children.forEach(c=>{ if(c.material && c.material.wireframe!==undefined){ c.material.wireframe = (v==='wireframe'); c.material.opacity = v==='blueprint'?0.15:1; c.material.transparent=true; } }); }
-    function paint3DColor(hex){ carGroup.children.forEach(c=>{ if(c.material && c.material.color && c.geometry.type==='BoxGeometry'){ c.material.color.setHex(hex); c.material.wireframe=false; c.material.opacity=1; } }); confetti({particleCount:20}); }
-    function paint3D(){ const col=document.getElementById('paintColorSenior')?.value || '#00ffff'; paint3DColor(parseInt(col.replace('#',''),16)); }
-    function addCustom(part){ const g=new THREE.BoxGeometry(0.25,0.25,0.25); const m=new THREE.Mesh(g,new THREE.MeshStandardMaterial({color:0x00ffff})); m.position.set(Math.random()*2-1, Math.random(), Math.random()*2-1); carGroup.add(m); log(`Custom ${part} added`); }
-    function setCameraView(v){ if(v==='front') camera.position.set(0,0,4); if(v==='side') camera.position.set(4,0,0); if(v==='top') camera.position.set(0,4,0); if(v==='iso') camera.position.set(3,2,4); controls.update(); }
-    function saveSlide(){ const url=c2d.toDataURL(); slides.push(url); document.getElementById('previewBar').innerHTML+=`<img src="${url}" class="w-12 h-8 bg-white rounded border">`; document.getElementById('slideList').innerHTML+=`<img src="${url}" class="w-12 h-8 bg-white rounded border">`; log('PPT Slide Saved'); confetti({particleCount:30}); }
-    function exportPDF(){ log('Blueprint PDF Exported - Side/Top/Front'); alert('Blueprint PDF Ready - Jaise tune car ki photo bheji thi - Side 2650mm, Top view ke saath!'); }
-    function powerTest(){ document.getElementById('powerStatus').innerText='🟢 POWER ON'; document.getElementById('powerStatus').className='text-emerald-400'; log('⚡ Power ON - Test OK'); confetti({particleCount:80}); }
-    function fixMachine(){ log('🔧 Fixed - All connections OK'); }
-    function finalSave(){ saveSlide(); confetti({particleCount:150}); alert('Final Design Saved! Bacche ka Portfolio taiyar hai!'); }
-    function log(m){ const b=document.getElementById('logBox'); b.innerHTML+=`> ${m}<br>`; b.scrollTop=b.scrollHeight; }
-
-    clear2D(); loadTemplate('rocket'); init3D();
-</script>
-</body>
-</html>
+setMain('kids'); setKA('5-7');
+</script></body></html>
     """
-    components.html(HTML, height=820, scrolling=True)        
+    components.html(HTML, height=800, scrolling=False, key="blank_powerpoint_no_readymade_final_v12")      
     
 def render_kids_logic_lab():
     # ============================================================
