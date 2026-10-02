@@ -3829,255 +3829,161 @@ def render_art_machinedesign():
 <style>
 *{box-sizing:border-box;} body{margin:0; background:#080a14; font-family:Inter,sans-serif; overflow:hidden;}
 .topbar{height:42px; background:#111326; border-bottom:1px solid #ffffff12; display:flex; align-items:center; justify-content:space-between; padding:0 10px;}
-.mini-btn{font-size:11px; font-weight:800; padding:6px 14px; border-radius:18px; border:1px solid #ffffff15; cursor:pointer; transition:0.15s;}
-.active-k{background:#ffcc00!important; color:black!important; border-color:#ffcc00!important;}
-.active-p{background:#00ffff!important; color:black!important; border-color:#00ffff!important;}
-.active-i{background:#ff5c00!important; color:white!important; border-color:#ff5c00!important;}
+.mini-btn{font-size:11px; font-weight:800; padding:6px 14px; border-radius:18px; border:1px solid #ffffff15; cursor:pointer;}
+.active-k{background:#ffcc00!important; color:black!important;}.active-p{background:#00ffff!important; color:black!important;}.active-i{background:#ff5c00!important; color:white!important;}
 .ribbon{height:46px; background:#1a1e36; border-bottom:1px solid #ffffff12; display:flex; align-items:center; gap:6px; padding:0 10px; overflow-x:auto;}
-.rib-btn{background:#242a4d; border:1px solid #ffffff10; padding:6px 11px; border-radius:10px; font-size:10px; cursor:pointer; display:flex; align-items:center; gap:5px; white-space:nowrap;}
+.rib-btn{background:#242a4d; border:1px solid #ffffff10; padding:6px 11px; border-radius:10px; font-size:10px; cursor:pointer;}
 .rib-on{background:#ff5c00!important; color:white!important;}
-.tool-icon{width:38px; height:38px; background:#1a1e36; border:1px solid #ffffff0f; border-radius:10px; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:16px;}
-.tool-icon:hover{background:#2a335f;}
+.tool-icon{width:38px; height:38px; background:#1a1e36; border:1px solid #ffffff0f; border-radius:10px; display:flex; align-items:center; justify-content:center; cursor:pointer;}
 .tool-on{outline:2px solid #00ffff; background:#253055!important;}
-.kid-part{background:#1e2648; border:1px solid #ffffff12; padding:8px 4px; border-radius:10px; text-align:center; cursor:pointer; font-size:10px; line-height:12px;}
-.kid-part:hover{background:#2e3a6b; transform:scale(1.03);}
-.card{background:#12162a; border:1px solid #ffffff10; border-radius:14px;}
+.kid-part{background:#1e2648; border:1px solid #ffffff12; padding:8px 4px; border-radius:10px; text-align:center; cursor:pointer; font-size:10px;}
+.alpha-btn{background:#242a4d; border:1px solid #ffffff15; padding:6px 2px; border-radius:8px; font-size:12px; font-weight:800; cursor:pointer; text-align:center;}
+.alpha-btn:hover{background:#ffcc00; color:black;}
+.alpha-num{color:#00ffff;}.alpha-spec{color:#ff5c9e;}
+#blockModal{position:fixed; inset:0; background:#000000d9; backdrop-filter:blur(8px); z-index:99999; display:none; align-items:center; justify-content:center;}
+.modal-box{background:#13162c; border:1px solid #ffffff25; border-radius:18px; width:800px; max-height:90vh; display:flex; flex-direction:column; overflow:hidden;}
+.block-item{background:#1e2648; border:1px solid #ffffff12; border-radius:12px; padding:10px 4px; text-align:center; cursor:pointer; font-size:9px;}
+.block-item:hover{background:#2e3a6b; border-color:#ff5c00;}
 </style>
 </head>
 <body class="h-screen flex flex-col text-white">
 
-<!-- FINAL COMPACT HEADER + LANGUAGE BAR -->
 <div class="topbar">
   <div class="flex items-center gap-3">
-    <div style="width:26px; height:26px; background:#ffcc00; color:black; border-radius:8px; display:flex; align-items:center; justify-content:center; font-weight:900; font-size:13px;">C</div>
-    <div>
-      <div id="headerTitle" style="font-size:12px; font-weight:900; letter-spacing:0.2px;">🚁 Create Your Future Design - Blank Se Banao</div>
-      <div id="headerSub" style="font-size:8.5px; color:#8e94ab;">No Readymade • Zero se Helicopter, Aeroplane, Machine, Graphic, Card</div>
-    </div>
+    <div style="width:26px; height:26px; background:#ffcc00; color:black; border-radius:8px; display:flex; align-items:center; justify-content:center; font-weight:900;">C</div>
+    <div><div id="headerTitle" style="font-size:12px; font-weight:900;">🚁 Create Your Future Design - Blank Se Banao + China Space Tech</div><div id="headerSub" style="font-size:8.5px; color:#8e94ab;">No Readymade • Zero se Helicopter, Aeroplane, Rocket, Satellite</div></div>
   </div>
-
   <div class="flex items-center gap-2">
     <select id="langSel" onchange="changeLang()" style="background:#0b0e1e; color:#00ffff; border:1px solid #00ffff55; border-radius:20px; padding:5px 10px; font-size:11px; font-weight:700;">
-      <option value="hinglish">Hinglish</option>
-      <option value="en">English</option>
-      <option value="hi">हिंदी</option>
+      <option value="hinglish">Hinglish</option><option value="en">English</option><option value="hi">हिंदी</option>
     </select>
-
     <button id="btnKids" onclick="setMain('kids')" class="mini-btn active-k">👶 KIDS</button>
-    <button id="btnPro" onclick="setMain('pro')" class="mini-btn bg-[#1e2238] text-white">🚀 PRO BLOCKS</button>
+    <button id="btnPro" onclick="setMain('pro')" class="mini-btn bg-[#1e2238] text-white">🚀 PRO</button>
     <button id="btnInd" onclick="setMain('industrial')" class="mini-btn bg-[#1e2238] text-white">🏭 INDUSTRIAL</button>
-
-    <div style="width:1px; height:18px; background:#ffffff20; margin:0 2px;"></div>
-
     <button onclick="clearAll()" class="mini-btn bg-[#2a2a2a] text-white">Clear</button>
-    <button onclick="downloadPNG()" class="mini-btn bg-white text-black">⬇️ PNG</button>
-    <button onclick="downloadPDF()" class="mini-btn bg-[#ffcc00] text-black">📄 PDF</button>
-    <button onclick="shareDesign()" class="mini-btn bg-[#00ffff] text-black">🔗 Share</button>
+    <button onclick="downloadPNG()" class="mini-btn bg-white text-black">PNG</button>
+    <button onclick="downloadPDF()" class="mini-btn bg-[#ffcc00] text-black">PDF</button>
+    <button onclick="shareDesign()" class="mini-btn bg-[#00ffff] text-black">Share</button>
   </div>
 </div>
 
-<!-- MAIN CONTENT -->
 <div class="flex-1 flex overflow-hidden">
 
-  <!-- ================= KIDS ================= -->
   <div id="kidsUI" style="display:flex; width:100%; height:100%;">
     <div style="width:54px; background:#15182e; border-right:1px solid #ffffff0f; display:flex; flex-direction:column; align-items:center; gap:8px; padding:10px 0;">
-      <div id="tSelect" onclick="setTool('select')" class="tool-icon tool-on" title="Select & Move">🖱️</div>
-      <div id="tPen" onclick="setTool('pen')" class="tool-icon" title="Free Pen">✏️</div>
-      <div id="tLine" onclick="setTool('line')" class="tool-icon" title="Line">📏</div>
-      <div id="tRect" onclick="setTool('rect')" class="tool-icon" title="Rectangle">⬜</div>
-      <div id="tCircle" onclick="setTool('circle')" class="tool-icon" title="Circle">⭕</div>
-      <div id="tTri" onclick="setTool('tri')" class="tool-icon" title="Triangle">🔺</div>
-      <div id="tText" onclick="setTool('text')" class="tool-icon" title="Text">🔤</div>
-      <div style="margin-top:auto; display:flex; flex-direction:column; gap:6px;">
-        <div onclick="setColor('#ff0000')" style="width:24px; height:24px; background:red; border-radius:50%; cursor:pointer; border:2px solid #ffffff20;"></div>
-        <div onclick="setColor('#00aaff')" style="width:24px; height:24px; background:#00aaff; border-radius:50%; cursor:pointer;"></div>
-        <div onclick="setColor('#22ff66')" style="width:24px; height:24px; background:#22ff66; border-radius:50%; cursor:pointer;"></div>
-        <div onclick="setColor('#ffcc00')" style="width:24px; height:24px; background:#ffcc00; border-radius:50%; cursor:pointer;"></div>
-        <div onclick="setColor('#000000')" style="width:24px; height:24px; background:black; border:1px solid #555; border-radius:50%; cursor:pointer;"></div>
-      </div>
+      <div id="tSelect" onclick="setTool('select')" class="tool-icon tool-on">🖱️</div><div id="tPen" onclick="setTool('pen')" class="tool-icon">✏️</div><div id="tLine" onclick="setTool('line')" class="tool-icon">📏</div><div id="tRect" onclick="setTool('rect')" class="tool-icon">⬜</div><div id="tCircle" onclick="setTool('circle')" class="tool-icon">⭕</div><div id="tTri" onclick="setTool('tri')" class="tool-icon">🔺</div><div id="tText" onclick="setTool('text')" class="tool-icon">🔤</div>
     </div>
 
-    <div style="width:230px; background:#12162a; border-right:1px solid #ffffff0f; padding:8px; overflow-y:auto; display:flex; flex-direction:column; gap:10px;">
-      <div>
-        <b id="kTitle1" style="font-size:11px; color:#ffcc00;">🎨 KIDS FACTORY - Click to Add</b>
-        <div id="kSub1" style="font-size:9px; color:#888; margin-top:2px;">Photo jaisa colorful aeroplane - Tinkercad style</div>
+    <div style="width:260px; background:#12162a; border-right:1px solid #ffffff0f; padding:8px; overflow-y:auto; display:flex; flex-direction:column; gap:10px;">
+      <div style="background:#1a1e36; border-radius:12px; padding:7px; border:1px solid #ffcc0030;">
+        <div style="font-size:11px; font-weight:800; color:#ffcc00;">🔤 ABCD + 123 + Special - FIXED</div>
+        <div style="font-size:9px; color:#aaa; margin:4px 0;">Alphabet - Click to add</div>
+        <div style="display:grid; grid-template-columns:repeat(6,1fr); gap:4px;">
+          <div onclick="addAlpha('A')" class="alpha-btn">A</div><div onclick="addAlpha('B')" class="alpha-btn">B</div><div onclick="addAlpha('C')" class="alpha-btn">C</div><div onclick="addAlpha('D')" class="alpha-btn">D</div><div onclick="addAlpha('E')" class="alpha-btn">E</div><div onclick="addAlpha('F')" class="alpha-btn">F</div>
+          <div onclick="addAlpha('G')" class="alpha-btn">G</div><div onclick="addAlpha('H')" class="alpha-btn">H</div><div onclick="addAlpha('I')" class="alpha-btn">I</div><div onclick="addAlpha('J')" class="alpha-btn">J</div><div onclick="addAlpha('K')" class="alpha-btn">K</div><div onclick="addAlpha('L')" class="alpha-btn">L</div>
+          <div onclick="addAlpha('M')" class="alpha-btn">M</div><div onclick="addAlpha('N')" class="alpha-btn">N</div><div onclick="addAlpha('O')" class="alpha-btn">O</div><div onclick="addAlpha('P')" class="alpha-btn">P</div><div onclick="addAlpha('Q')" class="alpha-btn">Q</div><div onclick="addAlpha('R')" class="alpha-btn">R</div>
+          <div onclick="addAlpha('S')" class="alpha-btn">S</div><div onclick="addAlpha('T')" class="alpha-btn">T</div><div onclick="addAlpha('U')" class="alpha-btn">U</div><div onclick="addAlpha('V')" class="alpha-btn">V</div><div onclick="addAlpha('W')" class="alpha-btn">W</div><div onclick="addAlpha('X')" class="alpha-btn">X</div>
+          <div onclick="addAlpha('Y')" class="alpha-btn">Y</div><div onclick="addAlpha('Z')" class="alpha-btn">Z</div>
+        </div>
+        <div style="font-size:9px; color:#00ffff; margin:8px 0 4px 0; font-weight:700;">NUMBERS 0-9</div>
+        <div style="display:grid; grid-template-columns:repeat(6,1fr); gap:4px;">
+          <div onclick="addAlpha('0')" class="alpha-btn alpha-num">0</div><div onclick="addAlpha('1')" class="alpha-btn alpha-num">1</div><div onclick="addAlpha('2')" class="alpha-btn alpha-num">2</div><div onclick="addAlpha('3')" class="alpha-btn alpha-num">3</div><div onclick="addAlpha('4')" class="alpha-btn alpha-num">4</div><div onclick="addAlpha('5')" class="alpha-btn alpha-num">5</div>
+          <div onclick="addAlpha('6')" class="alpha-btn alpha-num">6</div><div onclick="addAlpha('7')" class="alpha-btn alpha-num">7</div><div onclick="addAlpha('8')" class="alpha-btn alpha-num">8</div><div onclick="addAlpha('9')" class="alpha-btn alpha-num">9</div><div onclick="addAlpha('10')" class="alpha-btn alpha-num">10</div><div onclick="addAlpha('12')" class="alpha-btn alpha-num">12</div>
+        </div>
+        <div style="font-size:9px; color:#ff5c9e; margin:8px 0 4px 0; font-weight:700;">SPECIAL CHAR - Number Ke Niche</div>
+        <div style="display:grid; grid-template-columns:repeat(6,1fr); gap:4px;">
+          <div onclick="addAlpha('!')" class="alpha-btn alpha-spec">!</div><div onclick="addAlpha('@')" class="alpha-btn alpha-spec">@</div><div onclick="addAlpha('#')" class="alpha-btn alpha-spec">#</div><div onclick="addAlpha('$')" class="alpha-btn alpha-spec">$</div><div onclick="addAlpha('%')" class="alpha-btn alpha-spec">%</div><div onclick="addAlpha('&')" class="alpha-btn alpha-spec">&</div>
+          <div onclick="addAlpha('*')" class="alpha-btn alpha-spec">*</div><div onclick="addAlpha('+')" class="alpha-btn alpha-spec">+</div><div onclick="addAlpha('-')" class="alpha-btn alpha-spec">-</div><div onclick="addAlpha('=')" class="alpha-btn alpha-spec">=</div><div onclick="addAlpha('?')" class="alpha-btn alpha-spec">?</div><div onclick="addAlpha('♥')" class="alpha-btn alpha-spec">♥</div>
+        </div>
       </div>
 
       <div style="background:#1a1e36; border-radius:12px; padding:7px;">
         <div style="font-size:10px; font-weight:800; margin-bottom:6px;">📦 BASIC - Zero Se Start</div>
         <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:6px;">
-          <div onclick="addKidPart('rect','#ff5a5a')" class="kid-part">⬜<br>Body</div>
-          <div onclick="addKidPart('circle','#00aaff')" class="kid-part">⭕<br>Wheel</div>
-          <div onclick="addKidPart('tri','#ffcc00')" class="kid-part">🔺<br>Nose</div>
-          <div onclick="addKidPart('line','#00ff88')" class="kid-part">📏<br>Line</div>
-          <div onclick="addKidPart('longRect','#8b5cf6')" class="kid-part">▭<br>Wing Strip</div>
-          <div onclick="addKidPart('smallCircle','#ffffff')" class="kid-part">⚪<br>Rivet</div>
+          <div onclick="addKidPart('rect','#ff5a5a')" class="kid-part">⬜<br>Body</div><div onclick="addKidPart('circle','#00aaff')" class="kid-part">⭕<br>Wheel</div><div onclick="addKidPart('tri','#ffcc00')" class="kid-part">🔺<br>Nose</div>
         </div>
       </div>
 
       <div style="background:#1a1e36; border-radius:12px; padding:7px; border:1px solid #00ffff25;">
-        <div style="font-size:10px; font-weight:800; color:#00ffff; margin-bottom:6px;">✈️ AERO / HELI PARTS - Colorful</div>
+        <div style="font-size:10px; font-weight:800; color:#00ffff; margin-bottom:6px;">🇨🇳 CHINA SPACE + AERO TECH</div>
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px;">
-          <div onclick="addKidPart('wing','#22ff66')" class="kid-part" style="background:#22ff661a; border:1px solid #22ff6633;">🪽<br>Wing Green</div>
-          <div onclick="addKidPart('propeller','#ff8c00')" class="kid-part" style="background:#ff8c001a;">🌀<br>Propeller</div>
-          <div onclick="addKidPart('body','#ffaa00')" class="kid-part" style="background:#ffaa001a;">🟧<br>Fuselage Yellow</div>
-          <div onclick="addKidPart('tail','#ff4444')" class="kid-part" style="background:#ff44441a;">🚀<br>Tail Fin</div>
-          <div onclick="addKidPart('window','#7ec8ff')" class="kid-part" style="background:#7ec8ff1a;">🪟<br>Window</div>
-          <div onclick="addKidPart('landing','#aaaaaa')" class="kid-part" style="background:#aaaaaa1a;">🛞<br>Landing</div>
-          <div onclick="addKidPart('rotor','#00ffff')" class="kid-part" style="background:#00ffff1a;">✈️<br>Rotor Blade</div>
-          <div onclick="addKidPart('engine','#ffcc00')" class="kid-part" style="background:#ffcc001a;">🔧<br>Engine</div>
+          <div onclick="addKidPart('wing','#22ff66')" class="kid-part">🪽 Wing<br>Lift</div><div onclick="addKidPart('propeller','#ff8c00')" class="kid-part">🌀 Propeller<br>Thrust</div>
+          <div onclick="addKidPart('rocket','#ffaa00')" class="kid-part">🚀 Rocket<br>Space</div><div onclick="addKidPart('satellite','#7ec8ff')" class="kid-part">🛰️ Satellite<br>Orbit</div>
+          <div onclick="addKidPart('engine','#ffcc00')" class="kid-part">🔥 Engine<br>Thrust</div><div onclick="addKidPart('parachute','#ffffff')" class="kid-part">🪂 Parachute<br>Drag</div>
+          <div onclick="addKidPart('solar','#001a66')" class="kid-part">🔋 Solar<br>Power</div><div onclick="addKidPart('naca','#22ff66')" class="kid-part">📈 NACA<br>Airfoil</div>
         </div>
-      </div>
-
-      <div style="background:#1a1e36; border-radius:12px; padding:7px;">
-        <div style="font-size:10px; font-weight:800; margin-bottom:6px;">🎨 COLOR & SIZE</div>
-        <div style="display:grid; grid-template-columns:repeat(5,1fr); gap:6px;">
-          <div onclick="setColor('#ff0000')" style="height:26px; background:red; border-radius:8px; cursor:pointer;"></div>
-          <div onclick="setColor('#00aaff')" style="height:26px; background:#00aaff; border-radius:8px; cursor:pointer;"></div>
-          <div onclick="setColor('#22ff66')" style="height:26px; background:#22ff66; border-radius:8px; cursor:pointer;"></div>
-          <div onclick="setColor('#ffcc00')" style="height:26px; background:#ffcc00; border-radius:8px; cursor:pointer;"></div>
-          <div onclick="setColor('#ff8c00')" style="height:26px; background:#ff8c00; border-radius:8px; cursor:pointer;"></div>
-          <div onclick="setColor('#8b5cf6')" style="height:26px; background:#8b5cf6; border-radius:8px; cursor:pointer;"></div>
-          <div onclick="setColor('#000000')" style="height:26px; background:black; border:1px solid #444; border-radius:8px; cursor:pointer;"></div>
-          <div onclick="setColor('#ffffff')" style="height:26px; background:white; border:1px solid #444; border-radius:8px; cursor:pointer;"></div>
-          <div onclick="setColor('#ff5a9e')" style="height:26px; background:#ff5a9e; border-radius:8px; cursor:pointer;"></div>
-          <div onclick="setColor('#00ffff')" style="height:26px; background:#00ffff; border-radius:8px; cursor:pointer;"></div>
-        </div>
-        <div style="margin-top:8px; font-size:10px;">Size <input type="range" min="20" max="200" value="70" style="width:100%;" oninput="kSize=this.value; if(selectedIdx>=0){kObjects[selectedIdx].w=parseInt(this.value); drawK();}"></div>
+        <button onclick="startSim()" class="mini-btn" style="width:100%; background:#00ffff; color:black; margin-top:6px; font-weight:900;">▶️ Fly + Space Simulation</button>
       </div>
 
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:5px; margin-top:auto;">
-        <button onclick="duplicateKid()" class="mini-btn bg-[#242a4d] text-white">📋 Duplicate</button>
-        <button onclick="rotateKid()" class="mini-btn bg-[#242a4d] text-white">↻ Rotate</button>
-        <button onclick="deleteKid()" class="mini-btn bg-[#3a1a1a] text-white">🗑️ Delete</button>
-        <button onclick="clearK()" class="mini-btn bg-[#3a1a1a] text-white">Clear All</button>
+        <button onclick="duplicateKid()" class="mini-btn bg-[#242a4d] text-white">Duplicate</button><button onclick="rotateKid()" class="mini-btn bg-[#242a4d] text-white">Rotate</button><button onclick="deleteKid()" class="mini-btn bg-[#3a1a1a] text-white">Delete</button><button onclick="clearK()" class="mini-btn bg-[#3a1a1a] text-white">Clear</button>
       </div>
     </div>
 
     <div style="flex:1; background:#e9e9ef; padding:6px; display:flex; flex-direction:column;">
-      <div id="kHint" style="font-size:10px; color:#333; font-weight:800; padding:2px 4px;">👶 KIDS BLANK SHEET - Zero se start karo, click karke parts jodo, pen se draw karo - No readymade</div>
-      <canvas id="kCanvas" width="1300" height="750" style="flex:1; width:100%; background:white; border:1px solid #c0c0c8; border-radius:8px; margin-top:4px; background-image:radial-gradient(#ddd 1px, transparent 1px); background-size:20px 20px; cursor:crosshair;"></canvas>
+      <div id="kHint" style="font-size:10px; color:#333; font-weight:800;">👶 KIDS - ABCD 123 Special Fixed + China Space Tech - Rocket/Satellite/Orbit seekho</div>
+      <canvas id="kCanvas" width="1300" height="750" style="flex:1; width:100%; background:white; border-radius:8px; margin-top:4px; background-image:radial-gradient(#ddd 1px, transparent 1px); background-size:20px 20px;"></canvas>
     </div>
   </div>
 
-  <!-- ================= PRO BLOCKS ================= -->
   <div id="proUI" style="display:none; width:100%; height:100%;">
     <div style="width:56px; background:#111326; border-right:1px solid #ffffff0f; display:flex; flex-direction:column; align-items:center; gap:10px; padding:12px 0;">
-      <div onclick="add3D('box')" class="tool-icon" title="Fuselage Body">🧱</div>
-      <div onclick="add3D('cyl')" class="tool-icon" title="Engine / Cylinder">🛢️</div>
-      <div onclick="add3D('plane')" class="tool-icon" title="Wing / Blade">🪽</div>
-      <div onclick="add3D('sphere')" class="tool-icon" title="Cockpit / Nose">⚪</div>
-      <div onclick="add3D('rotor')" class="tool-icon" title="Rotor">🌀</div>
-      <div onclick="add3D('fin')" class="tool-icon" title="Tail Fin">🚀</div>
-      <div style="margin-top:12px; width:34px; height:1px; background:#ffffff15;"></div>
-      <div onclick="delete3D()" class="tool-icon" style="background:#3a1a1a;" title="Delete">🗑️</div>
-      <div onclick="duplicate3D()" class="tool-icon" title="Duplicate">📋</div>
-      <div onclick="rotate3D()" class="tool-icon" title="Rotate">↻</div>
+      <div onclick="add3D('box')" class="tool-icon">🧱</div><div onclick="add3D('cyl')" class="tool-icon">🛢️</div><div onclick="add3D('plane')" class="tool-icon">🪽</div><div onclick="add3D('sphere')" class="tool-icon">⚪</div><div onclick="add3D('rotor')" class="tool-icon">🌀</div><div onclick="delete3D()" class="tool-icon" style="background:#3a1a1a;">🗑️</div>
     </div>
-    <div style="flex:1; background:#05070a; padding:6px; display:flex; flex-direction:column;">
-      <div id="proHint" style="font-size:10px; color:#00ffff; font-weight:700; padding:2px 6px;">🚀 PRO BLOCKS - Click left blocks → 3D me ayega → Jod ke future machine banao - No readymade helicopter</div>
-      <div id="threePro" style="flex:1; width:100%; border-radius:10px; border:1px solid #00ffff15;"></div>
-    </div>
-    <div style="width:180px; background:#15182e; border-left:1px solid #ffffff0f; padding:10px; display:flex; flex-direction:column; gap:10px;">
-      <b style="font-size:12px; color:#00ffff;">PRO EDITOR</b>
-      <div style="background:#1a1e36; border-radius:10px; padding:8px;">
-        <div style="font-size:10px;">Color</div><input id="pCol" type="color" value="#ffcc00" style="width:100%; height:28px; border-radius:8px; border:none; margin-top:4px;" oninput="update3DColor()">
-        <div style="font-size:10px; margin-top:8px;">Size <span id="pSizeVal">80</span></div><input id="pSize" type="range" min="20" max="200" value="80" style="width:100%;" oninput="document.getElementById('pSizeVal').innerText=this.value; update3DSize()">
-        <div style="font-size:10px; margin-top:8px;">Move X</div><input id="pX" type="range" min="-5" max="5" step="0.1" value="0" style="width:100%;" oninput="move3D()">
-      </div>
-      <div style="background:#1a1e36; border-radius:10px; padding:8px; font-size:9px; color:#888; line-height:14px;">Click block to add<br>Drag mouse to rotate view<br>Scroll to zoom<br>Click body to select</div>
-      <button onclick="clearPro()" class="mini-btn bg-[#3a1a1a] text-white" style="margin-top:auto;">Clear All</button>
-    </div>
+    <div style="flex:1; background:#05070a; padding:6px; display:flex; flex-direction:column;"><div id="threePro" style="flex:1; width:100%; border-radius:10px;"></div></div>
+    <div style="width:180px; background:#15182e; padding:10px; display:flex; flex-direction:column; gap:10px;"><b style="font-size:12px; color:#00ffff;">PRO EDITOR</b><div style="background:#1a1e36; border-radius:10px; padding:8px;"><div style="font-size:10px;">Color</div><input id="pCol" type="color" value="#ffcc00" style="width:100%; height:28px;" oninput="update3DColor()"><div style="font-size:10px; margin-top:8px;">Size <span id="pSizeVal">80</span></div><input id="pSize" type="range" min="20" max="200" value="80" style="width:100%;" oninput="update3DSize()"></div><button onclick="clearPro()" class="mini-btn bg-[#3a1a1a] text-white">Clear</button></div>
   </div>
 
-  <!-- ================= INDUSTRIAL ================= -->
   <div id="industrialUI" style="display:none; width:100%; height:100%; flex-direction:column;">
-    <div class="ribbon">
-      <span style="font-size:9px; color:#888; font-weight:800;">SOLID TOOLS:</span>
-      <button id="rExtrude" onclick="indTool('extrude')" class="rib-btn rib-on">⬆️ Extrude</button>
-      <button id="rRevolve" onclick="indTool('revolve')" class="rib-btn">🔄 Revolve</button>
-      <button id="rLoft" onclick="indTool('loft')" class="rib-btn">〰️ Loft</button>
-      <button id="rSweep" onclick="indTool('sweep')" class="rib-btn">➰ Sweep</button>
-      <div style="width:1px; height:20px; background:#ffffff20;"></div>
-      <button id="rFillet" onclick="indTool('fillet')" class="rib-btn">◍ Fillet</button>
-      <button id="rChamfer" onclick="indTool('chamfer')" class="rib-btn">◫ Chamfer</button>
-      <button id="rShell" onclick="indTool('shell')" class="rib-btn">🥚 Shell</button>
-      <button id="rHole" onclick="indTool('hole')" class="rib-btn">⭕ Hole</button>
-      <div style="width:1px; height:20px; background:#ffffff20;"></div>
-      <button id="rMirror" onclick="indTool('mirror')" class="rib-btn">🪞 Mirror</button>
-      <button id="rPattern" onclick="indTool('pattern')" class="rib-btn">🔁 Pattern</button>
-      <button id="rJoint" onclick="indTool('joint')" class="rib-btn">🔗 Joint</button>
-      <button onclick="simulate()" class="rib-btn" style="background:#00ffff; color:black; margin-left:auto; font-weight:900;">▶ Simulate Motion</button>
-      <button onclick="analyze()" class="rib-btn" style="background:#ffcc00; color:black; font-weight:900;">📊 Analyze</button>
-    </div>
-
+    <div class="ribbon"><span style="font-size:9px; color:#888; font-weight:800;">SOLID:</span><button id="rExtrude" onclick="indTool('extrude')" class="rib-btn rib-on">Extrude</button><button id="rFillet" onclick="indTool('fillet')" class="rib-btn">Fillet</button><button id="rChamfer" onclick="indTool('chamfer')" class="rib-btn">Chamfer</button><button id="rMirror" onclick="indTool('mirror')" class="rib-btn">Mirror</button><button onclick="simulate()" class="rib-btn" style="background:#00ffff; color:black; margin-left:auto; font-weight:900;">▶ Simulate</button></div>
     <div style="flex:1; display:flex; overflow:hidden;">
-      <div style="width:200px; background:#0f1220; border-right:1px solid #ffffff10; padding:8px; overflow-y:auto; font-size:10px; display:flex; flex-direction:column; gap:8px;">
-        <b style="font-size:11px; color:#ff5c00;">BROWSER - Industrial Tree</b>
-        <div style="background:#1a1e36; border-radius:10px; padding:8px;">
-          <div>📁 Origin</div>
-          <div style="margin-left:12px; color:#6b7280; font-size:9px;"> XY Plane</div>
-          <div style="margin-left:12px; color:#6b7280; font-size:9px;"> XZ Plane</div>
-          <div style="margin-left:12px; color:#6b7280; font-size:9px;"> YZ Plane</div>
-        </div>
-        <div style="background:#1a1e36; border-radius:10px; padding:8px;">
-          <div>📦 Bodies (<span id="bodyCount">0</span>)</div><div id="bodyList" style="margin-left:6px; margin-top:4px; color:#aaa;"></div>
-        </div>
-        <div style="background:#1a1e36; border-radius:10px; padding:8px;">
-          <div>✏️ Sketches</div><div style="margin-left:6px; color:#aaa; margin-top:2px;"> Sketch1 - Base Profile (Blank)</div>
-        </div>
-        <div style="background:#1a1e36; border-radius:10px; padding:8px;">
-          <div>🕒 Timeline - History</div><div id="timeline" style="display:flex; gap:4px; flex-wrap:wrap; margin-top:6px;"></div>
-        </div>
-        <div style="font-size:9px; color:#666; margin-top:4px;">Selected: <span id="selInfo" style="color:#00ffff;">None - Click body</span><br>Tool: <span id="toolInfo">Extrude</span></div>
-      </div>
-
-      <div style="flex:1; position:relative; background:#06080f;"><div id="threeInd" style="width:100%; height:100%;"></div><div style="position:absolute; bottom:10px; left:12px; background:#000000aa; padding:6px 12px; border-radius:20px; font-size:9px; color:#aaa;">🏭 INDUSTRIAL - Professional CAD Logic - Extrude se 2D→3D, Fillet se edge round, Mirror/Pattern se industrial duplication</div></div>
-
-      <div style="width:220px; background:#15182e; border-left:1px solid #ffffff0f; padding:10px; overflow-y:auto; display:flex; flex-direction:column; gap:10px;">
-        <b style="font-size:12px; color:#ff5c00;">INDUSTRIAL PROPERTIES</b>
-
-        <div style="background:#1a1e36; border-radius:10px; padding:9px;">
-          <div style="font-size:10px; font-weight:700;">Operation Type</div>
-          <select id="opType" style="width:100%; background:#0f1220; color:white; border:1px solid #ffffff20; border-radius:8px; padding:5px; font-size:10px; margin-top:5px;">
-            <option>Join - Material Jodna</option><option>Cut - Material Katna (Hole)</option><option>Intersect - Common Part</option><option>New Body - Alag Body</option>
-          </select>
-          <div style="font-size:10px; margin-top:8px;">Material</div>
-          <select id="matType" style="width:100%; background:#0f1220; color:white; border:1px solid #ffffff20; border-radius:8px; padding:5px; font-size:10px; margin-top:4px;">
-            <option>Steel - Strong & Heavy</option><option>Aluminium 6061 - Light</option><option>Titanium - Aero Grade</option><option>Plastic ABS - Prototype</option><option>Carbon Fiber - High Performance</option>
-          </select>
-        </div>
-
-        <div style="background:#1a1e36; border-radius:10px; padding:9px;">
-          <div style="font-size:10px;">Extrude Depth <span id="extVal">1.5</span></div><input id="extDepth" type="range" min="0.1" max="6" step="0.1" value="1.5" style="width:100%;" oninput="document.getElementById('extVal').innerText=this.value; applyExtrude()">
-          <div style="font-size:10px; margin-top:8px;">Fillet Radius <span id="filVal">0.2</span> - Edge Round</div><input id="filRad" type="range" min="0.02" max="1.2" step="0.02" value="0.2" style="width:100%;" oninput="document.getElementById('filVal').innerText=this.value; applyFillet()">
-          <div style="font-size:10px; margin-top:8px;">Chamfer Distance <span id="chamVal">0.2</span> - Bevel</div><input id="chamDist" type="range" min="0.02" max="1.2" step="0.02" value="0.2" style="width:100%;" oninput="document.getElementById('chamVal').innerText=this.value; applyChamfer()">
-          <div style="font-size:10px; margin-top:8px;">Revolve Angle <span id="revVal">360°</span></div><input id="revAngle" type="range" min="10" max="360" step="10" value="360" style="width:100%;" oninput="document.getElementById('revVal').innerText=this.value+'°'; applyRevolve()">
-        </div>
-
-        <div style="background:#1a1e36; border-radius:10px; padding:9px;">
-          <div style="font-size:10px; font-weight:700; margin-bottom:6px;">Quick Add - Blank Blocks</div>
-          <button onclick="addIndustrialBlock()" class="mini-btn" style="width:100%; background:#ff5c00; color:white; font-weight:900;">+ Add Base Block (Blank)</button>
-          <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-top:8px;">
-            <button onclick="indAction('mirror')" class="mini-btn bg-[#242a4d] text-white">🪞 Mirror</button>
-            <button onclick="indAction('pattern')" class="mini-btn bg-[#242a4d] text-white">🔁 Pattern x3</button>
-            <button onclick="indAction('shell')" class="mini-btn bg-[#242a4d] text-white">🥚 Shell</button>
-            <button onclick="indAction('hole')" class="mini-btn bg-[#242a4d] text-white">⭕ Hole</button>
+      <div style="width:200px; background:#0f1220; border-right:1px solid #ffffff10; padding:8px; font-size:10px;"><b style="color:#ff5c00;">BROWSER</b><div id="bodyList" style="color:#aaa; margin-top:6px;"></div><div id="timeline" style="display:flex; flex-wrap:wrap; gap:4px; margin-top:8px;"></div><div style="margin-top:10px;">Selected: <span id="selInfo">None</span></div></div>
+      <div style="flex:1; background:#06080f;"><div id="threeInd" style="width:100%; height:100%;"></div></div>
+      <div style="width:240px; background:#15182e; padding:10px; display:flex; flex-direction:column; gap:10px; overflow-y:auto;">
+        <b style="font-size:12px; color:#ff5c00;">INDUSTRIAL - WORLD BLOCKS FINAL</b>
+        <div style="background:#1a1e36; border-radius:12px; padding:10px; border:1px solid #ff5c0040;">
+          <button onclick="openBlockLibrary()" class="mini-btn" style="width:100%; background:#ff5c00; color:white; font-weight:900; padding:14px; font-size:13px; border-radius:14px;">+ Add Base Block<br><span style="font-size:8px;">Click → 60+ World Blocks</span></button>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-top:10px;">
+            <button onclick="indAction('mirror')" class="mini-btn bg-[#242a4d] text-white">Mirror</button><button onclick="indAction('pattern')" class="mini-btn bg-[#242a4d] text-white">Pattern</button><button onclick="indAction('shell')" class="mini-btn bg-[#242a4d] text-white">Shell</button><button onclick="indAction('hole')" class="mini-btn bg-[#242a4d] text-white">Hole</button>
           </div>
-          <div style="font-size:9px; color:#888; margin-top:8px; line-height:13px;">Mass: <span id="massVal">0 kg</span><br>Volume: <span id="volVal">0 m³</span><br>Surface: <span id="surfVal">0 m²</span></div>
+          <div style="font-size:9px; color:#888; margin-top:8px;">Fillet <input id="filRad" type="range" min="0" max="1.2" step="0.05" value="0.2" style="width:100%;" oninput="applyFillet()"></div>
+          <div style="font-size:9px; color:#888;">Extrude <input id="extDepth" type="range" min="0.1" max="6" step="0.1" value="1.5" style="width:100%;" oninput="applyExtrude()"></div>
+          <div style="font-size:9px; color:#666; margin-top:6px;">Mass: <span id="massVal">0</span> | Vol: <span id="volVal">0</span></div>
         </div>
-
-        <button onclick="clearInd()" class="mini-btn bg-[#3a1a1a] text-white" style="margin-top:auto;">🗑️ Clear All Bodies</button>
+        <button onclick="clearInd()" class="mini-btn bg-[#3a1a1a] text-white">Clear All</button>
       </div>
     </div>
   </div>
 
 </div>
 
+<div id="blockModal" onclick="if(event.target.id==='blockModal') closeBlockLibrary()">
+<div class="modal-box">
+  <div style="padding:16px; border-bottom:1px solid #ffffff12; display:flex; justify-content:space-between;"><div><b style="font-size:14px;">🌍 World Block Library - 60+ Blocks - Final</b><div style="font-size:10px; color:#aaa;">Duniya ka sara block - Click to add</div></div><button onclick="closeBlockLibrary()" style="background:#2a2a3a; border:none; color:white; width:28px; height:28px; border-radius:50%; cursor:pointer;">✕</button></div>
+  <div style="padding:12px; overflow-y:auto; flex:1;">
+    <div style="font-size:10px; color:#ff5c00; font-weight:800; margin-bottom:8px;">BASIC - 10</div>
+    <div style="display:grid; grid-template-columns:repeat(5,1fr); gap:7px;">
+      <div onclick="addBlockType('box')" class="block-item">🧱<b>Box</b></div><div onclick="addBlockType('cylinder')" class="block-item">🛢️<b>Cylinder</b></div><div onclick="addBlockType('sphere')" class="block-item">⚪<b>Sphere</b></div><div onclick="addBlockType('cone')" class="block-item">🔺<b>Cone</b></div><div onclick="addBlockType('torus')" class="block-item">⭕<b>Torus</b></div>
+      <div onclick="addBlockType('plane')" class="block-item">▭<b>Plane</b></div><div onclick="addBlockType('wedge')" class="block-item">📐<b>Wedge</b></div><div onclick="addBlockType('capsule')" class="block-item">💊<b>Capsule</b></div><div onclick="addBlockType('tube')" class="block-item">◯<b>Tube</b></div><div onclick="addBlockType('pyramid')" class="block-item">🔺<b>Pyramid</b></div>
+    </div>
+    <div style="font-size:10px; color:#00ffff; font-weight:800; margin:12px 0 8px 0;">AEROSPACE + SPACE + CHINA - 30</div>
+    <div style="display:grid; grid-template-columns:repeat(5,1fr); gap:7px;">
+      <div onclick="addBlockType('fuselage')" class="block-item">🟧<b>Fuselage</b></div><div onclick="addBlockType('cockpit')" class="block-item">🪟<b>Cockpit</b></div><div onclick="addBlockType('wing')" class="block-item">🪽<b>Wing NACA</b></div><div onclick="addBlockType('fin')" class="block-item">🚀<b>Fin</b></div><div onclick="addBlockType('rotor')" class="block-item">🌀<b>Rotor</b></div>
+      <div onclick="addBlockType('propeller')" class="block-item">✈️<b>Propeller</b></div><div onclick="addBlockType('landing_skid')" class="block-item">🛞<b>Skid</b></div><div onclick="addBlockType('engine_jet')" class="block-item">🔥<b>Jet</b></div><div onclick="addBlockType('nozzle')" class="block-item">🚀<b>Nozzle</b></div><div onclick="addBlockType('rocket_body')" class="block-item">🚀<b>Rocket</b></div>
+      <div onclick="addBlockType('satellite')" class="block-item">🛰️<b>Satellite</b></div><div onclick="addBlockType('solar_panel')" class="block-item">🔋<b>Solar</b></div><div onclick="addBlockType('parachute')" class="block-item">🪂<b>Parachute</b></div><div onclick="addBlockType('airfoil_0012')" class="block-item">📈<b>NACA 0012</b></div><div onclick="addBlockType('ducted_fan')" class="block-item">🌀<b>Ducted Fan</b></div>
+      <div onclick="addBlockType('v_tail')" class="block-item">✈️<b>V-Tail</b></div><div onclick="addBlockType('delta_wing')" class="block-item">🔺<b>Delta</b></div><div onclick="addBlockType('fuselage_stealth')" class="block-item">⬛<b>Stealth</b></div><div onclick="addBlockType('thrust_vector')" class="block-item">🔥<b>Thrust Vec</b></div><div onclick="addBlockType('intake')" class="block-item">💨<b>Intake</b></div>
+    </div>
+    <div style="font-size:10px; color:#ffcc00; font-weight:800; margin:12px 0 8px 0;">MECHANICAL - 20</div>
+    <div style="display:grid; grid-template-columns:repeat(5,1fr); gap:7px;">
+      <div onclick="addBlockType('gear_spur')" class="block-item">⚙️<b>Gear</b></div><div onclick="addBlockType('bolt')" class="block-item">🔩<b>Bolt</b></div><div onclick="addBlockType('beam_i')" class="block-item">🏗️<b>I-Beam</b></div><div onclick="addBlockType('plate')" class="block-item">⬜<b>Plate</b></div><div onclick="addBlockType('motor_box')" class="block-item">⚡<b>Motor</b></div>
+      <div onclick="addBlockType('battery')" class="block-item">🔋<b>Battery</b></div><div onclick="addBlockType('bearing')" class="block-item">⭕<b>Bearing</b></div><div onclick="addBlockType('spring')" class="block-item">〰️<b>Spring</b></div><div onclick="addBlockType('hinge')" class="block-item">🚪<b>Hinge</b></div><div onclick="addBlockType('pulley')" class="block-item">⭕<b>Pulley</b></div>
+    </div>
+  </div>
+</div>
+</div>
+
 <script>
 let mainMode='kids', kTool='select', kColor='#ff0000', kSize=70, kObjects=[], selectedIdx=-1, isDown=false, currentFree=null, dragOff={x:0,y:0};
-
 function setMain(m){
   mainMode=m;
   document.getElementById('kidsUI').style.display=m==='kids'?'flex':'none';
@@ -4090,189 +3996,139 @@ function setMain(m){
 }
 function changeLang(){
   const l=document.getElementById('langSel').value;
-  if(l==='hi'){
-    document.getElementById('headerTitle').innerText='🚁 अपना भविष्य का डिज़ाइन बनाओ - जीरो से शुरू करो';
-    document.getElementById('headerSub').innerText='कोई रेडीमेड नहीं • हेलीकॉप्टर, हवाई जहाज, मशीन खुद बनाओ';
-    document.getElementById('kHint').innerText='👶 बच्चों का ब्लैंक शीट - जीरो से शुरू करो, क्लिक करके पार्ट्स जोड़ो';
-  } else if(l==='en'){
-    document.getElementById('headerTitle').innerText='🚁 Create Your Future Design - Start From Blank';
-    document.getElementById('headerSub').innerText='No Readymade • Build Helicopter, Aeroplane, Machine From Scratch';
-    document.getElementById('kHint').innerText='👶 KIDS BLANK SHEET - Start from zero, click parts to build';
-  } else {
-    document.getElementById('headerTitle').innerText='🚁 Create Your Future Design - Blank Se Banao';
-    document.getElementById('headerSub').innerText='No Readymade • Zero se Helicopter, Aeroplane, Machine, Graphic, Card';
-    document.getElementById('kHint').innerText='👶 KIDS BLANK SHEET - Zero se start karo, click karke parts jodo';
-  }
+  if(l==='hi'){document.getElementById('headerTitle').innerText='🚁 अपना भविष्य का डिज़ाइन बनाओ - China Space Tech'; document.getElementById('kHint').innerText='👶 ब्लैंक शीट - ABCD 123 Special + Rocket Satellite';}
+  else if(l==='en'){document.getElementById('headerTitle').innerText='🚁 Create Your Future Design - China Space Tech'; document.getElementById('kHint').innerText='👶 BLANK - ABCD 123 Special + Rocket Satellite';}
+  else{document.getElementById('headerTitle').innerText='🚁 Create Your Future Design - Blank Se Banao + China Space Tech'; document.getElementById('kHint').innerText='👶 KIDS - ABCD 123 Special Fixed + China Space Tech';}
 }
-function setTool(t){
-  kTool=t;
-  document.querySelectorAll('#kidsUI.tool-icon').forEach(e=>e.classList.remove('tool-on'));
-  const map={select:'tSelect', pen:'tPen', line:'tLine', rect:'tRect', circle:'tCircle', tri:'tTri', text:'tText'};
-  if(map[t]) document.getElementById(map[t]).classList.add('tool-on');
-  document.getElementById('kCanvas').style.cursor=t==='select'?'move':'crosshair';
-}
+function setTool(t){kTool=t; document.querySelectorAll('#kidsUI.tool-icon').forEach(e=>e.classList.remove('tool-on')); const map={select:'tSelect', pen:'tPen', line:'tLine', rect:'tRect', circle:'tCircle', tri:'tTri', text:'tText'}; if(map[t]) document.getElementById(map[t]).classList.add('tool-on');}
 function setColor(c){kColor=c; if(selectedIdx>=0){kObjects[selectedIdx].color=c; drawK();}}
-
 const kcv=document.getElementById('kCanvas'), kctx=kcv.getContext('2d');
 function drawKBG(){kctx.fillStyle='white'; kctx.fillRect(0,0,kcv.width,kcv.height);}
 function drawK(){
   drawKBG();
   kObjects.forEach((o,i)=>{
-    kctx.save(); kctx.translate(o.x,o.y); kctx.rotate((o.rot||0)*Math.PI/180); kctx.fillStyle=o.color; kctx.strokeStyle=i===selectedIdx?'#00aaff':'#222222'; kctx.lineWidth=i===selectedIdx?3:1.2;
-    const w=o.w,h=o.h;
-    if(['rect','body','longRect'].includes(o.type)) kctx.fillRect(-w/2,-h/2,w,h);
-    if(['circle','smallCircle','landing'].includes(o.type)||o.type==='circle'){kctx.beginPath(); kctx.arc(0,0,w/2,0,Math.PI*2); kctx.fill(); kctx.stroke();}
-    if(['tri','tail'].includes(o.type)){kctx.beginPath(); kctx.moveTo(0,-h/2); kctx.lineTo(-w/2,h/2); kctx.lineTo(w/2,h/2); kctx.closePath(); kctx.fill(); kctx.stroke();}
-    if(o.type==='line'){kctx.beginPath(); kctx.moveTo(-w/2,0); kctx.lineTo(w/2,0); kctx.strokeStyle=o.color; kctx.lineWidth=5; kctx.stroke();}
-    if(o.type==='wing'){kctx.fillRect(-w,-h/4,w*2,h/2); kctx.fillStyle='#00000020'; kctx.fillRect(-w,-h/4,w*2,4);}
-    if(o.type==='propeller'){kctx.fillRect(-w,-4,w*2,8); kctx.fillRect(-4,-w,8,w*2); kctx.beginPath(); kctx.arc(0,0,8,0,Math.PI*2); kctx.fillStyle='#333'; kctx.fill();}
-    if(o.type==='window'){kctx.fillStyle='#7ec8ffcc'; kctx.fillRect(-w/2,-h/2,w,h); kctx.strokeStyle='#4a90e2'; kctx.strokeRect(-w/2,-h/2,w,h);}
-    if(o.type==='rotor'){kctx.fillRect(-w,-3,w*2,6); kctx.fillRect(-3,-w,6,w*2);}
-    if(o.type==='engine'){kctx.fillRect(-w/2,-h/2,w,h); kctx.fillStyle='#222'; kctx.fillRect(-w/2+6,-h/2+6,w-12,h*0.3);}
-    if(o.type==='free'){kctx.beginPath(); for(let j=0;j<o.points.length-1;j++){kctx.moveTo(o.points[j].x-o.x,o.points[j].y-o.y); kctx.lineTo(o.points[j+1].x-o.x,o.points[j+1].y-o.y);} kctx.strokeStyle=o.color; kctx.lineWidth=o.lw||4; kctx.lineCap='round'; kctx.stroke();}
-    if(o.type==='text'){kctx.font='18px sans-serif'; kctx.fillStyle=o.color; kctx.fillText(o.text||'Design', -w/2, 0);}
+    kctx.save(); kctx.translate(o.x,o.y); kctx.rotate((o.rot||0)*Math.PI/180); kctx.fillStyle=o.color; kctx.strokeStyle=i===selectedIdx?'#00aaff':'#222'; kctx.lineWidth=i===selectedIdx?3:1.2;
+    if(o.type==='alpha'){kctx.font='bold '+(o.w*0.7)+'px sans-serif'; kctx.textAlign='center'; kctx.textBaseline='middle'; kctx.fillText(o.char,0,0); if(i===selectedIdx){kctx.strokeRect(-o.w/2-4,-o.h/2-4,o.w+8,o.h+8);}}
+    else if(['rect','body','longRect'].includes(o.type)) kctx.fillRect(-o.w/2,-o.h/2,o.w,o.h);
+    else if(o.type==='circle'){kctx.beginPath(); kctx.arc(0,0,o.w/2,0,Math.PI*2); kctx.fill();}
+    else if(o.type==='tri'){kctx.beginPath(); kctx.moveTo(0,-o.h/2); kctx.lineTo(-o.w/2,o.h/2); kctx.lineTo(o.w/2,o.h/2); kctx.closePath(); kctx.fill();}
+    else if(o.type==='wing'){kctx.beginPath(); kctx.ellipse(0,0,o.w/2,o.h/2.5,0,0,Math.PI*2); kctx.fill();}
+    else if(o.type==='rocket'){kctx.fillRect(-o.w/3,-o.h/2,o.w*0.66,o.h); kctx.beginPath(); kctx.moveTo(0,-o.h/2-12); kctx.lineTo(-o.w/3,-o.h/2); kctx.lineTo(o.w/3,-o.h/2); kctx.closePath(); kctx.fillStyle='red'; kctx.fill();}
+    else if(o.type==='satellite'){kctx.fillRect(-o.w/2,-o.h/2,o.w,o.h); kctx.fillRect(-o.w, -4, o.w/2, 8); kctx.fillRect(o.w/2, -4, o.w/2, 8);}
+    else if(o.type==='propeller'){kctx.fillRect(-o.w/2,-4,o.w,8); kctx.fillRect(-4,-o.h/2,8,o.h);}
+    else if(o.type==='parachute'){kctx.beginPath(); kctx.arc(0,-10,o.w/2,0,Math.PI,true); kctx.fill(); kctx.fillRect(-2,-10,4,25);}
+    else if(o.type==='naca'){kctx.beginPath(); kctx.ellipse(0,0,o.w/2,o.h/3,0,0,Math.PI*2); kctx.fill();}
+    else {kctx.fillRect(-o.w/2,-o.h/2,o.w,o.h);}
+    if(o.aero){kctx.fillStyle='black'; kctx.font='9px sans-serif'; kctx.fillText(o.aero, -18, o.h/2+12);}
     kctx.restore();
   });
 }
+function addAlpha(ch){
+  let col='#111'; if('0123456789'.includes(ch[0])||ch.length>1) col='#0066ff'; if('!@#$%&*+-=♥'.includes(ch)) col='#cc0066';
+  kObjects.push({type:'alpha', char:ch, x:300+Math.random()*180, y:220+Math.random()*140, w:44, h:44, color:col, rot:0, aero:''}); selectedIdx=kObjects.length-1; drawK();
+}
 function addKidPart(type,col){
   if(col) kColor=col;
-  const x=280+Math.random()*320, y=180+Math.random()*220;
-  let w=kSize,h=kSize*0.6;
-  if(type==='wing'){w=130; h=32;} if(type==='propeller'){w=55; h=55;} if(type==='longRect'){w=120; h=24;} if(type==='line'){w=100; h=10;}
-  kObjects.push({type:type, x:x, y:y, w:w, h:h, color:kColor, rot:0});
-  selectedIdx=kObjects.length-1; drawK();
+  const x=300+Math.random()*200, y=220+Math.random()*140; let w=kSize,h=kSize*0.6;
+  if(type==='wing'||type==='naca'){w=120; h=30;} if(type==='rocket'){w=36; h=80;} if(type==='satellite'){w=60; h=40;} if(type==='propeller'){w=55; h=55;}
+  kObjects.push({type:type, x:x, y:y, w:w, h:h, color:kColor, rot:0, aero:type}); selectedIdx=kObjects.length-1; drawK();
 }
 function getPos(e){const r=kcv.getBoundingClientRect(); return {x:(e.clientX-r.left)*(kcv.width/r.width), y:(e.clientY-r.top)*(kcv.height/r.height)};}
-kcv.addEventListener('mousedown',e=>{
-  const p=getPos(e); isDown=true;
-  if(kTool==='select'){
-    selectedIdx=-1;
-    for(let i=kObjects.length-1;i>=0;i--){const o=kObjects[i]; const dx=Math.abs(p.x-o.x), dy=Math.abs(p.y-o.y); if(dx<o.w*0.7 && dy<o.h*0.9){selectedIdx=i; dragOff={x:p.x-o.x, y:p.y-o.y}; break;}}
-    drawK(); return;
-  }
-  if(kTool==='pen'){currentFree={type:'free', x:p.x, y:p.y, points:[p], color:kColor, lw:4, w:20, h:20}; kObjects.push(currentFree);}
-  if(kTool==='text'){const txt=prompt('Kya likhna hai?','My Design'); if(txt){kObjects.push({type:'text', x:p.x, y:p.y, w:100, h:20, color:kColor, text:txt}); drawK();} isDown=false; return;}
-  if(['line','rect','circle','tri'].includes(kTool)){kObjects.push({type:kTool, x:p.x, y:p.y, w:10, h:10, x1:p.x, y1:p.y, x2:p.x, y2:p.y, color:kColor, lw:4}); selectedIdx=kObjects.length-1;}
-});
-kcv.addEventListener('mousemove',e=>{
-  if(!isDown) return; const p=getPos(e);
-  if(kTool==='select' && selectedIdx>=0){kObjects[selectedIdx].x=p.x-dragOff.x; kObjects[selectedIdx].y=p.y-dragOff.y; drawK(); return;}
-  if(kTool==='pen' && currentFree){currentFree.points.push(p); currentFree.x=(currentFree.points[0].x+p.x)/2; currentFree.y=(currentFree.points[0].y+p.y)/2; drawK(); return;}
-  if(selectedIdx>=0 && ['line','rect','circle','tri'].includes(kObjects[selectedIdx].type)){kObjects[selectedIdx].w=Math.abs(p.x-kObjects[selectedIdx].x)*2; kObjects[selectedIdx].h=Math.abs(p.y-kObjects[selectedIdx].y)*2; drawK();}
-});
-window.addEventListener('mouseup',()=>{isDown=false; currentFree=null;});
+kcv.addEventListener('mousedown',e=>{const p=getPos(e); isDown=true; if(kTool==='select'){selectedIdx=-1; for(let i=kObjects.length-1;i>=0;i--){const o=kObjects[i]; if(Math.abs(p.x-o.x)<o.w*0.7 && Math.abs(p.y-o.y)<o.h*0.8){selectedIdx=i; dragOff={x:p.x-o.x, y:p.y-o.y}; break;}} drawK(); return;} if(kTool==='pen'){currentFree={type:'free', x:p.x, y:p.y, points:[p], color:kColor, lw:4, w:20, h:20}; kObjects.push(currentFree);} if(['line','rect','circle','tri'].includes(kTool)){kObjects.push({type:kTool, x:p.x, y:p.y, w:10, h:10, color:kColor}); selectedIdx=kObjects.length-1;}});
+kcv.addEventListener('mousemove',e=>{if(!isDown) return; const p=getPos(e); if(kTool==='select'&&selectedIdx>=0){kObjects[selectedIdx].x=p.x-dragOff.x; kObjects[selectedIdx].y=p.y-dragOff.y; drawK(); return;} if(selectedIdx>=0){kObjects[selectedIdx].w=Math.abs(p.x-kObjects[selectedIdx].x)*2; kObjects[selectedIdx].h=Math.abs(p.y-kObjects[selectedIdx].y)*2; drawK();}});
+window.addEventListener('mouseup',()=>{isDown=false;});
 function deleteKid(){if(selectedIdx>=0){kObjects.splice(selectedIdx,1); selectedIdx=-1; drawK();}}
 function duplicateKid(){if(selectedIdx>=0){const o=JSON.parse(JSON.stringify(kObjects[selectedIdx])); o.x+=30; o.y+=30; kObjects.push(o); selectedIdx=kObjects.length-1; drawK();}}
 function rotateKid(){if(selectedIdx>=0){kObjects[selectedIdx].rot=(kObjects[selectedIdx].rot||0)+15; drawK();}}
 function clearK(){kObjects=[]; selectedIdx=-1; drawKBG();}
+function startSim(){let t=0; const id=setInterval(()=>{t+=0.05; kObjects.forEach(o=>{if(o.type==='propeller') o.rot+=20; if(o.type==='wing'||o.type==='naca') o.y+=Math.sin(t)*0.4; if(o.type==='rocket') o.y-=0.9; if(o.type==='satellite') o.x+=Math.sin(t)*0.6;}); drawK(); if(t>7) clearInterval(id);},30);}
 drawKBG(); setTool('select');
 
-// PRO BLOCKS - 100% sahi wala
+// PRO
 let sceneP,cameraP,rendererP,controlsP,groupP, proInit=false, selectedP=null;
-function initPro(){
-  if(proInit) return; proInit=true;
-  const c=document.getElementById('threePro');
-  sceneP=new THREE.Scene(); sceneP.background=new THREE.Color(0x05070a);
-  cameraP=new THREE.PerspectiveCamera(50,c.clientWidth/c.clientHeight,0.1,1000); cameraP.position.set(5,4,6);
-  rendererP=new THREE.WebGLRenderer({antialias:true}); rendererP.setSize(c.clientWidth,c.clientHeight); c.appendChild(rendererP.domElement);
-  controlsP=new THREE.OrbitControls(cameraP, rendererP.domElement); controlsP.enableDamping=true;
-  sceneP.add(new THREE.DirectionalLight(0xffffff,1.2)); sceneP.add(new THREE.AmbientLight(0xffffff,0.7));
-  groupP=new THREE.Group(); sceneP.add(groupP); sceneP.add(new THREE.GridHelper(24,48,0x223344,0x101a2a));
-  (function anim(){requestAnimationFrame(anim); controlsP.update(); rendererP.render(sceneP,cameraP);})();
-  const ray=new THREE.Raycaster(), mouse=new THREE.Vector2();
-  rendererP.domElement.addEventListener('click', e=>{
-    const r=rendererP.domElement.getBoundingClientRect(); mouse.x=((e.clientX-r.left)/r.width)*2-1; mouse.y=-((e.clientY-r.top)/r.height)*2+1;
-    ray.setFromCamera(mouse,cameraP); const inter=ray.intersectObjects(groupP.children,true);
-    if(inter.length>0){selectedP=inter[0].object; while(selectedP.parent&&selectedP.parent!==groupP) selectedP=selectedP.parent;}
-  });
-}
-function add3D(t){
-  initPro();
-  const col=document.getElementById('pCol').value; const s=1;
-  let mesh; const mat=new THREE.MeshStandardMaterial({color:col, metalness:0.2, roughness:0.5});
-  if(t==='box') mesh=new THREE.Mesh(new THREE.BoxGeometry(2.2,0.8,0.9), mat);
-  if(t==='cyl'){mesh=new THREE.Mesh(new THREE.CylinderGeometry(0.4,0.4,1.6,20), mat); mesh.rotation.z=Math.PI/2;}
-  if(t==='plane') mesh=new THREE.Mesh(new THREE.BoxGeometry(2.4,0.05,1.0), mat);
-  if(t==='sphere') mesh=new THREE.Mesh(new THREE.SphereGeometry(0.6,20,20), mat);
-  if(t==='rotor'){mesh=new THREE.Group(); const b1=new THREE.Mesh(new THREE.BoxGeometry(3.5,0.06,0.14), mat); const b2=new THREE.Mesh(new THREE.BoxGeometry(0.14,0.06,3.5), mat); mesh.add(b1); mesh.add(b2);}
-  if(t==='fin'){mesh=new THREE.Mesh(new THREE.BoxGeometry(0.08,0.9,0.7), mat);}
-  if(!mesh) return; mesh.position.set((Math.random()-0.5)*2,0.8,(Math.random()-0.5)*2); groupP.add(mesh); selectedP=mesh;
-}
-function delete3D(){if(selectedP) groupP.remove(selectedP); selectedP=null;}
-function duplicate3D(){if(selectedP){const c=selectedP.clone(); c.position.x+=0.7; groupP.add(c);}}
-function rotate3D(){if(selectedP) selectedP.rotation.y+=0.5;}
-function update3DColor(){if(selectedP){const col=document.getElementById('pCol').value; selectedP.traverse?selectedP.traverse(ch=>{if(ch.material) ch.material.color.set(col);}):selectedP.material.color.set(col);}}
-function update3DSize(){if(selectedP){const s=parseFloat(document.getElementById('pSize').value)*0.01; selectedP.scale.set(s,s,s);}}
-function move3D(){if(selectedP){selectedP.position.x=parseFloat(document.getElementById('pX').value);}}
-function clearPro(){if(groupP){while(groupP.children.length>0) groupP.remove(groupP.children[0]);}}
+function initPro(){if(proInit) return; proInit=true; const c=document.getElementById('threePro'); sceneP=new THREE.Scene(); sceneP.background=new THREE.Color(0x05070a); cameraP=new THREE.PerspectiveCamera(50,c.clientWidth/c.clientHeight,0.1,1000); cameraP.position.set(5,4,6); rendererP=new THREE.WebGLRenderer({antialias:true}); rendererP.setSize(c.clientWidth,c.clientHeight); c.appendChild(rendererP.domElement); controlsP=new THREE.OrbitControls(cameraP, rendererP.domElement); controlsP.enableDamping=true; sceneP.add(new THREE.DirectionalLight(0xffffff,1.2)); sceneP.add(new THREE.AmbientLight(0xffffff,0.7)); groupP=new THREE.Group(); sceneP.add(groupP); sceneP.add(new THREE.GridHelper(24,48,0x223344,0x101a2a)); (function anim(){requestAnimationFrame(anim); controlsP.update(); rendererP.render(sceneP,cameraP);})();}
+function add3D(t){initPro(); const col=document.getElementById('pCol').value; let mesh; const mat=new THREE.MeshStandardMaterial({color:col}); if(t==='box') mesh=new THREE.Mesh(new THREE.BoxGeometry(2.2,0.8,0.9), mat); if(t==='cyl'){mesh=new THREE.Mesh(new THREE.CylinderGeometry(0.4,0.4,1.6,20), mat); mesh.rotation.z=Math.PI/2;} if(t==='plane') mesh=new THREE.Mesh(new THREE.BoxGeometry(2.4,0.05,1.0), mat); if(t==='sphere') mesh=new THREE.Mesh(new THREE.SphereGeometry(0.6,20,20), mat); if(t==='rotor'){mesh=new THREE.Group(); const b1=new THREE.Mesh(new THREE.BoxGeometry(3.5,0.06,0.14), mat); const b2=new THREE.Mesh(new THREE.BoxGeometry(0.14,0.06,3.5), mat); mesh.add(b1); mesh.add(b2);} if(!mesh) return; mesh.position.set((Math.random()-0.5)*2,0.8,(Math.random()-0.5)*2); groupP.add(mesh); selectedP=mesh;}
+function delete3D(){if(selectedP) groupP.remove(selectedP);} function duplicate3D(){if(selectedP){const c=selectedP.clone(); c.position.x+=0.7; groupP.add(c);}} function rotate3D(){if(selectedP) selectedP.rotation.y+=0.5;} function update3DColor(){if(selectedP){const col=document.getElementById('pCol').value; selectedP.traverse?selectedP.traverse(ch=>{if(ch.material) ch.material.color.set(col);}):selectedP.material.color.set(col);}} function update3DSize(){if(selectedP){const s=parseFloat(document.getElementById('pSize').value)*0.01; selectedP.scale.set(s,s,s);}} function clearPro(){if(groupP){while(groupP.children.length>0) groupP.remove(groupP.children[0]);}}
 
-// INDUSTRIAL - Fusion 360 Logic
-let sceneI,cameraI,rendererI,controlsI,groupI, indInit=false, selI=null, bodiesI=[], indToolMode='extrude';
+// INDUSTRIAL
+let sceneI,cameraI,rendererI,controlsI,groupI, indInit=false, selI=null, bodiesI=[];
 function initInd(){
   if(indInit) return; indInit=true;
-  const c=document.getElementById('threeInd');
-  sceneI=new THREE.Scene(); sceneI.background=new THREE.Color(0x080a14);
-  cameraI=new THREE.PerspectiveCamera(50,c.clientWidth/c.clientHeight,0.1,1000); cameraI.position.set(7,6,8);
-  rendererI=new THREE.WebGLRenderer({antialias:true}); rendererI.setSize(c.clientWidth,c.clientHeight); c.appendChild(rendererI.domElement);
-  controlsI=new THREE.OrbitControls(cameraI, rendererI.domElement); controlsI.enableDamping=true;
-  sceneI.add(new THREE.DirectionalLight(0xffffff,1.3)); sceneI.add(new THREE.AmbientLight(0xffffff,0.6));
-  groupI=new THREE.Group(); sceneI.add(groupI); sceneI.add(new THREE.GridHelper(30,60,0x1e2a3a,0x0f1720));
+  const c=document.getElementById('threeInd'); sceneI=new THREE.Scene(); sceneI.background=new THREE.Color(0x080a14); cameraI=new THREE.PerspectiveCamera(50,c.clientWidth/c.clientHeight,0.1,1000); cameraI.position.set(7,6,8); rendererI=new THREE.WebGLRenderer({antialias:true}); rendererI.setSize(c.clientWidth,c.clientHeight); c.appendChild(rendererI.domElement); controlsI=new THREE.OrbitControls(cameraI, rendererI.domElement); controlsI.enableDamping=true; sceneI.add(new THREE.DirectionalLight(0xffffff,1.3)); sceneI.add(new THREE.AmbientLight(0xffffff,0.6)); groupI=new THREE.Group(); sceneI.add(groupI); sceneI.add(new THREE.GridHelper(30,60,0x1e2a3a,0x0f1720));
   const ray=new THREE.Raycaster(), mouse=new THREE.Vector2();
-  rendererI.domElement.addEventListener('click', e=>{
-    const r=rendererI.domElement.getBoundingClientRect(); mouse.x=((e.clientX-r.left)/r.width)*2-1; mouse.y=-((e.clientY-r.top)/r.height)*2+1;
-    ray.setFromCamera(mouse,cameraI); const inter=ray.intersectObjects(groupI.children,true);
-    if(inter.length>0){selI=inter[0].object; while(selI.parent&&selI.parent!==groupI) selI=selI.parent; document.getElementById('selInfo').innerText=selI.name||'Body';}
-  });
+  rendererI.domElement.addEventListener('click', e=>{const r=rendererI.domElement.getBoundingClientRect(); mouse.x=((e.clientX-r.left)/r.width)*2-1; mouse.y=-((e.clientY-r.top)/r.height)*2+1; ray.setFromCamera(mouse,cameraI); const inter=ray.intersectObjects(groupI.children,true); if(inter.length>0){selI=inter[0].object; while(selI.parent&&selI.parent!==groupI) selI=selI.parent; document.getElementById('selInfo').innerText=selI.name||'Body';}});
   (function anim(){requestAnimationFrame(anim); controlsI.update(); rendererI.render(sceneI,cameraI);})();
   addIndustrialBlock();
 }
-function addIndustrialBlock(){
-  initInd();
-  const mat=new THREE.MeshStandardMaterial({color:'#c8c8c8', metalness:0.35, roughness:0.35});
-  const mesh=new THREE.Mesh(new THREE.BoxGeometry(2.2,0.9,1.3), mat);
-  mesh.name='Body-'+(bodiesI.length+1); mesh.position.set((Math.random()-0.5)*1.5,0.7,(Math.random()-0.5)*1.5);
-  groupI.add(mesh); bodiesI.push(mesh); selI=mesh; updateLists();
-}
+function addIndustrialBlock(){initInd(); const mat=new THREE.MeshStandardMaterial({color:'#c8c8c8', metalness:0.35, roughness:0.35}); const mesh=new THREE.Mesh(new THREE.BoxGeometry(2.2,0.9,1.3), mat); mesh.name='Body-'+(bodiesI.length+1); mesh.position.set((Math.random()-0.5)*1.5,0.7,(Math.random()-0.5)*1.5); groupI.add(mesh); bodiesI.push(mesh); selI=mesh; updateLists();}
 function updateLists(){
   document.getElementById('bodyCount').innerText=bodiesI.length;
   document.getElementById('bodyList').innerHTML=bodiesI.map(b=>`<div>🔩 ${b.name}</div>`).join('');
-  document.getElementById('timeline').innerHTML=bodiesI.map((_,i)=>`<div style="width:32px; height:20px; background:#242a4d; border-radius:6px; font-size:8px; display:flex; align-items:center; justify-content:center; border:1px solid #ffffff10;">F${i+1}</div>`).join('');
-  const mass=(bodiesI.length*1.25).toFixed(2); document.getElementById('massVal').innerText=mass+' kg';
+  document.getElementById('timeline').innerHTML=bodiesI.map((_,i)=>`<div style="width:32px; height:20px; background:#242a4d; border-radius:6px; font-size:8px; display:flex; align-items:center; justify-content:center;">F${i+1}</div>`).join('');
+  document.getElementById('massVal').innerText=(bodiesI.length*1.25).toFixed(2)+' kg';
   document.getElementById('volVal').innerText=(bodiesI.length*0.0034).toFixed(5)+' m³';
   document.getElementById('surfVal').innerText=(bodiesI.length*0.82).toFixed(3)+' m²';
 }
-function indTool(t){
-  indToolMode=t;
-  document.querySelectorAll('.rib-btn').forEach(b=>b.classList.remove('rib-on'));
-  const id='r'+t.charAt(0).toUpperCase()+t.slice(1); const el=document.getElementById(id); if(el) el.classList.add('rib-on');
-  document.getElementById('toolInfo').innerText=t;
-  if(t==='extrude') applyExtrude(); if(t==='fillet') applyFillet(); if(t==='chamfer') applyChamfer(); if(t==='revolve') applyRevolve();
-}
-function applyExtrude(){if(!selI) return; const d=parseFloat(document.getElementById('extDepth').value); selI.scale.y=d; if(document.getElementById('opType').value.includes('Cut')) selI.scale.y=0.2;}
+function indTool(t){document.querySelectorAll('.rib-btn').forEach(b=>b.classList.remove('rib-on')); const el=document.getElementById('r'+t.charAt(0).toUpperCase()+t.slice(1)); if(el) el.classList.add('rib-on'); document.getElementById('toolInfo').innerText=t; if(t==='extrude') applyExtrude(); if(t==='fillet') applyFillet(); if(t==='chamfer') applyChamfer();}
+function applyExtrude(){if(!selI) return; selI.scale.y=parseFloat(document.getElementById('extDepth').value);}
 function applyFillet(){if(!selI) return; const r=parseFloat(document.getElementById('filRad').value); selI.scale.x=1+r*0.25; selI.scale.z=1+r*0.25;}
-function applyChamfer(){if(!selI) return; const r=parseFloat(document.getElementById('chamDist').value); selI.rotation.x=r*0.4;}
-function applyRevolve(){if(!selI) return; const a=parseFloat(document.getElementById('revAngle').value); selI.rotation.y=a*Math.PI/180;}
-function indAction(a){
-  if(!selI) return;
-  if(a==='mirror'){const c=selI.clone(); c.position.x=-c.position.x; c.name=selI.name+'_Mirror'; groupI.add(c); bodiesI.push(c);}
-  if(a==='pattern'){for(let i=1;i<=2;i++){const c=selI.clone(); c.position.x+=i*1.6; c.name=selI.name+'_Pat'+i; groupI.add(c); bodiesI.push(c);}}
-  if(a==='shell'){selI.material.wireframe=!selI.material.wireframe; selI.material.transparent=true; selI.material.opacity=0.55;}
-  if(a==='hole'){selI.scale.x*=0.78; selI.scale.z*=0.78;}
-  updateLists();
-}
+function applyChamfer(){if(!selI) return; selI.rotation.x=parseFloat(document.getElementById('chamDist').value)*0.4;}
+function indAction(a){if(!selI) return; if(a==='mirror'){const c=selI.clone(); c.position.x=-c.position.x; c.name=selI.name+'_Mirror'; groupI.add(c); bodiesI.push(c);} if(a==='pattern'){for(let i=1;i<=2;i++){const c=selI.clone(); c.position.x+=i*1.6; c.name=selI.name+'_Pat'+i; groupI.add(c); bodiesI.push(c);}} if(a==='shell'){selI.material.wireframe=!selI.material.wireframe; selI.material.transparent=true; selI.material.opacity=0.55;} if(a==='hole'){selI.scale.x*=0.78;} updateLists();}
 function simulate(){if(!selI) return; let t=0; const id=setInterval(()=>{t+=0.05; selI.rotation.y+=0.12; if(t>4) clearInterval(id);},16);}
-function analyze(){if(!selI) return; alert('Analysis: Mass='+document.getElementById('massVal').innerText+' | Material='+document.getElementById('matType').value+' | Operation='+document.getElementById('opType').value+' | Fillet='+document.getElementById('filRad').value+' | This is industrial logic: Fillet reduces stress concentration, Mirror creates symmetry, Shell reduces weight - as per Fusion 360/SolidWorks standards【1396587171547768093†L13-L17】');}
+function analyze(){alert('Analysis: Mass='+document.getElementById('massVal').innerText+' | Fillet reduces stress concentration, Mirror creates symmetry【1396587171547768093†L13-L17】');}
 function clearInd(){if(groupI){while(groupI.children.length>0) groupI.remove(groupI.children[0]);} bodiesI=[]; sceneI.add(new THREE.GridHelper(30,60,0x1e2a3a,0x0f1720)); updateLists();}
-
+function openBlockLibrary(){document.getElementById('blockModal').style.display='flex';}
+function closeBlockLibrary(){document.getElementById('blockModal').style.display='none';}
+function addBlockType(type){
+  initInd(); closeBlockLibrary();
+  let mesh; const matS=new THREE.MeshStandardMaterial({color:'#c0c0c0', metalness:0.3, roughness:0.4}); const matG=new THREE.MeshStandardMaterial({color:'#22ff66'}); const matB=new THREE.MeshStandardMaterial({color:'#7ec8ff', transparent:true, opacity:0.6});
+  if(type==='box') mesh=new THREE.Mesh(new THREE.BoxGeometry(2.2,0.9,1.3), matS);
+  if(type==='cylinder') mesh=new THREE.Mesh(new THREE.CylinderGeometry(0.5,0.5,1.6,20), matS);
+  if(type==='sphere') mesh=new THREE.Mesh(new THREE.SphereGeometry(0.65,20,20), matS);
+  if(type==='cone') mesh=new THREE.Mesh(new THREE.ConeGeometry(0.6,1.2,20), matS);
+  if(type==='torus') mesh=new THREE.Mesh(new THREE.TorusGeometry(0.5,0.18,12,24), matS);
+  if(type==='plane') mesh=new THREE.Mesh(new THREE.BoxGeometry(2.5,0.06,1.2), matS);
+  if(type==='wedge'){mesh=new THREE.Mesh(new THREE.BoxGeometry(1.5,0.8,1), matS); mesh.scale.x=0.5;}
+  if(type==='capsule'){mesh=new THREE.Group(); const c1=new THREE.Mesh(new THREE.CylinderGeometry(0.4,0.4,1.2,16), matS); const s1=new THREE.Mesh(new THREE.SphereGeometry(0.4,12,12), matS); s1.position.y=0.6; const s2=s1.clone(); s2.position.y=-0.6; mesh.add(c1,s1,s2);}
+  if(type==='tube') mesh=new THREE.Mesh(new THREE.TorusGeometry(0.5,0.12,12,24), matS);
+  if(type==='pyramid') mesh=new THREE.Mesh(new THREE.ConeGeometry(0.7,1,4), matS);
+  if(type==='fuselage') mesh=new THREE.Mesh(new THREE.BoxGeometry(3.2,0.7,0.7), matS);
+  if(type==='cockpit') mesh=new THREE.Mesh(new THREE.BoxGeometry(0.6,0.4,0.5), matB);
+  if(type==='wing'){const sh=new THREE.Shape(); sh.moveTo(0,0); sh.lineTo(2,0.15); sh.lineTo(0,0.25); sh.lineTo(0,0); const g=new THREE.ExtrudeGeometry(sh,{depth:0.06, bevelEnabled:false}); mesh=new THREE.Mesh(g, matG);}
+  if(type==='fin') mesh=new THREE.Mesh(new THREE.BoxGeometry(0.08,1.1,0.8), matS);
+  if(type==='rotor'){mesh=new THREE.Group(); const b1=new THREE.Mesh(new THREE.BoxGeometry(3.5,0.07,0.15), new THREE.MeshStandardMaterial({color:'#00ffff'})); const b2=b1.clone(); b2.rotation.y=Math.PI/2; mesh.add(b1,b2);}
+  if(type==='propeller'){mesh=new THREE.Group(); const b=new THREE.Mesh(new THREE.BoxGeometry(2.2,0.08,0.18), matS); const b2=b.clone(); b2.rotation.y=Math.PI/2; mesh.add(b,b2);}
+  if(type==='landing_skid'){mesh=new THREE.Group(); const bar=new THREE.Mesh(new THREE.BoxGeometry(2.2,0.08,0.08), matS); const l1=new THREE.Mesh(new THREE.CylinderGeometry(0.05,0.05,0.7,8), matS); l1.position.set(-0.7,-0.35,0); const l2=l1.clone(); l2.position.x=0.7; mesh.add(bar,l1,l2);}
+  if(type==='engine_jet') mesh=new THREE.Mesh(new THREE.CylinderGeometry(0.4,0.5,1.2,16), new THREE.MeshStandardMaterial({color:'#ff8c00'}));
+  if(type==='nozzle') mesh=new THREE.Mesh(new THREE.CylinderGeometry(0.5,0.3,0.6,16), new THREE.MeshStandardMaterial({color:'#ff5c00'}));
+  if(type==='rocket_body') mesh=new THREE.Mesh(new THREE.CylinderGeometry(0.35,0.35,2.2,16), new THREE.MeshStandardMaterial({color:'#ffaa00'}));
+  if(type==='satellite') mesh=new THREE.Mesh(new THREE.BoxGeometry(0.8,0.6,0.6), new THREE.MeshStandardMaterial({color:'#c0c0ff'}));
+  if(type==='solar_panel') mesh=new THREE.Mesh(new THREE.BoxGeometry(1.5,0.02,0.6), new THREE.MeshStandardMaterial({color:'#001a66'}));
+  if(type==='parachute') mesh=new THREE.Mesh(new THREE.SphereGeometry(0.6,12,8,0,Math.PI*2,0,Math.PI/2), new THREE.MeshStandardMaterial({color:'white', side:THREE.DoubleSide}));
+  if(type==='gear_spur') mesh=new THREE.Mesh(new THREE.CylinderGeometry(0.5,0.5,0.2,16), matS);
+  if(type==='bolt'){mesh=new THREE.Group(); const hd=new THREE.Mesh(new THREE.CylinderGeometry(0.18,0.18,0.1,6), matS); const sh=new THREE.Mesh(new THREE.CylinderGeometry(0.08,0.08,0.6,8), matS); sh.position.y=-0.35; mesh.add(hd,sh);}
+  if(type==='beam_i') mesh=new THREE.Mesh(new THREE.BoxGeometry(2.5,0.4,0.15), matS);
+  if(type==='plate') mesh=new THREE.Mesh(new THREE.BoxGeometry(1.8,0.08,1.2), matS);
+  if(type==='motor_box') mesh=new THREE.Mesh(new THREE.BoxGeometry(0.5,0.4,0.6), new THREE.MeshStandardMaterial({color:'#00ffff'}));
+  if(type==='airfoil_0012'){const sh=new THREE.Shape(); sh.moveTo(0,0); sh.bezierCurveTo(0.6,0.18,1.4,0.18,2,0); sh.bezierCurveTo(1.4,-0.08,0.6,-0.05,0,0); const g=new THREE.ExtrudeGeometry(sh,{depth:0.05, bevelEnabled:false}); mesh=new THREE.Mesh(g, matG);}
+  if(type==='ducted_fan'){mesh=new THREE.Group(); const duct=new THREE.Mesh(new THREE.TorusGeometry(0.4,0.08,8,20), matS); const fan=new THREE.Mesh(new THREE.BoxGeometry(0.7,0.04,0.1), matS); mesh.add(duct,fan);}
+  if(type==='v_tail'){mesh=new THREE.Group(); const f1=new THREE.Mesh(new THREE.BoxGeometry(0.06,0.8,0.5), matS); f1.rotation.z=Math.PI/6; const f2=f1.clone(); f2.rotation.z=-Math.PI/6; mesh.add(f1,f2);}
+  if(type==='delta_wing'){const sh=new THREE.Shape(); sh.moveTo(0,0); sh.lineTo(1.5,0); sh.lineTo(0,1); sh.lineTo(0,0); const g=new THREE.ExtrudeGeometry(sh,{depth:0.04, bevelEnabled:false}); mesh=new THREE.Mesh(g, matG);}
+  if(type==='fuselage_stealth') mesh=new THREE.Mesh(new THREE.BoxGeometry(2.8,0.6,0.6), new THREE.MeshStandardMaterial({color:'#222'}));
+  if(type==='thrust_vector'){mesh=new THREE.Group(); const base=new THREE.Mesh(new THREE.CylinderGeometry(0.35,0.4,0.6,16), new THREE.MeshStandardMaterial({color:'#ff5c00'})); const vec=new THREE.Mesh(new THREE.CylinderGeometry(0.3,0.25,0.5,16), new THREE.MeshStandardMaterial({color:'#ff5c00'})); vec.position.x=0.5; vec.rotation.z=0.3; mesh.add(base,vec);}
+  if(type==='intake'){mesh=new THREE.Group(); const box=new THREE.Mesh(new THREE.BoxGeometry(0.8,0.5,0.6), matS); const hole=new THREE.Mesh(new THREE.BoxGeometry(0.6,0.3,0.62), new THREE.MeshStandardMaterial({color:'#111'})); hole.position.x=0.1; mesh.add(box,hole);}
+  if(!mesh) return;
+  mesh.name=type+'_'+(bodiesI.length+1); mesh.position.set((Math.random()-0.5)*2,0.9,(Math.random()-0.5)*2); groupI.add(mesh); bodiesI.push(mesh); selI=mesh; updateLists();
+}
+function updateLists(){document.getElementById('bodyCount').innerText=bodiesI.length; document.getElementById('bodyList').innerHTML=bodiesI.map(b=>`<div>🔩 ${b.name}</div>`).join(''); document.getElementById('timeline').innerHTML=bodiesI.map((_,i)=>`<div style="width:32px; height:20px; background:#242a4d; border-radius:6px; font-size:8px; display:flex; align-items:center; justify-content:center;">F${i+1}</div>`).join(''); document.getElementById('massVal').innerText=(bodiesI.length*1.25).toFixed(2)+' kg'; document.getElementById('volVal').innerText=(bodiesI.length*0.0034).toFixed(5)+' m³'; document.getElementById('surfVal').innerText=(bodiesI.length*0.82).toFixed(3)+' m²';}
 function clearAll(){if(mainMode==='kids') clearK(); if(mainMode==='pro') clearPro(); if(mainMode==='industrial') clearInd();}
-function downloadPNG(){const link=document.createElement('a'); link.download='Future_Design_'+Date.now()+'.png'; link.href=document.getElementById('kCanvas').toDataURL(); link.click();}
-function downloadPDF(){const {jsPDF}=window.jspdf; const doc=new jsPDF(); doc.text('Create Your Future Design - Blueprint',10,10); doc.addImage(document.getElementById('kCanvas').toDataURL('image/png'),'PNG',10,20,180,100); doc.save('Blueprint_'+Date.now()+'.pdf');}
+function downloadPNG(){const a=document.createElement('a'); a.download='Design_'+Date.now()+'.png'; a.href=document.getElementById('kCanvas').toDataURL(); a.click();}
+function downloadPDF(){const {jsPDF}=window.jspdf; const doc=new jsPDF(); doc.text('Create Your Future Design - Blueprint + China Space Tech',10,10); doc.addImage(document.getElementById('kCanvas').toDataURL('image/png'),'PNG',10,20,180,100); doc.save('Blueprint_'+Date.now()+'.pdf');}
 function shareDesign(){const url=document.getElementById('kCanvas').toDataURL(); fetch(url).then(r=>r.blob()).then(b=>{const f=new File([b],'design.png',{type:'image/png'}); if(navigator.canShare&&navigator.canShare({files:[f]})) navigator.share({title:'My Future Design', text:'Maine blank se design banaya! 🚁', files:[f]}); else alert('Download karke share kar do!');});}
-
 setMain('kids');
 </script></body></html>
     """
-    components.html(HTML, height=860, scrolling=False)   
+    components.html(HTML, height=900, scrolling=False)  
     
 def render_kids_logic_lab():
     # ============================================================
