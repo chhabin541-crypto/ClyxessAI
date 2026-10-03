@@ -7527,7 +7527,7 @@ with st.sidebar:
 # ---- routes: one unique screen per feature ----
 if mode == "🔐 Login / Sign Up":
     render_login_signup(); st.stop() 
-if mode == "📱Data Science and Machin Learning":
+if mode == "📱 Data Science and Machin Learning":
     render_datascienceand_machinelearning(); st.stop() 
 if mode == "💸 Learn Finance":
     render_learn_finance(client); st.stop()   
