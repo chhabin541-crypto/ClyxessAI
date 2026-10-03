@@ -3568,156 +3568,83 @@ def render_physics_lab(client):
         
 def render_startup_app_websitebuilder():
     import os
-    import json
     import time
     import streamlit as st
     import streamlit.components.v1 as components
 
     GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "")
 
-    # ---- Session State ----
-    for k, v in [("em_html", ""), ("em_prompt", ""), ("em_type", "Web app"), ("em_stage", "input")]:
+    for k, v in [("em_html", ""), ("em_prompt", ""), ("em_stage", "input"), ("em_err", "")]:
         if k not in st.session_state:
             st.session_state[k] = v
 
-    # ============================================================
-    # FUNCTIONS — SABSE PEHLE DEFINE (Yeh fix hai!)
-    # ============================================================
-    def fallback_html(prompt):
-        title = prompt.title()[:50]
-        return f'''<!DOCTYPE html>
-<html><head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>{title}</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-<style>html{{scroll-behavior:smooth;}}body{{background:#020617;color:#e2e8f0;}}.glass{{background:rgba(15,23,42,.7);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.08);}}.grad{{background:linear-gradient(135deg,#10b981,#06b6d4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}}</style>
-</head><body>
+    def generate_html(prompt, api_key):
+        if not api_key:
+            return None, "GROQ_API_KEY set nahi hai"
 
-<nav class="glass sticky top-0 z-50 px-6 py-4 border-b border-slate-800">
-<div class="max-w-6xl mx-auto flex justify-between items-center">
-<div class="flex items-center gap-3">
-<div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-300 flex items-center justify-center text-slate-950 font-black"><i class="fa-solid fa-bolt"></i></div>
-<span class="font-bold text-lg">{title}</span></div>
-<div class="hidden md:flex gap-6 text-sm">
-<a href="#home" class="hover:text-emerald-400">Home</a>
-<a href="#features" class="hover:text-emerald-400">Features</a>
-<a href="#about" class="hover:text-emerald-400">About</a>
-<a href="#contact" class="hover:text-emerald-400">Contact</a></div>
-<button class="bg-emerald-500 text-slate-950 font-bold px-5 py-2 rounded-xl text-sm">Get Started</button>
-</div></nav>
+        try:
+            from groq import Groq
+            client = Groq(api_key=api_key)
 
-<section id="home" class="px-6 py-24 text-center">
-<div class="max-w-4xl mx-auto space-y-6">
-<span class="inline-block bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 px-4 py-1.5 rounded-full text-xs">🚀 Welcome</span>
-<h1 class="text-4xl md:text-6xl font-black"><span class="grad">{title}</span></h1>
-<p class="text-slate-400 text-lg">Built just for you — modern, fast, and beautiful.</p>
-<div class="flex flex-col sm:flex-row gap-3 justify-center pt-4">
-<button class="bg-emerald-500 text-slate-950 font-bold px-8 py-3 rounded-xl"><i class="fa-solid fa-rocket mr-2"></i>Get Started</button>
-<button class="glass border border-slate-700 px-8 py-3 rounded-xl">Learn More</button></div>
-</div></section>
+            sys_prompt = f"""You are an expert web developer. Return ONLY a complete HTML file. No explanations, no markdown, no backticks.
 
-<section id="features" class="px-6 py-20 bg-slate-900/40">
-<div class="max-w-6xl mx-auto">
-<h2 class="text-3xl md:text-4xl font-black text-center mb-12">Features</h2>
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-<div class="glass p-6 rounded-2xl"><div class="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-400 text-xl mb-4"><i class="fa-solid fa-bolt"></i></div><h3 class="font-bold text-lg mb-2">Fast</h3><p class="text-slate-400 text-sm">Lightning fast performance</p></div>
-<div class="glass p-6 rounded-2xl"><div class="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-400 text-xl mb-4"><i class="fa-solid fa-shield-halved"></i></div><h3 class="font-bold text-lg mb-2">Secure</h3><p class="text-slate-400 text-sm">100% safe and secure</p></div>
-<div class="glass p-6 rounded-2xl"><div class="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-400 text-xl mb-4"><i class="fa-solid fa-star"></i></div><h3 class="font-bold text-lg mb-2">Quality</h3><p class="text-slate-400 text-sm">Top quality work</p></div>
-<div class="glass p-6 rounded-2xl"><div class="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-400 text-xl mb-4"><i class="fa-solid fa-headset"></i></div><h3 class="font-bold text-lg mb-2">Support</h3><p class="text-slate-400 text-sm">24/7 customer support</p></div>
-</div></div></section>
+User wants: {prompt}
 
-<section id="about" class="px-6 py-20">
-<div class="max-w-4xl mx-auto glass p-10 rounded-3xl text-center">
-<h2 class="text-3xl font-black mb-4">About Us</h2>
-<p class="text-slate-400">We build modern digital experiences that matter.</p></div></section>
+Rules:
+- Start with <!DOCTYPE html>
+- End with </html>
+- Use Tailwind CSS CDN
+- Use FontAwesome icons
+- Sections: navbar, hero, features (3 cards), about, contact form, footer
+- Dark theme (bg-slate-950, emerald accents)
+- Mobile responsive
+- Real content based on user request
+- Keep HTML compact (under 4000 tokens)
 
-<section id="contact" class="px-6 py-20 bg-slate-900/40">
-<div class="max-w-2xl mx-auto">
-<h2 class="text-3xl font-black text-center mb-8">Contact Us</h2>
-<form class="glass p-8 rounded-2xl space-y-4" onsubmit="event.preventDefault();alert('Sent!');">
-<input type="text" placeholder="Name" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 focus:outline-none focus:border-emerald-500">
-<input type="email" placeholder="Email" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 focus:outline-none focus:border-emerald-500">
-<textarea rows="4" placeholder="Message" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 focus:outline-none focus:border-emerald-500"></textarea>
-<button type="submit" class="w-full bg-emerald-500 text-slate-950 font-bold py-3 rounded-xl">Send Message</button>
-</form></div></section>
+Return raw HTML only:"""
 
-<footer class="border-t border-slate-800 px-6 py-8 text-center text-sm text-slate-500">
-<p>© 2026 {title}. Built with Clyxess AI</p></footer>
-</body></html>'''
+            res = client.chat.completions.create(
+                messages=[
+                    {"role": "user", "content": sys_prompt}
+                ],
+                model="llama-3.3-70b-versatile",
+                temperature=0.7,
+                max_tokens=6000
+            )
 
-    def generate_html(prompt, build_type, api_key):
-        SYSTEM = f"""You are an expert web developer. Generate a COMPLETE modern website.
+            html = res.choices[0].message.content.strip()
 
-USER REQUEST: {prompt}
-TYPE: {build_type}
+            # Clean any markdown fences
+            if html.startswith("```"):
+                html = html.split("```")[1]
+                if html.startswith("html"):
+                    html = html[4:]
+                html = html.strip()
 
-RULES:
-1. Use Tailwind CSS CDN: <script src="https://cdn.tailwindcss.com"></script>
-2. Use FontAwesome for icons
-3. Build FULL website with:
-   - Sticky navbar (logo + menu + CTA button)
-   - Hero section (big heading + subtitle + 2 buttons)
-   - 3-4 feature cards with icons
-   - About/Services section
-   - Contact form
-   - Footer
-4. Dark theme: bg-slate-950, emerald-500 accents
-5. Mobile responsive
-6. Real content (not lorem ipsum) based on: {prompt}
+            if len(html) < 500:
+                return None, f"AI ne chhota output diya ({len(html)} chars)"
 
-Return ONLY JSON: {{"html": "<!DOCTYPE html>...full code..."}}
-"""
-        if api_key:
-            try:
-                from groq import Groq
-                client = Groq(api_key=api_key)
-                res = client.chat.completions.create(
-                    messages=[
-                        {"role": "system", "content": "Return valid JSON only."},
-                        {"role": "user", "content": SYSTEM}
-                    ],
-                    model="llama-3.3-70b-versatile",
-                    temperature=0.7,
-                    max_tokens=8000,
-                    response_format={"type": "json_object"}
-                )
-                data = json.loads(res.choices[0].message.content.strip())
-                if "html" in data and len(data["html"]) > 500:
-                    return data["html"]
-            except Exception as e:
-                st.warning(f"AI error, using fallback: {str(e)[:80]}")
-        return fallback_html(prompt)
+            return html, None
 
-    # ============================================================
+        except Exception as e:
+            return None, f"AI error: {type(e).__name__} - {str(e)[:150]}"
+
+    # ========================
     # STAGE 1: INPUT
-    # ============================================================
+    # ========================
     if st.session_state.em_stage == "input":
         st.markdown("""
         <div style="text-align:center; padding:60px 20px 30px 20px;">
-            <h1 style="font-size:38px; font-weight:900; color:#e2e8f0; margin:0;">
-                Start with one prompt.
-            </h1>
-            <p style="color:#64748b; margin-top:8px; font-size:15px;">
-                We'll bring your idea to life.
-            </p>
+            <h1 style="font-size:38px; font-weight:900; color:#e2e8f0; margin:0;">Start with one prompt.</h1>
+            <p style="color:#64748b; margin-top:8px; font-size:15px;">We'll bring your idea to life.</p>
         </div>
         """, unsafe_allow_html=True)
 
         col1, col2, col3 = st.columns([1, 3, 1])
         with col2:
-            em_type = st.radio(
-                "Type",
-                ["🌐 Web app", "📱 Mobile app"],
-                horizontal=True,
-                label_visibility="collapsed"
-            )
-            st.session_state.em_type = em_type
-
             prompt = st.text_area(
                 "Prompt",
-                placeholder="Describe your idea — we will bring it to life...",
+                placeholder="e.g., Ek food delivery website banao...",
                 height=140,
                 label_visibility="collapsed",
                 key="em_input_box"
@@ -3725,46 +3652,60 @@ Return ONLY JSON: {{"html": "<!DOCTYPE html>...full code..."}}
 
             if st.button("✨ Generate", use_container_width=True, type="primary"):
                 if not prompt.strip():
-                    st.warning("Pehle idea likho bhai")
+                    st.warning("Pehle idea likho")
                 else:
                     st.session_state.em_prompt = prompt
                     st.session_state.em_stage = "loading"
                     st.rerun()
 
         st.markdown("<br>", unsafe_allow_html=True)
-        st.markdown('<p style="text-align:center; color:#64748b; font-size:13px;">Not sure where to start? Try these:</p>', unsafe_allow_html=True)
+        st.markdown('<p style="text-align:center; color:#64748b; font-size:13px;">Try these:</p>', unsafe_allow_html=True)
 
-        ex_col1, ex_col2, ex_col3 = st.columns(3)
-        examples = ["🍔 Food delivery website", "☕ Coffee shop landing page", "📚 Library management app"]
-        for col, ex in zip([ex_col1, ex_col2, ex_col3], examples):
+        ex1, ex2, ex3 = st.columns(3)
+        for col, ex in zip([ex1, ex2, ex3], ["🍔 Food delivery", "☕ Coffee shop", "📚 Library app"]):
             with col:
-                if st.button(ex, use_container_width=True, key=f"ex_{ex}"):
+                if st.button(ex, use_container_width=True):
                     st.session_state.em_prompt = ex.split(" ", 1)[1]
                     st.session_state.em_stage = "loading"
                     st.rerun()
 
-    # ============================================================
+    # ========================
     # STAGE 2: LOADING
-    # ============================================================
+    # ========================
     elif st.session_state.em_stage == "loading":
         st.markdown("""
         <div style="text-align:center; padding:180px 20px;">
             <div style="font-size:50px;">⚙️</div>
             <h2 style="color:#10b981; margin-top:20px;">Building your app...</h2>
-            <p style="color:#64748b;">AI is writing your code, please wait</p>
         </div>
         """, unsafe_allow_html=True)
 
-        with st.spinner("Generating..."):
-            html = generate_html(st.session_state.em_prompt, st.session_state.em_type, GROQ_API_KEY)
+        html, err = generate_html(st.session_state.em_prompt, GROQ_API_KEY)
 
-        st.session_state.em_html = html
-        st.session_state.em_stage = "preview"
+        if html:
+            st.session_state.em_html = html
+            st.session_state.em_err = ""
+            st.session_state.em_stage = "preview"
+        else:
+            st.session_state.em_err = err
+            st.session_state.em_stage = "error"
         st.rerun()
 
-    # ============================================================
-    # STAGE 3: PREVIEW
-    # ============================================================
+    # ========================
+    # STAGE 3: ERROR
+    # ========================
+    elif st.session_state.em_stage == "error":
+        st.error(f"❌ Error: {st.session_state.em_err}")
+        st.info("💡 Screenshot bhej do, turant fix karenge")
+
+        if st.button("🔄 Try Again"):
+            st.session_state.em_stage = "input"
+            st.session_state.em_err = ""
+            st.rerun()
+
+    # ========================
+    # STAGE 4: PREVIEW
+    # ========================
     else:
         col_a, col_b, col_c = st.columns([3, 1, 1])
         with col_a:
