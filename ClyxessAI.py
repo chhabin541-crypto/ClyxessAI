@@ -7059,7 +7059,7 @@ with st.sidebar:
         "🚀 Physics Lab",  
         "🔢 Math Lab",  
         "💸 Learn Finance", 
-        "📈 App Website Builder",  
+        "📈 Startup App Website Builder",  
         "🔐 Login / Sign Up"
     ])
     st.markdown("---")
@@ -7074,8 +7074,8 @@ with st.sidebar:
 # ---- routes: one unique screen per feature ----
 if mode == "🔐 Login / Sign Up":
     render_login_signup(); st.stop() 
-if mode == "💸 App Website Builder":
-    render_app_websitebuilder(client); st.stop() 
+if mode == "💸Startup App Website Builder":
+    render_startupapp_websitebuilder(client); st.stop() 
 if mode == "💸 Learn Finance":
     render_learn_finance(client); st.stop()   
 if mode == "🔢 Math Lab":
