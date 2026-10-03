@@ -3313,7 +3313,7 @@ def render_learn_finance(client):
                              f"Keep it engaging and modern (include AI in finance, Web3, etc.)."
                     
                     try:
-                        response = client.chat.completions.create(model="llama-3.3-70b-versatile", messages=[{"role": "user", "content": prompt}], temperature=0.7, max_tokens=1000)
+                        response = client.chat.completions.create(model="openai/gpt-oss-120b", messages=[{"role": "user", "content": prompt}], temperature=0.7, max_tokens=1000)
                         st.info("AI Response:")
                         # Typewriter effect apply kiya
                         typewriter_effect(response.choices[0].message.content)
