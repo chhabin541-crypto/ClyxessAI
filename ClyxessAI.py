@@ -3581,166 +3581,7 @@ def render_startup_app_websitebuilder():
             st.session_state[k] = v
 
     # ============================================================
-    # STAGE 1: CLEAN INPUT (Emergent jaisa)
-    # ============================================================
-    if st.session_state.em_stage == "input":
-        st.markdown("""
-        <div style="text-align:center; padding:60px 20px 30px 20px;">
-            <h1 style="font-size:38px; font-weight:900; color:#e2e8f0; margin:0;">
-                Start with one prompt.
-            </h1>
-            <p style="color:#64748b; margin-top:8px; font-size:15px;">
-                We'll bring your idea to life.
-            </p>
-        </div>
-        """, unsafe_allow_html=True)
-
-        col1, col2, col3 = st.columns([1, 3, 1])
-        with col2:
-            # Type toggle
-            em_type = st.radio(
-                "Type",
-                ["🌐 Web app", "📱 Mobile app"],
-                horizontal=True,
-                label_visibility="collapsed"
-            )
-            st.session_state.em_type = em_type
-
-            # Prompt box
-            prompt = st.text_area(
-                "Prompt",
-                placeholder="Describe your idea — we will bring it to life...",
-                height=140,
-                label_visibility="collapsed",
-                key="em_input_box"
-            )
-
-            # Generate button
-            if st.button("✨ Generate", use_container_width=True, type="primary"):
-                if not prompt.strip():
-                    st.warning("Pehle idea likho bhai")
-                else:
-                    st.session_state.em_prompt = prompt
-                    st.session_state.em_stage = "loading"
-                    st.rerun()
-
-        # Example prompts
-        st.markdown("<br>", unsafe_allow_html=True)
-        st.markdown("""
-        <p style="text-align:center; color:#64748b; font-size:13px;">Not sure where to start? Try these:</p>
-        """, unsafe_allow_html=True)
-
-        ex_col1, ex_col2, ex_col3 = st.columns(3)
-        examples = [
-            "🍔 Food delivery website",
-            "☕ Coffee shop landing page",
-            "📚 Library management app"
-        ]
-        for col, ex in zip([ex_col1, ex_col2, ex_col3], examples):
-            with col:
-                if st.button(ex, use_container_width=True, key=f"ex_{ex}"):
-                    st.session_state.em_prompt = ex.split(" ", 1)[1]
-                    st.session_state.em_stage = "loading"
-                    st.rerun()
-
-    # ============================================================
-    # STAGE 2: LOADING
-    # ============================================================
-    elif st.session_state.em_stage == "loading":
-        st.markdown("""
-        <div style="text-align:center; padding:180px 20px;">
-            <div style="font-size:50px;">⚙️</div>
-            <h2 style="color:#10b981; margin-top:20px;">Building your app...</h2>
-            <p style="color:#64748b;">AI is writing your code, please wait</p>
-        </div>
-        """, unsafe_allow_html=True)
-
-        with st.spinner("Generating..."):
-            html = generate_html(st.session_state.em_prompt, st.session_state.em_type, GROQ_API_KEY)
-
-        st.session_state.em_html = html
-        st.session_state.em_stage = "preview"
-        st.rerun()
-
-    # ============================================================
-    # STAGE 3: PREVIEW (Emergent jaisa - chat left, preview right)
-    # ============================================================
-    else:
-        # Top bar
-        col_a, col_b, col_c = st.columns([3, 1, 1])
-        with col_a:
-            st.markdown(f"**💬 {st.session_state.em_prompt[:60]}**")
-        with col_b:
-            if st.button("🔄 New", use_container_width=True):
-                st.session_state.em_stage = "input"
-                st.session_state.em_html = ""
-                st.rerun()
-        with col_c:
-            st.download_button(
-                "📥 Download",
-                data=st.session_state.em_html,
-                file_name="index.html",
-                mime="text/html",
-                use_container_width=True
-            )
-
-        st.markdown("---")
-
-        # Preview
-        components.html(st.session_state.em_html, height=700, scrolling=True)
-
-
-    # ============================================================
-    # GENERATOR FUNCTION
-    # ============================================================
-    def generate_html(prompt, build_type, api_key):
-        SYSTEM = f"""You are an expert web developer. Generate a COMPLETE modern website.
-
-USER REQUEST: {prompt}
-TYPE: {build_type}
-
-RULES:
-1. Use Tailwind CSS CDN: <script src="https://cdn.tailwindcss.com"></script>
-2. Use FontAwesome for icons
-3. Build FULL website with:
-   - Sticky navbar (logo + menu + CTA button)
-   - Hero section (big heading + subtitle + 2 buttons)
-   - 3-4 feature cards with icons
-   - About/Services section
-   - Contact form
-   - Footer
-4. Dark theme: bg-slate-950, emerald-500 accents
-5. Mobile responsive
-6. Real content (not lorem ipsum) based on: {prompt}
-
-Return ONLY JSON: {{"html": "<!DOCTYPE html>...full code..."}}
-"""
-
-        if api_key:
-            try:
-                from groq import Groq
-                client = Groq(api_key=api_key)
-                res = client.chat.completions.create(
-                    messages=[
-                        {"role": "system", "content": "Return valid JSON only."},
-                        {"role": "user", "content": SYSTEM}
-                    ],
-                    model="llama-3.3-70b-versatile",
-                    temperature=0.7,
-                    max_tokens=8000,
-                    response_format={"type": "json_object"}
-                )
-                data = json.loads(res.choices[0].message.content.strip())
-                if "html" in data and len(data["html"]) > 500:
-                    return data["html"]
-            except Exception as e:
-                st.warning(f"AI error, using fallback: {str(e)[:80]}")
-
-        return fallback_html(prompt)
-
-
-    # ============================================================
-    # FALLBACK (proper 7-section website)
+    # FUNCTIONS — SABSE PEHLE DEFINE (Yeh fix hai!)
     # ============================================================
     def fallback_html(prompt):
         title = prompt.title()[:50]
@@ -3805,6 +3646,145 @@ Return ONLY JSON: {{"html": "<!DOCTYPE html>...full code..."}}
 <footer class="border-t border-slate-800 px-6 py-8 text-center text-sm text-slate-500">
 <p>© 2026 {title}. Built with Clyxess AI</p></footer>
 </body></html>'''
+
+    def generate_html(prompt, build_type, api_key):
+        SYSTEM = f"""You are an expert web developer. Generate a COMPLETE modern website.
+
+USER REQUEST: {prompt}
+TYPE: {build_type}
+
+RULES:
+1. Use Tailwind CSS CDN: <script src="https://cdn.tailwindcss.com"></script>
+2. Use FontAwesome for icons
+3. Build FULL website with:
+   - Sticky navbar (logo + menu + CTA button)
+   - Hero section (big heading + subtitle + 2 buttons)
+   - 3-4 feature cards with icons
+   - About/Services section
+   - Contact form
+   - Footer
+4. Dark theme: bg-slate-950, emerald-500 accents
+5. Mobile responsive
+6. Real content (not lorem ipsum) based on: {prompt}
+
+Return ONLY JSON: {{"html": "<!DOCTYPE html>...full code..."}}
+"""
+        if api_key:
+            try:
+                from groq import Groq
+                client = Groq(api_key=api_key)
+                res = client.chat.completions.create(
+                    messages=[
+                        {"role": "system", "content": "Return valid JSON only."},
+                        {"role": "user", "content": SYSTEM}
+                    ],
+                    model="llama-3.3-70b-versatile",
+                    temperature=0.7,
+                    max_tokens=8000,
+                    response_format={"type": "json_object"}
+                )
+                data = json.loads(res.choices[0].message.content.strip())
+                if "html" in data and len(data["html"]) > 500:
+                    return data["html"]
+            except Exception as e:
+                st.warning(f"AI error, using fallback: {str(e)[:80]}")
+        return fallback_html(prompt)
+
+    # ============================================================
+    # STAGE 1: INPUT
+    # ============================================================
+    if st.session_state.em_stage == "input":
+        st.markdown("""
+        <div style="text-align:center; padding:60px 20px 30px 20px;">
+            <h1 style="font-size:38px; font-weight:900; color:#e2e8f0; margin:0;">
+                Start with one prompt.
+            </h1>
+            <p style="color:#64748b; margin-top:8px; font-size:15px;">
+                We'll bring your idea to life.
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
+
+        col1, col2, col3 = st.columns([1, 3, 1])
+        with col2:
+            em_type = st.radio(
+                "Type",
+                ["🌐 Web app", "📱 Mobile app"],
+                horizontal=True,
+                label_visibility="collapsed"
+            )
+            st.session_state.em_type = em_type
+
+            prompt = st.text_area(
+                "Prompt",
+                placeholder="Describe your idea — we will bring it to life...",
+                height=140,
+                label_visibility="collapsed",
+                key="em_input_box"
+            )
+
+            if st.button("✨ Generate", use_container_width=True, type="primary"):
+                if not prompt.strip():
+                    st.warning("Pehle idea likho bhai")
+                else:
+                    st.session_state.em_prompt = prompt
+                    st.session_state.em_stage = "loading"
+                    st.rerun()
+
+        st.markdown("<br>", unsafe_allow_html=True)
+        st.markdown('<p style="text-align:center; color:#64748b; font-size:13px;">Not sure where to start? Try these:</p>', unsafe_allow_html=True)
+
+        ex_col1, ex_col2, ex_col3 = st.columns(3)
+        examples = ["🍔 Food delivery website", "☕ Coffee shop landing page", "📚 Library management app"]
+        for col, ex in zip([ex_col1, ex_col2, ex_col3], examples):
+            with col:
+                if st.button(ex, use_container_width=True, key=f"ex_{ex}"):
+                    st.session_state.em_prompt = ex.split(" ", 1)[1]
+                    st.session_state.em_stage = "loading"
+                    st.rerun()
+
+    # ============================================================
+    # STAGE 2: LOADING
+    # ============================================================
+    elif st.session_state.em_stage == "loading":
+        st.markdown("""
+        <div style="text-align:center; padding:180px 20px;">
+            <div style="font-size:50px;">⚙️</div>
+            <h2 style="color:#10b981; margin-top:20px;">Building your app...</h2>
+            <p style="color:#64748b;">AI is writing your code, please wait</p>
+        </div>
+        """, unsafe_allow_html=True)
+
+        with st.spinner("Generating..."):
+            html = generate_html(st.session_state.em_prompt, st.session_state.em_type, GROQ_API_KEY)
+
+        st.session_state.em_html = html
+        st.session_state.em_stage = "preview"
+        st.rerun()
+
+    # ============================================================
+    # STAGE 3: PREVIEW
+    # ============================================================
+    else:
+        col_a, col_b, col_c = st.columns([3, 1, 1])
+        with col_a:
+            st.markdown(f"**💬 {st.session_state.em_prompt[:60]}**")
+        with col_b:
+            if st.button("🔄 New", use_container_width=True):
+                st.session_state.em_stage = "input"
+                st.session_state.em_html = ""
+                st.rerun()
+        with col_c:
+            st.download_button(
+                "📥 Download",
+                data=st.session_state.em_html,
+                file_name="index.html",
+                mime="text/html",
+                use_container_width=True
+            )
+
+        st.markdown("---")
+        components.html(st.session_state.em_html, height=700, scrolling=True)
 
 def render_math_lab(client):
     import json
