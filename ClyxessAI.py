@@ -3563,7 +3563,8 @@ def render_physics_lab(client):
                     except:
                         reply = "Beta, thodi dikkat aa gayi. Phir se pucho."
                     st.markdown(reply)
-                    st.session_state.phy_doubts.append({"role": "assistant", "content": reply}) 
+                    st.session_state.phy_doubts.append({"role": "assistant", "content": reply})  
+        
 def render_datascienceand_machinelearning():
     import os
     import json
