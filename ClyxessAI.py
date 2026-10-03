@@ -7314,7 +7314,7 @@ with st.sidebar:
 if mode == "🔐 Login / Sign Up":
     render_login_signup(); st.stop() 
 if mode == "📱Startup App Website Builder":
-    render_startup_app_websitebuilder(client); st.stop() 
+    render_startup_app_websitebuilder(); st.stop() 
 if mode == "💸 Learn Finance":
     render_learn_finance(client); st.stop()   
 if mode == "🔢 Math Lab":
