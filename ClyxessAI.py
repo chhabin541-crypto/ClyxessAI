@@ -5150,40 +5150,6 @@ def render_kids_logic_lab():
     </body>
     </html>
     """
-    
-    # Streamlit में HTML को रेंडर करना
-    components.html(HTML_TEMPLATE, height=1200, scrolling=True)
-# 🤖 CLYXESSCHAT AI — LEARN AI
-# FINAL ADVANCED GLOBAL EDITION
-# AGE 5 → UNIVERSITY
-#
-# Features:
-# • Age adaptive AI teaching
-# • School + College + University
-# • AI Fundamentals
-# • Machine Learning
-# • Deep Learning
-# • Generative AI
-# • Prompt Engineering
-# • AI Agents
-# • Multimodal AI
-# • Computer Vision
-# • NLP
-# • Neural Networks
-# • AI Ethics & Safety
-# • Open Source Models
-# • RAG
-# • Fine-tuning Concepts
-# • AI Engineering
-# • AI Research
-# • Adaptive Practice
-# • AI Quiz
-# • Challenges
-# • Project Builder
-# • AI System Designer
-# • Progress / XP / Mastery
-# ============================================================
-
 def render_learn_ai(client):
 
     import streamlit as st
@@ -5192,2274 +5158,645 @@ def render_learn_ai(client):
     import time
 
     # ========================================================
+    # ⭐ LANGUAGE OPTIONS (Indian + European + World)
+    # ========================================================
+    LANGUAGES = [
+        "🌐 Auto Detect (Same as your question)",
+        "🇬🇧 English",
+        "🇮🇳 हिंदी (Hindi)",
+        "🇮🇳 Hinglish (Hindi + English)",
+        "🇮🇳 मराठी (Marathi)",
+        "🇮🇳 বাংলা (Bengali)",
+        "🇮🇳 தமிழ் (Tamil)",
+        "🇮🇳 తెలుగు (Telugu)",
+        "🇮🇳 ગુજરાતી (Gujarati)",
+        "🇮🇳 ಕನ್ನಡ (Kannada)",
+        "🇮🇳 മലയാളം (Malayalam)",
+        "🇮🇳 ਪੰਜਾਬੀ (Punjabi)",
+        "🇮🇳 ଓଡ଼ିଆ (Odia)",
+        "🇮🇳 اردو (Urdu)",
+        "🇮🇳 नेपाली (Nepali)",
+        "🇪🇸 Español (Spanish)",
+        "🇫🇷 Français (French)",
+        "🇩🇪 Deutsch (German)",
+        "🇮🇹 Italiano (Italian)",
+        "🇵🇹 Português (Portuguese)",
+        "🇷🇺 Русский (Russian)",
+        "🇳🇱 Nederlands (Dutch)",
+        "🇸🇪 Svenska (Swedish)",
+        "🇵🇱 Polski (Polish)",
+        "🇹🇷 Türkçe (Turkish)",
+        "🇬🇷 Ελληνικά (Greek)",
+        "🇨🇿 Čeština (Czech)",
+        "🇷🇴 Română (Romanian)",
+        "🇭🇺 Magyar (Hungarian)",
+        "🇺🇦 Українська (Ukrainian)",
+        "🇩🇰 Dansk (Danish)",
+        "🇫🇮 Suomi (Finnish)",
+        "🇳🇴 Norsk (Norwegian)",
+        "🇯🇵 日本語 (Japanese)",
+        "🇨🇳 中文 (Chinese)",
+        "🇰🇷 한국어 (Korean)",
+        "🇸🇦 العربية (Arabic)",
+        "🇮🇱 עברית (Hebrew)",
+        "🇮🇷 فارسی (Persian)",
+    ]
+
+    # ========================================================
     # SESSION STATE
     # ========================================================
-
     state_defaults = {
-
         "ai_teacher_messages": [],
         "ai_selected_topic": "",
         "ai_xp": 0,
-
         "ai_completed_topics": [],
         "ai_mastery": {},
-
         "ai_quiz_data": [],
         "ai_quiz_index": 0,
         "ai_quiz_score": 0,
         "ai_quiz_running": False,
-
         "ai_practice_question": "",
         "ai_practice_answer": "",
         "ai_practice_result": "",
-
         "ai_project_result": "",
         "ai_builder_result": "",
-
         "ai_last_level": "",
-
+        "ai_language": "🌐 Auto Detect (Same as your question)",
     }
 
     for key, value in state_defaults.items():
-
         if key not in st.session_state:
             st.session_state[key] = value
 
     # ========================================================
-    # HEADER
+    # HEADER (Extra description line deleted)
     # ========================================================
-
     st.markdown(
         """
         <div style="
             padding:25px;
             border-radius:20px;
-            background:
-            linear-gradient(
-                135deg,
-                #07152f,
-                #111c48,
-                #29105c
-            );
+            background: linear-gradient(135deg, #07152f, #111c48, #29105c);
             border:1px solid rgba(100,180,255,0.35);
             margin-bottom:20px;
         ">
-
-            <h1 style="
-                color:white;
-                margin:0;
-                font-size:32px;
-            ">
-                🤖 Learn AI
-            </h1>
-
-            <p style="
-                color:#b8d8ff;
-                font-size:16px;
-                margin-top:8px;
-            ">
-                Clyxess AI School — Age 5 to University
-            </p>
-
-            <p style="
-                color:#8ea9cc;
-                font-size:14px;
-                margin-bottom:0;
-            ">
-                Learn → Practice → Build → Test → Master
-            </p>
-
+            <h1 style="color:white; margin:0; font-size:32px;">🤖 Learn AI</h1>
         </div>
         """,
         unsafe_allow_html=True
     )
 
     # ========================================================
-    # AGE / LEVEL
+    # AGE + LANGUAGE ROW
     # ========================================================
+    col_age, col_lang = st.columns([2, 1])
 
-    age_level = st.selectbox(
+    with col_age:
+        age_level = st.selectbox(
+            "🎓 Student Age / Education Level",
+            [
+                "Age 5-6 — Early Explorer",
+                "Age 7-8 — Young Explorer",
+                "Age 9-10 — Young Builder",
+                "Age 11-12 — AI Explorer",
+                "Age 13-15 — AI Builder",
+                "Age 16-18 — Advanced AI",
+                "College — Undergraduate",
+                "University — Advanced / Research"
+            ],
+            key="learn_ai_age_level"
+        )
 
-        "🎓 Student Age / Education Level",
+    with col_lang:
+        language_choice = st.selectbox(
+            "🌐 Response Language",
+            LANGUAGES,
+            key="learn_ai_language_select"
+        )
+        st.session_state.ai_language = language_choice
 
-        [
-
-            "Age 5-6 — Early Explorer",
-            "Age 7-8 — Young Explorer",
-            "Age 9-10 — Young Builder",
-            "Age 11-12 — AI Explorer",
-            "Age 13-15 — AI Builder",
-            "Age 16-18 — Advanced AI",
-            "College — Undergraduate",
-            "University — Advanced / Research"
-
-        ],
-
-        key="learn_ai_age_level"
-    )
+    # Language instruction for AI
+    if "Auto Detect" in language_choice:
+        lang_rule = "Reply in the SAME language as the student's question. If they write English, reply in English. If Hindi, reply in Hindi. If Hinglish, reply in Hinglish."
+    else:
+        clean_lang = language_choice.split(" ", 1)[-1].split("(")[0].strip()
+        lang_rule = f"ALWAYS reply in {clean_lang} ONLY. Do not switch languages. Every heading, every example, every explanation in {clean_lang}."
 
     # ========================================================
     # LEVEL ENGINE
     # ========================================================
-
     level_config = {
-
         "Age 5-6 — Early Explorer": {
-
-            "difficulty": "Very Easy",
-            "style": "Stories, pictures, games, simple examples",
-            "math": False,
-            "coding": False,
-
-            "topics": [
-
-                "What is AI?",
-                "AI Around Me",
-                "Smart Machines",
-                "Patterns",
-                "Images and Recognition",
-                "Voice Assistants",
-                "Robots",
-                "Generative AI Basics",
-                "AI Safety",
-                "AI Creativity"
-
-            ]
+            "difficulty": "Very Easy", "style": "Stories, pictures, games, simple examples",
+            "topics": ["What is AI?", "AI Around Me", "Smart Machines", "Patterns", "Images and Recognition", "Voice Assistants", "Robots", "Generative AI Basics", "AI Safety", "AI Creativity"]
         },
-
         "Age 7-8 — Young Explorer": {
-
-            "difficulty": "Easy",
-            "style": "Stories + examples + simple activities",
-            "math": False,
-            "coding": "Optional",
-
-            "topics": [
-
-                "Artificial Intelligence",
-                "Data",
-                "Patterns",
-                "Machine Learning Basics",
-                "Computer Vision",
-                "Speech AI",
-                "Generative AI",
-                "Prompt Basics",
-                "AI Bias",
-                "AI Safety",
-                "Build a Simple AI Idea"
-
-            ]
+            "difficulty": "Easy", "style": "Stories + examples + simple activities",
+            "topics": ["Artificial Intelligence", "Data", "Patterns", "Machine Learning Basics", "Computer Vision", "Speech AI", "Generative AI", "Prompt Basics", "AI Bias", "AI Safety", "Build a Simple AI Idea"]
         },
-
         "Age 9-10 — Young Builder": {
-
-            "difficulty": "Beginner",
-            "style": "Examples + activities + beginner logic",
-            "math": "Basic",
-            "coding": "Beginner",
-
-            "topics": [
-
-                "AI Fundamentals",
-                "Data and Datasets",
-                "Machine Learning",
-                "Classification",
-                "Computer Vision",
-                "NLP Basics",
-                "Generative AI",
-                "Prompt Engineering",
-                "AI Agents Introduction",
-                "Neural Network Basics",
-                "AI Ethics",
-                "AI Project"
-
-            ]
+            "difficulty": "Beginner", "style": "Examples + activities + beginner logic",
+            "topics": ["AI Fundamentals", "Data and Datasets", "Machine Learning", "Classification", "Computer Vision", "NLP Basics", "Generative AI", "Prompt Engineering", "AI Agents Introduction", "Neural Network Basics", "AI Ethics", "AI Project"]
         },
-
         "Age 11-12 — AI Explorer": {
-
-            "difficulty": "Intermediate",
-            "style": "Concepts + experiments + beginner coding",
-            "math": "Basic",
-            "coding": "Python / Block Coding",
-
-            "topics": [
-
-                "AI Fundamentals",
-                "Machine Learning",
-                "Training Data",
-                "Supervised Learning",
-                "Unsupervised Learning",
-                "Classification",
-                "Regression",
-                "Neural Networks",
-                "Computer Vision",
-                "NLP",
-                "Generative AI",
-                "Prompt Engineering",
-                "AI Agents",
-                "AI Ethics",
-                "AI Project"
-
-            ]
+            "difficulty": "Intermediate", "style": "Concepts + experiments + beginner coding",
+            "topics": ["AI Fundamentals", "Machine Learning", "Training Data", "Supervised Learning", "Unsupervised Learning", "Classification", "Regression", "Neural Networks", "Computer Vision", "NLP", "Generative AI", "Prompt Engineering", "AI Agents", "AI Ethics", "AI Project"]
         },
-
         "Age 13-15 — AI Builder": {
-
-            "difficulty": "Intermediate-Advanced",
-            "style": "Technical concepts + coding + projects",
-            "math": "Intermediate",
-            "coding": "Python",
-
-            "topics": [
-
-                "Machine Learning",
-                "Datasets",
-                "Data Preprocessing",
-                "Regression",
-                "Classification",
-                "Clustering",
-                "Neural Networks",
-                "Deep Learning",
-                "CNN",
-                "Computer Vision",
-                "NLP",
-                "Transformers Basics",
-                "Generative AI",
-                "Prompt Engineering",
-                "AI Agents",
-                "RAG Introduction",
-                "AI Safety",
-                "AI Project"
-
-            ]
+            "difficulty": "Intermediate-Advanced", "style": "Technical concepts + coding + projects",
+            "topics": ["Machine Learning", "Datasets", "Data Preprocessing", "Regression", "Classification", "Clustering", "Neural Networks", "Deep Learning", "CNN", "Computer Vision", "NLP", "Transformers Basics", "Generative AI", "Prompt Engineering", "AI Agents", "RAG Introduction", "AI Safety", "AI Project"]
         },
-
         "Age 16-18 — Advanced AI": {
-
-            "difficulty": "Advanced",
-            "style": "Technical + mathematical + engineering",
-            "math": "Advanced",
-            "coding": "Python",
-
-            "topics": [
-
-                "Machine Learning",
-                "Probability for AI",
-                "Statistics for AI",
-                "Linear Algebra Basics",
-                "Data Preprocessing",
-                "Feature Engineering",
-                "Regression",
-                "Classification",
-                "Clustering",
-                "Neural Networks",
-                "Deep Learning",
-                "CNN",
-                "RNN",
-                "Transformers",
-                "Computer Vision",
-                "NLP",
-                "LLMs",
-                "Generative AI",
-                "Prompt Engineering",
-                "RAG",
-                "AI Agents",
-                "Multimodal AI",
-                "Model Evaluation",
-                "AI Ethics",
-                "AI Research Project"
-
-            ]
+            "difficulty": "Advanced", "style": "Technical + mathematical + engineering",
+            "topics": ["Machine Learning", "Probability for AI", "Statistics for AI", "Linear Algebra Basics", "Data Preprocessing", "Feature Engineering", "Regression", "Classification", "Clustering", "Neural Networks", "Deep Learning", "CNN", "RNN", "Transformers", "Computer Vision", "NLP", "LLMs", "Generative AI", "Prompt Engineering", "RAG", "AI Agents", "Multimodal AI", "Model Evaluation", "AI Ethics", "AI Research Project"]
         },
-
         "College — Undergraduate": {
-
-            "difficulty": "Advanced",
-            "style": "Engineering + mathematics + implementation",
-            "math": "Advanced",
-            "coding": "Python / ML",
-
-            "topics": [
-
-                "AI Foundations",
-                "Probability",
-                "Statistics",
-                "Linear Algebra",
-                "Calculus for ML",
-                "Optimization",
-                "Machine Learning",
-                "Supervised Learning",
-                "Unsupervised Learning",
-                "Reinforcement Learning",
-                "Feature Engineering",
-                "Model Selection",
-                "Neural Networks",
-                "Deep Learning",
-                "CNN",
-                "RNN",
-                "Transformers",
-                "Attention Mechanism",
-                "NLP",
-                "Computer Vision",
-                "Generative AI",
-                "LLMs",
-                "Prompt Engineering",
-                "Embeddings",
-                "Vector Databases",
-                "RAG",
-                "AI Agents",
-                "Multimodal AI",
-                "Model Evaluation",
-                "MLOps",
-                "AI Security",
-                "AI Ethics",
-                "AI Project"
-
-            ]
+            "difficulty": "Advanced", "style": "Engineering + mathematics + implementation",
+            "topics": ["AI Foundations", "Probability", "Statistics", "Linear Algebra", "Calculus for ML", "Optimization", "Machine Learning", "Supervised Learning", "Unsupervised Learning", "Reinforcement Learning", "Feature Engineering", "Model Selection", "Neural Networks", "Deep Learning", "CNN", "RNN", "Transformers", "Attention Mechanism", "NLP", "Computer Vision", "Generative AI", "LLMs", "Prompt Engineering", "Embeddings", "Vector Databases", "RAG", "AI Agents", "Multimodal AI", "Model Evaluation", "MLOps", "AI Security", "AI Ethics", "AI Project"]
         },
-
         "University — Advanced / Research": {
-
-            "difficulty": "Research / Expert",
-            "style": "Research + engineering + mathematical depth",
-            "math": "Advanced",
-            "coding": "Advanced",
-
-            "topics": [
-
-                "Advanced Machine Learning",
-                "Statistical Learning Theory",
-                "Optimization",
-                "Linear Algebra",
-                "Probability",
-                "Deep Learning",
-                "CNN Architectures",
-                "Sequence Models",
-                "Attention",
-                "Transformers",
-                "Large Language Models",
-                "Tokenization",
-                "Embeddings",
-                "Vector Search",
-                "RAG",
-                "AI Agents",
-                "Agentic Systems",
-                "Multimodal AI",
-                "Computer Vision",
-                "NLP",
-                "Reinforcement Learning",
-                "Fine-Tuning",
-                "Parameter Efficient Fine-Tuning",
-                "Open Source Models",
-                "Model Evaluation",
-                "AI Safety",
-                "AI Alignment",
-                "AI Security",
-                "MLOps",
-                "AI System Architecture",
-                "Research Methodology",
-                "AI Research Project"
-
-            ]
+            "difficulty": "Research / Expert", "style": "Research + engineering + mathematical depth",
+            "topics": ["Advanced Machine Learning", "Statistical Learning Theory", "Optimization", "Linear Algebra", "Probability", "Deep Learning", "CNN Architectures", "Sequence Models", "Attention", "Transformers", "Large Language Models", "Tokenization", "Embeddings", "Vector Search", "RAG", "AI Agents", "Agentic Systems", "Multimodal AI", "Computer Vision", "NLP", "Reinforcement Learning", "Fine-Tuning", "Parameter Efficient Fine-Tuning", "Open Source Models", "Model Evaluation", "AI Safety", "AI Alignment", "AI Security", "MLOps", "AI System Architecture", "Research Methodology", "AI Research Project"]
         }
-
     }
 
     config = level_config[age_level]
-
     topics = config["topics"]
 
-    # ========================================================
-    # CURRENT LEVEL CHANGE RESET
-    # ========================================================
-
+    # Reset chat on level change
     if st.session_state.ai_last_level != age_level:
-
         st.session_state.ai_last_level = age_level
-
         st.session_state.ai_teacher_messages = []
 
     # ========================================================
     # PROGRESS
     # ========================================================
-
-    completed_count = len(
-        st.session_state.ai_completed_topics
-    )
-
+    completed_count = len(st.session_state.ai_completed_topics)
     xp = st.session_state.ai_xp
-
     topic_count = len(topics)
-
-    progress = min(
-        completed_count / topic_count,
-        1
-    ) if topic_count else 0
-
-    # ========================================================
-    # TOP METRICS
-    # ========================================================
+    progress = min(completed_count / topic_count, 1) if topic_count else 0
 
     c1, c2, c3, c4 = st.columns(4)
-
-    with c1:
-        st.metric(
-            "⭐ XP",
-            xp
-        )
-
-    with c2:
-        st.metric(
-            "📚 Topics",
-            topic_count
-        )
-
-    with c3:
-        st.metric(
-            "✅ Completed",
-            completed_count
-        )
-
-    with c4:
-        st.metric(
-            "🎓 Level",
-            config["difficulty"]
-        )
+    with c1: st.metric("⭐ XP", xp)
+    with c2: st.metric("📚 Topics", topic_count)
+    with c3: st.metric("✅ Completed", completed_count)
+    with c4: st.metric("🎓 Level", config["difficulty"])
 
     st.progress(progress)
 
     # ========================================================
     # TABS
     # ========================================================
-
-    (
-        tab_path,
-        tab_teacher,
-        tab_practice,
-        tab_quiz,
-        tab_agent,
-        tab_project,
-        tab_ethics,
-        tab_progress
-
-    ) = st.tabs(
-
-        [
-
-            "🗺️ Learning Path",
-            "👨‍🏫 AI Teacher",
-            "🧪 Practice",
-            "📝 Assessment",
-            "🤖 Agent Builder",
-            "🛠️ Project Lab",
-            "🔐 AI Ethics",
-            "📊 Progress"
-
-        ]
-
-    )
+    (tab_path, tab_teacher, tab_practice, tab_quiz, tab_agent, tab_project, tab_ethics, tab_progress) = st.tabs([
+        "🗺️ Learning Path", "👨‍🏫 AI Teacher", "🧪 Practice", "📝 Assessment",
+        "🤖 Agent Builder", "🛠️ Project Lab", "🔐 AI Ethics", "📊 Progress"
+    ])
 
     # ========================================================
-    # TAB 1
-    # LEARNING PATH
+    # TAB 1: LEARNING PATH
     # ========================================================
-
     with tab_path:
-
-        st.subheader(
-            "🗺️ Personal AI Learning Path"
-        )
-
-        st.write(
-            f"""
-            **Level:** {age_level}
-
-            **Teaching style:** {config["style"]}
-
-            **Difficulty:** {config["difficulty"]}
-            """
-        )
-
+        st.subheader("🗺️ Personal AI Learning Path")
+        st.write(f"**Level:** {age_level}\n\n**Teaching style:** {config['style']}\n\n**Difficulty:** {config['difficulty']}")
         st.divider()
-
-        st.markdown(
-            """
-            ### 🧠 Clyxess Learning Method
-
-            **1. Understand**
-
-            Concept ko simple language mein samjho.
-
-            **2. See**
-
-            Real-world example dekho.
-
-            **3. Try**
-
-            Khud answer ya activity karo.
-
-            **4. Challenge**
-
-            AI tumhe challenge dega.
-
-            **5. Build**
-
-            Concept ko project mein use karo.
-
-            **6. Test**
-
-            Quiz aur practical assessment.
-
-            **7. Master**
-
-            Weak topics dobara practice.
-
-            **8. Create**
-
-            Apna project banao.
-            """
-        )
-
+        st.markdown("""
+        ### 🧠 Clyxess Learning Method
+        **1. Understand** — Concept ko simple language mein samjho.
+        **2. See** — Real-world example dekho.
+        **3. Try** — Khud answer ya activity karo.
+        **4. Challenge** — AI tumhe challenge dega.
+        **5. Build** — Concept ko project mein use karo.
+        **6. Test** — Quiz aur practical assessment.
+        **7. Master** — Weak topics dobara practice.
+        **8. Create** — Apna project banao.
+        """)
         st.divider()
 
         for index, topic in enumerate(topics):
+            topic_id = f"{age_level}::{topic}"
+            completed = topic_id in st.session_state.ai_completed_topics
+            mastery = st.session_state.ai_mastery.get(topic_id, 0)
 
-            topic_id = (
-                f"{age_level}::{topic}"
-            )
-
-            completed = (
-                topic_id
-                in st.session_state.ai_completed_topics
-            )
-
-            mastery = st.session_state.ai_mastery.get(
-                topic_id,
-                0
-            )
-
-            col1, col2, col3 = st.columns(
-                [0.6, 5, 1.5]
-            )
-
+            col1, col2, col3 = st.columns([0.6, 5, 1.5])
             with col1:
-
-                if completed:
-                    st.write("✅")
-
-                else:
-                    st.write(
-                        f"**{index + 1}**"
-                    )
-
+                st.write("✅" if completed else f"**{index + 1}**")
             with col2:
-
-                st.write(
-                    f"**{topic}**"
-                )
-
-                st.progress(
-                    min(mastery / 100, 1)
-                )
-
+                st.write(f"**{topic}**")
+                st.progress(min(mastery / 100, 1))
             with col3:
-
-                if st.button(
-                    "Learn",
-                    key=f"topic_learn_{index}_{age_level}"
-                ):
-
+                if st.button("Learn", key=f"topic_learn_{index}_{age_level}"):
                     st.session_state.ai_selected_topic = topic
-
                     st.session_state.ai_teacher_messages = []
-
                     st.rerun()
 
     # ========================================================
-    # TAB 2
-    # AI TEACHER
+    # TAB 2: AI TEACHER
     # ========================================================
-
     with tab_teacher:
+        st.subheader("👨‍🏫 Personal AI Teacher")
 
-        st.subheader(
-            "👨‍🏫 Personal AI Teacher"
-        )
-
-        selected_topic = (
-            st.session_state.ai_selected_topic
-        )
-
+        selected_topic = st.session_state.ai_selected_topic
         if selected_topic:
-
-            st.success(
-                f"🎯 Current Topic: {selected_topic}"
-            )
-
+            st.success(f"🎯 Current Topic: {selected_topic}")
         else:
+            st.info("Learning Path se topic select karo ya directly question pucho.")
 
-            st.info(
-                "Learning Path se topic select karo "
-                "ya directly question pucho."
-            )
-
-        # ----------------------------------------------------
-        # QUICK TOPICS
-        # ----------------------------------------------------
-
-        st.write(
-            "### ⚡ Quick Start"
-        )
-
-        quick_topics = [
-
-            "AI kya hai?",
-            "Machine Learning",
-            "Neural Network",
-            "Generative AI",
-            "Prompt Engineering",
-            "AI Agents",
-            "Computer Vision",
-            "NLP",
-            "RAG",
-            "Multimodal AI"
-
-        ]
+        st.write("### ⚡ Quick Start")
+        quick_topics = ["AI kya hai?", "Machine Learning", "Neural Network", "Generative AI", "Prompt Engineering",
+                       "AI Agents", "Computer Vision", "NLP", "RAG", "Multimodal AI"]
 
         quick_cols = st.columns(5)
-
         selected_quick = None
-
-        for i, topic in enumerate(
-            quick_topics
-        ):
-
+        for i, topic in enumerate(quick_topics):
             with quick_cols[i % 5]:
-
-                if st.button(
-                    topic,
-                    key=f"quick_topic_{i}_{age_level}"
-                ):
-
+                if st.button(topic, key=f"quick_topic_{i}_{age_level}"):
                     selected_quick = topic
 
-        # ----------------------------------------------------
-        # CHAT HISTORY
-        # ----------------------------------------------------
-
         for msg in st.session_state.ai_teacher_messages:
+            with st.chat_message(msg["role"]):
+                st.markdown(msg["content"])
 
-            with st.chat_message(
-                msg["role"]
-            ):
-
-                st.markdown(
-                    msg["content"]
-                )
-
-        user_input = st.chat_input(
-            "AI ke baare mein kuch bhi pucho..."
-        )
-
+        user_input = st.chat_input("AI ke baare mein kuch bhi pucho...")
         if selected_quick:
-
             user_input = selected_quick
 
-        # ----------------------------------------------------
-        # TEACHING ENGINE
-        # ----------------------------------------------------
-
         if user_input:
+            st.session_state.ai_teacher_messages.append({"role": "user", "content": user_input})
+            with st.chat_message("user"):
+                st.markdown(user_input)
 
-            st.session_state.ai_teacher_messages.append(
-                {
-                    "role": "user",
-                    "content": user_input
-                }
-            )
-
-            with st.chat_message(
-                "user"
-            ):
-
-                st.markdown(
-                    user_input
-                )
-
-            with st.chat_message(
-                "assistant"
-            ):
-
-                with st.spinner(
-                    "🤖 Personal AI Teacher soch raha hai..."
-                ):
-
+            with st.chat_message("assistant"):
+                with st.spinner("🤖 Personal AI Teacher soch raha hai..."):
                     teacher_prompt = f"""
-
 You are Clyxess AI School's Personal AI Teacher.
 
-============================================================
-STUDENT
-============================================================
-
-Education level:
-{age_level}
-
-Difficulty:
-{config["difficulty"]}
-
-Teaching style:
-{config["style"]}
-
-Current topic:
-{selected_topic or "General AI"}
-
-============================================================
-MISSION
-============================================================
-
-Teach the student according to their real developmental
-and educational level.
-
-The same AI system must successfully teach:
-
-• Age 5
-• Age 6
-• Age 7
-• Age 8
-• Age 9
-• Age 10
-• Age 11
-• Age 12
-• Age 13
-• Age 14
-• Age 15
-• Age 16
-• Age 17
-• Age 18
-• College
-• University
-• Advanced researchers
-
-Never give every learner the same explanation.
-
-============================================================
-AGE 5-6
-============================================================
-
-Use:
-
-• very simple words
-• stories
-• toys
-• animals
-• colors
-• family examples
-• games
-• imagination
-
-Avoid:
-
-• complicated mathematics
-• technical jargon
-• long explanations
-• advanced code
-
-Teach ideas such as:
-
-AI can recognize patterns.
-Machines can follow instructions.
-Computers can learn from examples.
-
-============================================================
-AGE 7-8
-============================================================
-
-Use:
-
-• simple explanations
-• everyday technology
-• mini activities
-• pattern games
-• visual thinking
-
-Introduce:
-
-• data
-• patterns
-• machine learning
-• robots
-• computer vision
-• generative AI
-
-============================================================
-AGE 9-10
-============================================================
-
-Introduce:
-
-• datasets
-• classification
-• basic algorithms
-• computer vision
-• NLP
-• prompts
-• neural networks
-
-Use beginner coding only when useful.
-
-============================================================
-AGE 11-12
-============================================================
-
-Introduce:
-
-• Python
-• machine learning
-• training data
-• supervised learning
-• regression
-• classification
-• neural networks
-• generative AI
-• AI agents
-
-============================================================
-AGE 13-15
-============================================================
-
-Use:
-
-• Python
-• algorithms
-• datasets
-• model training
-• neural networks
-• deep learning
-• CNN
-• NLP
-• transformers
-• AI agents
-• RAG
-
-============================================================
-AGE 16-18
-============================================================
-
-Use:
-
-• mathematical intuition
-• probability
-• statistics
-• vectors
-• optimization
-• ML pipelines
-• deep learning
-• transformers
-• LLMs
-• RAG
-• agents
-• evaluation
-
-============================================================
-COLLEGE
-============================================================
-
-Teach:
-
-• mathematics for AI
-• ML algorithms
-• deep learning
-• optimization
-• CNN
-• RNN
-• transformers
-• embeddings
-• vector databases
-• RAG
-• agents
-• multimodal AI
-• MLOps
-• deployment
-• evaluation
-
-Use technical terminology and implementation thinking.
-
-============================================================
-UNIVERSITY / RESEARCH
-============================================================
-
-Teach deeply:
-
-• statistical learning
-• optimization
-• representation learning
-• attention
-• transformers
-• LLM architecture
-• embeddings
-• retrieval
-• RAG
-• agentic systems
-• multimodal models
-• fine-tuning concepts
-• PEFT
-• open-source models
-• reinforcement learning
-• model evaluation
-• safety
-• alignment
-• AI security
-• MLOps
-• research methodology
-
-When mathematics is useful, explain the intuition
-and then the mathematics.
-
-============================================================
-TEACHING RULES
-============================================================
-
-Never simply dump information.
-
-Use:
-
-CONCEPT
-↓
-REAL WORLD EXAMPLE
-↓
-SIMPLE EXPLANATION
-↓
-STUDENT QUESTION
-↓
-PRACTICE
-↓
-FEEDBACK
-↓
-CHALLENGE
-↓
-MASTERY
-
-If the student is solving a problem:
-
-DO NOT immediately give the final answer.
-
-Use:
-
-Hint 1
-↓
-Guiding question
-↓
-Hint 2
-↓
-Small example
-↓
-Student attempt
-↓
-Feedback
-
-Only reveal the full solution when appropriate.
-
-============================================================
-AI AGENTS
-============================================================
-
-Explain agent systems as:
-
-GOAL
-↓
-PLAN
-↓
-MEMORY
-↓
-TOOLS
-↓
-ACTION
-↓
-OBSERVATION
-↓
-REFLECTION
-↓
-NEXT ACTION
-
-For advanced students explain:
-
-• tool calling
-• orchestration
-• planning
-• memory
-• retrieval
-• evaluation
-• guardrails
-• human approval
-
-============================================================
-GENERATIVE AI
-============================================================
-
-Explain according to level:
-
-• prompts
-• tokens
-• context
-• generation
-• embeddings
-• transformers
-• LLMs
-• multimodal models
-• limitations
-
-============================================================
-ETHICS
-============================================================
-
-Teach:
-
-• privacy
-• bias
-• fairness
-• misinformation
-• hallucination
-• copyright
-• security
-• responsible AI
-• human oversight
-
-============================================================
-IMPORTANT
-============================================================
-
-Never pretend AI output is guaranteed correct.
-
-Encourage verification.
-
-Never make the student dependent on the AI.
-
-The goal is:
-
-UNDERSTAND
-THINK
-SOLVE
-CREATE
-BECOME INDEPENDENT
-
-Use the student's language naturally.
-
-If student uses Hindi/Hinglish:
-reply in Hindi/Hinglish.
-
-If student uses English:
-reply in English.
-
-Keep response length appropriate to age.
-
+STUDENT:
+Education level: {age_level}
+Difficulty: {config["difficulty"]}
+Teaching style: {config["style"]}
+Current topic: {selected_topic or "General AI"}
+
+🌐 LANGUAGE RULE (MOST IMPORTANT):
+{lang_rule}
+
+TEACHING APPROACH:
+- Match the student's education level
+- For young kids (5-8): very simple words, stories, toys, no coding
+- For ages 9-12: examples, beginner coding, simple concepts
+- For teens (13-18): technical concepts, Python, math intuition
+- For college/university: deep technical, math, implementation
+
+STRUCTURE:
+CONCEPT → REAL WORLD EXAMPLE → SIMPLE EXPLANATION → PRACTICE → CHALLENGE
+
+RULES:
+- Never dump information
+- Never give final answer immediately — use hints
+- Encourage independent thinking
+- Keep response length age-appropriate
 """
-
-                    messages = [
-
-                        {
-                            "role": "system",
-                            "content": teacher_prompt
-                        }
-
-                    ]
-
-                    messages.extend(
-                        st.session_state.ai_teacher_messages[-10:]
-                    )
+                    messages = [{"role": "system", "content": teacher_prompt}]
+                    messages.extend(st.session_state.ai_teacher_messages[-10:])
 
                     try:
-
                         completion = client.chat.completions.create(
-
-                            model="llama-3.3-70b-versatile",
-
+                            model="openai/gpt-oss-120b",
                             messages=messages,
-
                             temperature=0.65,
-
                             max_tokens=2200
-
                         )
+                        reply = completion.choices[0].message.content
+                    except Exception as e:
+                        reply = f"⚠️ AI Teacher error: {type(e).__name__}: {str(e)[:150]}"
 
-                        reply = (
-                            completion
-                            .choices[0]
-                            .message
-                            .content
-                        )
-
-                    except Exception:
-
-                        reply = (
-                            "⚠️ AI Teacher abhi available nahi hai. "
-                            "Please thodi der baad try karo."
-                        )
-
-                    st.markdown(
-                        reply
-                    )
-
-                    st.session_state.ai_teacher_messages.append(
-                        {
-                            "role": "assistant",
-                            "content": reply
-                        }
-                    )
+                    st.markdown(reply)
+                    st.session_state.ai_teacher_messages.append({"role": "assistant", "content": reply})
 
     # ========================================================
-    # TAB 3
-    # ADAPTIVE PRACTICE
+    # TAB 3: PRACTICE
     # ========================================================
-
     with tab_practice:
+        st.subheader("🧪 Adaptive AI Practice")
 
-        st.subheader(
-            "🧪 Adaptive AI Practice"
-        )
+        practice_topic = st.selectbox("📚 Topic", topics, key="adaptive_practice_topic")
+        difficulty = st.select_slider("🎯 Difficulty",
+            ["Very Easy", "Easy", "Medium", "Hard", "Expert"],
+            value="Medium", key="adaptive_difficulty")
 
-        practice_topic = st.selectbox(
-
-            "📚 Topic",
-
-            topics,
-
-            key="adaptive_practice_topic"
-
-        )
-
-        difficulty = st.select_slider(
-
-            "🎯 Difficulty",
-
-            [
-
-                "Very Easy",
-                "Easy",
-                "Medium",
-                "Hard",
-                "Expert"
-
-            ],
-
-            value="Medium",
-
-            key="adaptive_difficulty"
-
-        )
-
-        if st.button(
-            "🎯 Generate Challenge",
-            key="generate_adaptive_challenge"
-        ):
-
+        if st.button("🎯 Generate Challenge", key="generate_adaptive_challenge"):
             prompt = f"""
-
 Create one adaptive learning challenge.
 
-Student:
-{age_level}
+Student: {age_level}
+Topic: {practice_topic}
+Difficulty: {difficulty}
 
-Topic:
-{practice_topic}
-
-Difficulty:
-{difficulty}
-
-Rules:
-
-• Age appropriate
-• Test understanding
-• Real-world context
-• Do not immediately reveal answer
-• Give one small hint
-• Encourage independent thinking
+🌐 LANGUAGE: {lang_rule}
 
 Format:
-
 🎯 CHALLENGE
-
 💡 HINT
-
 🧠 WHAT TO THINK ABOUT
-
 """
-
             try:
-
                 result = client.chat.completions.create(
-
-                    model="llama-3.3-70b-versatile",
-
-                    messages=[
-                        {
-                            "role": "user",
-                            "content": prompt
-                        }
-                    ],
-
-                    temperature=0.7,
-                    max_tokens=1200
-
+                    model="openai/gpt-oss-120b",
+                    messages=[{"role": "user", "content": prompt}],
+                    temperature=0.7, max_tokens=1200
                 )
-
-                st.session_state.ai_practice_question = (
-                    result.choices[0]
-                    .message
-                    .content
-                )
-
+                st.session_state.ai_practice_question = result.choices[0].message.content
                 st.session_state.ai_practice_result = ""
-
-            except:
-
-                st.error(
-                    "Challenge generate nahi ho paya."
-                )
+            except Exception as e:
+                st.error(f"❌ Challenge failed: {type(e).__name__}: {str(e)[:150]}")
 
         if st.session_state.ai_practice_question:
+            st.markdown(st.session_state.ai_practice_question)
+            answer = st.text_area("✍️ Apna solution likho", key="adaptive_answer")
 
-            st.markdown(
-                st.session_state.ai_practice_question
-            )
-
-            answer = st.text_area(
-                "✍️ Apna solution likho",
-                key="adaptive_answer"
-            )
-
-            if st.button(
-                "🔍 Check My Answer",
-                key="check_adaptive_answer"
-            ):
-
+            if st.button("🔍 Check My Answer", key="check_adaptive_answer"):
                 if not answer.strip():
-
-                    st.warning(
-                        "Pehle apna answer likho."
-                    )
-
+                    st.warning("Pehle apna answer likho.")
                 else:
-
                     evaluation = f"""
-
 You are an educational evaluator.
+Student: {age_level} | Topic: {practice_topic}
+🌐 LANGUAGE: {lang_rule}
 
-Student:
-{age_level}
+Challenge: {st.session_state.ai_practice_question}
+Student answer: {answer}
 
-Topic:
-{practice_topic}
-
-Challenge:
-{st.session_state.ai_practice_question}
-
-Student answer:
-{answer}
-
-Evaluate:
-
-1. Concept understanding
-2. Reasoning
-3. Correct parts
-4. Mistakes
-5. One useful hint
-6. Correct explanation
-7. Next difficulty recommendation
-
-Do not humiliate the student.
-
-Encourage independent thinking.
-
+Evaluate: concept understanding, reasoning, correct parts, mistakes, one hint, correct explanation, next difficulty.
+Encourage independent thinking. Do not humiliate.
 """
-
-                    with st.spinner(
-                        "🧠 Answer analyse ho raha hai..."
-                    ):
-
+                    with st.spinner("🧠 Answer analyse ho raha hai..."):
                         try:
-
                             result = client.chat.completions.create(
-
-                                model="llama-3.3-70b-versatile",
-
-                                messages=[
-                                    {
-                                        "role": "user",
-                                        "content": evaluation
-                                    }
-                                ],
-
-                                temperature=0.35,
-                                max_tokens=1800
-
+                                model="openai/gpt-oss-120b",
+                                messages=[{"role": "user", "content": evaluation}],
+                                temperature=0.35, max_tokens=1800
                             )
-
-                            feedback = (
-                                result.choices[0]
-                                .message
-                                .content
-                            )
-
+                            feedback = result.choices[0].message.content
                             st.session_state.ai_practice_result = feedback
-
-                            st.markdown(
-                                feedback
-                            )
-
+                            st.markdown(feedback)
                             st.session_state.ai_xp += 10
-
-                        except:
-
-                            st.error(
-                                "Answer evaluation failed."
-                            )
+                        except Exception as e:
+                            st.error(f"❌ Evaluation failed: {type(e).__name__}: {str(e)[:150]}")
 
     # ========================================================
-    # TAB 4
-    # ASSESSMENT
+    # TAB 4: QUIZ / ASSESSMENT
     # ========================================================
-
     with tab_quiz:
+        st.subheader("📝 AI Assessment Engine")
 
-        st.subheader(
-            "📝 AI Assessment Engine"
-        )
+        quiz_topic = st.selectbox("Quiz Topic", topics, key="advanced_quiz_topic")
+        quiz_size = st.slider("Questions", 5, 15, 5, key="advanced_quiz_size")
+        quiz_level = st.selectbox("Difficulty", ["Easy", "Medium", "Hard", "Expert"], key="advanced_quiz_level")
 
-        quiz_topic = st.selectbox(
-
-            "Quiz Topic",
-
-            topics,
-
-            key="advanced_quiz_topic"
-
-        )
-
-        quiz_size = st.slider(
-
-            "Questions",
-
-            5,
-            15,
-            5,
-
-            key="advanced_quiz_size"
-
-        )
-
-        quiz_level = st.selectbox(
-
-            "Difficulty",
-
-            [
-                "Easy",
-                "Medium",
-                "Hard",
-                "Expert"
-            ],
-
-            key="advanced_quiz_level"
-
-        )
-
-        if st.button(
-            "🚀 Generate Assessment",
-            key="advanced_generate_quiz"
-        ):
-
+        if st.button("🚀 Generate Assessment", key="advanced_generate_quiz"):
             quiz_prompt = f"""
-
 Create {quiz_size} MCQ questions.
+Student: {age_level} | Topic: {quiz_topic} | Difficulty: {quiz_level}
+🌐 LANGUAGE: {lang_rule}
 
-Student:
-{age_level}
-
-Topic:
-{quiz_topic}
-
-Difficulty:
-{quiz_level}
-
-Return ONLY valid JSON.
-
-Format:
-
+Return ONLY valid JSON array:
 [
-  {{
-    "question": "Question",
-    "options": [
-      "Option 1",
-      "Option 2",
-      "Option 3",
-      "Option 4"
-    ],
-    "answer": "Option 1",
-    "explanation": "Short explanation"
-  }}
+  {{"question": "...", "options": ["A","B","C","D"], "answer": "A", "explanation": "..."}}
 ]
-
-Rules:
-
-• Exactly 4 options
-• answer must exactly match one option
-• Test understanding
-• Age appropriate
-• No ambiguous questions
-• No trick questions
-• Use Hinglish unless English is more appropriate
-
 """
-
-            with st.spinner(
-                "🤖 AI assessment prepare kar raha hai..."
-            ):
-
+            with st.spinner("🤖 AI assessment prepare kar raha hai..."):
                 try:
-
                     result = client.chat.completions.create(
-
-                        model="llama-3.3-70b-versatile",
-
-                        messages=[
-                            {
-                                "role": "user",
-                                "content": quiz_prompt
-                            }
-                        ],
-
-                        temperature=0.35,
-
-                        max_tokens=5000
-
+                        model="openai/gpt-oss-120b",
+                        messages=[{"role": "user", "content": quiz_prompt}],
+                        temperature=0.35, max_tokens=5000
                     )
-
-                    raw = (
-                        result
-                        .choices[0]
-                        .message
-                        .content
-                        .strip()
-                    )
-
-                    match = re.search(
-                        r"\[[\s\S]*\]",
-                        raw
-                    )
-
+                    raw = result.choices[0].message.content.strip()
+                    match = re.search(r"\[[\s\S]*\]", raw)
                     if not match:
-
-                        raise ValueError(
-                            "Invalid quiz JSON"
-                        )
-
-                    quiz = json.loads(
-                        match.group(0)
-                    )
-
+                        raise ValueError("No JSON array found in response")
+                    quiz = json.loads(match.group(0))
                     valid_questions = []
-
-                    for question in quiz:
-
-                        if not isinstance(
-                            question,
-                            dict
-                        ):
-                            continue
-
-                        options = question.get(
-                            "options",
-                            []
-                        )
-
-                        answer = question.get(
-                            "answer",
-                            ""
-                        )
-
-                        if (
-                            isinstance(options, list)
-                            and len(options) == 4
-                            and answer in options
-                        ):
-
-                            valid_questions.append(
-                                question
-                            )
-
+                    for q in quiz:
+                        if not isinstance(q, dict): continue
+                        opts = q.get("options", [])
+                        ans = q.get("answer", "")
+                        if isinstance(opts, list) and len(opts) == 4 and ans in opts:
+                            valid_questions.append(q)
                     if not valid_questions:
-
-                        raise ValueError(
-                            "No valid questions"
-                        )
-
-                    st.session_state.ai_quiz_data = (
-                        valid_questions
-                    )
-
+                        raise ValueError("No valid questions")
+                    st.session_state.ai_quiz_data = valid_questions
                     st.session_state.ai_quiz_index = 0
                     st.session_state.ai_quiz_score = 0
                     st.session_state.ai_quiz_running = True
-
                     st.rerun()
-
-                except Exception:
-
-                    st.error(
-                        "Quiz generate nahi ho paya. Dobara try karo."
-                    )
-
-        # ----------------------------------------------------
-        # QUIZ RUNNER
-        # ----------------------------------------------------
+                except Exception as e:
+                    st.error(f"❌ Quiz failed: {type(e).__name__}: {str(e)[:200]}")
 
         if st.session_state.ai_quiz_running:
-
             quiz = st.session_state.ai_quiz_data
-
             index = st.session_state.ai_quiz_index
-
             if index < len(quiz):
-
                 question = quiz[index]
-
-                st.progress(
-                    index / len(quiz)
-                )
-
-                st.write(
-                    f"### Q{index + 1}/{len(quiz)}"
-                )
-
-                st.markdown(
-                    f"**{question['question']}**"
-                )
-
-                selected = st.radio(
-
-                    "Choose answer:",
-
-                    question["options"],
-
-                    key=f"ai_assessment_{index}"
-
-                )
-
-                if st.button(
-                    "✅ Submit Answer",
-                    key=f"submit_ai_assessment_{index}"
-                ):
-
+                st.progress(index / len(quiz))
+                st.write(f"### Q{index + 1}/{len(quiz)}")
+                st.markdown(f"**{question['question']}**")
+                selected = st.radio("Choose answer:", question["options"], key=f"ai_assessment_{index}")
+                if st.button("✅ Submit Answer", key=f"submit_ai_assessment_{index}"):
                     if selected == question["answer"]:
-
-                        st.success(
-                            "🎉 Correct!"
-                        )
-
+                        st.success("🎉 Correct!")
                         st.session_state.ai_quiz_score += 1
-
                         st.session_state.ai_xp += 20
-
                     else:
-
-                        st.error(
-                            "❌ Incorrect"
-                        )
-
-                    st.info(
-                        "💡 "
-                        + question.get(
-                            "explanation",
-                            "Concept ko dobara review karo."
-                        )
-                    )
-
+                        st.error("❌ Incorrect")
+                    st.info("💡 " + question.get("explanation", ""))
                     st.session_state.ai_quiz_index += 1
-
                     time.sleep(0.25)
-
                     st.rerun()
-
             else:
-
                 total = len(quiz)
-
-                score = (
-                    st.session_state.ai_quiz_score
-                )
-
-                percentage = (
-                    score / total * 100
-                    if total
-                    else 0
-                )
-
+                score = st.session_state.ai_quiz_score
+                percentage = (score / total * 100) if total else 0
                 st.balloons()
-
-                st.success(
-                    f"🏆 Assessment Complete: {score}/{total}"
-                )
-
-                st.metric(
-                    "Accuracy",
-                    f"{percentage:.0f}%"
-                )
-
-                if percentage >= 85:
-
-                    st.success(
-                        "🔥 Strong mastery — next difficulty unlock kar sakte ho."
-                    )
-
-                elif percentage >= 60:
-
-                    st.info(
-                        "👍 Good progress — thodi practice aur karo."
-                    )
-
-                else:
-
-                    st.warning(
-                        "📚 Weak concepts ko Learning Path se dobara practice karo."
-                    )
-
-                if st.button(
-                    "🔄 New Assessment",
-                    key="new_ai_assessment"
-                ):
-
+                st.success(f"🏆 Complete: {score}/{total}")
+                st.metric("Accuracy", f"{percentage:.0f}%")
+                if st.button("🔄 New Assessment", key="new_ai_assessment"):
                     st.session_state.ai_quiz_data = []
                     st.session_state.ai_quiz_index = 0
                     st.session_state.ai_quiz_score = 0
                     st.session_state.ai_quiz_running = False
-
                     st.rerun()
 
     # ========================================================
-    # TAB 5
-    # AI AGENT BUILDER
+    # TAB 5: AGENT BUILDER
     # ========================================================
-
     with tab_agent:
+        st.subheader("🤖 AI Agent Builder")
+        st.write("Student apna AI Agent design karega.")
 
-        st.subheader(
-            "🤖 AI Agent Builder"
-        )
+        agent_type = st.selectbox("Agent Type",
+            ["AI Study Assistant", "Weather Agent", "Agriculture Agent", "Research Agent",
+             "Coding Agent", "Language Agent", "Business Assistant", "Personal Productivity Agent", "Custom Agent"],
+            key="agent_type")
 
-        st.write(
-            "Student apna AI Agent design karega."
-        )
+        agent_goal = st.text_area("🎯 Agent ka goal kya hai?",
+            placeholder="Example: Farmers ko weather information samajhne mein help karna.",
+            key="agent_goal")
 
-        agent_type = st.selectbox(
-
-            "Agent Type",
-
-            [
-
-                "AI Study Assistant",
-                "Weather Agent",
-                "Agriculture Agent",
-                "Research Agent",
-                "Coding Agent",
-                "Language Agent",
-                "Business Assistant",
-                "Personal Productivity Agent",
-                "Custom Agent"
-
-            ],
-
-            key="agent_type"
-
-        )
-
-        agent_goal = st.text_area(
-
-            "🎯 Agent ka goal kya hai?",
-
-            placeholder=(
-                "Example: Farmers ko weather information "
-                "samajhne mein help karna."
-            ),
-
-            key="agent_goal"
-
-        )
-
-        if st.button(
-            "🚀 Design My AI Agent",
-            key="design_agent"
-        ):
-
+        if st.button("🚀 Design My AI Agent", key="design_agent"):
             agent_prompt = f"""
-
 You are an AI Agent Engineering Teacher.
+Student: {age_level} | Agent: {agent_type} | Goal: {agent_goal or "Educational example"}
+🌐 LANGUAGE: {lang_rule}
 
-Student:
-{age_level}
+Explain: 1.Agent Name 2.Problem 3.User 4.Goal 5.Inputs 6.Knowledge 7.Memory 8.Tools 9.Planning 10.Actions 11.Observation 12.Feedback 13.Safety 14.Human Approval 15.Testing 16.Future
 
-Agent:
-{agent_type}
+Architecture: USER → GOAL → PLANNER → MEMORY → TOOLS → ACTION → OBSERVATION → EVALUATION
 
-Goal:
-{agent_goal or "Create an educational example."}
-
-Create an age-appropriate AI Agent design.
-
-Explain:
-
-1. Agent Name
-2. Problem
-3. User
-4. Goal
-5. Inputs
-6. Knowledge
-7. Memory
-8. Tools
-9. Planning
-10. Actions
-11. Observation
-12. Feedback
-13. Safety
-14. Human Approval
-15. Testing
-16. Future Improvements
-
-Architecture:
-
-USER
-↓
-GOAL
-↓
-PLANNER
-↓
-MEMORY / KNOWLEDGE
-↓
-TOOLS
-↓
-ACTION
-↓
-OBSERVATION
-↓
-EVALUATION
-↓
-NEXT ACTION
-
-For young children explain this with a simple story.
-
-For teenagers explain the architecture.
-
-For college/university include:
-
-• APIs
-• tool calling
-• retrieval
-• embeddings
-• vector database
-• orchestration
-• evaluation
-• guardrails
-• deployment
-
-Do not claim the agent has actually been deployed.
-
+For young children: simple story.
+For teens: architecture.
+For college: APIs, tool calling, retrieval, embeddings, vector DB, orchestration.
 """
-
-            with st.spinner(
-                "🤖 Agent architecture design ho raha hai..."
-            ):
-
+            with st.spinner("🤖 Agent design ho raha hai..."):
                 try:
-
                     result = client.chat.completions.create(
-
-                        model="llama-3.3-70b-versatile",
-
-                        messages=[
-                            {
-                                "role": "user",
-                                "content": agent_prompt
-                            }
-                        ],
-
-                        temperature=0.55,
-                        max_tokens=3000
-
+                        model="openai/gpt-oss-120b",
+                        messages=[{"role": "user", "content": agent_prompt}],
+                        temperature=0.55, max_tokens=3000
                     )
-
-                    output = (
-                        result.choices[0]
-                        .message
-                        .content
-                    )
-
+                    output = result.choices[0].message.content
                     st.session_state.ai_builder_result = output
-
-                    st.markdown(
-                        output
-                    )
-
+                    st.markdown(output)
                     st.session_state.ai_xp += 30
-
-                except:
-
-                    st.error(
-                        "Agent design generate nahi ho paya."
-                    )
+                except Exception as e:
+                    st.error(f"❌ Agent failed: {type(e).__name__}: {str(e)[:200]}")
 
     # ========================================================
-    # TAB 6
-    # PROJECT LAB
+    # TAB 6: PROJECT LAB
     # ========================================================
-
     with tab_project:
+        st.subheader("🛠️ AI Project Lab")
 
-        st.subheader(
-            "🛠️ AI Project Lab"
-        )
+        project_area = st.selectbox("🌍 Project Area",
+            ["Education", "Agriculture", "Space", "Healthcare", "Environment", "Finance",
+             "Robotics", "Languages", "Games", "Business", "Cyber Safety", "Social Impact"],
+            key="ai_project_area")
 
-        project_area = st.selectbox(
+        project_type = st.selectbox("🚀 Project Level",
+            ["Fun Project", "School Project", "Science Fair", "Real World Project",
+             "Advanced Project", "College Project", "University Research Project"],
+            key="ai_project_type")
 
-            "🌍 Project Area",
+        project_problem = st.text_area("💡 Problem you want to solve",
+            placeholder="Example: Students ko difficult concepts samjhane ke liye AI tutor banana.",
+            key="ai_project_problem")
 
-            [
-
-                "Education",
-                "Agriculture",
-                "Space",
-                "Healthcare",
-                "Environment",
-                "Finance",
-                "Robotics",
-                "Languages",
-                "Games",
-                "Business",
-                "Cyber Safety",
-                "Social Impact"
-
-            ],
-
-            key="ai_project_area"
-
-        )
-
-        project_type = st.selectbox(
-
-            "🚀 Project Level",
-
-            [
-
-                "Fun Project",
-                "School Project",
-                "Science Fair",
-                "Real World Project",
-                "Advanced Project",
-                "College Project",
-                "University Research Project"
-
-            ],
-
-            key="ai_project_type"
-
-        )
-
-        project_problem = st.text_area(
-
-            "💡 Problem you want to solve",
-
-            placeholder=(
-                "Example: Students ko difficult concepts "
-                "samjhane ke liye AI tutor banana."
-            ),
-
-            key="ai_project_problem"
-
-        )
-
-        if st.button(
-            "🚀 Build My Project Plan",
-            key="build_ai_project"
-        ):
-
+        if st.button("🚀 Build My Project Plan", key="build_ai_project"):
             project_prompt = f"""
-
 You are a senior AI project mentor.
+Student: {age_level} | Project: {project_type} | Area: {project_area}
+Problem: {project_problem or "Suitable educational project"}
+🌐 LANGUAGE: {lang_rule}
 
-Student:
-{age_level}
+Include: PROJECT NAME, PROBLEM, WHY, WHAT, CONCEPTS, DATA, TOOLS, ARCHITECTURE, STEP 1-5, TESTING, RESULT, ERRORS, SAFETY, SKILLS, ADVANCED VERSION.
 
-Project level:
-{project_type}
-
-Area:
-{project_area}
-
-Problem:
-{project_problem or "Create a suitable project."}
-
-Create a complete educational AI project.
-
-Include:
-
-# PROJECT NAME
-
-# PROBLEM
-
-# WHY IT MATTERS
-
-# WHAT STUDENT WILL BUILD
-
-# CONCEPTS
-
-# DATA
-
-# TOOLS
-
-# ARCHITECTURE
-
-# STEP 1
-
-# STEP 2
-
-# STEP 3
-
-# STEP 4
-
-# STEP 5
-
-# TESTING
-
-# EXPECTED RESULT
-
-# COMMON ERRORS
-
-# SAFETY
-
-# SKILLS LEARNED
-
-# ADVANCED VERSION
-
-For Age 5-8:
-Use games, visual activities and no-code ideas.
-
-For Age 9-12:
-Use beginner coding and simple AI concepts.
-
-For Age 13-18:
-Use Python, datasets and real AI concepts.
-
-For College:
-Use implementation, APIs and model evaluation.
-
-For University:
-Include research methodology, experiments,
-baselines, metrics and deployment/research direction.
-
-Never claim the project is already built.
-
+For Age 5-8: games, visual, no-code.
+For 9-12: beginner coding.
+For 13-18: Python, datasets.
+For College: implementation, APIs.
+For University: research, experiments, metrics.
 """
-
-            with st.spinner(
-                "🛠️ Project architecture ban rahi hai..."
-            ):
-
+            with st.spinner("🛠️ Project plan ban raha hai..."):
                 try:
-
                     result = client.chat.completions.create(
-
-                        model="llama-3.3-70b-versatile",
-
-                        messages=[
-                            {
-                                "role": "user",
-                                "content": project_prompt
-                            }
-                        ],
-
-                        temperature=0.7,
-                        max_tokens=3500
-
+                        model="openai/gpt-oss-120b",
+                        messages=[{"role": "user", "content": project_prompt}],
+                        temperature=0.7, max_tokens=3500
                     )
-
-                    project = (
-                        result.choices[0]
-                        .message
-                        .content
-                    )
-
+                    project = result.choices[0].message.content
                     st.session_state.ai_project_result = project
-
-                    st.markdown(
-                        project
-                    )
-
+                    st.markdown(project)
                     st.session_state.ai_xp += 40
-
-                except:
-
-                    st.error(
-                        "Project generate nahi ho paya."
-                    )
+                except Exception as e:
+                    st.error(f"❌ Project failed: {type(e).__name__}: {str(e)[:200]}")
 
         if st.session_state.ai_project_result:
-
-            st.download_button(
-
-                "📥 Save Project Plan",
-
+            st.download_button("📥 Save Project Plan",
                 data=st.session_state.ai_project_result,
-
-                file_name="clyxess_ai_project.txt",
-
-                mime="text/plain",
-
-                key="download_ai_project"
-
-            )
+                file_name="clyxess_ai_project.txt", mime="text/plain",
+                key="download_ai_project")
 
     # ========================================================
-    # TAB 7
-    # AI ETHICS
+    # TAB 7: ETHICS
     # ========================================================
-
     with tab_ethics:
-
-        st.subheader(
-            "🔐 Responsible AI & Ethics"
-        )
+        st.subheader("🔐 Responsible AI & Ethics")
 
         ethics_items = [
-
-            (
-                "🔒 Privacy",
-                "Personal information ko protect karna."
-            ),
-
-            (
-                "⚖️ Bias & Fairness",
-                "AI systems mein unfair patterns ko samajhna."
-            ),
-
-            (
-                "🧠 Hallucination",
-                "AI kabhi incorrect information generate kar sakta hai."
-            ),
-
-            (
-                "📰 Misinformation",
-                "AI-generated information ko verify karna."
-            ),
-
-            (
-                "©️ Copyright",
-                "Content aur intellectual property ka responsible use."
-            ),
-
-            (
-                "🛡️ Security",
-                "AI systems ko misuse aur attacks se protect karna."
-            ),
-
-            (
-                "👤 Human Oversight",
-                "Important decisions mein human judgment."
-            ),
-
-            (
-                "🌍 Social Impact",
-                "AI ka society par positive aur negative impact."
-            )
-
+            ("🔒 Privacy", "Personal information ko protect karna."),
+            ("⚖️ Bias & Fairness", "AI systems mein unfair patterns ko samajhna."),
+            ("🧠 Hallucination", "AI kabhi incorrect information generate kar sakta hai."),
+            ("📰 Misinformation", "AI-generated information ko verify karna."),
+            ("©️ Copyright", "Content aur intellectual property ka responsible use."),
+            ("🛡️ Security", "AI systems ko misuse aur attacks se protect karna."),
+            ("👤 Human Oversight", "Important decisions mein human judgment."),
+            ("🌍 Social Impact", "AI ka society par impact.")
         ]
 
         for title, description in ethics_items:
-
             with st.expander(title):
-
-                st.write(
-                    description
-                )
+                st.write(description)
 
         st.divider()
 
-        if st.button(
-            "🎯 Generate Ethics Challenge",
-            key="generate_ethics"
-        ):
-
+        if st.button("🎯 Generate Ethics Challenge", key="generate_ethics"):
             ethics_prompt = f"""
-
 Create one AI ethics scenario.
+Student: {age_level}
+🌐 LANGUAGE: {lang_rule}
 
-Student:
-{age_level}
-
-Make it age appropriate.
-
-Give:
-
-1. Situation
-2. Problem
-3. Two possible decisions
-4. Ask student what they would do
-5. Ask why
-6. Explain the relevant ethical principles
-
-Do not immediately give the best answer.
-
+Give: Situation, Problem, Two possible decisions, ask student what they'd do, ask why, explain principles.
 """
-
             try:
-
                 result = client.chat.completions.create(
-
-                    model="llama-3.3-70b-versatile",
-
-                    messages=[
-                        {
-                            "role": "user",
-                            "content": ethics_prompt
-                        }
-                    ],
-
-                    temperature=0.7,
-                    max_tokens=1400
-
+                    model="openai/gpt-oss-120b",
+                    messages=[{"role": "user", "content": ethics_prompt}],
+                    temperature=0.7, max_tokens=1400
                 )
-
-                st.markdown(
-                    result.choices[0]
-                    .message
-                    .content
-                )
-
-            except:
-
-                st.error(
-                    "Ethics challenge generate nahi ho paya."
-                )
+                st.markdown(result.choices[0].message.content)
+            except Exception as e:
+                st.error(f"❌ Ethics failed: {type(e).__name__}: {str(e)[:200]}")
 
     # ========================================================
-    # TAB 8
-    # PROGRESS / MASTERY
+    # TAB 8: PROGRESS
     # ========================================================
-
     with tab_progress:
-
-        st.subheader(
-            "📊 Student Progress"
-        )
+        st.subheader("📊 Student Progress")
 
         c1, c2, c3 = st.columns(3)
-
-        with c1:
-
-            st.metric(
-                "⭐ Total XP",
-                st.session_state.ai_xp
-            )
-
-        with c2:
-
-            st.metric(
-                "📚 Completed",
-                len(
-                    st.session_state.ai_completed_topics
-                )
-            )
-
-        with c3:
-
-            st.metric(
-                "🎓 Difficulty",
-                config["difficulty"]
-            )
+        with c1: st.metric("⭐ Total XP", st.session_state.ai_xp)
+        with c2: st.metric("📚 Completed", len(st.session_state.ai_completed_topics))
+        with c3: st.metric("🎓 Difficulty", config["difficulty"])
 
         st.divider()
-
-        st.subheader(
-            "🧠 Topic Mastery"
-        )
+        st.subheader("🧠 Topic Mastery")
 
         for topic in topics:
-
-            topic_id = (
-                f"{age_level}::{topic}"
-            )
-
-            mastery = st.session_state.ai_mastery.get(
-                topic_id,
-                0
-            )
-
-            st.write(
-                f"**{topic} — {mastery}%**"
-            )
-
-            st.progress(
-                min(mastery / 100, 1)
-            )
-
-        st.divider()
-
-        st.info(
-            """
-            🔮 Adaptive Mastery Engine:
-
-            Future learning engine automatically student ke:
-
-            • Quiz accuracy
-            • Practice answers
-            • Mistake patterns
-            • Time taken
-            • Topic completion
-            • Project performance
-
-            ko analyse karke difficulty adjust karega.
-
-            Weak topic → prerequisite / easier practice
-
-            Strong topic → harder challenge
-
-            Mastered topic → project / advanced concept
-            """
-        )
+            topic_id = f"{age_level}::{topic}"
+            mastery = st.session_state.ai_mastery.get(topic_id, 0)
+            st.write(f"**{topic} — {mastery}%**")
+            st.progress(min(mastery / 100, 1))
 
     # ========================================================
     # FOOTER
     # ========================================================
-
     st.divider()
-
-    st.markdown(
-        """
-        <div style="
-            padding:20px;
-            text-align:center;
-            border-radius:18px;
-            background:#071326;
-            border:1px solid #243b60;
-        ">
-
-            <h3 style="color:white;">
-                🤖 ClyxessChat AI School
-            </h3>
-
-            <p style="color:#9eb7d7;">
-                Learn • Think • Practice • Build • Create
-            </p>
-
-            <p style="
-                color:#7089aa;
-                font-size:13px;
-            ">
-                From first AI concept to advanced AI research.
-            </p>
-
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
+    st.markdown("""
+    <div style="padding:20px; text-align:center; border-radius:18px; background:#071326; border:1px solid #243b60;">
+        <h3 style="color:white;">🤖 ClyxessChat AI School</h3>
+        <p style="color:#9eb7d7;">Learn • Think • Practice • Build • Create</p>
+        <p style="color:#7089aa; font-size:13px;">From first AI concept to advanced AI research.</p>
+    </div>
+    """, unsafe_allow_html=True)    
 
 def render_parent_dashboard():
     st.title("👨‍👩‍👦 Parent Dashboard")
