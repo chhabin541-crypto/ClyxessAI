@@ -3564,7 +3564,7 @@ def render_physics_lab(client):
                         reply = "Beta, thodi dikkat aa gayi. Phir se pucho."
                     st.markdown(reply)
                     st.session_state.phy_doubts.append({"role": "assistant", "content": reply}) 
-def render_datascience&_machinelearning():
+def render_datascienceand_machinelearning():
     import os
     import json
     import time
@@ -7527,8 +7527,8 @@ with st.sidebar:
 # ---- routes: one unique screen per feature ----
 if mode == "🔐 Login / Sign Up":
     render_login_signup(); st.stop() 
-if mode == "📱Data Science & Machin Learning":
-    render_datascience&_machinelearning(); st.stop() 
+if mode == "📱Data Science and Machin Learning":
+    render_datascienceand_machinelearning(); st.stop() 
 if mode == "💸 Learn Finance":
     render_learn_finance(client); st.stop()   
 if mode == "🔢 Math Lab":
