@@ -5184,7 +5184,7 @@ def render_kids_logic_lab():
 # • Progress / XP / Mastery
 # ============================================================
 
-def render_learn_ai():
+def render_learn_ai(client):
 
     import streamlit as st
     import json
