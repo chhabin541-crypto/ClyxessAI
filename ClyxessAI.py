@@ -3567,7 +3567,7 @@ def render_physics_lab(client):
         
 def render_startup_app_websitebuilder():
     import os
-    import time
+    import json
     import streamlit as st
     import streamlit.components.v1 as components
 
@@ -3577,15 +3577,23 @@ def render_startup_app_websitebuilder():
         if k not in st.session_state:
             st.session_state[k] = v
 
+    # ------------------------------------------------------------
+    # AI GENERATOR
+    # ------------------------------------------------------------
     def generate_html(prompt, api_key):
         if not api_key:
             return None, "GROQ_API_KEY set nahi hai"
 
-        try:
-            from groq import Groq
-            client = Groq(api_key=api_key)
+        # Models in order of preference
+        MODELS = [
+            "openai/gpt-oss-120b",
+            "qwen/qwen3-32b",
+            "meta-llama/llama-4-maverick-17b-128e-instruct",
+            "openai/gpt-oss-20b",
+            "meta-llama/llama-4-scout-17b-16e-instruct",
+        ]
 
-            sys_prompt = f"""You are an expert web developer. Return ONLY a complete HTML file. No explanations, no markdown, no backticks.
+        sys_prompt = f"""You are an expert web developer. Return ONLY complete HTML. No markdown, no backticks, no explanation.
 
 User wants: {prompt}
 
@@ -3594,43 +3602,48 @@ Rules:
 - End with </html>
 - Use Tailwind CSS CDN
 - Use FontAwesome icons
-- Sections: navbar, hero, features (3 cards), about, contact form, footer
-- Dark theme (bg-slate-950, emerald accents)
+- Sections: navbar, hero, features (3-4 cards), about, contact form, footer
+- Dark theme (bg-slate-950, emerald-500 accents)
 - Mobile responsive
 - Real content based on user request
-- Keep HTML compact (under 4000 tokens)
 
-Return raw HTML only:"""
+Return the complete HTML now:"""
 
-            res = client.chat.completions.create(
-                messages=[
-                    {"role": "user", "content": sys_prompt}
-                ],
-                model="llama-3.3-70b-versatile",
-                temperature=0.7,
-                max_tokens=6000
-            )
+        last_error = ""
+        for model in MODELS:
+            try:
+                from groq import Groq
+                client = Groq(api_key=api_key)
+                res = client.chat.completions.create(
+                    messages=[{"role": "user", "content": sys_prompt}],
+                    model=model,
+                    temperature=0.7,
+                    max_tokens=6000
+                )
+                html = res.choices[0].message.content.strip()
 
-            html = res.choices[0].message.content.strip()
+                # Clean markdown fences if any
+                if html.startswith("```"):
+                    parts = html.split("```")
+                    if len(parts) > 1:
+                        html = parts[1]
+                        if html.startswith("html"):
+                            html = html[4:]
+                        html = html.strip()
 
-            # Clean any markdown fences
-            if html.startswith("```"):
-                html = html.split("```")[1]
-                if html.startswith("html"):
-                    html = html[4:]
-                html = html.strip()
+                if len(html) > 500 and "<!DOCTYPE" in html.upper():
+                    return html, None
 
-            if len(html) < 500:
-                return None, f"AI ne chhota output diya ({len(html)} chars)"
+                last_error = f"{model}: chhota output ({len(html)} chars)"
+            except Exception as e:
+                last_error = f"{model}: {str(e)[:100]}"
+                continue
 
-            return html, None
+        return None, last_error or "Sab models fail ho gaye"
 
-        except Exception as e:
-            return None, f"AI error: {type(e).__name__} - {str(e)[:150]}"
-
-    # ========================
+    # ------------------------------------------------------------
     # STAGE 1: INPUT
-    # ========================
+    # ------------------------------------------------------------
     if st.session_state.em_stage == "input":
         st.markdown("""
         <div style="text-align:center; padding:60px 20px 30px 20px;">
@@ -3668,9 +3681,9 @@ Return raw HTML only:"""
                     st.session_state.em_stage = "loading"
                     st.rerun()
 
-    # ========================
+    # ------------------------------------------------------------
     # STAGE 2: LOADING
-    # ========================
+    # ------------------------------------------------------------
     elif st.session_state.em_stage == "loading":
         st.markdown("""
         <div style="text-align:center; padding:180px 20px;">
@@ -3690,21 +3703,19 @@ Return raw HTML only:"""
             st.session_state.em_stage = "error"
         st.rerun()
 
-    # ========================
+    # ------------------------------------------------------------
     # STAGE 3: ERROR
-    # ========================
+    # ------------------------------------------------------------
     elif st.session_state.em_stage == "error":
-        st.error(f"❌ Error: {st.session_state.em_err}")
-        st.info("💡 Screenshot bhej do, turant fix karenge")
-
+        st.error(f"❌ {st.session_state.em_err}")
         if st.button("🔄 Try Again"):
             st.session_state.em_stage = "input"
             st.session_state.em_err = ""
             st.rerun()
 
-    # ========================
+    # ------------------------------------------------------------
     # STAGE 4: PREVIEW
-    # ========================
+    # ------------------------------------------------------------
     else:
         col_a, col_b, col_c = st.columns([3, 1, 1])
         with col_a:
