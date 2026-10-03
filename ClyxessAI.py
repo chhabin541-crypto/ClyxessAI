@@ -3036,7 +3036,7 @@ applyAge("5 Years");
 '''
     components.html(html_code, height=950, scrolling=False) 
 
-  def render_learn_finance(client):
+def render_learn_finance(client):
     import json
     import re
     import random
