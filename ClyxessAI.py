@@ -3449,6 +3449,23 @@ def render_physics_lab(client):
     # University check
     is_university = "University" in class_level
 
+    # ⭐ DIAGRAM INSTRUCTION (Added as requested)
+    diagram_rule = """
+    VISUAL DIAGRAM REQUIREMENT:
+    You MUST include a text-based diagram (ASCII art, flowchart, or structured visual representation) in your response to explain the concept visually. 
+    Use code blocks for the diagram. Example format:
+    ```text
+      N
+      ↑
+      |
+    ← • → F
+      |
+      ↓
+     mg
+    ```
+    Make sure the diagram is relevant to the topic/question.
+    """
+
     # ============================================================
     # TABS
     # ============================================================
@@ -3472,6 +3489,7 @@ TOPIC: {topic}
 STUDENT LEVEL: University / Postgraduate
 
 {lang_rule}
+{diagram_rule}
 
 Teach like a real university professor:
 1. **Definition & Scope** — What is this field?
@@ -3495,6 +3513,7 @@ Use rigorous language. Include equations as text (E = mc², iℏ∂ψ/∂t = Ĥ�
                     prompt = f"""You are a Physics Teacher. Explain '{topic}' to a student of {class_level}.
 
 {lang_rule}
+{diagram_rule}
 
 Rules:
 - Simple language suited to {class_level}
@@ -3564,7 +3583,7 @@ Rules:
             st.markdown("📝 **Observation:** Thrust ↑ → Acceleration ↑ · Mass ↑ → Acceleration ↓")
             if st.button("🤖 Explain with AI", key="rocket_ai_btn"):
                 with st.spinner("AI is thinking..."):
-                    p = f"Explain Rocket Launch (Thrust, Mass, Acceleration, Net Force) to a {class_level} student. {lang_rule}\n\nThrust={thrust}N, Mass={mass}kg, Acceleration={acc:.2f}m/s²."
+                    p = f"Explain Rocket Launch (Thrust, Mass, Acceleration, Net Force) to a {class_level} student. {lang_rule}\n{diagram_rule}\n\nThrust={thrust}N, Mass={mass}kg, Acceleration={acc:.2f}m/s²."
                     try:
                         r = client.chat.completions.create(model="openai/gpt-oss-120b",
                             messages=[{"role": "user", "content": p}], temperature=0.7, max_tokens=1000)
@@ -3589,7 +3608,7 @@ Rules:
                 with st.spinner("AI is thinking..."):
                     try:
                         r = client.chat.completions.create(model="openai/gpt-oss-120b",
-                            messages=[{"role": "user", "content": f"Explain Mass vs Weight to a {class_level} student. {lang_rule}\n\nOn {planet}: {mass}kg → {weight:.2f}N."}],
+                            messages=[{"role": "user", "content": f"Explain Mass vs Weight to a {class_level} student. {lang_rule}\n{diagram_rule}\n\nOn {planet}: {mass}kg → {weight:.2f}N."}],
                             temperature=0.7, max_tokens=1000)
                         st.info(r.choices[0].message.content)
                     except Exception as e:
@@ -3612,7 +3631,7 @@ Rules:
                 with st.spinner("AI is thinking..."):
                     try:
                         r = client.chat.completions.create(model="openai/gpt-oss-120b",
-                            messages=[{"role": "user", "content": f"Explain Solar Energy to a {class_level} student. {lang_rule}\n\nSunlight={sunlight}%, Area={area}m², Energy={energy:.2f}kWh."}],
+                            messages=[{"role": "user", "content": f"Explain Solar Energy to a {class_level} student. {lang_rule}\n{diagram_rule}\n\nSunlight={sunlight}%, Area={area}m², Energy={energy:.2f}kWh."}],
                             temperature=0.7, max_tokens=1000)
                         st.info(r.choices[0].message.content)
                     except Exception as e:
@@ -3635,7 +3654,7 @@ Rules:
                 with st.spinner("AI is thinking..."):
                     try:
                         r = client.chat.completions.create(model="openai/gpt-oss-120b",
-                            messages=[{"role": "user", "content": f"Explain Ohm's Law to a {class_level} student. {lang_rule}\n\nI={current}A, R={resistance}Ω, V={v:.2f}V."}],
+                            messages=[{"role": "user", "content": f"Explain Ohm's Law to a {class_level} student. {lang_rule}\n{diagram_rule}\n\nI={current}A, R={resistance}Ω, V={v:.2f}V."}],
                             temperature=0.7, max_tokens=1000)
                         st.info(r.choices[0].message.content)
                     except Exception as e:
@@ -3659,7 +3678,7 @@ Rules:
                 with st.spinner("AI is thinking..."):
                     try:
                         r = client.chat.completions.create(model="openai/gpt-oss-120b",
-                            messages=[{"role": "user", "content": f"Explain Roller Coaster energy to a {class_level} student. {lang_rule}\n\nHeight={height}m, Mass={mass}kg, PE={pe:.0f}J, v_bottom={v_bottom:.2f}m/s."}],
+                            messages=[{"role": "user", "content": f"Explain Roller Coaster energy to a {class_level} student. {lang_rule}\n{diagram_rule}\n\nHeight={height}m, Mass={mass}kg, PE={pe:.0f}J, v_bottom={v_bottom:.2f}m/s."}],
                             temperature=0.7, max_tokens=1000)
                         st.info(r.choices[0].message.content)
                     except Exception as e:
@@ -3684,7 +3703,7 @@ Rules:
                 with st.spinner("AI is thinking..."):
                     try:
                         r = client.chat.completions.create(model="openai/gpt-oss-120b",
-                            messages=[{"role": "user", "content": f"Explain Projectile Motion to a {class_level} student. {lang_rule}\n\nv={velocity}m/s, angle={angle}°, range={range_m:.2f}m."}],
+                            messages=[{"role": "user", "content": f"Explain Projectile Motion to a {class_level} student. {lang_rule}\n{diagram_rule}\n\nv={velocity}m/s, angle={angle}°, range={range_m:.2f}m."}],
                             temperature=0.7, max_tokens=1000)
                         st.info(r.choices[0].message.content)
                     except Exception as e:
@@ -3702,7 +3721,7 @@ Rules:
                 with st.spinner("AI is thinking..."):
                     try:
                         r = client.chat.completions.create(model="openai/gpt-oss-120b",
-                            messages=[{"role": "user", "content": f"Explain Simple Pendulum to a {class_level} student. {lang_rule}\n\nLength={length}m, T={t_period:.3f}s."}],
+                            messages=[{"role": "user", "content": f"Explain Simple Pendulum to a {class_level} student. {lang_rule}\n{diagram_rule}\n\nLength={length}m, T={t_period:.3f}s."}],
                             temperature=0.7, max_tokens=1000)
                         st.info(r.choices[0].message.content)
                     except Exception as e:
@@ -3730,7 +3749,7 @@ Rules:
                 with st.spinner("AI is thinking..."):
                     try:
                         r = client.chat.completions.create(model="openai/gpt-oss-120b",
-                            messages=[{"role": "user", "content": f"Explain Snell's Law to a {class_level} student. {lang_rule}\n\nAngle={angle_i}°, Medium={medium[0]}."}],
+                            messages=[{"role": "user", "content": f"Explain Snell's Law to a {class_level} student. {lang_rule}\n{diagram_rule}\n\nAngle={angle_i}°, Medium={medium[0]}."}],
                             temperature=0.7, max_tokens=1000)
                         st.info(r.choices[0].message.content)
                     except Exception as e:
@@ -3754,7 +3773,7 @@ Rules:
                 with st.spinner("AI is thinking..."):
                     try:
                         r = client.chat.completions.create(model="openai/gpt-oss-120b",
-                            messages=[{"role": "user", "content": f"Explain Sound Waves to a {class_level} student. {lang_rule}\n\nf={freq}Hz, T={temp}°C, λ={wl:.3f}m."}],
+                            messages=[{"role": "user", "content": f"Explain Sound Waves to a {class_level} student. {lang_rule}\n{diagram_rule}\n\nf={freq}Hz, T={temp}°C, λ={wl:.3f}m."}],
                             temperature=0.7, max_tokens=1000)
                         st.info(r.choices[0].message.content)
                     except Exception as e:
@@ -3777,7 +3796,7 @@ Rules:
                 with st.spinner("AI is thinking..."):
                     try:
                         r = client.chat.completions.create(model="openai/gpt-oss-120b",
-                            messages=[{"role": "user", "content": f"Explain Magnetic Field around wire to a {class_level} student. {lang_rule}\n\nI={current}A, distance={distance}cm."}],
+                            messages=[{"role": "user", "content": f"Explain Magnetic Field around wire to a {class_level} student. {lang_rule}\n{diagram_rule}\n\nI={current}A, distance={distance}cm."}],
                             temperature=0.7, max_tokens=1000)
                         st.info(r.choices[0].message.content)
                     except Exception as e:
@@ -3800,7 +3819,7 @@ Rules:
                 with st.spinner("AI is thinking..."):
                     try:
                         r = client.chat.completions.create(model="openai/gpt-oss-120b",
-                            messages=[{"role": "user", "content": f"Explain Braking Distance to a {class_level} student. {lang_rule}\n\nSpeed={speed_kmh}km/h, μ={friction}, Distance={dist:.2f}m."}],
+                            messages=[{"role": "user", "content": f"Explain Braking Distance to a {class_level} student. {lang_rule}\n{diagram_rule}\n\nSpeed={speed_kmh}km/h, μ={friction}, Distance={dist:.2f}m."}],
                             temperature=0.7, max_tokens=1000)
                         st.info(r.choices[0].message.content)
                     except Exception as e:
@@ -3826,7 +3845,7 @@ Rules:
                 with st.spinner("AI is thinking..."):
                     try:
                         r = client.chat.completions.create(model="openai/gpt-oss-120b",
-                            messages=[{"role": "user", "content": f"Explain Heat Conduction to a {class_level} student. {lang_rule}\n\nMaterial={material[0]}, Rate={rate:.2f}W."}],
+                            messages=[{"role": "user", "content": f"Explain Heat Conduction to a {class_level} student. {lang_rule}\n{diagram_rule}\n\nMaterial={material[0]}, Rate={rate:.2f}W."}],
                             temperature=0.7, max_tokens=1000)
                         st.info(r.choices[0].message.content)
                     except Exception as e:
@@ -3847,7 +3866,7 @@ Rules:
                 with st.spinner("Professor is thinking..."):
                     try:
                         r = client.chat.completions.create(model="openai/gpt-oss-120b",
-                            messages=[{"role": "user", "content": f"Explain Heisenberg Uncertainty Principle at University physics level. {lang_rule}\n\nΔx={dx_nm}nm, Δp={dp:.4e}kg·m/s. Include mathematical derivation and physical interpretation."}],
+                            messages=[{"role": "user", "content": f"Explain Heisenberg Uncertainty Principle at University physics level. {lang_rule}\n{diagram_rule}\n\nΔx={dx_nm}nm, Δp={dp:.4e}kg·m/s. Include mathematical derivation and physical interpretation."}],
                             temperature=0.6, max_tokens=1500)
                         st.info(r.choices[0].message.content)
                     except Exception as e:
@@ -3865,7 +3884,7 @@ Rules:
                 with st.spinner("Professor is thinking..."):
                     try:
                         r = client.chat.completions.create(model="openai/gpt-oss-120b",
-                            messages=[{"role": "user", "content": f"Explain Special Relativity Time Dilation at University level. {lang_rule}\n\nv={v_frac}c, γ={gamma:.4f}. Include Lorentz transformation and physical meaning."}],
+                            messages=[{"role": "user", "content": f"Explain Special Relativity Time Dilation at University level. {lang_rule}\n{diagram_rule}\n\nv={v_frac}c, γ={gamma:.4f}. Include Lorentz transformation and physical meaning."}],
                             temperature=0.6, max_tokens=1500)
                         st.info(r.choices[0].message.content)
                     except Exception as e:
@@ -3890,7 +3909,7 @@ Rules:
                 with st.spinner("Professor is thinking..."):
                     try:
                         r = client.chat.completions.create(model="openai/gpt-oss-120b",
-                            messages=[{"role": "user", "content": f"Explain Carnot Engine & 2nd Law of Thermodynamics at University level. {lang_rule}\n\nT_hot={T_hot}K, T_cold={T_cold}K."}],
+                            messages=[{"role": "user", "content": f"Explain Carnot Engine & 2nd Law of Thermodynamics at University level. {lang_rule}\n{diagram_rule}\n\nT_hot={T_hot}K, T_cold={T_cold}K."}],
                             temperature=0.6, max_tokens=1500)
                         st.info(r.choices[0].message.content)
                     except Exception as e:
@@ -3991,6 +4010,7 @@ Return ONLY valid JSON array:
                         prompt = f"""You are a Physics Professor at MIT/Stanford/Tsinghua level. Answer this university-level question.
 
 {lang_rule}
+{diagram_rule}
 
 Question: {doubt}
 
@@ -4006,6 +4026,7 @@ Be rigorous but clear."""
                         prompt = f"""You are a loving Physics Teacher. Answer this doubt for a {class_level} student.
 
 {lang_rule}
+{diagram_rule}
 
 Doubt: {doubt}"""
 
@@ -4021,6 +4042,17 @@ Doubt: {doubt}"""
 
                     st.markdown(reply)
                     st.session_state.phy_doubts.append({"role": "assistant", "content": reply})
+
+    # ============================================================
+    # FOOTER (Added as requested)
+    # ============================================================
+    st.markdown("---")
+    st.markdown(
+        "<div style='text-align: center; color: gray; padding: 20px; font-size: 0.9em;'>"
+        "🔒 ClyxessChat AI secure fast private"
+        "</div>", 
+        unsafe_allow_html=True
+    )
         
 def render_datascienceand_machinelearning():
     import os
