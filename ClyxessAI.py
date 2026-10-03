@@ -3564,11 +3564,7 @@ def render_physics_lab(client):
                         reply = "Beta, thodi dikkat aa gayi. Phir se pucho."
                     st.markdown(reply)
                     st.session_state.phy_doubts.append({"role": "assistant", "content": reply}) 
-        
 def render_startup_app_websitebuilder():
-    # ============================================================
-    # IMPORTS - ANDAR
-    # ============================================================
     import os
     import json
     import time
@@ -3586,77 +3582,74 @@ def render_startup_app_websitebuilder():
         ("em_prompt", ""),
         ("em_age", "kids"),
         ("em_topic", "Data Science"),
-        ("em_err", "")
+        ("em_err", ""),
+        ("em_language", "English")
     ]:
         if k not in st.session_state:
             st.session_state[k] = v
 
     # ============================================================
-    # AI GENERATOR — AUTO LANGUAGE + FOOTER
+    # AI GENERATOR — LANGUAGE LOCKED + FOOTER
     # ============================================================
-    def call_groq(age_group, topic, question, user_name):
+    def call_groq(age_group, topic, question, user_name, language):
         if not GROQ_API_KEY:
             return None, "GROQ_API_KEY set nahi hai"
 
         AGE_STYLE = {
-            "kids": "बिल्कुल सरल भाषा, कहानी, खिलौने, चॉकलेट के उदाहरण. कोई coding नहीं. Emoji खूब.",
-            "school": "Simple language, रोज़मर्रा के उदाहरण (YouTube, Cricket). Basic Python 2-3 lines.",
+            "kids": "Very simple language, stories, toys, chocolates. NO coding. Lots of emojis. Short sentences.",
+            "school": "Simple language, everyday examples (YouTube, Cricket). Basic Python 2-3 lines.",
             "college": "Technical language, real datasets, full Python code (Pandas/Sklearn), math, career path."
         }
 
         style = AGE_STYLE.get(age_group, AGE_STYLE["school"])
 
-        prompt = f"""तुम ClyxessChat AI हो — Data Science & ML teacher.
+        prompt = f"""You are ClyxessChat AI — Data Science & ML teacher.
 
-USER'S EXACT QUESTION: "{question}"
+USER'S QUESTION: "{question}"
 
 Student: {user_name} | Age Level: {age_group} | Topic: {topic}
 Teaching style: {style}
 
-🔴 RULE 1 — LANGUAGE DETECTION (MOST IMPORTANT):
-Detect the language of the USER'S EXACT QUESTION above and reply in THE EXACT SAME LANGUAGE.
+🔴 CRITICAL RULE #1 — LANGUAGE LOCK:
+You MUST reply ONLY in {language}. 
 
-- User wrote English → Reply ONLY in English
-- User wrote Hindi → Reply ONLY in Hindi
-- User wrote Hinglish → Reply in Hinglish
-- User wrote Tamil → Reply in Tamil
-- User wrote Telugu → Reply in Telugu
-- User wrote Bengali → Reply in Bengali
-- User wrote Spanish → Reply in Spanish
-- User wrote French → Reply in French
-- Any other language → Reply in that same language
+- If language is "English" → reply ONLY in English (no Hindi words at all)
+- If language is "Hindi" → reply ONLY in Hindi (Devanagari script)
+- If language is "Hinglish" → reply in Hindi+English mix
+- If language is "Tamil" → reply ONLY in Tamil
+- If language is "Spanish" → reply ONLY in Spanish
+- Same for ALL other languages.
 
-DO NOT default to Hindi if user wrote in English.
-DO NOT mix languages unless the user mixed them.
+DO NOT switch languages. DO NOT default to Hindi. 
+Even the section headings (Concept, Example, Activity, Next Step, Pro Tip) should be translated into {language}.
 
-🔴 RULE 2 — MANDATORY FOOTER (VERY IMPORTANT):
-At the END of your response, after all the content, add this EXACT footer line on a new line:
+🔴 CRITICAL RULE #2 — FOOTER (English only):
+At the VERY END of your reply, on a new line, write exactly:
 
 --- ClyxessChat AI | Secure • Fast • Private
 
-Do NOT translate this footer. Keep it in English EXACTLY as written above.
+Do NOT translate this footer.
 
-🔴 RULE 3 — STRUCTURE:
-Use this format in the user's language:
+🔴 RULE #3 — FORMAT:
 
-📚 **Concept:**
-[2-4 lines]
+📚 Concept:
+[2-4 lines in {language}]
 
-🎯 **Example:**
-[1-2 real examples]
+🎯 Example:
+[1-2 examples in {language}]
 
-🛠️ **Activity:**
-[hands-on task]
+🛠️ Activity:
+[hands-on task in {language}]
 
-🚀 **Next Step:**
-[next hint]
+🚀 Next Step:
+[next hint in {language}]
 
-💡 **Pro Tip:**
-[important point]
+💡 Pro Tip:
+[one important point in {language}]
 
 --- ClyxessChat AI | Secure • Fast • Private
 
-Now reply:"""
+Now write ENTIRELY in {language}:"""
 
         MODELS = [
             "openai/gpt-oss-120b",
@@ -3672,16 +3665,15 @@ Now reply:"""
                 client = Groq(api_key=GROQ_API_KEY)
                 res = client.chat.completions.create(
                     messages=[
-                        {"role": "system", "content": "You are ClyxessChat AI. Always reply in the exact same language the user wrote in. Always end your response with: --- ClyxessChat AI | Secure • Fast • Private"},
+                        {"role": "system", "content": f"You are ClyxessChat AI. You MUST reply ONLY in {language}. Never switch languages. Always end with: --- ClyxessChat AI | Secure • Fast • Private"},
                         {"role": "user", "content": prompt}
                     ],
                     model=model,
                     temperature=0.7,
-                    max_tokens=2000
+                    max_tokens=2500
                 )
                 text = res.choices[0].message.content.strip()
                 if len(text) > 100:
-                    # Ensure footer is always there
                     if "ClyxessChat AI | Secure" not in text:
                         text = text.rstrip() + "\n\n--- ClyxessChat AI | Secure • Fast • Private"
                     return text, None
@@ -3693,7 +3685,7 @@ Now reply:"""
         return None, last_error or "All models failed"
 
     # ============================================================
-    # PAGE STYLING
+    # STYLING
     # ============================================================
     st.markdown("""
     <style>
@@ -3713,11 +3705,7 @@ Now reply:"""
         font-weight: 900;
         margin: 0;
     }
-    .clyx-header p {
-        color: #94a3b8;
-        font-size: 13px;
-        margin: 6px 0 0 0;
-    }
+    .clyx-header p { color: #94a3b8; font-size: 13px; margin: 6px 0 0 0; }
     .stat-card {
         background: rgba(15,23,42,0.7);
         border: 1px solid #334155;
@@ -3725,35 +3713,19 @@ Now reply:"""
         padding: 16px;
         text-align: center;
     }
-    .stat-card .label {
-        color: #64748b;
-        font-size: 11px;
-        text-transform: uppercase;
-        font-weight: 700;
-        letter-spacing: 0.5px;
-    }
-    .stat-card .value {
-        color: #10b981;
-        font-size: 24px;
-        font-weight: 900;
-        margin-top: 4px;
-    }
+    .stat-card .label { color: #64748b; font-size: 11px; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; }
+    .stat-card .value { color: #10b981; font-size: 24px; font-weight: 900; margin-top: 4px; }
     </style>
     """, unsafe_allow_html=True)
 
-    # ============================================================
-    # HEADER
-    # ============================================================
     st.markdown("""
     <div class="clyx-header">
         <h1>🧠 ClyxessChat AI — Data Science & ML Lab</h1>
-        <p>Auto language detection — likho kisi bhi language mein, jawab usi language mein milega</p>
+        <p>Personalized AI learning — language apni chuno, jawab usi mein milega</p>
     </div>
     """, unsafe_allow_html=True)
 
-    # ============================================================
     # STATS
-    # ============================================================
     c1, c2, c3 = st.columns(3)
     with c1:
         st.markdown('<div class="stat-card"><div class="label">Lessons</div><div class="value">0</div></div>', unsafe_allow_html=True)
@@ -3787,6 +3759,40 @@ Now reply:"""
         else:
             st.session_state.em_age = "college"
 
+        # ⭐ LANGUAGE DROPDOWN
+        st.markdown("#### 🌐 Language")
+        language_label = st.selectbox(
+            "Language",
+            [
+                "English",
+                "हिंदी (Hindi)",
+                "Hinglish (Hindi + English)",
+                "मराठी (Marathi)",
+                "বাংলা (Bengali)",
+                "தமிழ் (Tamil)",
+                "తెలుగు (Telugu)",
+                "ગુજરાતી (Gujarati)",
+                "ಕನ್ನಡ (Kannada)",
+                "മലയാളം (Malayalam)",
+                "ਪੰਜਾਬੀ (Punjabi)",
+                "ଓଡ଼ିଆ (Odia)",
+                "اردو (Urdu)",
+                "Español (Spanish)",
+                "Français (French)",
+                "Deutsch (German)",
+                "日本語 (Japanese)",
+                "中文 (Chinese)",
+                "العربية (Arabic)",
+                "Português (Portuguese)",
+                "Русский (Russian)",
+                "한국어 (Korean)"
+            ],
+            label_visibility="collapsed",
+            key="em_lang_sel"
+        )
+        clean_lang = language_label.split("(")[0].strip()
+        st.session_state.em_language = clean_lang
+
         st.markdown("#### 📚 Topic")
         topic = st.selectbox(
             "Topic",
@@ -3809,10 +3815,10 @@ Now reply:"""
 
     with col_right:
         st.markdown("#### ❓ Your Question")
-        st.caption("🌐 Hindi, English, Tamil, Spanish, French — koi bhi language try karo")
+        st.caption(f"🌐 Selected language: **{clean_lang}** — AI isi language mein jawab dega")
         custom_q = st.text_area(
             "Question",
-            placeholder="e.g., What is Machine Learning?\nया: Machine Learning kya hai?\nया: ¿Qué es el aprendizaje automático?",
+            placeholder="e.g., What is Machine Learning?",
             height=120,
             label_visibility="collapsed",
             key="em_q"
@@ -3830,12 +3836,13 @@ Now reply:"""
     # LOADING / RESULT
     # ============================================================
     if st.session_state.em_stage == "loading":
-        with st.spinner("🧠 AI tumhare liye lesson bana raha hai..."):
+        with st.spinner(f"🧠 Clyxess is responding in {st.session_state.em_language}..."):
             lesson, err = call_groq(
                 st.session_state.em_age,
                 st.session_state.em_topic,
                 st.session_state.em_prompt,
-                user_name
+                user_name,
+                st.session_state.em_language
             )
         if lesson:
             st.session_state.em_lesson = lesson
@@ -3855,7 +3862,7 @@ Now reply:"""
 
     elif st.session_state.em_stage == "preview" and st.session_state.em_lesson:
         st.markdown("---")
-        st.markdown(f"#### 📖 Lesson: **{st.session_state.em_topic}** ({st.session_state.em_age})")
+        st.markdown(f"#### 📖 Lesson: **{st.session_state.em_topic}** • {st.session_state.em_language}")
 
         lesson_text = st.session_state.em_lesson.replace("\\", "\\\\").replace("`", "\\`").replace("$", "\\$")
 
@@ -3870,7 +3877,7 @@ Now reply:"""
                 border: 1px solid #334155;
                 border-radius: 16px;
                 padding: 24px;
-                max-height: 600px;
+                max-height: 620px;
                 overflow-y: auto;
             }}
             .lesson-header {{
@@ -3887,6 +3894,45 @@ Now reply:"""
                 color: #10b981; font-size: 12px; font-weight: 800;
                 text-transform: uppercase; letter-spacing: 1px;
             }}
+
+            /* ⭐ Clyxess is responding status */
+            .responding-status {{
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                padding: 12px 16px;
+                background: linear-gradient(90deg, rgba(16,185,129,0.08), rgba(6,182,212,0.08));
+                border: 1px solid rgba(16,185,129,0.25);
+                border-radius: 12px;
+                margin-bottom: 18px;
+                animation: fadeIn 0.4s ease;
+            }}
+            @keyframes fadeIn {{ from {{ opacity:0; transform: translateY(-6px); }} to {{ opacity:1; transform: translateY(0); }} }}
+            .responding-status .pulse-dot {{
+                width: 10px; height: 10px; border-radius: 50%;
+                background: #10b981;
+                box-shadow: 0 0 12px #10b981;
+                animation: strongPulse 1.2s infinite;
+            }}
+            @keyframes strongPulse {{
+                0%,100% {{ transform: scale(1); opacity: 1; }}
+                50% {{ transform: scale(1.4); opacity: 0.5; }}
+            }}
+            .responding-status .status-text {{
+                color: #10b981;
+                font-size: 13px;
+                font-weight: 700;
+                letter-spacing: 0.3px;
+            }}
+            .responding-status .shimmer {{
+                background: linear-gradient(90deg, #10b981 0%, #6ee7b7 50%, #10b981 100%);
+                background-size: 200% auto;
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                animation: shimmer 2s linear infinite;
+            }}
+            @keyframes shimmer {{ to {{ background-position: 200% center; }} }}
+
             .lesson-content {{
                 color: #e2e8f0; font-size: 14.5px;
                 line-height: 1.8; white-space: pre-wrap; word-wrap: break-word;
@@ -3916,6 +3962,13 @@ Now reply:"""
                 <div class="dot"></div>
                 <div class="title">AI Teacher Response</div>
             </div>
+
+            <!-- Clyxess is responding status -->
+            <div class="responding-status" id="respondingBox">
+                <div class="pulse-dot"></div>
+                <div class="status-text">Clyxess is responding<span class="shimmer">...</span></div>
+            </div>
+
             <div class="lesson-content"><span id="typed"></span><span class="cursor" id="cursor">▊</span></div>
             <div class="footer" id="footer">🛡️ ClyxessChat AI | Secure • Fast • Private</div>
         </div>
@@ -3926,6 +3979,7 @@ Now reply:"""
             const cursor = document.getElementById('cursor');
             const container = document.querySelector('.lesson-container');
             const footer = document.getElementById('footer');
+            const respondingBox = document.getElementById('respondingBox');
 
             function type() {{
                 if (i < fullText.length) {{
@@ -3936,11 +3990,15 @@ Now reply:"""
                     setTimeout(type, delay);
                 }} else {{
                     cursor.style.display = 'none';
+                    respondingBox.style.transition = 'opacity 0.4s, transform 0.4s';
+                    respondingBox.style.opacity = '0';
+                    respondingBox.style.transform = 'translateY(-6px)';
+                    setTimeout(() => {{ respondingBox.style.display = 'none'; }}, 400);
                     footer.classList.add('show');
                     container.scrollTop = container.scrollHeight;
                 }}
             }}
-            type();
+            setTimeout(type, 400);
         </script>
         </body>
         </html>
@@ -3961,8 +4019,8 @@ Now reply:"""
                 file_name=f"{st.session_state.em_topic.replace(' ', '_')}_lesson.txt",
                 mime="text/plain",
                 use_container_width=True
-            )
-
+            )       
+ 
 def render_math_lab(client):
     import json
     import re
