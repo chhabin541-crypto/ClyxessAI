@@ -7512,7 +7512,7 @@ with st.sidebar:
         "🚀 Physics Lab",  
         "🔢 Math Lab",  
         "💸 Learn Finance", 
-        "📱Startup App Website Builder",  
+        "📱 Data Science & Machine Learning",  
         "🔐 Login / Sign Up"
     ])
     st.markdown("---")
