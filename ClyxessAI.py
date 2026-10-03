@@ -114,18 +114,17 @@ st.markdown("""
 # ============================================================
 
 GROQ_MODELS = [
-    "llama-3.3-70b-versatile",      # 1 - Sabse best, fast + smart
-    "llama-3.1-8b-instant",         # 2 - Sabse tez, fallback ke liye
-    "openai/gpt-oss-120b",         # 3 - Tera wala purana
-    "openai/gpt-oss-20b",          # 4 - Tera wala purana
-    "qwen/qwen3-32b",              # 5 - Qwen ka naya, qwen3.6 se better chalta hai
-    "meta-llama/llama-4-maverick-17b-128e-instruct", # 6 - Llama 4 naya wala
-    "meta-llama/llama-4-scout-17b-16e-instruct",     # 7 - Llama 4 chota wala
-    "deepseek-r1-distill-llama-70b", # 8 - Coding ke liye best
-    "gemma2-9b-it",                # 9 - Google ka, halka fulka sawal ke liye
-    "mixtral-8x7b-32768"           # 10 - Last backup
+    "openai/gpt-oss-120b",
+    "qwen/qwen3-32b",
+    "meta-llama/llama-4-maverick-17b-128e-instruct",
+    "moonshotai/kimi-k2-instruct",
+    "openai/gpt-oss-20b",
+    "meta-llama/llama-4-scout-17b-16e-instruct",
+    "llama-3.1-8b-instant",
+    "llama-3.1-70b-versatile",
+    "qwen/qwen2.5-32b-instruct",
+    "meta-llama/llama-4-maverick-17b-128e-instruct",
 ]
-
 QUESTIONS_PER_LEVEL = 10
 
 # ============================================================
