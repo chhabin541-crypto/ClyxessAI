@@ -3209,7 +3209,7 @@ def render_learn_finance(client):
                          f"If the topic is about Cyber Security or Fraud, specifically explain safe vs unsafe transactions, how to avoid OTP/Phishing scams, and how to protect net banking."
                 
                 try:
-                    response = client.chat.completions.create(model="llama-3.3-70b-versatile", messages=[{"role": "user", "content": prompt}], temperature=0.7, max_tokens=1500)
+                    response = client.chat.completions.create(model="openai/gpt-oss-120b", messages=[{"role": "user", "content": prompt}], temperature=0.7, max_tokens=1500)
                     st.success("AI Response:")
                     # Typewriter effect apply kiya
                     typewriter_effect(response.choices[0].message.content)
