@@ -3567,7 +3567,7 @@ def render_physics_lab(client):
         
 def render_startup_app_websitebuilder():
     # ============================================================
-    # IMPORTS - ANDAR (Tumhara structure sahi hai)
+    # IMPORTS - ANDAR
     # ============================================================
     import os
     import json
@@ -3582,7 +3582,6 @@ def render_startup_app_websitebuilder():
     # ============================================================
     for k, v in [
         ("em_stage", "input"),
-        ("em_html", ""),
         ("em_lesson", ""),
         ("em_prompt", ""),
         ("em_age", "kids"),
@@ -3593,7 +3592,7 @@ def render_startup_app_websitebuilder():
             st.session_state[k] = v
 
     # ============================================================
-    # AI GENERATOR
+    # AI GENERATOR — AUTO LANGUAGE + FOOTER
     # ============================================================
     def call_groq(age_group, topic, question, user_name):
         if not GROQ_API_KEY:
@@ -3601,42 +3600,63 @@ def render_startup_app_websitebuilder():
 
         AGE_STYLE = {
             "kids": "बिल्कुल सरल भाषा, कहानी, खिलौने, चॉकलेट के उदाहरण. कोई coding नहीं. Emoji खूब.",
-            "school": "Simple Hinglish, रोज़मर्रा के उदाहरण (YouTube, Cricket). Basic Python 2-3 lines.",
-            "college": "Technical Hinglish, real datasets, full Python code (Pandas/Sklearn), math, career path."
+            "school": "Simple language, रोज़मर्रा के उदाहरण (YouTube, Cricket). Basic Python 2-3 lines.",
+            "college": "Technical language, real datasets, full Python code (Pandas/Sklearn), math, career path."
         }
 
         style = AGE_STYLE.get(age_group, AGE_STYLE["school"])
 
         prompt = f"""तुम ClyxessChat AI हो — Data Science & ML teacher.
-Student: {user_name} | Age: {age_group} | Topic: {topic}
-Question: {question}
 
+USER'S EXACT QUESTION: "{question}"
+
+Student: {user_name} | Age Level: {age_group} | Topic: {topic}
 Teaching style: {style}
 
-STRICT RULES:
-1. Hinglish में जवाब
-2. सिर्फ {age_group} level पर बात करो
-3. असली knowledge दो
-4. Structured format
+🔴 RULE 1 — LANGUAGE DETECTION (MOST IMPORTANT):
+Detect the language of the USER'S EXACT QUESTION above and reply in THE EXACT SAME LANGUAGE.
 
-FORMAT:
+- User wrote English → Reply ONLY in English
+- User wrote Hindi → Reply ONLY in Hindi
+- User wrote Hinglish → Reply in Hinglish
+- User wrote Tamil → Reply in Tamil
+- User wrote Telugu → Reply in Telugu
+- User wrote Bengali → Reply in Bengali
+- User wrote Spanish → Reply in Spanish
+- User wrote French → Reply in French
+- Any other language → Reply in that same language
 
-📚 **Concept (समझो):**
+DO NOT default to Hindi if user wrote in English.
+DO NOT mix languages unless the user mixed them.
+
+🔴 RULE 2 — MANDATORY FOOTER (VERY IMPORTANT):
+At the END of your response, after all the content, add this EXACT footer line on a new line:
+
+--- ClyxessChat AI | Secure • Fast • Private
+
+Do NOT translate this footer. Keep it in English EXACTLY as written above.
+
+🔴 RULE 3 — STRUCTURE:
+Use this format in the user's language:
+
+📚 **Concept:**
 [2-4 lines]
 
-🎯 **Example (देखो):**
+🎯 **Example:**
 [1-2 real examples]
 
-🛠️ **Activity (करके देखो):**
+🛠️ **Activity:**
 [hands-on task]
 
-🚀 **Next Step (आगे क्या):**
-[next level hint]
+🚀 **Next Step:**
+[next hint]
 
 💡 **Pro Tip:**
-[important baat]
+[important point]
 
-अब जवाब दे:"""
+--- ClyxessChat AI | Secure • Fast • Private
+
+Now reply:"""
 
         MODELS = [
             "openai/gpt-oss-120b",
@@ -3652,7 +3672,7 @@ FORMAT:
                 client = Groq(api_key=GROQ_API_KEY)
                 res = client.chat.completions.create(
                     messages=[
-                        {"role": "system", "content": "You are a brilliant patient teacher."},
+                        {"role": "system", "content": "You are ClyxessChat AI. Always reply in the exact same language the user wrote in. Always end your response with: --- ClyxessChat AI | Secure • Fast • Private"},
                         {"role": "user", "content": prompt}
                     ],
                     model=model,
@@ -3661,13 +3681,16 @@ FORMAT:
                 )
                 text = res.choices[0].message.content.strip()
                 if len(text) > 100:
+                    # Ensure footer is always there
+                    if "ClyxessChat AI | Secure" not in text:
+                        text = text.rstrip() + "\n\n--- ClyxessChat AI | Secure • Fast • Private"
                     return text, None
                 last_error = f"{model}: short output"
             except Exception as e:
                 last_error = f"{model}: {str(e)[:80]}"
                 continue
 
-        return None, last_error or "Sab models fail"
+        return None, last_error or "All models failed"
 
     # ============================================================
     # PAGE STYLING
@@ -3715,21 +3738,6 @@ FORMAT:
         font-weight: 900;
         margin-top: 4px;
     }
-    .lesson-box {
-        background: rgba(15,23,42,0.7);
-        border: 1px solid #334155;
-        border-radius: 20px;
-        padding: 24px;
-        margin-top: 16px;
-    }
-    .lesson-box .title {
-        color: #10b981;
-        font-size: 12px;
-        font-weight: 800;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        margin-bottom: 12px;
-    }
     </style>
     """, unsafe_allow_html=True)
 
@@ -3739,16 +3747,16 @@ FORMAT:
     st.markdown("""
     <div class="clyx-header">
         <h1>🧠 ClyxessChat AI — Data Science & ML Lab</h1>
-        <p>Personalized AI learning for every age — 8 saal se lekar college tak</p>
+        <p>Auto language detection — likho kisi bhi language mein, jawab usi language mein milega</p>
     </div>
     """, unsafe_allow_html=True)
 
     # ============================================================
-    # STATS ROW
+    # STATS
     # ============================================================
     c1, c2, c3 = st.columns(3)
     with c1:
-        st.markdown('<div class="stat-card"><div class="label">Lessons</div><div class="value" id="s1">0</div></div>', unsafe_allow_html=True)
+        st.markdown('<div class="stat-card"><div class="label">Lessons</div><div class="value">0</div></div>', unsafe_allow_html=True)
     with c2:
         st.markdown('<div class="stat-card"><div class="label">Level</div><div class="value">1</div></div>', unsafe_allow_html=True)
     with c3:
@@ -3800,18 +3808,18 @@ FORMAT:
         st.session_state.em_topic = topic
 
     with col_right:
-        st.markdown("#### ❓ Custom Question (Optional)")
+        st.markdown("#### ❓ Your Question")
+        st.caption("🌐 Hindi, English, Tamil, Spanish, French — koi bhi language try karo")
         custom_q = st.text_area(
             "Question",
-            placeholder="e.g., Gradient Descent kya hai? Pandas kaise use karein?",
-            height=100,
+            placeholder="e.g., What is Machine Learning?\nया: Machine Learning kya hai?\nया: ¿Qué es el aprendizaje automático?",
+            height=120,
             label_visibility="collapsed",
             key="em_q"
         )
 
-        st.markdown("#### 🚀 Ready?")
         if st.button("▶️ Start Learning", use_container_width=True, type="primary", key="em_start"):
-            question = custom_q.strip() if custom_q.strip() else f"{topic} kya hai aur kaise kaam karta hai?"
+            question = custom_q.strip() if custom_q.strip() else f"What is {topic} and how does it work?"
             st.session_state.em_prompt = question
             st.session_state.em_lesson = ""
             st.session_state.em_err = ""
@@ -3849,21 +3857,14 @@ FORMAT:
         st.markdown("---")
         st.markdown(f"#### 📖 Lesson: **{st.session_state.em_topic}** ({st.session_state.em_age})")
 
-        # Typewriter effect using components.html
-        lesson_text = st.session_state.em_lesson.replace("`", "\\`").replace("$", "\\$")
+        lesson_text = st.session_state.em_lesson.replace("\\", "\\\\").replace("`", "\\`").replace("$", "\\$")
 
         typewriter_html = f"""
         <!DOCTYPE html>
         <html>
         <head>
-        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
         <style>
-            body {{
-                margin: 0;
-                padding: 0;
-                background: transparent;
-                font-family: 'Inter', system-ui, sans-serif;
-            }}
+            body {{ margin: 0; padding: 0; background: transparent; font-family: 'Inter', system-ui, sans-serif; }}
             .lesson-container {{
                 background: rgba(15,23,42,0.7);
                 border: 1px solid #334155;
@@ -3873,46 +3874,38 @@ FORMAT:
                 overflow-y: auto;
             }}
             .lesson-header {{
-                display: flex;
-                align-items: center;
-                gap: 8px;
-                padding-bottom: 12px;
-                border-bottom: 1px solid #334155;
-                margin-bottom: 16px;
+                display: flex; align-items: center; gap: 8px;
+                padding-bottom: 12px; border-bottom: 1px solid #334155; margin-bottom: 16px;
             }}
             .lesson-header .dot {{
                 width: 8px; height: 8px; border-radius: 50%;
-                background: #10b981;
-                box-shadow: 0 0 10px #10b981;
+                background: #10b981; box-shadow: 0 0 10px #10b981;
                 animation: pulse 1.5s infinite;
             }}
-            @keyframes pulse {{
-                0%,100% {{ opacity: 1; }}
-                50% {{ opacity: 0.4; }}
-            }}
+            @keyframes pulse {{ 0%,100% {{ opacity: 1; }} 50% {{ opacity: 0.4; }} }}
             .lesson-header .title {{
-                color: #10b981;
-                font-size: 12px;
-                font-weight: 800;
-                text-transform: uppercase;
-                letter-spacing: 1px;
+                color: #10b981; font-size: 12px; font-weight: 800;
+                text-transform: uppercase; letter-spacing: 1px;
             }}
             .lesson-content {{
-                color: #e2e8f0;
-                font-size: 14.5px;
-                line-height: 1.8;
-                white-space: pre-wrap;
-                word-wrap: break-word;
+                color: #e2e8f0; font-size: 14.5px;
+                line-height: 1.8; white-space: pre-wrap; word-wrap: break-word;
             }}
-            .cursor {{
+            .cursor {{ color: #10b981; font-weight: bold; animation: blink 1s infinite; }}
+            @keyframes blink {{ 0%,50% {{ opacity: 1; }} 51%,100% {{ opacity: 0; }} }}
+            .footer {{
+                margin-top: 20px;
+                padding-top: 12px;
+                border-top: 1px solid #334155;
+                text-align: center;
                 color: #10b981;
-                font-weight: bold;
-                animation: blink 1s infinite;
+                font-size: 11px;
+                font-weight: 700;
+                letter-spacing: 1px;
+                opacity: 0;
+                transition: opacity 0.5s ease;
             }}
-            @keyframes blink {{
-                0%,50% {{ opacity: 1; }}
-                51%,100% {{ opacity: 0; }}
-            }}
+            .footer.show {{ opacity: 1; }}
             ::-webkit-scrollbar {{ width: 6px; }}
             ::-webkit-scrollbar-thumb {{ background: #334155; border-radius: 3px; }}
         </style>
@@ -3924,6 +3917,7 @@ FORMAT:
                 <div class="title">AI Teacher Response</div>
             </div>
             <div class="lesson-content"><span id="typed"></span><span class="cursor" id="cursor">▊</span></div>
+            <div class="footer" id="footer">🛡️ ClyxessChat AI | Secure • Fast • Private</div>
         </div>
         <script>
             const fullText = `{lesson_text}`;
@@ -3931,6 +3925,7 @@ FORMAT:
             const target = document.getElementById('typed');
             const cursor = document.getElementById('cursor');
             const container = document.querySelector('.lesson-container');
+            const footer = document.getElementById('footer');
 
             function type() {{
                 if (i < fullText.length) {{
@@ -3941,6 +3936,8 @@ FORMAT:
                     setTimeout(type, delay);
                 }} else {{
                     cursor.style.display = 'none';
+                    footer.classList.add('show');
+                    container.scrollTop = container.scrollHeight;
                 }}
             }}
             type();
@@ -3949,9 +3946,8 @@ FORMAT:
         </html>
         """
 
-        components.html(typewriter_html, height=650, scrolling=False)
+        components.html(typewriter_html, height=700, scrolling=False)
 
-        # New lesson button
         col_a, col_b = st.columns([1, 1])
         with col_a:
             if st.button("🔄 New Lesson", use_container_width=True, key="em_new"):
