@@ -3566,176 +3566,406 @@ def render_physics_lab(client):
                     st.session_state.phy_doubts.append({"role": "assistant", "content": reply}) 
         
 def render_startup_app_websitebuilder():
+    # ============================================================
+    # IMPORTS - ANDAR (Tumhara structure sahi hai)
+    # ============================================================
     import os
     import json
+    import time
     import streamlit as st
     import streamlit.components.v1 as components
 
     GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "")
 
-    for k, v in [("em_html", ""), ("em_prompt", ""), ("em_stage", "input"), ("em_err", "")]:
+    # ============================================================
+    # SESSION STATE
+    # ============================================================
+    for k, v in [
+        ("em_stage", "input"),
+        ("em_html", ""),
+        ("em_lesson", ""),
+        ("em_prompt", ""),
+        ("em_age", "kids"),
+        ("em_topic", "Data Science"),
+        ("em_err", "")
+    ]:
         if k not in st.session_state:
             st.session_state[k] = v
 
-    # ------------------------------------------------------------
+    # ============================================================
     # AI GENERATOR
-    # ------------------------------------------------------------
-    def generate_html(prompt, api_key):
-        if not api_key:
+    # ============================================================
+    def call_groq(age_group, topic, question, user_name):
+        if not GROQ_API_KEY:
             return None, "GROQ_API_KEY set nahi hai"
 
-        # Models in order of preference
+        AGE_STYLE = {
+            "kids": "बिल्कुल सरल भाषा, कहानी, खिलौने, चॉकलेट के उदाहरण. कोई coding नहीं. Emoji खूब.",
+            "school": "Simple Hinglish, रोज़मर्रा के उदाहरण (YouTube, Cricket). Basic Python 2-3 lines.",
+            "college": "Technical Hinglish, real datasets, full Python code (Pandas/Sklearn), math, career path."
+        }
+
+        style = AGE_STYLE.get(age_group, AGE_STYLE["school"])
+
+        prompt = f"""तुम ClyxessChat AI हो — Data Science & ML teacher.
+Student: {user_name} | Age: {age_group} | Topic: {topic}
+Question: {question}
+
+Teaching style: {style}
+
+STRICT RULES:
+1. Hinglish में जवाब
+2. सिर्फ {age_group} level पर बात करो
+3. असली knowledge दो
+4. Structured format
+
+FORMAT:
+
+📚 **Concept (समझो):**
+[2-4 lines]
+
+🎯 **Example (देखो):**
+[1-2 real examples]
+
+🛠️ **Activity (करके देखो):**
+[hands-on task]
+
+🚀 **Next Step (आगे क्या):**
+[next level hint]
+
+💡 **Pro Tip:**
+[important baat]
+
+अब जवाब दे:"""
+
         MODELS = [
             "openai/gpt-oss-120b",
             "qwen/qwen3-32b",
             "meta-llama/llama-4-maverick-17b-128e-instruct",
-            "openai/gpt-oss-20b",
-            "meta-llama/llama-4-scout-17b-16e-instruct",
+            "openai/gpt-oss-20b"
         ]
-
-        sys_prompt = f"""You are an expert web developer. Return ONLY complete HTML. No markdown, no backticks, no explanation.
-
-User wants: {prompt}
-
-Rules:
-- Start with <!DOCTYPE html>
-- End with </html>
-- Use Tailwind CSS CDN
-- Use FontAwesome icons
-- Sections: navbar, hero, features (3-4 cards), about, contact form, footer
-- Dark theme (bg-slate-950, emerald-500 accents)
-- Mobile responsive
-- Real content based on user request
-
-Return the complete HTML now:"""
 
         last_error = ""
         for model in MODELS:
             try:
                 from groq import Groq
-                client = Groq(api_key=api_key)
+                client = Groq(api_key=GROQ_API_KEY)
                 res = client.chat.completions.create(
-                    messages=[{"role": "user", "content": sys_prompt}],
+                    messages=[
+                        {"role": "system", "content": "You are a brilliant patient teacher."},
+                        {"role": "user", "content": prompt}
+                    ],
                     model=model,
                     temperature=0.7,
-                    max_tokens=6000
+                    max_tokens=2000
                 )
-                html = res.choices[0].message.content.strip()
-
-                # Clean markdown fences if any
-                if html.startswith("```"):
-                    parts = html.split("```")
-                    if len(parts) > 1:
-                        html = parts[1]
-                        if html.startswith("html"):
-                            html = html[4:]
-                        html = html.strip()
-
-                if len(html) > 500 and "<!DOCTYPE" in html.upper():
-                    return html, None
-
-                last_error = f"{model}: chhota output ({len(html)} chars)"
+                text = res.choices[0].message.content.strip()
+                if len(text) > 100:
+                    return text, None
+                last_error = f"{model}: short output"
             except Exception as e:
-                last_error = f"{model}: {str(e)[:100]}"
+                last_error = f"{model}: {str(e)[:80]}"
                 continue
 
-        return None, last_error or "Sab models fail ho gaye"
+        return None, last_error or "Sab models fail"
 
-    # ------------------------------------------------------------
-    # STAGE 1: INPUT
-    # ------------------------------------------------------------
-    if st.session_state.em_stage == "input":
-        st.markdown("""
-        <div style="text-align:center; padding:60px 20px 30px 20px;">
-            <h1 style="font-size:38px; font-weight:900; color:#e2e8f0; margin:0;">Start with one prompt.</h1>
-            <p style="color:#64748b; margin-top:8px; font-size:15px;">We'll bring your idea to life.</p>
-        </div>
-        """, unsafe_allow_html=True)
+    # ============================================================
+    # PAGE STYLING
+    # ============================================================
+    st.markdown("""
+    <style>
+    .clyx-header {
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+        border: 1px solid #334155;
+        border-radius: 20px;
+        padding: 24px 28px;
+        margin-bottom: 20px;
+        box-shadow: 0 10px 40px rgba(16,185,129,0.1);
+    }
+    .clyx-header h1 {
+        background: linear-gradient(135deg, #10b981, #06b6d4, #8b5cf6);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-size: 26px;
+        font-weight: 900;
+        margin: 0;
+    }
+    .clyx-header p {
+        color: #94a3b8;
+        font-size: 13px;
+        margin: 6px 0 0 0;
+    }
+    .stat-card {
+        background: rgba(15,23,42,0.7);
+        border: 1px solid #334155;
+        border-radius: 16px;
+        padding: 16px;
+        text-align: center;
+    }
+    .stat-card .label {
+        color: #64748b;
+        font-size: 11px;
+        text-transform: uppercase;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+    }
+    .stat-card .value {
+        color: #10b981;
+        font-size: 24px;
+        font-weight: 900;
+        margin-top: 4px;
+    }
+    .lesson-box {
+        background: rgba(15,23,42,0.7);
+        border: 1px solid #334155;
+        border-radius: 20px;
+        padding: 24px;
+        margin-top: 16px;
+    }
+    .lesson-box .title {
+        color: #10b981;
+        font-size: 12px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 12px;
+    }
+    </style>
+    """, unsafe_allow_html=True)
 
-        col1, col2, col3 = st.columns([1, 3, 1])
-        with col2:
-            prompt = st.text_area(
-                "Prompt",
-                placeholder="e.g., Ek food delivery website banao...",
-                height=140,
-                label_visibility="collapsed",
-                key="em_input_box"
-            )
+    # ============================================================
+    # HEADER
+    # ============================================================
+    st.markdown("""
+    <div class="clyx-header">
+        <h1>🧠 ClyxessChat AI — Data Science & ML Lab</h1>
+        <p>Personalized AI learning for every age — 8 saal se lekar college tak</p>
+    </div>
+    """, unsafe_allow_html=True)
 
-            if st.button("✨ Generate", use_container_width=True, type="primary"):
-                if not prompt.strip():
-                    st.warning("Pehle idea likho")
-                else:
-                    st.session_state.em_prompt = prompt
-                    st.session_state.em_stage = "loading"
-                    st.rerun()
+    # ============================================================
+    # STATS ROW
+    # ============================================================
+    c1, c2, c3 = st.columns(3)
+    with c1:
+        st.markdown('<div class="stat-card"><div class="label">Lessons</div><div class="value" id="s1">0</div></div>', unsafe_allow_html=True)
+    with c2:
+        st.markdown('<div class="stat-card"><div class="label">Level</div><div class="value">1</div></div>', unsafe_allow_html=True)
+    with c3:
+        st.markdown('<div class="stat-card"><div class="label">Streak</div><div class="value">0</div></div>', unsafe_allow_html=True)
 
-        st.markdown("<br>", unsafe_allow_html=True)
-        st.markdown('<p style="text-align:center; color:#64748b; font-size:13px;">Try these:</p>', unsafe_allow_html=True)
+    st.markdown("<br>", unsafe_allow_html=True)
 
-        ex1, ex2, ex3 = st.columns(3)
-        for col, ex in zip([ex1, ex2, ex3], ["🍔 Food delivery", "☕ Coffee shop", "📚 Library app"]):
-            with col:
-                if st.button(ex, use_container_width=True):
-                    st.session_state.em_prompt = ex.split(" ", 1)[1]
-                    st.session_state.em_stage = "loading"
-                    st.rerun()
+    # ============================================================
+    # INPUT SECTION
+    # ============================================================
+    col_left, col_right = st.columns([1, 2])
 
-    # ------------------------------------------------------------
-    # STAGE 2: LOADING
-    # ------------------------------------------------------------
-    elif st.session_state.em_stage == "loading":
-        st.markdown("""
-        <div style="text-align:center; padding:180px 20px;">
-            <div style="font-size:50px;">⚙️</div>
-            <h2 style="color:#10b981; margin-top:20px;">Building your app...</h2>
-        </div>
-        """, unsafe_allow_html=True)
+    with col_left:
+        st.markdown("#### 👤 Student Info")
+        user_name = st.text_input("Your Name", value="Student", key="em_user")
 
-        html, err = generate_html(st.session_state.em_prompt, GROQ_API_KEY)
+        st.markdown("#### 🎂 Age Group")
+        age_choice = st.radio(
+            "Age",
+            ["🧒 8-12 (Kids)", "🎓 13-17 (School)", "🎯 18+ (College)"],
+            label_visibility="collapsed",
+            key="em_age_radio"
+        )
+        if "8-12" in age_choice:
+            st.session_state.em_age = "kids"
+        elif "13-17" in age_choice:
+            st.session_state.em_age = "school"
+        else:
+            st.session_state.em_age = "college"
 
-        if html:
-            st.session_state.em_html = html
+        st.markdown("#### 📚 Topic")
+        topic = st.selectbox(
+            "Topic",
+            [
+                "Data Science",
+                "Machine Learning",
+                "Neural Networks",
+                "Deep Learning",
+                "Python for Data Science",
+                "Statistics",
+                "AI Ethics",
+                "Computer Vision",
+                "Natural Language Processing",
+                "Reinforcement Learning"
+            ],
+            label_visibility="collapsed",
+            key="em_topic_sel"
+        )
+        st.session_state.em_topic = topic
+
+    with col_right:
+        st.markdown("#### ❓ Custom Question (Optional)")
+        custom_q = st.text_area(
+            "Question",
+            placeholder="e.g., Gradient Descent kya hai? Pandas kaise use karein?",
+            height=100,
+            label_visibility="collapsed",
+            key="em_q"
+        )
+
+        st.markdown("#### 🚀 Ready?")
+        if st.button("▶️ Start Learning", use_container_width=True, type="primary", key="em_start"):
+            question = custom_q.strip() if custom_q.strip() else f"{topic} kya hai aur kaise kaam karta hai?"
+            st.session_state.em_prompt = question
+            st.session_state.em_lesson = ""
             st.session_state.em_err = ""
+            st.session_state.em_stage = "loading"
+            st.rerun()
+
+    # ============================================================
+    # LOADING / RESULT
+    # ============================================================
+    if st.session_state.em_stage == "loading":
+        with st.spinner("🧠 AI tumhare liye lesson bana raha hai..."):
+            lesson, err = call_groq(
+                st.session_state.em_age,
+                st.session_state.em_topic,
+                st.session_state.em_prompt,
+                user_name
+            )
+        if lesson:
+            st.session_state.em_lesson = lesson
             st.session_state.em_stage = "preview"
+            st.session_state.em_err = ""
         else:
             st.session_state.em_err = err
             st.session_state.em_stage = "error"
         st.rerun()
 
-    # ------------------------------------------------------------
-    # STAGE 3: ERROR
-    # ------------------------------------------------------------
     elif st.session_state.em_stage == "error":
         st.error(f"❌ {st.session_state.em_err}")
-        if st.button("🔄 Try Again"):
+        if st.button("🔄 Try Again", key="em_try_again"):
             st.session_state.em_stage = "input"
             st.session_state.em_err = ""
             st.rerun()
 
-    # ------------------------------------------------------------
-    # STAGE 4: PREVIEW
-    # ------------------------------------------------------------
-    else:
-        col_a, col_b, col_c = st.columns([3, 1, 1])
+    elif st.session_state.em_stage == "preview" and st.session_state.em_lesson:
+        st.markdown("---")
+        st.markdown(f"#### 📖 Lesson: **{st.session_state.em_topic}** ({st.session_state.em_age})")
+
+        # Typewriter effect using components.html
+        lesson_text = st.session_state.em_lesson.replace("`", "\\`").replace("$", "\\$")
+
+        typewriter_html = f"""
+        <!DOCTYPE html>
+        <html>
+        <head>
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+        <style>
+            body {{
+                margin: 0;
+                padding: 0;
+                background: transparent;
+                font-family: 'Inter', system-ui, sans-serif;
+            }}
+            .lesson-container {{
+                background: rgba(15,23,42,0.7);
+                border: 1px solid #334155;
+                border-radius: 16px;
+                padding: 24px;
+                max-height: 600px;
+                overflow-y: auto;
+            }}
+            .lesson-header {{
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                padding-bottom: 12px;
+                border-bottom: 1px solid #334155;
+                margin-bottom: 16px;
+            }}
+            .lesson-header .dot {{
+                width: 8px; height: 8px; border-radius: 50%;
+                background: #10b981;
+                box-shadow: 0 0 10px #10b981;
+                animation: pulse 1.5s infinite;
+            }}
+            @keyframes pulse {{
+                0%,100% {{ opacity: 1; }}
+                50% {{ opacity: 0.4; }}
+            }}
+            .lesson-header .title {{
+                color: #10b981;
+                font-size: 12px;
+                font-weight: 800;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+            }}
+            .lesson-content {{
+                color: #e2e8f0;
+                font-size: 14.5px;
+                line-height: 1.8;
+                white-space: pre-wrap;
+                word-wrap: break-word;
+            }}
+            .cursor {{
+                color: #10b981;
+                font-weight: bold;
+                animation: blink 1s infinite;
+            }}
+            @keyframes blink {{
+                0%,50% {{ opacity: 1; }}
+                51%,100% {{ opacity: 0; }}
+            }}
+            ::-webkit-scrollbar {{ width: 6px; }}
+            ::-webkit-scrollbar-thumb {{ background: #334155; border-radius: 3px; }}
+        </style>
+        </head>
+        <body>
+        <div class="lesson-container">
+            <div class="lesson-header">
+                <div class="dot"></div>
+                <div class="title">AI Teacher Response</div>
+            </div>
+            <div class="lesson-content"><span id="typed"></span><span class="cursor" id="cursor">▊</span></div>
+        </div>
+        <script>
+            const fullText = `{lesson_text}`;
+            let i = 0;
+            const target = document.getElementById('typed');
+            const cursor = document.getElementById('cursor');
+            const container = document.querySelector('.lesson-container');
+
+            function type() {{
+                if (i < fullText.length) {{
+                    target.innerHTML = fullText.substring(0, i + 1);
+                    container.scrollTop = container.scrollHeight;
+                    i++;
+                    const delay = fullText[i-1] === '\\n' ? 5 : 12;
+                    setTimeout(type, delay);
+                }} else {{
+                    cursor.style.display = 'none';
+                }}
+            }}
+            type();
+        </script>
+        </body>
+        </html>
+        """
+
+        components.html(typewriter_html, height=650, scrolling=False)
+
+        # New lesson button
+        col_a, col_b = st.columns([1, 1])
         with col_a:
-            st.markdown(f"**💬 {st.session_state.em_prompt[:60]}**")
-        with col_b:
-            if st.button("🔄 New", use_container_width=True):
+            if st.button("🔄 New Lesson", use_container_width=True, key="em_new"):
                 st.session_state.em_stage = "input"
-                st.session_state.em_html = ""
+                st.session_state.em_lesson = ""
                 st.rerun()
-        with col_c:
+        with col_b:
             st.download_button(
-                "📥 Download",
-                data=st.session_state.em_html,
-                file_name="index.html",
-                mime="text/html",
+                "📥 Download Lesson",
+                data=st.session_state.em_lesson,
+                file_name=f"{st.session_state.em_topic.replace(' ', '_')}_lesson.txt",
+                mime="text/plain",
                 use_container_width=True
             )
-
-        st.markdown("---")
-        components.html(st.session_state.em_html, height=700, scrolling=True)
 
 def render_math_lab(client):
     import json
