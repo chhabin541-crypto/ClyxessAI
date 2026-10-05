@@ -3089,7 +3089,7 @@ Rules:
                 except Exception as e:
                     st.error(f"❌ Test generation failed: {type(e).__name__}: {str(e)[:200]}")
 qs = st.session_state.hw_questions
-        if qs:
+            if qs:
             st.markdown("---")
             for i, q in enumerate(qs):
                 st.markdown(f"**Q{i+1}. {q['question']}**")
