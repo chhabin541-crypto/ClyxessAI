@@ -3088,13 +3088,13 @@ Rules:
                     st.rerun()
                 except Exception as e:
                     st.error(f"❌ Test generation failed: {type(e).__name__}: {str(e)[:200]}")
-qs = st.session_state.hw_questions
-            if qs:
-            st.markdown("---")
-            for i, q in enumerate(qs):
-                st.markdown(f"**Q{i+1}. {q['question']}**")
-                st.session_state.hw_answers[i] = st.radio(
-                    f"ans_{i}", q["options"], key=f"hw_ans_{i}", label_visibility="collapsed")
+                qs = st.session_state.hw_questions
+                if qs:
+                   st.markdown("---")
+                for i, q in enumerate(qs):
+                   st.markdown(f"**Q{i+1}. {q['question']}**")
+                   st.session_state.hw_answers[i] = st.radio(
+                   f"ans_{i}", q["options"], key=f"hw_ans_{i}", label_visibility="collapsed")
 
             if st.button("✅ Submit Test", type="primary", use_container_width=True, key="hw_submit"):
                 score = sum(1 for i, q in enumerate(qs)
