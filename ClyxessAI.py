@@ -2836,206 +2836,393 @@ def render_cyber_security():
         render_advanced_cyber_lab() 
         
     
-def render_homework_test():
-    st.title("📝 Interactive Homework & Test")
-    c1, c2, c3 = st.columns(3)
+def render_homework_test(client):
+    import json
+    import re
+    import time
+    import datetime
+    import streamlit as st
+
+    FOOTER = "\n\n---\n🛡️ **ClyxessChat AI** • Secure • Fast • Private"
+
+    DIAGRAM_RULE = """
+
+📊 DIAGRAM MANDATORY:
+Har answer mein diagram banao using: → ← ↑ ↓ ═ ║ ╔ ╗ ╚ ╝ ● ○ ■ ▲ ▼ ⚫
+
+Rules:
+1. Har response mein KAM SE KAM 1 diagram
+2. Diagram upar: "📊 Diagram:"
+3. Neeche 2-3 line explanation
+4. Chhote bacchon ke liye simple ASCII art
+5. Bade students ke liye labeled diagram
+"""
+
+    LANGUAGES = [
+        "🌐 Auto Detect (Same as question)",
+        "🇬🇧 English", "🇮🇳 हिंदी (Hindi)", "🇮🇳 Hinglish",
+        "🇮🇳 मराठी", "🇮🇳 বাংলা", "🇮🇳 தமிழ்", "🇮🇳 తెలుగు",
+        "🇮🇳 ગુજરાતી", "🇮🇳 ಕನ್ನಡ", "🇮🇳 മലയാളം", "🇮🇳 ਪੰਜਾਬੀ",
+        "🇮🇳 ଓଡ଼ିଆ", "🇮🇳 اردو", "🇮🇳 नेपाली",
+        "🇪🇸 Español", "🇫🇷 Français", "🇩🇪 Deutsch", "🇮🇹 Italiano",
+        "🇵🇹 Português", "🇷🇺 Русский", "🇳🇱 Nederlands", "🇸🇪 Svenska",
+        "🇵🇱 Polski", "🇹🇷 Türkçe", "🇬🇷 Ελληνικά", "🇨🇿 Čeština",
+        "🇷🇴 Română", "🇭🇺 Magyar", "🇺🇦 Українська", "🇩🇰 Dansk",
+        "🇫🇮 Suomi", "🇳🇴 Norsk", "🇯🇵 日本語", "🇨🇳 中文",
+        "🇰🇷 한국어", "🇸🇦 العربية", "🇮🇱 עברית", "🇮🇷 فارسی"
+    ]
+
+    CLASS_AGE_MAP = {
+        "Class 1": "Age 6-7", "Class 2": "Age 7-8", "Class 3": "Age 8-9",
+        "Class 4": "Age 9-10", "Class 5": "Age 10-11", "Class 6": "Age 11-12",
+        "Class 7": "Age 12-13", "Class 8": "Age 13-14", "Class 9": "Age 14-15",
+        "Class 10": "Age 15-16", "Class 11": "Age 16-17", "Class 12": "Age 17-18",
+        "College Year 1": "Age 18-19", "College Year 2": "Age 19-20",
+        "University": "Age 20+"
+    }
+
+    SUBJECTS_BY_LEVEL = {
+        "Class 1": ["Maths", "English", "Hindi", "EVS", "Drawing", "General Knowledge", "Moral Science"],
+        "Class 2": ["Maths", "English", "Hindi", "EVS", "Drawing", "General Knowledge", "Moral Science"],
+        "Class 3": ["Maths", "English", "Hindi", "EVS", "Drawing", "General Knowledge", "Computer Basics"],
+        "Class 4": ["Maths", "English", "Hindi", "EVS", "Science", "Drawing", "Computer Basics"],
+        "Class 5": ["Maths", "English", "Hindi", "EVS", "Science", "Social Studies", "Computer"],
+        "Class 6": ["Maths", "Science", "English", "Hindi", "Social Studies", "Sanskrit", "Computer", "Art"],
+        "Class 7": ["Maths", "Science", "English", "Hindi", "Social Studies", "Sanskrit", "Computer", "Art"],
+        "Class 8": ["Maths", "Science", "English", "Hindi", "Social Studies", "Sanskrit", "Computer", "Art"],
+        "Class 9": ["Maths", "Physics", "Chemistry", "Biology", "English", "Hindi", "History", "Geography", "Economics", "Computer", "IT"],
+        "Class 10": ["Maths", "Physics", "Chemistry", "Biology", "English", "Hindi", "History", "Geography", "Economics", "Computer", "IT"],
+        "Class 11": ["Physics", "Chemistry", "Maths", "Biology", "Computer Science", "Accountancy", "Business Studies", "Economics", "English", "Hindi", "Political Science", "History", "Geography", "Psychology"],
+        "Class 12": ["Physics", "Chemistry", "Maths", "Biology", "Computer Science", "Accountancy", "Business Studies", "Economics", "English", "Hindi", "Political Science", "History", "Geography", "Psychology"],
+        "College Year 1": ["Data Science", "Machine Learning", "Python Programming", "Statistics", "Linear Algebra", "Calculus", "Physics", "Chemistry", "Computer Science", "Economics", "Finance"],
+        "College Year 2": ["Data Science", "Machine Learning", "Deep Learning", "AI", "Python", "Statistics", "Quantum Physics", "Astrophysics", "Robotics", "Cyber Security", "Web Development", "Finance"],
+        "University": ["Data Science", "Machine Learning", "Deep Learning", "AI", "Quantum Physics", "Astrophysics", "Robotics", "Cyber Security", "Web Development", "Mobile Development", "Blockchain", "Biotechnology", "Nanotechnology", "Neuroscience", "Research Methodology", "Financial Modeling"]
+    }
+
+    if "hw_questions" not in st.session_state:
+        st.session_state.hw_questions = []
+    if "hw_answers" not in st.session_state:
+        st.session_state.hw_answers = {}
+    if "hw_result" not in st.session_state:
+        st.session_state.hw_result = None
+    if "hw_ai_response" not in st.session_state:
+        st.session_state.hw_ai_response = ""
+
+    st.markdown("""
+    <div style="background:linear-gradient(135deg,#07152f,#111c48,#29105c);padding:24px;border-radius:20px;margin-bottom:20px;border:1px solid rgba(100,180,255,0.3);">
+        <h1 style="color:white;margin:0;font-size:30px;">📝 Interactive Homework & Test</h1>
+        <p style="color:#b8d8ff;margin:8px 0 0 0;font-size:14px;">AI-powered · Subject-wise · Diagram-based learning</p>
+    </div>
+    """, unsafe_allow_html=True)
+
+    c1, c2, c3, c4 = st.columns([1, 1, 1, 1])
+
     with c1:
-        homework_age = st.selectbox("👶 Age", PLAY_AGE_LEVELS, key="homework_age")
+        class_name = st.selectbox("🎓 Class",
+            ["Class 1","Class 2","Class 3","Class 4","Class 5","Class 6",
+             "Class 7","Class 8","Class 9","Class 10","Class 11","Class 12",
+             "College Year 1","College Year 2","University"],
+            key="hw_class")
+        st.info(f"👶 {CLASS_AGE_MAP.get(class_name, 'Age 6-18')}")
+
     with c2:
-        homework_label = st.selectbox("🌐 Language", list(PLAY_LANGUAGES.keys()), key="homework_language")
-        homework_language = PLAY_LANGUAGES[homework_label]
+        language_label = st.selectbox("🌐 Language", LANGUAGES, key="hw_lang_sel")
+
     with c3:
-        subjects = get_play_subjects(homework_age)
-        subject = st.selectbox("📚 Subject", subjects, key="homework_subject")
+        subjects = SUBJECTS_BY_LEVEL.get(class_name, ["Maths", "Science", "English"])
+        subject = st.selectbox("📚 Subject", subjects, key="hw_subject")
 
-    st.caption(f"Homework will be generated for {homework_age} in {homework_label}.")
-    if st.button("Generate Test", type="primary", use_container_width=True):
-        st.session_state.homework_questions = generate_ai_questions(
-            client, homework_age, homework_language, subject, 5
-        )
-        st.session_state.homework_answers = {}
-        st.session_state.homework_result = None
+    with c4:
+        mode = st.selectbox("🎯 Mode",
+            ["📖 Homework Help", "📝 Test Mode", "🎯 Practice", "📊 Project"],
+            key="hw_mode")
 
-    qs = st.session_state.get("homework_questions", [])
-    if qs:
-        for i, q in enumerate(qs):
-            st.session_state.homework_answers[i] = st.radio(
-                q["question"], q["options"], key=f"hw_{i}"
-            )
-        if st.button("Submit Test", use_container_width=True):
-            score = sum(
-                st.session_state.homework_answers.get(i) == q["answer"]
-                for i, q in enumerate(qs)
-            )
-            st.session_state.homework_result = f"{score}/{len(qs)}"
-            st.success(f"Score: {st.session_state.homework_result}")
+    if "Auto Detect" in language_label:
+        lang_rule = "Reply in the SAME language as the question."
+        clean_lang = "the student's language"
+    else:
+        clean_lang = language_label.split(" ", 1)[-1].split("(")[0].strip()
+        lang_rule = f"ALWAYS reply in {clean_lang} ONLY."
 
-def learning_report():
-    best=max(st.session_state.play_best_scores.values(),default=0)
-    return "\n".join([
-        "ClyxessChat AI — Learning Report",
-        f"Generated: {india_clock_text()}",
-        f"Current Level: {st.session_state.play_age}",
-        f"Language: {next((n for n,c in PLAY_LANGUAGES.items() if c==st.session_state.play_language),'English')}",
-        f"Completed Levels: {len(st.session_state.play_completed_levels)}",
-        f"Best Score: {best}/10",
-        f"Homework/Test: {st.session_state.get('homework_result') or 'Not attempted'}" 
-    ])
-def render_coding_lab_mod():
-    import streamlit.components.v1 as components
-    html_code = r'''<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Clyxess Kids Coding Lab - Final</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{background:#08080a;color:#fff;font-family:'Segoe UI',sans-serif;height:100vh;display:flex;flex-direction:column;overflow:hidden}
-.top{background:#111113;padding:10px 14px;display:flex;align-items:center;gap:10px;border-bottom:1px solid #27272a;flex-wrap:wrap}
-.logo{font-weight:900;font-size:15px;line-height:1.1}
-.beta{background:#3f3aff;color:#fff;font-size:8px;padding:2px 6px;border-radius:10px;margin-left:6px}
-.sel{background:#1e1e24;color:#fff;border:1px solid #333;padding:7px 12px;border-radius:20px;font-size:12px}
-.btn{background:#27272a;border:1px solid #444;color:#fff;padding:7px 14px;border-radius:10px;font-size:12px;cursor:pointer}
-.btn-run{background:#22c55e;color:#000;font-weight:900;padding:8px 20px;border-radius:10px;border:none}
-.main{display:flex;flex:1;overflow:hidden}
-.left{width:190px;background:#121215;border-right:1px solid #27272a;overflow:auto;padding:10px}
-.tt{font-size:10px;color:#71717a;text-transform:uppercase;margin:14px 0 6px;font-weight:700}
-.age,.lang{padding:8px 10px;border-radius:8px;font-size:12px;cursor:pointer;color:#a1a1aa;margin-bottom:2px}
-.age.active{background:#6366f1;color:#fff;font-weight:700}
-.lang.active{background:#27273a;color:#fff;border-left:3px solid #6366f1}
-.center{flex:1.2;background:#18181b;display:flex;flex-direction:column;min-width:0}
-.tabs{display:flex;background:#121215;border-bottom:1px solid #27272a}
-.tab{padding:9px 14px;font-size:11px;color:#71717a;cursor:pointer}
-.tab.active{color:#fff;background:#18181b;border-top:2px solid #6366f1}
-#editor{flex:1;background:#18181b;color:#e4e4e7;border:none;padding:14px;font-family:Consolas,monospace;font-size:13px;line-height:1.7;resize:none;outline:none}
-.right{flex:1.1;background:#1e1e24;display:flex;flex-direction:column;border-left:1px solid #27272a}
-.rhead{padding:8px 12px;background:#121215;border-bottom:1px solid #27272a;display:flex;justify-content:space-between;font-size:12px}
-.rwrap{flex:1;padding:15px;overflow:auto;background:#2a2a35;display:flex;justify-content:center}
-#prev{width:100%;height:100%;border:none;background:#fff;border-radius:12px}
-#qrBox{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:999;justify-content:center;align-items:center}
-</style>
-</head>
-<body>
-<div class="top">
-<div class="logo">🚀 Clyxess Kids Coding Lab <span class="beta">BETA</span></div>
-<select class="sel" id="ageSelect" onchange="changeAgeBySelect()"><option>Select Age</option><option>5 Years</option><option>6 Years</option><option>7 Years</option><option>8 Years</option><option>9 Years</option><option>10 Years</option><option>11-12 Years</option><option>13-14 Years</option><option>15-16 Years</option><option>17-18 Years</option><option>18+ Years</option></select>
-<select class="sel" id="langSelect"><option>HTML</option><option>CSS</option><option>JavaScript</option><option>Python</option><option>Scratch (Block)</option></select>
-<select class="sel" id="readySelect" onchange="loadReady()"><option>📦 3 Readymade Website</option><option value="r1">1. My First Page (Easy)</option><option value="r2">2. My Colour Game (Medium)</option><option value="r3">3. My Mini Shop (Pro)</option></select>
-<button class="btn" onclick="blankPage()">🧹 Blank / Clear</button>
-<button class="btn" onclick="downloadCode()">⬇ Download</button>
-<button class="btn" style="border-color:#f59e0b;color:#fbbf24" onclick="openQR()">📱 QR / Link</button>
-<button class="btn-run" onclick="run()">▶ Run</button>
-</div>
+    is_university = "University" in class_name or "College" in class_name
 
-<div class="main">
-<div class="left">
-<div class="tt">🎂 Select Age (5 to 18+)</div><div id="ageList"></div>
-<div class="tt">💻 Language</div><div id="langList"></div>
-<div style="margin-top:12px;background:#6366f1;padding:10px;border-radius:10px;font-size:11px;line-height:1.4"><b id="tipTitle">5 Years Tip:</b><br><span id="tipText">Yahan apna naam likho, color badlo! Button dabao to magic hoga!</span></div>
-</div>
+    with st.expander("⏰ Homework Time Table — Auto / Manual", expanded=False):
+        tt_mode = st.radio("Mode", ["🤖 Auto (AI banayega)", "✍️ Manual (Khud set karo)"],
+            horizontal=True, key="hw_tt_mode")
 
-<div class="center">
-<div class="tabs"><div class="tab active">index.html</div><div class="tab">style.css</div><div class="tab">script.js</div></div>
-<textarea id="editor"></textarea>
-<div style="padding:6px 10px;background:#09090b;font-size:10px;color:#666;display:flex;justify-content:space-between"><span>✅ Auto-save ON • Live Preview</span><span id="status">Ready for 5 Years</span></div>
-</div>
+        if "Auto" in tt_mode:
+            if st.button("🎯 Generate Time Table", key="hw_gen_tt"):
+                with st.spinner("AI tumhara time table bana raha hai..."):
+                    tt_prompt = f"""Create a homework time table for a {class_name} student ({CLASS_AGE_MAP.get(class_name)}).
 
-<div class="right">
-<div class="rhead"><span>👁 Live Preview</span><span style="color:#22c55e">● Live</span></div>
-<div class="rwrap"><iframe id="prev"></iframe></div>
-</div>
-</div>
+{lang_rule}
 
-<div id="qrBox"><div style="background:#1e1e24;padding:20px;border-radius:16px;text-align:center;width:90%;max-width:350px;border:1px solid #333"><h4>📱 Mobile me dekho</h4><img id="qrImg" src="" style="width:200px;height:200px;background:#fff;padding:8px;border-radius:10px;margin-top:10px"><input id="linkInput" readonly style="width:100%;margin-top:10px;background:#111;border:1px solid #333;color:#22c55e;padding:6px;border-radius:6px;font-size:9px"><div style="display:flex;gap:8px;margin-top:10px"><button onclick="copyLink()" style="flex:1;background:#6366f1;color:#fff;border:none;padding:8px;border-radius:8px">Copy Link</button><button onclick="document.getElementById('qrBox').style.display='none'" style="flex:1;background:#333;color:#fff;border:none;padding:8px;border-radius:8px">Band</button></div></div></div>
+Rules:
+- Max homework time for Class 1-2: 30 min
+- Class 3-5: 60 min
+- Class 6-8: 90 min
+- Class 9-12: 2-3 hours
+- Include breaks every 45 min
+- Include subjects: {', '.join(subjects[:5])}
 
-<script>
-const ageTemplates={
-"5 Years":{html:`<!-- 5 Saal ke bacche ke liye - Sirf Naam badlo -->\n<h1>👋 Hello! Mera Naam Aman Hai</h1>\n<p>Main 5 saal ka hu!</p>\n<!-- Neeche apna naam likho -->\n<h2 style="color:blue">Mera favourite color BLUE hai</h2>\n<button onclick="alert('Wah! Tumne button dabaya! 🌟')" style="padding:15px 30px;background:orange;color:white;border:none;border-radius:20px;font-size:18px">Mujhe Dabao!</button>`, css:`body{text-align:center;padding:30px;background:#fef9c3;font-family:'Comic Sans MS'} h1{background:white;padding:15px;border-radius:15px}`, tipTitle:"5 Years Tip:", tipText:"Apna naam likho - Aman ki jagah apna naam likh do. Blue ki jagah RED likh do to color badal jayega!"},
-"6 Years":{html:`<h1>🔤 ABCD - A for Apple 🍎</h1>\n<div class="box">B for Ball ⚽</div>\n<div class="box">C for Cat 🐱</div>\n<button onclick="this.innerText='Shabash! 🌟'">Mujhe Click Karo</button>`, css:`body{text-align:center;padding:20px;background:#dcfce7}.box{background:white;margin:10px;padding:15px;border-radius:15px;font-size:20px}`, tipTitle:"6 Years Tip:", tipText:"Apple ki jagah apna favourite fruit likho! Color badlo!"},
-"7 Years":{html:`<h1>🎨 Mera Rang Biranga Page</h1>\n<p>Neeche kisi rang pe click karo!</p>\n<div style="display:flex;gap:10px;justify-content:center">\n<div onclick="document.body.style.background='lightcoral'" style="width:70px;height:70px;background:red;border-radius:15px;cursor:pointer"></div>\n<div onclick="document.body.style.background='lightblue'" style="width:70px;height:70px;background:blue;border-radius:15px;cursor:pointer"></div>\n<div onclick="document.body.style.background='lightgreen'" style="width:70px;height:70px;background:green;border-radius:15px;cursor:pointer"></div>\n</div>`, css:`body{text-align:center;padding:30px;transition:0.5s}`, tipTitle:"7 Years Tip:", tipText:"Red, blue, green ki jagah apne color add karo!"},
-"8 Years":{html:`<h1>🐶 My Pet Dog</h1>\n<img src="https://cdn-icons-png.flaticon.com/512/616/616408.png" width="100">\n<p>Iska naam Tommy hai! Woof Woof!</p>\n<button onclick="alert('Bhow Bhow! 🐶')">Tommy ko Bulao</button>`, css:`body{text-align:center;padding:20px;background:#ffedd5}`, tipTitle:"8 Years Tip:", tipText:"Dog ki jagah Cat ka photo laga sakte ho!"},
-"9 Years":{html:`<h1>🏫 Meri School</h1>\n<ul style="text-align:left;display:inline-block;background:white;padding:20px;border-radius:15px">\n<li>Class 1 - Drawing 🎨</li>\n<li>Class 2 - ABCD 🔤</li>\n<li>Class 3 - Coding 💻</li>\n</ul>`, css:`body{padding:20px;background:#e0f2fe}`, tipTitle:"9 Years Tip:", tipText:"Apni school ki list banao!"},
-"10 Years":{html:`<h1>🎮 Click Game - Score: <span id="sc">0</span></h1>\n<button onclick="document.getElementById('sc').innerText++" style="padding:20px 40px;background:#f59e0b;color:white;border:none;border-radius:15px;font-size:20px">CLICK KARO!</button>\n<p>Kitna score kar sakte ho?</p>`, css:`body{text-align:center;padding:40px;background:#fef3c7}`, tipTitle:"10 Years Tip:", tipText:"Game ka logic samjho - click pe score badhta hai!"},
-"11-12 Years":{html:`<div style="padding:30px;text-align:center"><h1>👨‍💻 Hi, I am Coder Rohan</h1><p>Age 12 | I make websites</p><div style="background:white;color:black;padding:15px;border-radius:15px;margin-top:15px">My Skills: HTML, CSS, JS</div><button onclick="alert('Contact me!')" style="margin-top:15px;padding:10px 20px;border-radius:20px;border:none;background:#6366f1;color:white">Hire Me</button></div>`, css:`body{background:linear-gradient(135deg,#667eea,#764ba2);color:white;margin:0}`, tipTitle:"11-12 Years Tip:", tipText:"Apna portfolio banao!"},
-"13-14 Years":{html:`<h1>🧮 Calculator</h1>\n<input id="n1" type="number" placeholder="Pehla number" style="padding:10px;border-radius:8px">\n<input id="n2" type="number" placeholder="Dusra number" style="padding:10px;border-radius:8px">\n<br><br>\n<button onclick="alert('Jawab: '+(Number(n1.value)+Number(n2.value)))" style="padding:10px 20px;background:green;color:white;border:none;border-radius:8px">Jodo (+)</button>\n<button onclick="alert('Jawab: '+(Number(n1.value)*Number(n2.value)))" style="padding:10px 20px;background:blue;color:white;border:none;border-radius:8px">Guna (x)</button>`, css:`body{text-align:center;padding:30px}`, tipTitle:"13-14 Years Tip:", tipText:"Plus ki jagah minus, multiply ka logic lagao!"},
-"15-16 Years":{html:`<header style="background:white;padding:15px;display:flex;justify-content:space-between;box-shadow:0 2px 10px #0001"><b style="color:green;font-size:22px">🛒 FreshCart</b><span>Home | Cart</span></header>\n<div style="padding:30px"><h1 style="font-size:38px">Groceries<br><span style="color:green">Delivered Fast</span></h1><p>30 min me delivery!</p><button style="background:green;color:white;padding:12px 24px;border:none;border-radius:8px">Shop Now 🛒</button></div>`, css:`body{margin:0;background:#f0fdf4;font-family:sans-serif}`, tipTitle:"15-16 Years Tip:", tipText:"Pro shop ka design - color, text change karo!"},
-"17-18 Years":{html:`<div style="padding:20px"><h1>💬 Chat App UI</h1><div style="background:white;border-radius:15px;padding:15px;max-width:350px"><p style="background:#e0e7ff;padding:10px;border-radius:10px">Hi! Project kaisa laga? 😊</p><p style="background:#dcfce7;padding:10px;border-radius:10px;text-align:right">Ek dum solid hai bhai! 🔥</p><input placeholder="Message likho..." style="width:100%;padding:10px;border-radius:20px;border:1px solid #ddd;margin-top:10px"></div></div>`, css:`body{background:#f3f4f6}`, tipTitle:"17-18 Years Tip:", tipText:"Chat app jaisa UI - isko real JS se connect kar sakte ho!"},
-"18+ Years":{html:`<!DOCTYPE html>\n<html><head><title>My Pro Website</title></head><body>\n<h1>🚀 Welcome to Pro Coding</h1>\n<p>Ab yahan se tum apna khud ka full website likh sakte ho!</p>\n<button onclick="alert('Pro Coder!')">Click Me</button>\n</body></html>`, css:`body{padding:20px;font-family:Arial}`, tipTitle:"18+ Years Tip:", tipText:"Full blank - HTML, CSS, JS sab khud likho!"}
-};
+Format as table with Time, Subject, Duration, Break.
+Include a short note at end about balanced study.
+End with footer: --- ClyxessChat AI • Secure • Fast • Private"""
+                    try:
+                        r = client.chat.completions.create(
+                            model="openai/gpt-oss-120b",
+                            messages=[{"role": "user", "content": tt_prompt}],
+                            temperature=0.7, max_tokens=1500)
+                        st.markdown(r.choices[0].message.content)
+                    except Exception as e:
+                        st.error(f"❌ {type(e).__name__}: {str(e)[:150]}")
+        else:
+            st.write("Khud set karo — sliders se:")
+            subjects_tt = subjects[:4]
+            for s in subjects_tt:
+                st.slider(f"⏱️ {s} (minutes)", 0, 120, 30, key=f"tt_{s}")
+            if st.button("💾 Save Time Table", key="hw_save_tt"):
+                st.success("✅ Time table save ho gaya! (Session mein)")
 
-const readyMade={
-r1:{html:`<h1>🌟 My First Page</h1><p>Mera naam <b style="color:blue">Aman</b> hai</p><p>Main 5 saal ka hu aur mujhe coding pasand hai!</p><button onclick="alert('Hi Aman!')">Hello Bolo</button>`, css:`body{text-align:center;padding:30px;background:#fef9c3} button{padding:12px 20px;background:orange;border:none;border-radius:20px}`},
-r2:{html:`<h1>🎨 My Colour Game</h1><p>Click any color!</p><div style="display:flex;gap:10px;justify-content:center"><div onclick="document.body.style.background='pink'" style="width:60px;height:60px;background:red;border-radius:50%"></div><div onclick="document.body.style.background='lightblue'" style="width:60px;height:60px;background:blue;border-radius:50%"></div><div onclick="document.body.style.background='lightgreen'" style="width:60px;height:60px;background:green;border-radius:50%"></div></div>`, css:`body{text-align:center;padding:30px;transition:0.5s}`},
-r3:{html:`<header style="background:white;padding:12px;display:flex;justify-content:space-between"><b>🛒 My Mini Shop</b><span>Cart (0)</span></header><div style="padding:20px"><h2>Toys - 50% OFF!</h2><div style="background:white;padding:15px;border-radius:12px"><p>🧸 Teddy - ₹299</p><button style="background:green;color:white;padding:8px 16px;border:none;border-radius:8px">Buy Now</button></div></div>`, css:`body{margin:0;background:#f0fdf4}`}
-};
+    st.divider()
 
-const ages=Object.keys(ageTemplates);
-document.getElementById('ageList').innerHTML=ages.map((a,i)=>`<div class="age ${i==0?'active':''}" onclick="selectAge('${a}',this)">${a}</div>`).join('');
-document.getElementById('langList').innerHTML=["HTML","CSS","JavaScript","Python","Scratch"].map((l,i)=>`<div class="lang ${i==0?'active':''}" onclick="this.parentNode.querySelectorAll('.lang').forEach(x=>x.classList.remove('active'));this.classList.add('active')">${l}</div>`).join('');
+    if mode == "📖 Homework Help":
+        st.subheader("📖 Ask Any Homework Question")
+        st.caption(f"Class: {class_name} | Subject: {subject} | Language: {clean_lang}")
 
-function selectAge(age,el){
- document.querySelectorAll('.age').forEach(x=>x.classList.remove('active')); el.classList.add('active');
- document.getElementById('ageSelect').value=age;
- applyAge(age);
-}
-function changeAgeBySelect(){
- let age=document.getElementById('ageSelect').value;
- if(!ageTemplates[age]) return;
- document.querySelectorAll('.age').forEach(x=>{ if(x.innerText==age) x.classList.add('active'); else x.classList.remove('active'); });
- applyAge(age);
-}
-function applyAge(age){
- let data=ageTemplates[age];
- document.getElementById('editor').value=data.html+"\n\n<style>\n"+data.css+"\n</style>";
- document.getElementById('tipTitle').innerText=data.tipTitle;
- document.getElementById('tipText').innerText=data.tipText;
- document.getElementById('status').innerText="Ready for "+age;
- run();
-}
-function loadReady(){
- let v=document.getElementById('readySelect').value;
- if(!readyMade[v]) return;
- let d=readyMade[v];
- document.getElementById('editor').value=d.html+"\n\n<style>\n"+d.css+"\n</style>";
- run();
-}
-function blankPage(){
- if(confirm("Kya sach me blank karna hai? Saara code hat jayega!")){
-  document.getElementById('editor').value="<h1>Hello World!</h1>\n<p>Yahan se apna naya code likho...</p>\n\n<style>\nbody{padding:20px;font-family:Arial}\n</style>";
-  run();
- }
-}
-function run(){
- let code=document.getElementById('editor').value;
- document.getElementById('prev').srcdoc=code;
- localStorage.setItem('clyxess_final',code);
-}
-function downloadCode(){
- let blob=new Blob([document.getElementById('editor').value],{type:'text/html'});
- let a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download="Clyxess-Project-"+Date.now()+".html"; a.click();
-}
-function openQR(){
- run();
- let b64=btoa(unescape(encodeURIComponent(document.getElementById('editor').value)));
- let dataUrl='data:text/html;base64,'+b64;
- document.getElementById('qrImg').src='https://api.qrserver.com/v1/create-qr-code/?size=250x250&data='+encodeURIComponent(dataUrl);
- document.getElementById('linkInput').value=dataUrl;
- document.getElementById('qrBox').style.display='flex';
-}
-function copyLink(){
- let i=document.getElementById('linkInput'); i.select();
- navigator.clipboard.writeText(i.value).then(()=>alert("✅ Link Copy ho gaya! Bacche WhatsApp pe khol sakte hain"));
-}
-let timer; document.getElementById('editor').addEventListener('input',()=>{clearTimeout(timer); timer=setTimeout(run,500);});
-// default 5 years load
-applyAge("5 Years");
-</script>
-</body>
-</html>
-'''
-    components.html(html_code, height=950, scrolling=False) 
+        question = st.text_area("Your question / doubt:",
+            placeholder="e.g., 2x + 5 = 15 solve karo, ya photosynthesize kya hai?",
+            height=100, key="hw_question")
 
+        if st.button("🚀 Get Answer + Diagram", type="primary", use_container_width=True, key="hw_get_answer"):
+            if not question.strip():
+                st.warning("Pehle question likho!")
+            else:
+                with st.spinner("AI teacher soch raha hai..."):
+                    prompt = f"""You are an expert {subject} Teacher for a {class_name} student ({CLASS_AGE_MAP.get(class_name)}).
+
+{lang_rule}
+
+STUDENT'S QUESTION: {question}
+
+Rules:
+1. Explain step-by-step
+2. Use simple language for the class level
+3. ALWAYS include a diagram
+4. Give a real-world example
+5. End with a practice question
+
+Format:
+📚 Concept
+🎯 Step-by-Step Solution
+📊 Diagram (MANDATORY)
+🌍 Real-Life Example
+❓ Practice Question
+
+{DIAGRAM_RULE}
+
+End with footer: --- ClyxessChat AI • Secure • Fast • Private"""
+
+                    try:
+                        r = client.chat.completions.create(
+                            model="openai/gpt-oss-120b",
+                            messages=[{"role": "user", "content": prompt}],
+                            temperature=0.7, max_tokens=2500)
+                        text = r.choices[0].message.content
+                        if "ClyxessChat AI" not in text:
+                            text += FOOTER
+                        st.session_state.hw_ai_response = text
+                    except Exception as e:
+                        st.error(f"❌ {type(e).__name__}: {str(e)[:200]}")
+
+        if st.session_state.hw_ai_response:
+            st.markdown("---")
+            st.markdown(st.session_state.hw_ai_response)
+            st.download_button("📥 Download Answer",
+                data=st.session_state.hw_ai_response,
+                file_name=f"homework_{subject}_{datetime.datetime.now().strftime('%Y%m%d')}.txt",
+                mime="text/plain", key="hw_dl_ans")
+
+    elif mode == "📝 Test Mode":
+        st.subheader("📝 Auto-Generated Test")
+        st.caption(f"Class: {class_name} | Subject: {subject} | Language: {clean_lang}")
+
+        num_q = st.slider("Number of questions:", 5, 15, 5, key="hw_num_q")
+        difficulty = st.select_slider("Difficulty:",
+            ["Easy", "Medium", "Hard", "Expert"], value="Medium", key="hw_diff")
+
+        if st.button("🎯 Generate Test", type="primary", use_container_width=True, key="hw_gen_test"):
+            with st.spinner("Test ban raha hai..."):
+                quiz_prompt = f"""Create {num_q} MCQ questions for a {class_name} student on {subject}.
+Difficulty: {difficulty}
+
+{lang_rule}
+
+Return ONLY valid JSON array:
+[{{"question":"...","options":["A","B","C","D"],"answer":"A","explanation":"..."}}]
+
+Rules:
+- Age-appropriate
+- Real-world context
+- Exactly 4 options
+- Explanation in {clean_lang}"""
+
+                try:
+                    r = client.chat.completions.create(
+                        model="openai/gpt-oss-120b",
+                        messages=[{"role": "user", "content": quiz_prompt}],
+                        temperature=0.5, max_tokens=3500)
+                    raw = r.choices[0].message.content
+                    match = re.search(r"\[[\s\S]*\]", raw)
+                    if not match:
+                        raise ValueError("No JSON found")
+                    qs = json.loads(match.group(0))
+                    valid = []
+                    for q in qs:
+                        if isinstance(q, dict) and "question" in q and "options" in q and "answer" in q:
+                            if len(q["options"]) == 4 and q["answer"] in q["options"]:
+                                valid.append(q)
+                    st.session_state.hw_questions = valid
+                    st.session_state.hw_answers = {}
+                    st.session_state.hw_result = None
+                    st.rerun()
+                except Exception as e:
+                    st.error(f"❌ Test generation failed: {type(e).__name__}: {str(e)[:200]}")
+qs = st.session_state.hw_questions
+        if qs:
+            st.markdown("---")
+            for i, q in enumerate(qs):
+                st.markdown(f"**Q{i+1}. {q['question']}**")
+                st.session_state.hw_answers[i] = st.radio(
+                    f"ans_{i}", q["options"], key=f"hw_ans_{i}", label_visibility="collapsed")
+
+            if st.button("✅ Submit Test", type="primary", use_container_width=True, key="hw_submit"):
+                score = sum(1 for i, q in enumerate(qs)
+                           if st.session_state.hw_answers.get(i) == q["answer"])
+                total = len(qs)
+                pct = (score / total * 100) if total else 0
+                st.session_state.hw_result = f"{score}/{total} ({pct:.0f}%)"
+
+                if pct >= 80:
+                    st.balloons()
+                    st.success(f"🏆 Excellent! Score: {st.session_state.hw_result}")
+                elif pct >= 50:
+                    st.info(f"👍 Good! Score: {st.session_state.hw_result}")
+                else:
+                    st.warning(f"📚 Practice needed. Score: {st.session_state.hw_result}")
+
+                st.markdown("---")
+                st.markdown("### 📖 Answer Key + Explanations")
+                for i, q in enumerate(qs):
+                    user_ans = st.session_state.hw_answers.get(i)
+                    correct = q["answer"]
+                    is_correct = "✅" if user_ans == correct else "❌"
+                    st.markdown(f"**{is_correct} Q{i+1}:** {q['question']}")
+                    st.write(f"Your answer: {user_ans} | Correct: {correct}")
+                    if "explanation" in q:
+                        st.info(f"💡 {q['explanation']}")
+                    st.markdown("---")
+
+                st.markdown(FOOTER)
+
+                if st.button("🔄 New Test", key="hw_new_test"):
+                    st.session_state.hw_questions = []
+                    st.session_state.hw_answers = {}
+                    st.session_state.hw_result = None
+                    st.rerun()
+
+    elif mode == "🎯 Practice":
+        st.subheader("🎯 Adaptive Practice")
+        st.caption(f"Class: {class_name} | Subject: {subject}")
+
+        level = st.select_slider("Practice Level:",
+            ["Beginner", "Intermediate", "Advanced", "Expert"],
+            value="Intermediate", key="hw_practice_lvl")
+
+        if st.button("🎯 Generate Practice Question", type="primary", use_container_width=True, key="hw_practice_btn"):
+            with st.spinner("Question ban raha hai..."):
+                p_prompt = f"""Create ONE practice problem for a {class_name} student on {subject}.
+Level: {level}
+{lang_rule}
+
+Include:
+📚 Problem
+💡 Hint (do NOT give full answer)
+🧠 What to think about
+📊 Diagram (MANDATORY)
+
+{DIAGRAM_RULE}"""
+
+                try:
+                    r = client.chat.completions.create(
+                        model="openai/gpt-oss-120b",
+                        messages=[{"role": "user", "content": p_prompt}],
+                        temperature=0.7, max_tokens=1500)
+                    text = r.choices[0].message.content
+                    if "ClyxessChat AI" not in text:
+                        text += FOOTER
+                    st.markdown(text)
+                except Exception as e:
+                    st.error(f"❌ {type(e).__name__}: {str(e)[:150]}")
+
+    else:
+        st.subheader("📊 AI Project Builder")
+        st.caption(f"Class: {class_name} | Subject: {subject}")
+
+        project_idea = st.text_area("Project idea ya problem:",
+            placeholder="e.g., School attendance app banana, ya solar panel project",
+            height=100, key="hw_project_idea")
+
+        if st.button("🚀 Build Project Plan", type="primary", use_container_width=True, key="hw_build_proj"):
+            if not project_idea.strip():
+                st.warning("Pehle project idea likho!")
+            else:
+                with st.spinner("Project plan ban raha hai..."):
+                    proj_prompt = f"""You are a project mentor for a {class_name} student.
+
+{lang_rule}
+
+PROJECT: {project_idea}
+SUBJECT: {subject}
+
+Create complete project plan:
+1. 📝 Project Name
+2. 🎯 Goal
+3. 📚 Concepts used
+4. 🛠️ Tools needed
+5. 📊 Architecture/Design (diagram mandatory)
+6. 🔨 Steps 1-5
+7. ✅ Testing
+8. 🌍 Real-world impact
+9. 🚀 Advanced version
+
+{DIAGRAM_RULE}
+
+End with footer: --- ClyxessChat AI • Secure • Fast • Private"""
+
+                    try:
+                        r = client.chat.completions.create(
+                            model="openai/gpt-oss-120b",
+                            messages=[{"role": "user", "content": proj_prompt}],
+                            temperature=0.7, max_tokens=3000)
+                        text = r.choices[0].message.content
+                        if "ClyxessChat AI" not in text:
+                            text += FOOTER
+                        st.markdown(text)
+                        st.download_button("📥 Download Project Plan",
+                            data=text,
+                            file_name=f"project_{subject}.txt",
+                            mime="text/plain", key="hw_dl_proj")
+                    except Exception as e:
+                        st.error(f"❌ {type(e).__name__}: {str(e)[:150]}")
+
+    st.divider()
+    st.markdown("""
+    <div style="padding:16px;text-align:center;border-radius:14px;background:#071326;border:1px solid #243b60;margin-top:10px;">
+        <p style="color:#8ea9cc;font-size:13px;margin:0;">📝 Clyxess AI Homework Lab — Learn · Practice · Test · Build</p>
+    </div>
+    """, unsafe_allow_html=True)
+        
 def render_learn_finance(client):
     import json
     import re
