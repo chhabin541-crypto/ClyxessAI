@@ -2836,7 +2836,7 @@ def render_cyber_security():
         render_advanced_cyber_lab() 
         
     
-def render_homework_test(client):
+def render_homework_test():
     import json
     import re
     import time
