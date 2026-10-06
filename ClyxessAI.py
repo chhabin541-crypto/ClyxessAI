@@ -2098,7 +2098,6 @@ def render_vision_lab():
     import os
     import streamlit.components.v1 as components
 
-    # --- OLD WALA SAHI MODEL - SAME TO SAME ---
     def analyze_image_with_groq(image_bytes, mime_type, full_prompt):
         import base64
         try:
@@ -2113,230 +2112,136 @@ def render_vision_lab():
                     pass
             if not api_key:
                 api_key = os.getenv("GROQ_API_KEY")
-
             if not api_key:
-                return "❌ GROQ_API_KEY nahi mila! Secrets me daalo."
-
+                return "❌ GROQ_API_KEY nahi mila!"
             groq_client = Groq(api_key=api_key)
         except Exception as e:
             return f"Groq Client Error: {e}"
 
         b64 = base64.b64encode(image_bytes).decode("utf-8")
-
-        try:
-            response = groq_client.chat.completions.create(
-                model="meta-llama/llama-4-maverick-17b-128e-instruct",
-                messages=[
-                    {
-                        "role": "user",
-                        "content": [
-                            {"type": "text", "text": full_prompt},
-                            {"type": "image_url", "image_url": {"url": f"data:{mime_type};base64,{b64}"}}
-                        ]
-                    }
-                ],
-                temperature=0.3,
-                max_tokens=4000
-            )
-            return response.choices[0].message.content
-        except Exception as e:
-            # Fallback
+        models_to_try = [
+            "meta-llama/llama-4-maverick-17b-128e-instruct",
+            "meta-llama/llama-4-scout-17b-16e-instruct",
+        ]
+        last_err = None
+        for model_name in models_to_try:
             try:
                 response = groq_client.chat.completions.create(
-                    model="llama-3.2-11b-vision-preview",
-                    messages=[
-                        {
-                            "role": "user",
-                            "content": [
-                                {"type": "text", "text": full_prompt},
-                                {"type": "image_url", "image_url": {"url": f"data:{mime_type};base64,{b64}"}}
-                            ]
-                        }
-                    ],
+                    model=model_name,
+                    messages=[{"role": "user", "content": [{"type": "text", "text": full_prompt}, {"type": "image_url", "image_url": {"url": f"data:{mime_type};base64,{b64}"}}]}],
                     temperature=0.3,
                     max_tokens=4000
                 )
                 return response.choices[0].message.content
-            except Exception as e2:
-                return f"Analysis failed: {type(e2).__name__}: {str(e2)[:500]}"
+            except Exception as e:
+                last_err = e
+                continue
+        return f"Analysis failed: {type(last_err).__name__}: {str(last_err)[:600]}"
 
-    # --- NEW WALA SPECIAL LOGIC ---
+    # --- LANGUAGE TITLES MAP ---
+    UI_TEXT = {
+        "Auto": {"title": "📷 Vision Lab — Exam Paper Checker", "subtitle": "Blank paper solve · Filled paper check · Diagram + Marks", "class": "🎓 Class", "subject": "📚 Subject", "lang": "🌐 Language", "mode": "🎯 Mode", "upload": "📷 Upload exam paper / homework / diagram", "instruct": "✍️ Any specific instruction? (Optional)", "instruct_ph": "e.g., Check all answers", "explain": "What should AI explain?", "btn": "🧠 Analyze Paper", "spinner": "🔄 AI paper padh raha hai..."},
+        "English": {"title": "📷 Vision Lab — Exam Paper Checker", "subtitle": "Blank paper solve · Filled paper check · Diagram + Marks", "class": "🎓 Class", "subject": "📚 Subject", "lang": "🌐 Language", "mode": "🎯 Mode", "upload": "📷 Upload exam paper / homework / diagram", "instruct": "✍️ Any specific instruction? (Optional)", "instruct_ph": "e.g., Check all answers", "explain": "What should AI explain?", "btn": "🧠 Analyze Paper", "spinner": "🔄 AI is reading the paper..."},
+        "Hindi": {"title": "📷 विजन लैब — परीक्षा पेपर चेकर", "subtitle": "खाली पेपर हल करो · भरे पेपर को जाँचो · डायग्राम + नंबर", "class": "🎓 कक्षा", "subject": "📚 विषय", "lang": "🌐 भाषा", "mode": "🎯 मोड", "upload": "📷 परीक्षा पेपर / होमवर्क / डायग्राम अपलोड करो", "instruct": "✍️ कोई खास निर्देश? (वैकल्पिक)", "instruct_ph": "जैसे, सारे उत्तर जाँचो", "explain": "AI को क्या समझाना है?", "btn": "🧠 पेपर विश्लेषण करो", "spinner": "🔄 AI पेपर पढ़ रहा है..."},
+        "Hinglish": {"title": "📷 Vision Lab — Exam Paper Checker", "subtitle": "Blank paper solve · Filled paper check · Diagram + Marks", "class": "🎓 Class", "subject": "📚 Subject", "lang": "🌐 Language", "mode": "🎯 Mode", "upload": "📷 Exam paper / homework / diagram upload karo", "instruct": "✍️ Koi khaas instruction? (Optional)", "instruct_ph": "Jaise, saare answers check karo", "explain": "AI ko kya samjhana hai?", "btn": "🧠 Paper Analyze Karo", "spinner": "🔄 AI paper padh raha hai..."},
+        "Marathi": {"title": "📷 व्हिजन लॅब — परीक्षा पेपर तपासक", "subtitle": "कोरा पेपर सोडवा · भरलेला पेपर तपासा", "class": "🎓 वर्ग", "subject": "📚 विषय", "lang": "🌐 भाषा", "mode": "🎯 मोड", "upload": "📷 परीक्षा पेपर अपलोड करा", "instruct": "✍️ सूचना", "instruct_ph": "उदा. सर्व उत्तरे तपासा", "explain": "AI ने काय स्पष्ट करावे?", "btn": "🧠 पेपर विश्लेषण करा", "spinner": "🔄 AI पेपर वाचत आहे..."},
+        "Bangla": {"title": "📷 ভিশন ল্যাব — পরীক্ষার পেপার চেকার", "subtitle": "ফাঁকা পেপার সমাধান · ভরা পেপার চেক", "class": "🎓 ক্লাস", "subject": "📚 বিষয়", "lang": "🌐 ভাষা", "mode": "🎯 মোড", "upload": "📷 পরীক্ষার পেপার আপলোড করুন", "instruct": "✍️ নির্দেশ", "instruct_ph": "যেমন, সব উত্তর চেক করো", "explain": "AI কী ব্যাখ্যা করবে?", "btn": "🧠 পেপার বিশ্লেষণ করো", "spinner": "🔄 AI পেপার পড়ছে..."},
+    }
+
     FOOTER = "\n\n---\n🛡️ **ClyxessChat AI** • Secure • Fast • Private"
-
-    AGI_REASONING = """
-🧠 AGI-LEVEL REASONING:
-Step 1 — OBSERVE: Image mein kya dikh raha hai?
-Step 2 — IDENTIFY: Ye paper BLANK hai ya FILLED? Ya TABLE / BOOK / DIAGRAM?
-Step 3 — EXTRACT: Har question aur answer padho
-Step 4 — ANALYZE: Filled hai to sahi/galat check karo
-Step 5 — SOLVE: Blank hai to step-by-step solve karo
-Step 6 — VERIFY: Answer khud check karo
-Step 7 — DIAGRAM: Har question ke saath diagram explain karo
-Step 8 — CONFIDENCE: HIGH/MEDIUM/LOW
-"""
-
-    OUTPUT_FORMAT = """
-📋 MANDATORY OUTPUT FORMAT:
-📄 PAPER TYPE: [BLANK / FILLED / PARTIAL / TABLE / BOOK]
-📊 DETECTED: [N] questions | [M] marks | Class: [X] | Subject: [Y]
-
-For EACH question:
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-📌 Q[number]. [Question] [marks]
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-📖 CONCEPT: [Concept name]
-🧠 ANALYSIS: [Solution OR verification]
-📊 DIAGRAM: [Diagram explain karo]
-📚 STEP-BY-STEP:
-✅ CORRECT ANSWER: [answer]
-🎯 CONFIDENCE: [HIGH/MEDIUM/LOW]
-
-If FILLED:
-👤 Student's Answer: [answer]
-Status: ✅ SAHI / ❌ GALAT / ⚠️ PARTIAL
-Marks: [X/Y]
-
-At end: SUMMARY TABLE + FINAL RESULT + WEAK/STRONG CONCEPTS
-End with footer: 🛡️ ClyxessChat AI • Secure • Fast • Private
-"""
 
     LANGUAGES = ["🌐 Auto Detect", "🇬🇧 English", "🇮🇳 हिंदी (Hindi)", "🇮🇳 Hinglish", "🇮🇳 मराठी", "🇮🇳 বাংলা", "🇮🇳 தமிழ்", "🇮🇳 తెలుగు", "🇮🇳 ગુજરાતી", "🇮🇳 ಕನ್ನಡ", "🇮🇳 മലയാളം", "🇮🇳 ਪੰਜਾਬੀ"]
     CLASS_SUBJECT_MAP = {
-        "Class 1-5": ["Maths", "English", "Hindi", "EVS", "Science", "General Knowledge"],
-        "Class 6-8": ["Maths", "Science", "English", "Hindi", "Social Studies", "Sanskrit", "Computer"],
-        "Class 9-10": ["Maths", "Physics", "Chemistry", "Biology", "English", "Hindi", "History", "Geography", "Economics"],
-        "Class 11-12": ["Physics", "Chemistry", "Maths", "Biology", "Computer Science", "Accountancy", "Business", "Economics", "English"],
-        "College": ["Data Science", "ML", "AI", "Python", "Statistics", "Physics", "Chemistry", "Economics", "Finance"],
-        "University": ["Advanced Maths", "Quantum Physics", "Astrophysics", "AI", "ML", "Deep Learning", "Research"]
+        "Class 1-5": ["Maths", "English", "Hindi", "EVS", "Science"], "Class 6-8": ["Maths", "Science", "English", "Hindi", "Social Studies"],
+        "Class 9-10": ["Maths", "Physics", "Chemistry", "Biology", "English"], "Class 11-12": ["Physics", "Chemistry", "Maths", "Biology", "Computer Science"],
+        "College": ["Data Science", "ML", "AI", "Python"], "University": ["Advanced Maths", "AI", "ML"]
     }
 
-    st.markdown("""
+    # Language select FIRST to change UI
+    lang_label = st.selectbox("🌐 Language / भाषा", LANGUAGES, key="vl_lang")
+
+    # Detect UI language key
+    if "Hindi" in lang_label: ui_key = "Hindi"; lang_code = "Hindi"; script_rule = "You MUST write ONLY in Hindi language using Devanagari script (हिंदी में लिखो). Do NOT use English at all. If you use English word, translate it to Hindi."
+    elif "Hinglish" in lang_label: ui_key = "Hinglish"; lang_code = "Hinglish"; script_rule = "You MUST write in Hinglish (Hindi + English mix in Roman script) like 'Ye sawal ka jawab hai...'. Use Roman Hindi."
+    elif "मराठी" in lang_label: ui_key = "Marathi"; lang_code = "Marathi"; script_rule = "You MUST write ONLY in Marathi using Devanagari script."
+    elif "বাংলা" in lang_label: ui_key = "Bangla"; lang_code = "Bengali"; script_rule = "You MUST write ONLY in Bengali language."
+    elif "English" in lang_label: ui_key = "English"; lang_code = "English"; script_rule = "You MUST write ONLY in English."
+    else: ui_key = "Auto"; lang_code = "auto-detected"; script_rule = "Reply in the SAME language as the paper's text."
+
+    T = UI_TEXT.get(ui_key, UI_TEXT["English"])
+
+    st.markdown(f"""
     <div style="background:linear-gradient(135deg,#07152f,#111c48,#29105c);padding:24px;border-radius:20px;margin-bottom:20px;border:1px solid rgba(100,180,255,0.3);">
-        <h1 style="color:white;margin:0;font-size:30px;">📷 Vision Lab — Exam Paper Checker</h1>
-        <p style="color:#b8d8ff;margin:8px 0 0 0;font-size:14px;">Blank paper solve · Filled paper check · Diagram + Marks</p>
+        <h1 style="color:white;margin:0;font-size:30px;">{T['title']}</h1>
+        <p style="color:#b8d8ff;margin:8px 0 0 0;font-size:14px;">{T['subtitle']}</p>
     </div>
     """, unsafe_allow_html=True)
 
-    c1, c2, c3, c4 = st.columns(4)
-    with c1:
-        class_level = st.selectbox("🎓 Class", ["Class 1-5", "Class 6-8", "Class 9-10", "Class 11-12", "College", "University"], key="vl_class")
-    with c2:
-        subject = st.selectbox("📚 Subject", CLASS_SUBJECT_MAP.get(class_level, ["General"]), key="vl_subject")
-    with c3:
-        lang_label = st.selectbox("🌐 Language", LANGUAGES, key="vl_lang")
-    with c4:
-        mode = st.selectbox("🎯 Mode", ["🔍 Auto Detect", "📝 Check Filled Paper", "🆕 Solve Blank Paper"], key="vl_mode")
+    c1, c2, c4 = st.columns(3)
+    with c1: class_level = st.selectbox(T['class'], ["Class 1-5", "Class 6-8", "Class 9-10", "Class 11-12", "College", "University"], key="vl_class")
+    with c2: subject = st.selectbox(T['subject'], CLASS_SUBJECT_MAP.get(class_level, ["General"]), key="vl_subject")
+    with c4: mode = st.selectbox(T['mode'], ["🔍 Auto Detect", "📝 Check Filled Paper", "🆕 Solve Blank Paper"], key="vl_mode")
 
-    if "Auto" in lang_label:
-        lang_rule = "Reply in the SAME language as the paper's text. If Hindi text, reply in Hindi. If English, reply in English."
-        clean_lang = "auto-detected"
-    else:
-        clean_lang = lang_label.split(" ", 1)[-1].split("(")[0].strip()
-        lang_rule = f"ALWAYS reply in {clean_lang} ONLY."
-
-    uploaded = st.file_uploader("📷 Upload exam paper / homework / diagram", type=["png", "jpg", "jpeg", "webp"], key="vl_upload")
-    user_prompt = st.text_input("✍️ Any specific instruction? (Optional)", value="", placeholder="e.g., Check all answers / Solve all questions", key="vl_prompt")
-    question_text = st.text_input("What should AI explain?", value="Explain the image simply and solve any visible question.", key="vl_question")
+    uploaded = st.file_uploader(T['upload'], type=["png", "jpg", "jpeg", "webp"], key="vl_upload")
+    user_prompt = st.text_input(T['instruct'], value="", placeholder=T['instruct_ph'], key="vl_prompt")
+    question_text = st.text_input(T['explain'], value="Explain the image simply and solve any visible question.", key="vl_question")
 
     if uploaded:
-        st.markdown('<div class="media-card">', unsafe_allow_html=True)
         st.image(uploaded, width=480)
-        st.markdown('</div>', unsafe_allow_html=True)
-
-        if st.button("🧠 Analyze Paper", type="primary", use_container_width=True, key="vl_analyze"):
-            with st.spinner("🔄 AI paper padh raha hai... (30-60 sec)"):
+        if st.button(T['btn'], type="primary", use_container_width=True, key="vl_analyze"):
+            with st.spinner(T['spinner']):
                 instruction = user_prompt if user_prompt.strip() else question_text
-                full_prompt = f"""You are ClyxessChat AI — an expert teacher.
 
-{lang_rule}
+                # --- STRONG LANGUAGE RULE ---
+                full_prompt = f"""
+CRITICAL LANGUAGE INSTRUCTION: {script_rule}
+This is MANDATORY. If language is Hindi, write 100% Hindi. No English words.
 
+You are ClyxessChat AI — an expert teacher.
 Class Level: {class_level}
 Subject: {subject}
 Mode: {mode}
-User's Question: {instruction}
+User Question: {instruction}
+Language to use: {lang_code}
 
-{AGI_REASONING}
-{OUTPUT_FORMAT}
+🧠 TASK:
+1. Image mein kya hai dekho
+2. Agar {lang_code} hai to {lang_code} me hi jawab do
+3. Har question ko step-by-step solve karo
+4. Diagram bhi explain karo
 
-Now analyze the uploaded image carefully:
+📋 OUTPUT FORMAT:
+📄 PAPER TYPE: [BLANK / FILLED / TABLE / BOOK]
+📌 Q[number]. [Question]
+📖 CONCEPT: [Concept]
+📚 STEP-BY-STEP:
+✅ CORRECT ANSWER:
+🎯 CONFIDENCE:
+
+IMPORTANT: {script_rule}
+End with: 🛡️ ClyxessChat AI • Secure • Fast • Private
 """
                 answer = analyze_image_with_groq(uploaded.getvalue(), uploaded.type, full_prompt)
-
-                if "ClyxessChat AI" not in answer:
-                    answer += FOOTER
-
+                if "ClyxessChat AI" not in answer: answer += FOOTER
                 st.session_state.vl_analysis = answer
-                st.session_state.vl_last_question = question_text
+                st.session_state.vl_lang_used = lang_code
 
     if st.session_state.get("vl_analysis"):
         st.markdown("---")
-        analysis_text = st.session_state.vl_analysis
-        question = st.session_state.get("vl_last_question", "")
+        # Header bhi language ke hisab se
+        lang_used = st.session_state.get("vl_lang_used", "English")
+        if lang_used == "Hindi": header = "🔍 ClyxessChat AI का उत्तर:"
+        elif lang_used == "Hinglish": header = "🔍 ClyxessChat AI ka Jawab:"
+        elif lang_used == "Marathi": header = "🔍 ClyxessChat AI चे उत्तर:"
+        elif lang_used == "Bengali": header = "🔍 ClyxessChat AI এর উত্তর:"
+        else: header = "🔍 Let me explain clearly:"
 
-        # Old wala Sahi/Galat logic bhi rakha hai
-        is_wrong = any(x in analysis_text.lower() for x in ["galat", "incorrect", "wrong"])
-        is_english = "English" in lang_label if 'lang_label' in locals() else True
-        tick = "❌ Galat" if is_wrong else "✅ Sahi"
-        if is_english:
-            tick = "❌ Wrong" if is_wrong else "✅ Correct"
-
-        header = "🔍 ClyxessChat AI:" if not is_english else "🔍 Let me explain clearly:"
         st.markdown(f"### {header}")
+        st.write(st.session_state.vl_analysis)
 
-        # Typewriter Effect - New wala UI
-        safe_text = analysis_text.replace("\\", "\\\\").replace("`", "\\`").replace("$", "\\$")
-
-        typewriter_html = f"""
-        <!DOCTYPE html>
-        <html><head><style>
-            body {{ margin:0; padding:0; background:transparent; font-family:'Inter',system-ui,sans-serif; }}
-          .container {{ background: rgba(15,23,42,0.7); border: 1px solid #334155; border-radius: 16px; padding: 22px; max-height: 700px; overflow-y: auto; }}
-          .responding-status {{ display:flex; align-items:center; gap:10px; padding:12px 16px; background:linear-gradient(90deg,rgba(16,185,129,0.08),rgba(6,182,212,0.08)); border:1px solid rgba(16,185,129,0.25); border-radius:12px; margin-bottom:18px; }}
-          .pulse-dot {{ width:10px; height:10px; border-radius:50%; background:#10b981; box-shadow:0 0 12px #10b981; animation:strongPulse 1.2s infinite; }}
-            @keyframes strongPulse {{ 0%,100%{{transform:scale(1);opacity:1;}} 50%{{transform:scale(1.4);opacity:0.5;}} }}
-          .status-text {{ color:#10b981; font-size:13px; font-weight:700; }}
-          .shimmer {{ background:linear-gradient(90deg,#10b981 0%,#6ee7b7 50%,#10b981 100%); background-size:200% auto; -webkit-background-clip:text; -webkit-text-fill-color:transparent; animation:shimmer 2s linear infinite; }}
-            @keyframes shimmer {{ to{{background-position:200% center;}} }}
-          .content {{ color:#e2e8f0; font-size:14px; line-height:1.75; white-space:pre-wrap; word-wrap:break-word; }}
-          .cursor {{ color:#10b981; font-weight:bold; animation:blink 1s infinite; }}
-            @keyframes blink {{ 0%,50%{{opacity:1;}} 51%,100%{{opacity:0;}} }}
-          .footer {{ margin-top:22px; padding-top:14px; border-top:1px solid #334155; text-align:center; color:#10b981; font-size:11px; font-weight:700; opacity:0; transition:opacity 0.5s ease; }}
-          .footer.show {{ opacity:1; }}
-        </style></head>
-        <body>
-        <div class="container" id="container">
-            <div class="responding-status" id="respondingBox"><div class="pulse-dot"></div><div class="status-text">ClyxessChat AI is responding<span class="shimmer">...</span></div></div>
-            <div class="content"><span id="typed"></span><span class="cursor" id="cursor">▊</span></div>
-            <div class="footer" id="footer">🛡️ ClyxessChat AI • Secure • Fast • Private</div>
-        </div>
-        <script>
-            const fullText = `{safe_text}`;
-            let i=0; const target=document.getElementById('typed'); const cursor=document.getElementById('cursor'); const container=document.getElementById('container'); const respondingBox=document.getElementById('respondingBox'); const footer=document.getElementById('footer');
-            function type(){{ if(i<fullText.length){{ target.innerHTML=fullText.substring(0,i+1); container.scrollTop=container.scrollHeight; i++; const delay=fullText[i-1]==='\\n'?3:8; setTimeout(type,delay); }} else {{ cursor.style.display='none'; respondingBox.style.opacity='0'; setTimeout(()=>{{respondingBox.style.display='none';}},400); footer.classList.add('show'); }} }}
-            setTimeout(type,300);
-        </script></body></html>
-        """
-        components.html(typewriter_html, height=750, scrolling=False)
-
-        # Old wala Table bhi add kiya
-        st.markdown("#### Table")
-        is_math = any(x in (analysis_text+question).lower() for x in ["πr", "area", "volume", "formula"])
-        if is_math:
-            example_val = "r=7 => A=154" if "πr" in (analysis_text+question).lower() else "l=2,w=3,h=4 => V=24"
-            table_data = {"Example" if is_english else "उदाहरण": [example_val], "Status" if is_english else "स्थिति": [tick]}
-            st.table(table_data)
-        else:
-            table_data = {"Photo" if is_english else "फोटो": ["Samajh aa gayi" if not is_english else "Understood"], "Status" if is_english else "स्थिति": [tick]}
-            st.table(table_data)
-
-        st.markdown("---")
-        col_d1, col_d2 = st.columns(2)
-        with col_d1:
-            st.download_button("📥 Download Report", data=analysis_text, file_name=f"exam_report_{datetime.datetime.now().strftime('%Y%m%d_%H%M')}.txt", mime="text/plain", use_container_width=True, key="vl_download")
-        with col_d2:
-            if st.button("🔄 New Analysis", use_container_width=True, key="vl_new"):
-                st.session_state.vl_analysis = ""
-                st.rerun()
+        if st.button("🔄 New Analysis / नया विश्लेषण", use_container_width=True, key="vl_new"):
+            st.session_state.vl_analysis = ""
+            st.rerun()
 
 def render_roleplay():
     st.title("🎭 Peer Roleplay Modes")
