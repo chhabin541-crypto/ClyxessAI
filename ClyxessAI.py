@@ -2091,123 +2091,252 @@ def render_ai_autonomous_behavior():
     # यह लाइन HTML को Streamlit में दिखाएगी
     components.html(HTML_TEMPLATE, height=850, scrolling=True)
     
-def render_vision_lab():
+def render_vision_lab(client=None):
     import streamlit as st
     import base64
     import datetime
+    import os
     import streamlit.components.v1 as components
 
+    # --- OLD WALA SAHI MODEL - SAME TO SAME ---
+    def analyze_image_with_groq(image_bytes, mime_type, full_prompt):
+        import base64
+        try:
+            from groq import Groq
+            api_key = None
+            try:
+                api_key = st.secrets["GROQ_API_KEY"]
+            except:
+                try:
+                    api_key = st.secrets["groq"]["api_key"]
+                except:
+                    pass
+            if not api_key:
+                api_key = os.getenv("GROQ_API_KEY")
+
+            if not api_key:
+                return "❌ GROQ_API_KEY nahi mila! Secrets me daalo."
+
+            groq_client = Groq(api_key=api_key)
+        except Exception as e:
+            return f"Groq Client Error: {e}"
+
+        b64 = base64.b64encode(image_bytes).decode("utf-8")
+
+        try:
+            response = groq_client.chat.completions.create(
+                model="meta-llama/llama-4-maverick-17b-128e-instruct",
+                messages=[
+                    {
+                        "role": "user",
+                        "content": [
+                            {"type": "text", "text": full_prompt},
+                            {"type": "image_url", "image_url": {"url": f"data:{mime_type};base64,{b64}"}}
+                        ]
+                    }
+                ],
+                temperature=0.3,
+                max_tokens=4000
+            )
+            return response.choices[0].message.content
+        except Exception as e:
+            # Fallback
+            try:
+                response = groq_client.chat.completions.create(
+                    model="llama-3.2-11b-vision-preview",
+                    messages=[
+                        {
+                            "role": "user",
+                            "content": [
+                                {"type": "text", "text": full_prompt},
+                                {"type": "image_url", "image_url": {"url": f"data:{mime_type};base64,{b64}"}}
+                            ]
+                        }
+                    ],
+                    temperature=0.3,
+                    max_tokens=4000
+                )
+                return response.choices[0].message.content
+            except Exception as e2:
+                return f"Analysis failed: {type(e2).__name__}: {str(e2)[:500]}"
+
+    # --- NEW WALA SPECIAL LOGIC ---
     FOOTER = "\n\n---\n🛡️ **ClyxessChat AI** • Secure • Fast • Private"
 
     AGI_REASONING = """
 🧠 AGI-LEVEL REASONING:
 Step 1 — OBSERVE: Image mein kya dikh raha hai?
-Step 2 — IDENTIFY: Ye paper BLANK hai ya FILLED? Ya Table/Book?
-Step 3 — EXTRACT: Har question padho
-Step 4 — ANALYZE: Sahi/Galat check
-Step 5 — SOLVE: Step-by-step
-Step 6 — DIAGRAM
+Step 2 — IDENTIFY: Ye paper BLANK hai ya FILLED? Ya TABLE / BOOK / DIAGRAM?
+Step 3 — EXTRACT: Har question aur answer padho
+Step 4 — ANALYZE: Filled hai to sahi/galat check karo
+Step 5 — SOLVE: Blank hai to step-by-step solve karo
+Step 6 — VERIFY: Answer khud check karo
+Step 7 — DIAGRAM: Har question ke saath diagram explain karo
+Step 8 — CONFIDENCE: HIGH/MEDIUM/LOW
 """
 
     OUTPUT_FORMAT = """
 📋 MANDATORY OUTPUT FORMAT:
-📄 PAPER TYPE: [BLANK / FILLED / TABLE / BOOK]
+📄 PAPER TYPE: [BLANK / FILLED / PARTIAL / TABLE / BOOK]
+📊 DETECTED: [N] questions | [M] marks | Class: [X] | Subject: [Y]
+
 For EACH question:
-📌 Q[number]. [Question]
-📖 CONCEPT:
-📊 DIAGRAM:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📌 Q[number]. [Question] [marks]
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📖 CONCEPT: [Concept name]
+🧠 ANALYSIS: [Solution OR verification]
+📊 DIAGRAM: [Diagram explain karo]
 📚 STEP-BY-STEP:
-✅ CORRECT ANSWER:
-If FILLED: Status: ✅ SAHI / ❌ GALAT + Marks
+✅ CORRECT ANSWER: [answer]
+🎯 CONFIDENCE: [HIGH/MEDIUM/LOW]
+
+If FILLED:
+👤 Student's Answer: [answer]
+Status: ✅ SAHI / ❌ GALAT / ⚠️ PARTIAL
+Marks: [X/Y]
+
+At end: SUMMARY TABLE + FINAL RESULT + WEAK/STRONG CONCEPTS
+End with footer: 🛡️ ClyxessChat AI • Secure • Fast • Private
 """
 
     LANGUAGES = ["🌐 Auto Detect", "🇬🇧 English", "🇮🇳 हिंदी (Hindi)", "🇮🇳 Hinglish", "🇮🇳 मराठी", "🇮🇳 বাংলা", "🇮🇳 தமிழ்", "🇮🇳 తెలుగు", "🇮🇳 ગુજરાતી", "🇮🇳 ಕನ್ನಡ", "🇮🇳 മലയാളം", "🇮🇳 ਪੰਜਾਬੀ"]
     CLASS_SUBJECT_MAP = {
-        "Class 1-5": ["Maths", "English", "Hindi", "EVS", "Science"],
-        "Class 6-8": ["Maths", "Science", "English", "Hindi", "Social Studies"],
-        "Class 9-10": ["Maths", "Physics", "Chemistry", "Biology", "English"],
-        "Class 11-12": ["Physics", "Chemistry", "Maths", "Biology", "Computer Science"],
-        "College": ["Data Science", "ML", "AI", "Python"],
-        "University": ["Advanced Maths", "AI", "ML"]
+        "Class 1-5": ["Maths", "English", "Hindi", "EVS", "Science", "General Knowledge"],
+        "Class 6-8": ["Maths", "Science", "English", "Hindi", "Social Studies", "Sanskrit", "Computer"],
+        "Class 9-10": ["Maths", "Physics", "Chemistry", "Biology", "English", "Hindi", "History", "Geography", "Economics"],
+        "Class 11-12": ["Physics", "Chemistry", "Maths", "Biology", "Computer Science", "Accountancy", "Business", "Economics", "English"],
+        "College": ["Data Science", "ML", "AI", "Python", "Statistics", "Physics", "Chemistry", "Economics", "Finance"],
+        "University": ["Advanced Maths", "Quantum Physics", "Astrophysics", "AI", "ML", "Deep Learning", "Research"]
     }
 
-    st.markdown("""<div style="background:linear-gradient(135deg,#07152f,#111c48,#29105c);padding:24px;border-radius:20px;margin-bottom:20px;border:1px solid rgba(100,180,255,0.3);"><h1 style="color:white;margin:0;font-size:30px;">📷 Vision Lab — Exam Paper Checker</h1><p style="color:#b8d8ff;margin:8px 0 0 0;font-size:14px;">Blank paper solve · Filled paper check · Diagram + Marks</p></div>""", unsafe_allow_html=True)
+    st.markdown("""
+    <div style="background:linear-gradient(135deg,#07152f,#111c48,#29105c);padding:24px;border-radius:20px;margin-bottom:20px;border:1px solid rgba(100,180,255,0.3);">
+        <h1 style="color:white;margin:0;font-size:30px;">📷 Vision Lab — Exam Paper Checker</h1>
+        <p style="color:#b8d8ff;margin:8px 0 0 0;font-size:14px;">Blank paper solve · Filled paper check · Diagram + Marks</p>
+    </div>
+    """, unsafe_allow_html=True)
 
     c1, c2, c3, c4 = st.columns(4)
-    with c1: class_level = st.selectbox("🎓 Class", ["Class 1-5", "Class 6-8", "Class 9-10", "Class 11-12", "College", "University"], key="vl_class")
-    with c2: subject = st.selectbox("📚 Subject", CLASS_SUBJECT_MAP.get(class_level, ["General"]), key="vl_subject")
-    with c3: lang_label = st.selectbox("🌐 Language", LANGUAGES, key="vl_lang")
-    with c4: mode = st.selectbox("🎯 Mode", ["🔍 Auto Detect", "📝 Check Filled Paper", "🆕 Solve Blank Paper"], key="vl_mode")
+    with c1:
+        class_level = st.selectbox("🎓 Class", ["Class 1-5", "Class 6-8", "Class 9-10", "Class 11-12", "College", "University"], key="vl_class")
+    with c2:
+        subject = st.selectbox("📚 Subject", CLASS_SUBJECT_MAP.get(class_level, ["General"]), key="vl_subject")
+    with c3:
+        lang_label = st.selectbox("🌐 Language", LANGUAGES, key="vl_lang")
+    with c4:
+        mode = st.selectbox("🎯 Mode", ["🔍 Auto Detect", "📝 Check Filled Paper", "🆕 Solve Blank Paper"], key="vl_mode")
 
-    if "Auto" in lang_label: lang_rule = "Reply in the SAME language as the paper's text."
+    if "Auto" in lang_label:
+        lang_rule = "Reply in the SAME language as the paper's text. If Hindi text, reply in Hindi. If English, reply in English."
+        clean_lang = "auto-detected"
     else:
         clean_lang = lang_label.split(" ", 1)[-1].split("(")[0].strip()
         lang_rule = f"ALWAYS reply in {clean_lang} ONLY."
 
     uploaded = st.file_uploader("📷 Upload exam paper / homework / diagram", type=["png", "jpg", "jpeg", "webp"], key="vl_upload")
     user_prompt = st.text_input("✍️ Any specific instruction? (Optional)", value="", placeholder="e.g., Check all answers / Solve all questions", key="vl_prompt")
+    question_text = st.text_input("What should AI explain?", value="Explain the image simply and solve any visible question.", key="vl_question")
 
     if uploaded:
-        st.image(uploaded, width=500)
+        st.markdown('<div class="media-card">', unsafe_allow_html=True)
+        st.image(uploaded, width=480)
+        st.markdown('</div>', unsafe_allow_html=True)
+
         if st.button("🧠 Analyze Paper", type="primary", use_container_width=True, key="vl_analyze"):
-            with st.spinner("🔄 AI paper padh raha hai..."):
-                try:
-                    b64 = base64.b64encode(uploaded.getvalue()).decode("utf-8")
-                    instruction = user_prompt if user_prompt.strip() else "Analyze this exam paper carefully."
-                    full_prompt = f"""You are ClyxessChat AI — expert teacher.
+            with st.spinner("🔄 AI paper padh raha hai... (30-60 sec)"):
+                instruction = user_prompt if user_prompt.strip() else question_text
+                full_prompt = f"""You are ClyxessChat AI — an expert teacher.
 
 {lang_rule}
-Class: {class_level} | Subject: {subject} | Mode: {mode}
-Instruction: {instruction}
+
+Class Level: {class_level}
+Subject: {subject}
+Mode: {mode}
+User's Question: {instruction}
 
 {AGI_REASONING}
 {OUTPUT_FORMAT}
 
-Now analyze the uploaded image:
+Now analyze the uploaded image carefully:
 """
+                answer = analyze_image_with_groq(uploaded.getvalue(), uploaded.type, full_prompt)
 
-                    # --- OPENROUTER FIX ---
-                    # gpt-oss-120b image nahi dekhta, isliye gpt-4o-mini use kiya
-                    response = client.chat.completions.create(
-                        model="openai/gpt-4o-mini",
-                        messages=[
-                            {
-                                "role": "user",
-                                "content": [
-                                    {"type": "text", "text": full_prompt},
-                                    {"type": "image_url", "image_url": {"url": f"data:{uploaded.type};base64,{b64}"}}
-                                ]
-                            }
-                        ],
-                        temperature=0.3,
-                        max_tokens=4000
-                    )
+                if "ClyxessChat AI" not in answer:
+                    answer += FOOTER
 
-                    analysis = response.choices[0].message.content
-                    if "ClyxessChat AI" not in analysis: analysis += FOOTER
-                    st.session_state.vl_analysis = analysis
-
-                except Exception as e:
-                    st.error(f"❌ Analysis failed: {type(e).__name__}: {str(e)[:500]}")
+                st.session_state.vl_analysis = answer
+                st.session_state.vl_last_question = question_text
 
     if st.session_state.get("vl_analysis"):
         st.markdown("---")
         analysis_text = st.session_state.vl_analysis
+        question = st.session_state.get("vl_last_question", "")
+
+        # Old wala Sahi/Galat logic bhi rakha hai
+        is_wrong = any(x in analysis_text.lower() for x in ["galat", "incorrect", "wrong"])
+        is_english = "English" in lang_label if 'lang_label' in locals() else True
+        tick = "❌ Galat" if is_wrong else "✅ Sahi"
+        if is_english:
+            tick = "❌ Wrong" if is_wrong else "✅ Correct"
+
+        header = "🔍 ClyxessChat AI:" if not is_english else "🔍 Let me explain clearly:"
+        st.markdown(f"### {header}")
+
+        # Typewriter Effect - New wala UI
         safe_text = analysis_text.replace("\\", "\\\\").replace("`", "\\`").replace("$", "\\$")
 
         typewriter_html = f"""
+        <!DOCTYPE html>
         <html><head><style>
-            body{{margin:0;padding:0;background:transparent;font-family:Inter,system-ui;}}
-         .container{{background:rgba(15,23,42,0.7);border:1px solid #334155;border-radius:16px;padding:22px;max-height:700px;overflow-y:auto;}}
-         .content{{color:#e2e8f0;font-size:14px;line-height:1.75;white-space:pre-wrap;}}
-         .footer{{margin-top:22px;padding-top:14px;border-top:1px solid #334155;text-align:center;color:#10b981;font-size:11px;}}
+            body {{ margin:0; padding:0; background:transparent; font-family:'Inter',system-ui,sans-serif; }}
+          .container {{ background: rgba(15,23,42,0.7); border: 1px solid #334155; border-radius: 16px; padding: 22px; max-height: 700px; overflow-y: auto; }}
+          .responding-status {{ display:flex; align-items:center; gap:10px; padding:12px 16px; background:linear-gradient(90deg,rgba(16,185,129,0.08),rgba(6,182,212,0.08)); border:1px solid rgba(16,185,129,0.25); border-radius:12px; margin-bottom:18px; }}
+          .pulse-dot {{ width:10px; height:10px; border-radius:50%; background:#10b981; box-shadow:0 0 12px #10b981; animation:strongPulse 1.2s infinite; }}
+            @keyframes strongPulse {{ 0%,100%{{transform:scale(1);opacity:1;}} 50%{{transform:scale(1.4);opacity:0.5;}} }}
+          .status-text {{ color:#10b981; font-size:13px; font-weight:700; }}
+          .shimmer {{ background:linear-gradient(90deg,#10b981 0%,#6ee7b7 50%,#10b981 100%); background-size:200% auto; -webkit-background-clip:text; -webkit-text-fill-color:transparent; animation:shimmer 2s linear infinite; }}
+            @keyframes shimmer {{ to{{background-position:200% center;}} }}
+          .content {{ color:#e2e8f0; font-size:14px; line-height:1.75; white-space:pre-wrap; word-wrap:break-word; }}
+          .cursor {{ color:#10b981; font-weight:bold; animation:blink 1s infinite; }}
+            @keyframes blink {{ 0%,50%{{opacity:1;}} 51%,100%{{opacity:0;}} }}
+          .footer {{ margin-top:22px; padding-top:14px; border-top:1px solid #334155; text-align:center; color:#10b981; font-size:11px; font-weight:700; opacity:0; transition:opacity 0.5s ease; }}
+          .footer.show {{ opacity:1; }}
         </style></head>
-        <body><div class="container"><div class="content">{safe_text}</div><div class="footer">🛡️ ClyxessChat AI • Secure • Fast • Private</div></div></body></html>
+        <body>
+        <div class="container" id="container">
+            <div class="responding-status" id="respondingBox"><div class="pulse-dot"></div><div class="status-text">ClyxessChat AI is responding<span class="shimmer">...</span></div></div>
+            <div class="content"><span id="typed"></span><span class="cursor" id="cursor">▊</span></div>
+            <div class="footer" id="footer">🛡️ ClyxessChat AI • Secure • Fast • Private</div>
+        </div>
+        <script>
+            const fullText = `{safe_text}`;
+            let i=0; const target=document.getElementById('typed'); const cursor=document.getElementById('cursor'); const container=document.getElementById('container'); const respondingBox=document.getElementById('respondingBox'); const footer=document.getElementById('footer');
+            function type(){{ if(i<fullText.length){{ target.innerHTML=fullText.substring(0,i+1); container.scrollTop=container.scrollHeight; i++; const delay=fullText[i-1]==='\\n'?3:8; setTimeout(type,delay); }} else {{ cursor.style.display='none'; respondingBox.style.opacity='0'; setTimeout(()=>{{respondingBox.style.display='none';}},400); footer.classList.add('show'); }} }}
+            setTimeout(type,300);
+        </script></body></html>
         """
         components.html(typewriter_html, height=750, scrolling=False)
-        if st.button("🔄 New Analysis", use_container_width=True, key="vl_new"):
-            st.session_state.vl_analysis = ""
-            st.rerun()
+
+        # Old wala Table bhi add kiya
+        st.markdown("#### Table")
+        is_math = any(x in (analysis_text+question).lower() for x in ["πr", "area", "volume", "formula"])
+        if is_math:
+            example_val = "r=7 => A=154" if "πr" in (analysis_text+question).lower() else "l=2,w=3,h=4 => V=24"
+            table_data = {"Example" if is_english else "उदाहरण": [example_val], "Status" if is_english else "स्थिति": [tick]}
+            st.table(table_data)
+        else:
+            table_data = {"Photo" if is_english else "फोटो": ["Samajh aa gayi" if not is_english else "Understood"], "Status" if is_english else "स्थिति": [tick]}
+            st.table(table_data)
+
+        st.markdown("---")
+        col_d1, col_d2 = st.columns(2)
+        with col_d1:
+            st.download_button("📥 Download Report", data=analysis_text, file_name=f"exam_report_{datetime.datetime.now().strftime('%Y%m%d_%H%M')}.txt", mime="text/plain", use_container_width=True, key="vl_download")
+        with col_d2:
+            if st.button("🔄 New Analysis", use_container_width=True, key="vl_new"):
+                st.session_state.vl_analysis = ""
+                st.rerun()
 
 def render_roleplay():
     st.title("🎭 Peer Roleplay Modes")
