@@ -2091,7 +2091,7 @@ def render_ai_autonomous_behavior():
     # यह लाइन HTML को Streamlit में दिखाएगी
     components.html(HTML_TEMPLATE, height=850, scrolling=True)
     
-def render_vision_lab(client=None):
+def render_vision_lab():
     import streamlit as st
     import base64
     import datetime
