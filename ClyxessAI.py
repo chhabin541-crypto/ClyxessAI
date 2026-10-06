@@ -6567,7 +6567,7 @@ if mode == "🚀 Physics Lab":
 if mode == "🧠 Learn AI":
     render_learn_ai(client); st.stop()
 if mode == "👨‍💻 Coding Lab":
-    render_coding_lab_mod(); st.stop() 
+    render_coding_lab_mod(client); st.stop() 
 if mode == "👨‍👩‍👦 Parent Dashboard":
     render_parent_dashboard(); st.stop()
 if mode == "🎨 Creative AI Image Generator":
