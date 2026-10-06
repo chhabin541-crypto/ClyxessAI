@@ -2091,50 +2091,277 @@ def render_ai_autonomous_behavior():
     # यह लाइन HTML को Streamlit में दिखाएगी
     components.html(HTML_TEMPLATE, height=850, scrolling=True)
     
-def render_vision_lab(): 
-    st.title("📷 Vision Lab")
-    f=st.file_uploader("Upload book, homework or diagram",type=["png","jpg","jpeg","webp"])
-    labels=list(PLAY_LANGUAGES.keys()); label=st.selectbox("Answer language",labels)
-    question=st.text_input("What should AI explain?",value="Explain the image simply and solve any visible question.")
-    if f:
-        st.markdown('<div class="media-card">',unsafe_allow_html=True); st.image(f,width=480); st.markdown('</div>',unsafe_allow_html=True)
-        if st.button("🧠 Analyze Image",type="primary",use_container_width=True):
-            answer = analyze_image_with_groq(f.getvalue(),f.type,question,PLAY_LANGUAGES[label])
+def render_vision_lab():
+    import streamlit as st
+    import json
+    import re
+    import base64
+    import datetime
+    import streamlit.components.v1 as components
 
-            lang = PLAY_LANGUAGES[label]
-            is_english = "English" in label
+    FOOTER = "\n\n---\n🛡️ **ClyxessChat AI** • Secure • Fast • Private"
 
-            # Upar ka header - har language me
-            header = "🔍 ClyxessChat AI:" if not is_english else "🔍 Let me explain clearly:"
-            st.markdown(f"### {header}")
-            st.write(answer)
+    AGI_REASONING = """
 
-            # --- Naya Simple Example Chart ---
-            # Sahi / Galat ka pata lagana
-            is_wrong = any(x in answer.lower() for x in ["galat", "incorrect", "wrong"])
-            tick = "❌ Galat" if is_wrong else "✅ Sahi"
-            if is_english:
-                tick = "❌ Wrong" if is_wrong else "✅ Correct"
+🧠 AGI-LEVEL REASONING:
 
-            # Chhota sa table - jaise tumhari photo me hai
-            st.markdown("#### Table")
-            is_math = any(x in (answer+question).lower() for x in ["πr", "area", "volume", "formula"])
+Step 1 — OBSERVE: Image mein kya dikh raha hai?
+Step 2 — IDENTIFY: Ye paper BLANK hai ya FILLED?
+Step 3 — EXTRACT: Har question aur aage ka answer padho
+Step 4 — ANALYZE: (Filled ke liye) Student ka answer sahi/galat?
+Step 5 — SOLVE: (Blank ke liye) Step-by-step solve karo
+Step 6 — VERIFY: Apne answer khud check karo
+Step 7 — DIAGRAM: Har question ke saath diagram
+Step 8 — CONFIDENCE: HIGH/MEDIUM/LOW
+"""
 
-            if is_math:
-                # Math hai to example dikhao
-                example_val = "r=7 => A=154" if "πr" in (answer+question).lower() else "l=2,w=3,h=4 => V=24"
-                table_data = {
-                    "Example" if is_english else "उदाहरण": [example_val],
-                    "Status" if is_english else "स्थिति": [tick]
-                }
-                st.table(table_data)
-            else:
-                # Simple photo hai to sirf status
-                table_data = {
-                    "Photo" if is_english else "फोटो": ["Samajh aa gayi" if not is_english else "Understood"],
-                    "Status" if is_english else "स्थिति": [tick]
-                }
-                st.table(table_data)
+    OUTPUT_FORMAT = """
+
+📋 MANDATORY OUTPUT FORMAT:
+
+📄 PAPER TYPE: [BLANK / FILLED / PARTIAL]
+📊 DETECTED: [N] questions | [M] marks | Class: [X] | Subject: [Y]
+
+For EACH question:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📌 Q[number]. [Question] [marks]
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📖 CONCEPT: [Concept name]
+🧠 ANALYSIS: [Solution OR verification]
+
+📊 DIAGRAM:
+
+📚 STEP-BY-STEP:
+Step 1:...
+Step 2:...
+Step 3:...
+
+✅ CORRECT ANSWER: [answer]
+🎯 CONFIDENCE: [HIGH/MEDIUM/LOW]
+
+If FILLED:
+👤 Student's Answer: [answer]
+Status: ✅ SAHI / ❌ GALAT / ⚠️ PARTIAL
+Marks: [X/Y]
+💡 Reason (if wrong): [why]
+
+At end:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📊 SUMMARY TABLE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+| Q# | Question | Your Answer | Correct Answer | Status | Marks |
+|----|----------|-------------|----------------|--------|-------|
+| 1 |... |... |... | ✅/❌ | X/Y |
+
+📊 FINAL RESULT:
+✅ Correct: [N] | ❌ Wrong: [N] | ⚠️ Partial: [N]
+🏆 TOTAL SCORE: [X/Y] ([%])
+
+📚 WEAK CONCEPTS: [list]
+💪 STRONG CONCEPTS: [list]
+🎯 NEXT STEPS: [suggestion]
+
+End with footer: 🛡️ ClyxessChat AI • Secure • Fast • Private
+"""
+
+    LANGUAGES = [
+        "🌐 Auto Detect", "🇬🇧 English", "🇮🇳 हिंदी (Hindi)", "🇮🇳 Hinglish",
+        "🇮🇳 मराठी", "🇮🇳 বাংলা", "🇮🇳 தமிழ்", "🇮🇳 తెలుగు",
+        "🇮🇳 ગુજરાતી", "🇮🇳 ಕನ್ನಡ", "🇮🇳 മലയാളം", "🇮🇳 ਪੰਜਾਬੀ",
+        "🇪🇸 Español", "🇫🇷 Français", "🇩🇪 Deutsch", "🇯🇵 日本語",
+        "🇨🇳 中文", "🇰🇷 한국어", "🇸🇦 العربية", "🇷🇺 Русский"
+    ]
+
+    CLASS_SUBJECT_MAP = {
+        "Class 1-5": ["Maths", "English", "Hindi", "EVS", "Science", "General Knowledge"],
+        "Class 6-8": ["Maths", "Science", "English", "Hindi", "Social Studies", "Sanskrit", "Computer"],
+        "Class 9-10": ["Maths", "Physics", "Chemistry", "Biology", "English", "Hindi", "History", "Geography", "Economics"],
+        "Class 11-12": ["Physics", "Chemistry", "Maths", "Biology", "Computer Science", "Accountancy", "Business", "Economics", "English"],
+        "College": ["Data Science", "ML", "AI", "Python", "Statistics", "Physics", "Chemistry", "Economics", "Finance"],
+        "University": ["Advanced Maths", "Quantum Physics", "Astrophysics", "AI", "ML", "Deep Learning", "Research"]
+    }
+
+    st.markdown("""
+    <div style="background:linear-gradient(135deg,#07152f,#111c48,#29105c);padding:24px;border-radius:20px;margin-bottom:20px;border:1px solid rgba(100,180,255,0.3);">
+        <h1 style="color:white;margin:0;font-size:30px;">📷 Vision Lab — Exam Paper Checker</h1>
+        <p style="color:#b8d8ff;margin:8px 0 0 0;font-size:14px;">Blank paper solve · Filled paper check · Diagram + Marks</p>
+    </div>
+    """, unsafe_allow_html=True)
+
+    c1, c2, c3, c4 = st.columns(4)
+
+    with c1:
+        class_level = st.selectbox("🎓 Class",
+            ["Class 1-5", "Class 6-8", "Class 9-10", "Class 11-12", "College", "University"],
+            key="vl_class")
+
+    with c2:
+        subject = st.selectbox("📚 Subject",
+            CLASS_SUBJECT_MAP.get(class_level, ["General"]),
+            key="vl_subject")
+
+    with c3:
+        lang_label = st.selectbox("🌐 Language", LANGUAGES, key="vl_lang")
+
+    with c4:
+        mode = st.selectbox("🎯 Mode",
+            ["🔍 Auto Detect", "📝 Check Filled Paper", "🆕 Solve Blank Paper"],
+            key="vl_mode")
+
+    if "Auto" in lang_label:
+        lang_rule = "Reply in the SAME language as the paper's text."
+        clean_lang = "auto-detected"
+    else:
+        clean_lang = lang_label.split(" ", 1)[-1].split("(")[0].strip()
+        lang_rule = f"ALWAYS reply in {clean_lang} ONLY."
+
+    uploaded = st.file_uploader("📷 Upload exam paper / homework / diagram",
+        type=["png", "jpg", "jpeg", "webp"], key="vl_upload")
+
+    user_prompt = st.text_input("✍️ Any specific instruction? (Optional)",
+        value="", placeholder="e.g., Check all answers / Solve all questions",
+        key="vl_prompt")
+
+    if uploaded:
+        st.markdown('<div class="media-card">', unsafe_allow_html=True)
+        st.image(uploaded, width=500)
+        st.markdown('</div>', unsafe_allow_html=True)
+
+        if st.button("🧠 Analyze Paper", type="primary", use_container_width=True, key="vl_analyze"):
+            with st.spinner("🔄 AI paper padh raha hai... (30-60 sec)"):
+                try:
+                    b64 = base64.b64encode(uploaded.getvalue()).decode("utf-8")
+                    instruction = user_prompt if user_prompt.strip() else "Analyze this exam paper carefully."
+
+                    full_prompt = f"""You are ClyxessChat AI — an expert teacher checking a student's exam paper.
+
+{lang_rule}
+
+Class Level: {class_level}
+Subject: {subject}
+Mode: {mode}
+Student's instruction: {instruction}
+
+{AGI_REASONING}
+
+{OUTPUT_FORMAT}
+
+Now analyze the uploaded paper image:
+"""
+
+                    response = client.chat.completions.create(
+                        model="openai/gpt-oss-120b",
+                        messages=[
+                            {
+                                "role": "user",
+                                "content": [
+                                    {"type": "text", "text": full_prompt},
+                                    {"type": "image_url", "image_url": {"url": f"data:{uploaded.type};base64,{b64}"}}
+                                ]
+                            }
+                        ],
+                        temperature=0.3,
+                        max_tokens=4000
+                    )
+
+                    analysis = response.choices[0].message.content
+
+                    if "ClyxessChat AI" not in analysis:
+                        analysis += FOOTER
+
+                    st.session_state.vl_analysis = analysis
+                    st.session_state.vl_uploaded_name = uploaded.name
+
+                except Exception as e:
+                    st.error(f"❌ Analysis failed: {type(e).__name__}: {str(e)[:200]}")
+
+    if st.session_state.get("vl_analysis"):
+        st.markdown("---")
+        analysis_text = st.session_state.vl_analysis
+        safe_text = analysis_text.replace("\\", "\\\\").replace("`", "\\`").replace("$", "\\$")
+
+        typewriter_html = f"""
+        <!DOCTYPE html>
+        <html>
+        <head>
+        <style>
+            body {{ margin: 0; padding: 0; background: transparent; font-family: 'Inter', system-ui, sans-serif; }}
+           .container {{ background: rgba(15,23,42,0.7); border: 1px solid #334155; border-radius: 16px; padding: 22px; max-height: 700px; overflow-y: auto; }}
+           .responding-status {{ display: flex; align-items: center; gap: 10px; padding: 12px 16px; background: linear-gradient(90deg, rgba(16,185,129,0.08), rgba(6,182,212,0.08)); border: 1px solid rgba(16,185,129,0.25); border-radius: 12px; margin-bottom: 18px; animation: fadeIn 0.4s ease; }}
+            @keyframes fadeIn {{ from {{ opacity:0; transform: translateY(-6px); }} to {{ opacity:1; transform: translateY(0); }} }}
+           .pulse-dot {{ width: 10px; height: 10px; border-radius: 50%; background: #10b981; box-shadow: 0 0 12px #10b981; animation: strongPulse 1.2s infinite; }}
+            @keyframes strongPulse {{ 0%,100% {{ transform: scale(1); opacity: 1; }} 50% {{ transform: scale(1.4); opacity: 0.5; }} }}
+           .status-text {{ color: #10b981; font-size: 13px; font-weight: 700; letter-spacing: 0.3px; }}
+           .shimmer {{ background: linear-gradient(90deg, #10b981 0%, #6ee7b7 50%, #10b981 100%); background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: shimmer 2s linear infinite; }}
+            @keyframes shimmer {{ to {{ background-position: 200% center; }} }}
+           .content {{ color: #e2e8f0; font-size: 14px; line-height: 1.75; white-space: pre-wrap; word-wrap: break-word; font-family: 'Inter', system-ui, sans-serif; }}
+           .cursor {{ color: #10b981; font-weight: bold; animation: blink 1s infinite; }}
+            @keyframes blink {{ 0%,50% {{ opacity: 1; }} 51%,100% {{ opacity: 0; }} }}
+           .footer {{ margin-top: 22px; padding-top: 14px; border-top: 1px solid #334155; text-align: center; color: #10b981; font-size: 11px; font-weight: 700; letter-spacing: 1px; opacity: 0; transition: opacity 0.5s ease; }}
+           .footer.show {{ opacity: 1; }}
+            ::-webkit-scrollbar {{ width: 6px; }}
+            ::-webkit-scrollbar-thumb {{ background: #334155; border-radius: 3px; }}
+        </style>
+        </head>
+        <body>
+        <div class="container" id="container">
+            <div class="responding-status" id="respondingBox">
+                <div class="pulse-dot"></div>
+                <div class="status-text">ClyxessChat AI is responding<span class="shimmer">...</span></div>
+            </div>
+            <div class="content"><span id="typed"></span><span class="cursor" id="cursor">▊</span></div>
+            <div class="footer" id="footer">🛡️ ClyxessChat AI • Secure • Fast • Private</div>
+        </div>
+        <script>
+            const fullText = `{safe_text}`;
+            let i = 0;
+            const target = document.getElementById('typed');
+            const cursor = document.getElementById('cursor');
+            const container = document.getElementById('container');
+            const respondingBox = document.getElementById('respondingBox');
+            const footer = document.getElementById('footer');
+            function type() {{
+                if (i < fullText.length) {{
+                    target.innerHTML = fullText.substring(0, i + 1);
+                    container.scrollTop = container.scrollHeight;
+                    i++;
+                    const delay = fullText[i-1] === '\\n'? 3 : 8;
+                    setTimeout(type, delay);
+                }} else {{
+                    cursor.style.display = 'none';
+                    respondingBox.style.transition = 'opacity 0.4s, transform 0.4s';
+                    respondingBox.style.opacity = '0';
+                    respondingBox.style.transform = 'translateY(-6px)';
+                    setTimeout(() => {{ respondingBox.style.display = 'none'; }}, 400);
+                    footer.classList.add('show');
+                    container.scrollTop = container.scrollHeight;
+                }}
+            }}
+            setTimeout(type, 300);
+        </script>
+        </body>
+        </html>
+        """
+        components.html(typewriter_html, height=750, scrolling=False)
+        st.markdown("---")
+        col_d1, col_d2 = st.columns(2)
+        with col_d1:
+            st.download_button(
+                "📥 Download Report",
+                data=analysis_text,
+                file_name=f"exam_report_{datetime.datetime.now().strftime('%Y%m%d_%H%M')}.txt",
+                mime="text/plain",
+                use_container_width=True,
+                key="vl_download"
+            )
+        with col_d2:
+            if st.button("🔄 New Analysis", use_container_width=True, key="vl_new"):
+                st.session_state.vl_analysis = ""
+                st.rerun()
 
 def render_roleplay():
     st.title("🎭 Peer Roleplay Modes")
