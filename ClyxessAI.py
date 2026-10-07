@@ -8906,7 +8906,6 @@ with st.sidebar:
         "🎨 Creative AI Image Generator",
         "📷 Vision Lab", 
         "🧠 Cyber Security", 
-        "🧩 Kids Logic Lab", 
         "🎨 Art Machine Design",  
         "🎭 Peer Roleplay Modes",
         "📝 Interactive Homework & Test",
