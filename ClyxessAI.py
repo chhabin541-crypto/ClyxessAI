@@ -5471,20 +5471,20 @@ Now write ENTIRELY in {language}:"""
                 {"role": "user", "content": prompt}
             ],
             model=model,
-            temperature=0.2,
-            max_tokens=900
-        )
-        text = res.choices[0].message.content.strip()
-        if len(text) > 20:
-            if "ClyxessChat AI | Secure" not in text:
-                text = text.rstrip() + "\n\n--- ClyxessChat AI | Secure • Fast • Private"
-            return text, None
-        last_error = f"{model}: short output"
-    except Exception as e:
-        last_error = f"{model}: {str(e)[:80]}"
-        continue
+                    temperature=0.7,
+                    max_tokens=2500
+                )
+                text = res.choices[0].message.content.strip()
+                if len(text) > 100:
+                    if "ClyxessChat AI | Secure" not in text:
+                        text = text.rstrip() + "\n\n--- ClyxessChat AI | Secure • Fast • Private"
+                    return text, None
+                last_error = f"{model}: short output"
+            except Exception as e:
+                last_error = f"{model}: {str(e)[:80]}"
+                continue
 
-return None, last_error or "All models failed"
+        return None, last_error or "All models failed"
 
     # ============================================================
     # STYLING
