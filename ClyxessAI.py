@@ -2980,7 +2980,7 @@ def render_roleplay():
     from datetime import datetime
 
     # ============================================
-    # 🧠 HELPER FUNCTIONS (इन्हें अंदर रखा है ताकि कोई error न आए)
+    # 🧠 HELPER FUNCTIONS
     # ============================================
     def get_role_opening(role, scenario, difficulty):
         openings = {
@@ -3044,6 +3044,7 @@ def render_roleplay():
     </style>
     """, unsafe_allow_html=True)
     
+    # SESSION STATE INIT (सब कुछ पहले से सेव कर लो)
     if "rp_messages" not in st.session_state:
         st.session_state.rp_messages = []
     if "rp_started" not in st.session_state:
@@ -3052,39 +3053,54 @@ def render_roleplay():
         st.session_state.rp_feedback = []
     if "show_report" not in st.session_state:
         st.session_state.show_report = False
+    if "rp_role" not in st.session_state:
+        st.session_state.rp_role = "Classmate"
+    if "rp_label" not in st.session_state:
+        st.session_state.rp_label = list(PLAY_LANGUAGES.keys())[0]
+    if "rp_difficulty" not in st.session_state:
+        st.session_state.rp_difficulty = "🟢 Easy (Friendly)"
+    if "rp_scenario" not in st.session_state:
+        st.session_state.rp_scenario = "Free Talk"
 
+    # SETTINGS
     if not st.session_state.rp_started:
         col1, col2 = st.columns(2)
         
         with col1:
-            role = st.selectbox("🎭 Role", [
+            st.session_state.rp_role = st.selectbox("🎭 Role", [
                 "Classmate", "Teacher", "Study Buddy", 
                 "Interview Partner (HR)", "Project Teammate",
                 "Boss / Manager", "University Professor"
-            ], key="rp_role")
+            ], key="rp_role_select")
             
-            label = st.selectbox("🌐 Language", list(PLAY_LANGUAGES.keys()), key="role_language")
+            st.session_state.rp_label = st.selectbox("🌐 Language", list(PLAY_LANGUAGES.keys()), key="role_language")
             
         with col2:
-            difficulty = st.selectbox("📊 Difficulty Level", [
+            st.session_state.rp_difficulty = st.selectbox("📊 Difficulty Level", [
                 "🟢 Easy (Friendly)", 
                 "🟡 Medium (Challenging)", 
                 "🔴 Hard (Strict)"
-            ], key="rp_difficulty")
+            ], key="rp_diff_select")
             
-            scenario = st.selectbox("🎬 Scenario Template", [
+            st.session_state.rp_scenario = st.selectbox("🎬 Scenario Template", [
                 "Free Talk", "Job Interview (FAANG Style)",
                 "University Admission (US/UK)", "Class Presentation"
-            ], key="rp_scenario")
+            ], key="rp_scen_select")
 
         if st.button("🚀 Start Roleplay", type="primary", use_container_width=True):
             st.session_state.rp_started = True
             st.session_state.rp_messages = []
-            opening = get_role_opening(role, scenario, difficulty)
+            opening = get_role_opening(st.session_state.rp_role, st.session_state.rp_scenario, st.session_state.rp_difficulty)
             st.session_state.rp_messages.append({"role": "assistant", "content": opening})
             st.rerun()
 
     else:
+        # Values को session_state से लो
+        role = st.session_state.rp_role
+        label = st.session_state.rp_label
+        difficulty = st.session_state.rp_difficulty
+        scenario = st.session_state.rp_scenario
+
         st.markdown(f"**🎭 {role}** | **🌐 {label}** | **📊 {difficulty}** | **🎬 {scenario}**")
         
         for msg in st.session_state.rp_messages:
@@ -3123,7 +3139,6 @@ def render_roleplay():
                     system = build_smart_system_prompt(role, PLAY_LANGUAGES[label], difficulty, scenario)
                     context_messages = [{"role": m["role"], "content": m["content"]} for m in st.session_state.rp_messages[-10:]]
                     
-                    # आपका ओरिजिनल function call
                     ans, _ = get_groq_response(client, context_messages, system, "")
                     ai_response = ans.choices[0].message.content if ans else "⚠️ No response"
                     
