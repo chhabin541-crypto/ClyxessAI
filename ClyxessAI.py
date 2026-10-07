@@ -2424,27 +2424,33 @@ Do not skip visible questions unless the image is unreadable.
     # ============================================================
 
     st.markdown("""
+<div style="
+    background:linear-gradient(135deg,#07152f,#111c48,#29105c);
+    padding:24px;
+    border-radius:20px;
+    margin-bottom:20px;
+    border:1px solid rgba(100,180,255,0.3);
+">
     <div style="
-        background:linear-gradient(135deg,#07152f,#111c48,#29105c);
-        padding:24px;
-        border-radius:20px;
-        margin-bottom:20px;
-        border:1px solid rgba(100,180,255,0.3);
+        color:white;
+        font-size:30px;
+        font-weight:700;
+        line-height:1.2;
     ">
-        <h1 style="color:white;margin:0;font-size:30px;">
-            📷 Vision Lab — ClyxessChat AI
-        </h1>
-
-        <p style="
-            color:#b8d8ff;
-            margin:8px 0 0 0;
-            font-size:14px;
-        ">
-            Book • Homework • Exam • Diagram • Graph •
-            Question • Doubt — Everything Explained
-        </p>
+        📷 Vision Lab — ClyxessChat AI
     </div>
-    """, unsafe_allow_html=True)
+
+    <div style="
+        color:#b8d8ff;
+        margin-top:10px;
+        font-size:14px;
+        line-height:1.6;
+    ">
+        Book • Homework • Exam • Diagram • Graph •
+        Question • Doubt — Everything Explained
+    </div>
+</div>
+""", unsafe_allow_html=True)
 
     # ============================================================
     # CONTROLS
