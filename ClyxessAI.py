@@ -5470,7 +5470,7 @@ Now write ENTIRELY in {language}:"""
                 {"role": "system", "content": f"You are ClyxessChat AI. You MUST reply ONLY in {lang}"},
                 {"role": "user", "content": prompt}
             ],
-            model=model,
+                    model=model,
                     temperature=0.7,
                     max_tokens=2500
                 )
