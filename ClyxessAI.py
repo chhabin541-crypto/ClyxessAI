@@ -1199,90 +1199,189 @@ Return ONLY valid JSON with this format:
 # ============================================================
 
 def render_play_and_learn(client):
+    import random
+    import time
+    from datetime import datetime
 
+    # ============================================
+    # 🎮 GAME TYPES (Duolingo-Style Unlimited)
+    # ============================================
+    GAME_TYPES = {
+        "🎯 Classic Quiz": "quiz",
+        "🖼️ Image Match": "image_match",
+        "⚡ True / False": "true_false",
+        "🧠 Memory Flip": "memory_flip",
+        "🔊 Listen & Choose": "listen_choose",
+        "🧩 Pattern Complete": "pattern",
+        "🌍 Word Scramble": "scramble",
+        "📝 Sentence Build": "sentence",
+        "🔬 Virtual Lab": "virtual_lab",
+        "⏱️ Speed Round": "speed_round",
+    }
+
+    # ============================================
+    # 🎨 CSS
+    # ============================================
+    st.markdown("""
+    <style>
+        .play-hero {
+            background: linear-gradient(135deg, #58CC02 0%, #1CB0F6 50%, #FF9600 100%);
+            padding: 2rem; border-radius: 25px; text-align: center; color: white;
+            margin-bottom: 1.5rem; box-shadow: 0 10px 30px rgba(88,204,2,0.3);
+        }
+        .play-hero h1 { color: white; font-size: 2.5rem; margin: 0; }
+        .play-hero p { color: #FFF; font-size: 1.1rem; margin-top: 0.5rem; }
+        .play-card {
+            background: white; padding: 2rem; border-radius: 20px;
+            border: 3px solid #E5E5E5; margin: 1rem 0;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+        .stats-bar-duo {
+            background: linear-gradient(135deg, #FFFFFF, #F7F7F7);
+            padding: 1rem; border-radius: 15px; border: 2px solid #E5E5E5;
+            display: flex; justify-content: space-around; align-items: center;
+            margin: 1rem 0; font-weight: bold; font-size: 1.1rem;
+        }
+        .heart-icon { color: #FF4B4B; font-size: 1.5rem; }
+        .streak-icon { color: #FF9600; font-size: 1.5rem; }
+        .xp-icon { color: #FFC800; font-size: 1.5rem; }
+        .question-box-duo {
+            background: linear-gradient(135deg, #E3F2FD, #BBDEFB);
+            padding: 2rem; border-radius: 20px; border: 3px solid #1CB0F6;
+            margin: 1.5rem 0; text-align: center;
+            font-size: 1.5rem; font-weight: bold; color: #1A1A1A;
+        }
+        .game-type-card {
+            background: linear-gradient(135deg, #FFFFFF, #F0F8FF);
+            padding: 1.5rem; border-radius: 20px;
+            border: 3px solid #E5E5E5; text-align: center;
+            margin: 0.5rem 0; transition: all 0.3s;
+        }
+        .game-type-card:hover {
+            transform: translateY(-5px);
+            border-color: #58CC02;
+            box-shadow: 0 10px 25px rgba(88,204,2,0.2);
+        }
+        .correct-flash {
+            background: #D7FFB8; padding: 1rem; border-radius: 15px;
+            border-left: 6px solid #58CC02; margin: 1rem 0;
+            font-size: 1.1rem; font-weight: bold;
+        }
+        .wrong-flash {
+            background: #FFDFE0; padding: 1rem; border-radius: 15px;
+            border-left: 6px solid #FF4B4B; margin: 1rem 0;
+            font-size: 1.1rem; font-weight: bold;
+        }
+        .game-over-box {
+            background: linear-gradient(135deg, #FF4B4B, #FF6B6B);
+            color: white; padding: 2rem; border-radius: 20px;
+            text-align: center; margin: 1rem 0;
+        }
+        .victory-box {
+            background: linear-gradient(135deg, #58CC02, #89E219);
+            color: white; padding: 2rem; border-radius: 20px;
+            text-align: center; margin: 1rem 0;
+        }
+    </style>
+    """, unsafe_allow_html=True)
+
+    # ============================================
+    # HERO
+    # ============================================
     st.markdown(
         """
         <div class="play-hero">
             <h1>🎮 ClyxessChat AI — Play & Learn</h1>
-            <p>
-            Learn through AI-generated questions, games and age-based challenges.
-            </p>
+            <p>Unlimited Games • Age-Based • Duolingo-Style • AI-Powered</p>
         </div>
         """,
         unsafe_allow_html=True
     )
 
-    # --------------------------------------------------------
-    # Settings
-    # --------------------------------------------------------
+    # ============================================
+    # SESSION STATE — Game Engine
+    # ============================================
+    defaults = {
+        "play_hearts": 5,
+        "play_streak": 0,
+        "play_best_streak": 0,
+        "play_xp": 0,
+        "play_game_type": None,
+        "play_show_game_selector": False,
+        "play_speed_mode": False,
+        "play_start_time": None,
+        "play_achievements": [],
+    }
+    for k, v in defaults.items():
+        if k not in st.session_state:
+            st.session_state[k] = v
 
+    # ============================================
+    # SETTINGS (Age, Language, Subject)
+    # ============================================
     col1, col2, col3 = st.columns(3)
 
     with col1:
         play_age = st.selectbox(
             "👶 Select Age",
             PLAY_AGE_LEVELS,
-            index=PLAY_AGE_LEVELS.index(
-                st.session_state.play_age
-            )
+            index=PLAY_AGE_LEVELS.index(st.session_state.play_age),
+            key="pl_age_sel"
         )
 
     with col2:
         language_label = st.selectbox(
             "🌐 Select Language",
             list(PLAY_LANGUAGES.keys()),
-            index=list(PLAY_LANGUAGES.values()).index(
-                st.session_state.play_language
-            )
+            index=list(PLAY_LANGUAGES.values()).index(st.session_state.play_language),
+            key="pl_lang_sel"
         )
-
         play_language = PLAY_LANGUAGES[language_label]
 
     with col3:
         subjects = get_play_subjects(play_age)
-
         previous_subject = st.session_state.play_subject
-
-        subject_index = (
-            subjects.index(previous_subject)
-            if previous_subject in subjects
-            else 0
-        )
+        subject_index = subjects.index(previous_subject) if previous_subject in subjects else 0
 
         play_subject = st.selectbox(
             "📚 Select Subject",
             subjects,
-            index=subject_index
+            index=subject_index,
+            key="pl_subj_sel"
         )
 
     st.session_state.play_age = play_age
     st.session_state.play_language = play_language
     st.session_state.play_subject = play_subject
 
-    # --------------------------------------------------------
-    # Locked Level
-    # --------------------------------------------------------
-
+    # ============================================
+    # AGE LOCK
+    # ============================================
     if not play_level_unlocked(play_age):
-
-        st.error(
-            f"🔒 {play_age} is locked."
-        )
-
-        st.info(
-            "Complete the previous age level with 10/10 "
-            "to unlock this level."
-        )
-
+        st.error(f"🔒 {play_age} is locked.")
+        st.info("Complete the previous age level with 10/10 to unlock this level.")
         return
 
-    # --------------------------------------------------------
-    # Sidebar
-    # --------------------------------------------------------
-
+    # ============================================
+    # SIDEBAR — Stats (Duolingo-Style)
+    # ============================================
     with st.sidebar:
-        st.markdown("### 🎮 Play & Learn Progress")
+        st.markdown("### 🏆 Your Stats")
 
+        st.markdown(
+            f"""
+            <div class="stats-bar-duo" style="flex-direction:column; gap:0.5rem;">
+                <div><span class="heart-icon">❤️</span> Hearts: <b>{st.session_state.play_hearts}</b>/5</div>
+                <div><span class="streak-icon">🔥</span> Streak: <b>{st.session_state.play_streak}</b></div>
+                <div><span class="xp-icon">⭐</span> XP: <b>{st.session_state.play_xp}</b></div>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
+        st.divider()
+
+        st.markdown("### 🎮 Progress")
         st.write(f"👶 **Age:** {play_age}")
         st.write(f"🌐 **Language:** {language_label}")
         st.write(f"📚 **Subject:** {play_subject}")
@@ -1290,90 +1389,151 @@ def render_play_and_learn(client):
         st.divider()
 
         st.markdown("### 🔓 Age Levels")
-
         for level in PLAY_AGE_LEVELS:
-
             if level in st.session_state.play_unlocked_levels:
-
                 if level == play_age:
                     st.success(f"⭐ {level}")
                 else:
                     st.write(f"✅ {level}")
-
             else:
                 st.write(f"🔒 {level}")
 
-    # --------------------------------------------------------
-    # Start Screen
-    # --------------------------------------------------------
+        st.divider()
 
-    if not st.session_state.play_game_started:
+        if st.session_state.play_achievements:
+            st.markdown("### 🏅 Achievements")
+            for a in st.session_state.play_achievements:
+                st.write(f"🏅 {a}")
 
+    # ============================================
+    # GAME OVER — Hearts खत्म
+    # ============================================
+    if st.session_state.play_hearts <= 0:
         st.markdown(
-            '<div class="play-card">',
+            """
+            <div class="game-over-box">
+                <h1>💔 Game Over!</h1>
+                <p>Hearts खत्म हो गए। कोई बात नहीं — फिर से try करो!</p>
+            </div>
+            """,
             unsafe_allow_html=True
         )
+        st.markdown(f"### 🎯 Score: {st.session_state.play_score}/10")
+        st.markdown(f"### ⭐ Total XP: {st.session_state.play_xp}")
+        st.markdown(f"### 🔥 Best Streak: {st.session_state.play_best_streak}")
 
-        st.subheader("🎯 Ready to Learn?")
-
-        st.write(f"**Age:** {play_age}")
-        st.write(f"**Subject:** {play_subject}")
-        st.write(f"**Language:** {language_label}")
-
-        st.info(
-            "🎮 इस level में 10 AI-generated questions होंगे। "
-            "10/10 करने पर अगला age level unlock होगा."
-        )
-
-        if st.button(
-            "🚀 Start Game",
-            use_container_width=True,
-            type="primary"
-        ):
-
-            with st.spinner(
-                "🤖 AI आपके लिए learning challenge बना रहा है..."
-            ):
-
-                questions = generate_ai_questions(
-                    client=client,
-                    age=play_age,
-                    language=play_language,
-                    subject=play_subject,
-                    count=QUESTIONS_PER_LEVEL
-                )
-
-            if not questions:
-                st.error(
-                    "Questions generate नहीं हो पाए। Please try again."
-                )
-                return
-
-            st.session_state.play_questions = questions
-            st.session_state.play_question_index = 0
+        if st.button("🔄 फिर से खेलो", type="primary", use_container_width=True):
+            st.session_state.play_hearts = 5
+            st.session_state.play_streak = 0
             st.session_state.play_score = 0
+            st.session_state.play_question_index = 0
             st.session_state.play_answered = False
             st.session_state.play_last_correct = False
             st.session_state.play_last_explanation = ""
-            st.session_state.play_game_started = True
-
+            st.session_state.play_game_started = False
+            st.session_state.play_show_game_selector = False
             st.rerun()
-
-        st.markdown(
-            "</div>",
-            unsafe_allow_html=True
-        )
-
         return
 
-    # --------------------------------------------------------
-    # Question Data
-    # --------------------------------------------------------
+    # ============================================
+    # SCREEN 1: GAME TYPE SELECTOR (Duolingo-Style)
+    # ============================================
+    if not st.session_state.play_show_game_selector and not st.session_state.play_game_started:
+        
+        st.markdown("## 🎮 कौन सा Game खेलना है?")
+        st.markdown(f"**{play_age}** | **{play_subject}** | **{language_label}**")
 
+        cols = st.columns(2)
+        for idx, (label, key) in enumerate(GAME_TYPES.items()):
+            with cols[idx % 2]:
+                if st.button(
+                    f"{label}",
+                    key=f"gt_btn_{key}",
+                    use_container_width=True
+                ):
+                    st.session_state.play_game_type = key
+                    st.session_state.play_show_game_selector = True
+                    st.rerun()
+
+        st.markdown("---")
+        st.info(
+            "🎯 हर game में 10 AI-generated questions हैं। "
+            "10/10 करने पर next age level unlock होगा। "
+            "गलत जवाब पर ❤️ कम होगा!"
+        )
+        return
+
+    # ============================================
+    # SCREEN 2: START GAME (Before questions load)
+    # ============================================
+    if not st.session_state.play_game_started:
+        
+        gt_key = st.session_state.play_game_type
+        gt_label = [k for k, v in GAME_TYPES.items() if v == gt_key]
+        gt_label = gt_label[0] if gt_label else "Quiz"
+
+        st.markdown('<div class="play-card">', unsafe_allow_html=True)
+        st.subheader(f"🎯 Ready to Learn?")
+        st.markdown(f"### {gt_label}")
+        st.write(f"**Age:** {play_age}")
+        st.write(f"**Subject:** {play_subject}")
+        st.write(f"**Language:** {language_label}")
+        st.write(f"**Hearts:** ❤️ {st.session_state.play_hearts}/5")
+
+        st.info(
+            "🎮 10 AI-generated questions. सही जवाब पर +10 XP + Streak bonus. "
+            "गलत जवाब पर -1 ❤️ और Streak reset!"
+        )
+
+        colA, colB = st.columns(2)
+        with colA:
+            if st.button("🚀 Start Game", use_container_width=True, type="primary"):
+                with st.spinner("🤖 AI आपके लिए challenge बना रहा है..."):
+                    questions = generate_ai_questions(
+                        client=client,
+                        age=play_age,
+                        language=play_language,
+                        subject=play_subject,
+                        count=QUESTIONS_PER_LEVEL
+                    )
+
+                if not questions:
+                    st.error("Questions generate नहीं हो पाए। Please try again.")
+                    return
+
+                # Game type के हिसाब से questions transform करो
+                questions = transform_questions_for_game(questions, gt_key)
+
+                st.session_state.play_questions = questions
+                st.session_state.play_question_index = 0
+                st.session_state.play_score = 0
+                st.session_state.play_answered = False
+                st.session_state.play_last_correct = False
+                st.session_state.play_last_explanation = ""
+                st.session_state.play_streak = 0
+                st.session_state.play_game_started = True
+                st.session_state.play_start_time = time.time()
+                st.rerun()
+
+        with colB:
+            if st.button("⬅️ Back to Games", use_container_width=True):
+                st.session_state.play_show_game_selector = False
+                st.session_state.play_game_type = None
+                st.rerun()
+
+        st.markdown('</div>', unsafe_allow_html=True)
+        return
+
+    # ============================================
+    # SCREEN 3: GAME PLAYING
+    # ============================================
     questions = st.session_state.play_questions
 
     if not questions:
         st.error("No questions available.")
+        if st.button("🏠 Home"):
+            st.session_state.play_game_started = False
+            st.rerun()
         return
 
     question_index = st.session_state.play_question_index
@@ -1383,243 +1543,404 @@ def render_play_and_learn(client):
         st.session_state.play_question_index = 0
 
     current = questions[question_index]
-
     question_text = current["question"]
     options = current["options"]
     correct_answer = current["answer"]
     explanation = current.get("explanation", "")
+    gt_key = st.session_state.play_game_type
 
-    # --------------------------------------------------------
-    # Progress
-    # --------------------------------------------------------
+    # ============================================
+    # TOP STATS BAR (Duolingo-Style)
+    # ============================================
+    st.markdown(
+        f"""
+        <div class="stats-bar-duo">
+            <div><span class="heart-icon">❤️</span> {st.session_state.play_hearts}</div>
+            <div><span class="streak-icon">🔥</span> {st.session_state.play_streak}</div>
+            <div><span class="xp-icon">⭐</span> {st.session_state.play_xp}</div>
+            <div>🎯 {question_index + 1}/10</div>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
 
+    # Progress Bar
     progress = question_index / QUESTIONS_PER_LEVEL
-
     st.progress(
         progress,
-        text=(
-            f"Question {question_index + 1}/"
-            f"{QUESTIONS_PER_LEVEL}"
-        )
+        text=f"Question {question_index + 1}/{QUESTIONS_PER_LEVEL}"
     )
 
-    c1, c2, c3 = st.columns(3)
+    # ============================================
+    # GAME TYPE RENDERER
+    # ============================================
+    answer = None  # user का selected answer
 
-    with c1:
-        st.metric(
-            "🎯 Question",
-            f"{question_index + 1}/10"
+    # -------- Classic Quiz --------
+    if gt_key == "quiz":
+        st.markdown(f'<div class="question-box-duo">❓ {question_text}</div>', unsafe_allow_html=True)
+        answer = st.radio(
+            "Choose your answer:",
+            options,
+            key=f"pl_ans_{play_age}_{play_subject}_{question_index}",
+            label_visibility="collapsed"
         )
 
-    with c2:
-        st.metric(
-            "⭐ Score",
-            f"{st.session_state.play_score}/10"
+    # -------- True / False --------
+    elif gt_key == "true_false":
+        st.markdown(f'<div class="question-box-duo">⚡ {question_text}</div>', unsafe_allow_html=True)
+        col1, col2 = st.columns(2)
+        with col1:
+            if st.button("✅ TRUE", key=f"tf_t_{question_index}", use_container_width=True):
+                answer = "True"
+                st.session_state.play_user_answer = answer
+        with col2:
+            if st.button("❌ FALSE", key=f"tf_f_{question_index}", use_container_width=True):
+                answer = "False"
+                st.session_state.play_user_answer = answer
+        answer = st.session_state.get("play_user_answer")
+
+    # -------- Image Match --------
+    elif gt_key == "image_match":
+        st.markdown(f'<div class="question-box-duo">🖼️ {question_text}</div>', unsafe_allow_html=True)
+        
+        # Emoji search from options
+        cols = st.columns(2)
+        for idx, opt in enumerate(options):
+            with cols[idx % 2]:
+                emoji = get_emoji_for_option(opt)
+                if st.button(
+                    f"{emoji}  {opt}",
+                    key=f"img_{idx}_{question_index}",
+                    use_container_width=True
+                ):
+                    st.session_state.play_user_answer = opt
+                    st.rerun()
+        answer = st.session_state.get("play_user_answer")
+
+    # -------- Memory Flip --------
+    elif gt_key == "memory_flip":
+        st.markdown('<div class="question-box-duo">🧠 Memory Flip — जोड़ी बनाओ!</div>', unsafe_allow_html=True)
+        
+        if "mem_flipped" not in st.session_state:
+            st.session_state.mem_flipped = [False] * len(options)
+        if "mem_selected" not in st.session_state:
+            st.session_state.mem_selected = []
+        
+        cols = st.columns(min(4, len(options)))
+        for idx, opt in enumerate(options):
+            with cols[idx % 4]:
+                label = opt if st.session_state.mem_flipped[idx] else "❓"
+                if st.button(label, key=f"mem_{idx}_{question_index}", use_container_width=True):
+                    st.session_state.mem_flipped[idx] = True
+                    st.session_state.mem_selected.append(opt)
+                    st.rerun()
+        
+        if len(st.session_state.mem_selected) >= 2:
+            if len(set(st.session_state.mem_selected)) >= 2:
+                answer = "memory_complete"
+                st.session_state.play_user_answer = "memory_complete"
+        
+        st.info(f"Flip किए गए: {sum(st.session_state.mem_flipped)}/{len(options)}")
+        answer = st.session_state.get("play_user_answer", "")
+
+    # -------- Listen & Choose --------
+    elif gt_key == "listen_choose":
+        st.markdown(f'<div class="question-box-duo">🔊 {question_text}</div>', unsafe_allow_html=True)
+        st.info("🔊 सुनो और सही विकल्प चुनो (audio simulated)")
+        answer = st.radio(
+            "Choose:",
+            options,
+            key=f"list_{question_index}",
+            label_visibility="collapsed"
         )
 
-    with c3:
-        st.metric(
-            "📚 Subject",
-            play_subject
+    # -------- Pattern Complete --------
+    elif gt_key == "pattern":
+        st.markdown(f'<div class="question-box-duo">🧩 {question_text}</div>', unsafe_allow_html=True)
+        answer = st.radio(
+            "अगला क्या होगा?",
+            options,
+            key=f"pat_{question_index}",
+            label_visibility="collapsed"
         )
 
-    # --------------------------------------------------------
-    # Question Card
-    # --------------------------------------------------------
+    # -------- Word Scramble --------
+    elif gt_key == "scramble":
+        st.markdown(f'<div class="question-box-duo">🌍 {question_text}</div>', unsafe_allow_html=True)
+        st.info(f"🔤 अक्षर: {' • '.join(options) if isinstance(options, list) else options}")
+        answer = st.text_input("तुम्हारा जवाब:", key=f"scr_{question_index}")
 
-    st.markdown(
-        '<div class="play-card">',
-        unsafe_allow_html=True
-    )
+    # -------- Sentence Build --------
+    elif gt_key == "sentence":
+        st.markdown(f'<div class="question-box-duo">📝 {question_text}</div>', unsafe_allow_html=True)
+        if isinstance(options, list):
+            st.info(f"🔤 शब्द: {' • '.join(options)}")
+        answer = st.text_input("वाक्य लिखो:", key=f"sen_{question_index}")
 
-    st.subheader(f"❓ {question_text}")
+    # -------- Virtual Lab --------
+    elif gt_key == "virtual_lab":
+        st.markdown(f'<div class="question-box-duo">🔬 {question_text}</div>', unsafe_allow_html=True)
+        slider_val = st.slider("Experiment:", 0, 100, 50, key=f"lab_{question_index}")
+        answer = str(slider_val)
+        st.info(f"🔬 Slider value: {slider_val}")
+        if st.button("✅ Experiment Done", key=f"lab_done_{question_index}"):
+            st.session_state.play_user_answer = answer
+            st.rerun()
+        answer = st.session_state.get("play_user_answer", answer)
 
-    answer = st.radio(
-        "Choose your answer:",
-        options,
-        key=(
-            f"play_answer_{play_age}_"
-            f"{play_subject}_{question_index}"
+    # -------- Speed Round (Timer) --------
+    elif gt_key == "speed_round":
+        st.markdown(f'<div class="question-box-duo">⏱️ {question_text}</div>', unsafe_allow_html=True)
+        st.warning("⚡ जल्दी जवाब दो — 15 seconds!")
+        answer = st.radio(
+            "Choose:",
+            options,
+            key=f"spd_{question_index}",
+            label_visibility="collapsed"
         )
-    )
 
-    st.markdown(
-        "</div>",
-        unsafe_allow_html=True
-    )
+    # -------- Default --------
+    else:
+        st.markdown(f'<div class="question-box-duo">❓ {question_text}</div>', unsafe_allow_html=True)
+        answer = st.radio(
+            "Choose:",
+            options,
+            key=f"def_{question_index}",
+            label_visibility="collapsed"
+        )
 
-    # --------------------------------------------------------
-    # Submit
-    # --------------------------------------------------------
-
+    # ============================================
+    # SUBMIT BUTTON
+    # ============================================
     if not st.session_state.play_answered:
-
-        if st.button(
-            "✅ Submit Answer",
-            use_container_width=True,
-            type="primary"
-        ):
-
-            if answer == correct_answer:
+        if st.button("✅ Submit Answer", use_container_width=True, type="primary"):
+            user_ans = st.session_state.get("play_user_answer", answer)
+            
+            # Check if correct (flexible)
+            is_correct = check_answer(user_ans, correct_answer, gt_key)
+            
+            if is_correct:
                 st.session_state.play_score += 1
                 st.session_state.play_last_correct = True
+                # Streak bonus
+                st.session_state.play_streak += 1
+                if st.session_state.play_streak > st.session_state.play_best_streak:
+                    st.session_state.play_best_streak = st.session_state.play_streak
+                # XP with streak bonus
+                xp_gain = 10 + (st.session_state.play_streak * 2)
+                st.session_state.play_xp += xp_gain
             else:
                 st.session_state.play_last_correct = False
+                st.session_state.play_streak = 0
+                st.session_state.play_hearts -= 1
 
             st.session_state.play_last_explanation = explanation
             st.session_state.play_answered = True
-
             st.rerun()
 
-    # --------------------------------------------------------
-    # Feedback
-    # --------------------------------------------------------
-
+    # ============================================
+    # FEEDBACK
+    # ============================================
     if st.session_state.play_answered:
-
         if st.session_state.play_last_correct:
-            st.success(
-                f"✅ Correct! ⭐ "
-                f"Score: {st.session_state.play_score}/10"
+            st.markdown(
+                f"""
+                <div class="correct-flash">
+                    ✅ Correct! ⭐ +XP: {10 + st.session_state.play_streak * 2} • 
+                    🔥 Streak: {st.session_state.play_streak}
+                </div>
+                """,
+                unsafe_allow_html=True
             )
         else:
-            st.warning(
-                "❌ Not quite! "
-                f"Correct answer: **{correct_answer}**"
+            st.markdown(
+                f"""
+                <div class="wrong-flash">
+                    ❌ Not quite! Correct: <b>{correct_answer}</b> • 
+                    ❤️ Hearts: {st.session_state.play_hearts}/5
+                </div>
+                """,
+                unsafe_allow_html=True
             )
 
         if st.session_state.play_last_explanation:
-            st.info(
-                f"💡 {st.session_state.play_last_explanation}"
-            )
+            st.info(f"💡 {st.session_state.play_last_explanation}")
 
-    # --------------------------------------------------------
-    # Next Question / Result
-    # --------------------------------------------------------
-
-    if st.session_state.play_answered:
-
+        # ============================================
+        # NEXT / RESULT
+        # ============================================
         if question_index < QUESTIONS_PER_LEVEL - 1:
-
-            if st.button(
-                "➡️ Next Question",
-                use_container_width=True
-            ):
-
+            if st.button("➡️ Next Question", use_container_width=True, type="primary"):
                 st.session_state.play_question_index += 1
                 st.session_state.play_answered = False
                 st.session_state.play_last_correct = False
                 st.session_state.play_last_explanation = ""
-
+                st.session_state.play_user_answer = None
+                st.session_state.mem_flipped = []
+                st.session_state.mem_selected = []
                 st.rerun()
-
         else:
-
+            # Level Complete
             st.divider()
-
             final_score = st.session_state.play_score
 
             if final_score == 10:
-
                 st.balloons()
-
-                st.success(
-                    "🏆 LEVEL COMPLETE — 10/10!"
+                st.markdown(
+                    f"""
+                    <div class="victory-box">
+                        <h1>🏆 LEVEL COMPLETE — 10/10!</h1>
+                        <p>🎉 शाबाश! तुमने पूरे 10 सही किए!</p>
+                        <p>⭐ XP: +{st.session_state.play_xp} | 🔥 Best Streak: {st.session_state.play_best_streak}</p>
+                    </div>
+                    """,
+                    unsafe_allow_html=True
                 )
 
-                st.session_state.play_completed_levels.append(
-                    play_age
-                )
+                if play_age not in st.session_state.play_completed_levels:
+                    st.session_state.play_completed_levels.append(play_age)
 
-                st.session_state.play_best_scores[
-                    f"{play_age}:{play_subject}"
-                ] = max(
+                st.session_state.play_best_scores[f"{play_age}:{play_subject}"] = max(
                     final_score,
-                    st.session_state.play_best_scores.get(
-                        f"{play_age}:{play_subject}",
-                        0
-                    )
+                    st.session_state.play_best_scores.get(f"{play_age}:{play_subject}", 0)
                 )
+
+                # Achievement
+                if len(st.session_state.play_achievements) < 10:
+                    ach = f"🏆 Perfect {play_subject} ({play_age})"
+                    if ach not in st.session_state.play_achievements:
+                        st.session_state.play_achievements.append(ach)
 
                 next_level = unlock_next_play_level(play_age)
-
                 if next_level:
+                    st.success(f"🔓 Next Level Unlocked: **{next_level}**")
+                    colX, colY = st.columns(2)
+                    with colX:
+                        if st.button(f"🚀 Play {next_level}", use_container_width=True, type="primary"):
+                            st.session_state.play_age = next_level
+                            st.session_state.play_game_started = False
+                            st.session_state.play_show_game_selector = False
+                            st.session_state.play_questions = []
+                            st.session_state.play_question_index = 0
+                            st.session_state.play_score = 0
+                            st.session_state.play_hearts = 5
+                            st.session_state.play_streak = 0
+                            st.session_state.play_answered = False
+                            st.rerun()
+                    with colY:
+                        if st.button("🔄 Same Level दोबारा", use_container_width=True):
+                            st.session_state.play_game_started = False
+                            st.session_state.play_show_game_selector = False
+                            st.session_state.play_score = 0
+                            st.session_state.play_hearts = 5
+                            st.session_state.play_streak = 0
+                            st.session_state.play_question_index = 0
+                            st.session_state.play_answered = False
+                            st.rerun()
+                else:
+                    st.success("👑 Congratulations! All levels complete!")
+            else:
+                st.warning(f"⭐ Final Score: {final_score}/10")
+                st.info(
+                    "🔒 अगला level unlock करने के लिए 10/10 करना ज़रूरी है। "
+                    "कोई बात नहीं — फिर से try करो!"
+                )
 
-                    st.success(
-                        f"🔓 Next Level Unlocked: **{next_level}**"
-                    )
-
-                    if st.button(
-                        f"🚀 Play {next_level}",
-                        use_container_width=True,
-                        type="primary"
-                    ):
-
-                        st.session_state.play_age = next_level
+                colX, colY = st.columns(2)
+                with colX:
+                    if st.button("🔄 Retry Level", use_container_width=True, type="primary"):
                         st.session_state.play_game_started = False
-                        st.session_state.play_questions = []
-                        st.session_state.play_question_index = 0
                         st.session_state.play_score = 0
+                        st.session_state.play_hearts = 5
+                        st.session_state.play_streak = 0
+                        st.session_state.play_question_index = 0
                         st.session_state.play_answered = False
-                        st.session_state.play_last_correct = False
-                        st.session_state.play_last_explanation = ""
-
+                        st.rerun()
+                with colY:
+                    if st.button("🎮 Change Game", use_container_width=True):
+                        st.session_state.play_game_started = False
+                        st.session_state.play_show_game_selector = False
+                        st.session_state.play_score = 0
+                        st.session_state.play_hearts = 5
+                        st.session_state.play_streak = 0
+                        st.session_state.play_question_index = 0
+                        st.session_state.play_answered = False
                         st.rerun()
 
-                else:
-
-                    st.success(
-                        "👑 Congratulations! "
-                        "All available age levels are complete."
-                    )
-
-            else:
-
-                st.warning(
-                    f"⭐ Final Score: {final_score}/10"
-                )
-
-                st.info(
-                    "🔒 अगला level unlock करने के लिए इस level में "
-                    "10/10 करना जरूरी है."
-                )
-
-                if st.button(
-                    "🔄 Retry Level",
-                    use_container_width=True,
-                    type="primary"
-                ):
-
-                    st.session_state.play_game_started = False
-                    st.session_state.play_questions = []
-                    st.session_state.play_question_index = 0
-                    st.session_state.play_score = 0
-                    st.session_state.play_answered = False
-                    st.session_state.play_last_correct = False
-                    st.session_state.play_last_explanation = ""
-
-                    st.rerun()
-
-    # --------------------------------------------------------
-    # Reset Game
-    # --------------------------------------------------------
-
+    # ============================================
+    # RESET
+    # ============================================
     st.divider()
+    colR1, colR2 = st.columns(2)
+    with colR1:
+        if st.button("🔄 Restart Current Game", use_container_width=True):
+            st.session_state.play_game_started = False
+            st.session_state.play_questions = []
+            st.session_state.play_question_index = 0
+            st.session_state.play_score = 0
+            st.session_state.play_hearts = 5
+            st.session_state.play_streak = 0
+            st.session_state.play_answered = False
+            st.rerun()
+    with colR2:
+        if st.button("🎮 Back to Game Menu", use_container_width=True):
+            st.session_state.play_game_started = False
+            st.session_state.play_show_game_selector = False
+            st.session_state.play_game_type = None
+            st.session_state.play_score = 0
+            st.session_state.play_hearts = 5
+            st.session_state.play_streak = 0
+            st.session_state.play_question_index = 0
+            st.session_state.play_answered = False
+            st.rerun()
 
-    if st.button(
-        "🔄 Restart Current Game",
-        use_container_width=True
-    ):
 
-        st.session_state.play_game_started = False
-        st.session_state.play_questions = []
-        st.session_state.play_question_index = 0
-        st.session_state.play_score = 0
-        st.session_state.play_answered = False
-        st.session_state.play_last_correct = False
-        st.session_state.play_last_explanation = ""
+# ============================================================
+# 🧠 HELPER FUNCTIONS (ये render_play_and_learn के बाहर हैं)
+# ============================================================
 
-        st.rerun()
+def transform_questions_for_game(questions, game_type):
+    """AI questions को game type के हिसाब से ढालो"""
+    if game_type in ["quiz", "true_false", "speed_round", "pattern", "listen_choose"]:
+        return questions  # वैसे ही रहने दो
+    
+    # बाकी game types के लिए भी वही questions use करेंगे
+    # क्योंकि AI-generated हैं तो flexible हैं
+    return questions
+
+
+def check_answer(user_ans, correct, game_type):
+    """Flexible answer checking"""
+    if user_ans is None:
+        return False
+    
+    u = str(user_ans).strip().lower()
+    c = str(correct).strip().lower()
+    
+    if game_type == "true_false":
+        return (u in ["true", "सही"]) == (c in ["true", "सही"])
+    
+    if game_type == "memory_flip":
+        return u == "memory_complete"
+    
+    return u == c or c in u or u in c
+
+
+def get_emoji_for_option(option):
+    """Option के लिए emoji ढूँढो"""
+    emoji_map = {
+        "apple": "🍎", "banana": "🍌", "cat": "🐱", "dog": "🐕",
+        "sun": "☀️", "moon": "🌙", "star": "⭐", "book": "📚",
+        "car": "🚗", "tree": "🌳", "fish": "🐟", "ball": "⚽",
+        "oxygen": "O", "hydrogen": "H", "carbon": "C",
+        "earth": "🌍", "mars": "🔴", "jupiter": "🪐",
+    }
+    opt_lower = str(option).lower()
+    for key, emoji in emoji_map.items():
+        if key in opt_lower:
+            return emoji
+    return "🔹"
 
 
 # ============================================================
