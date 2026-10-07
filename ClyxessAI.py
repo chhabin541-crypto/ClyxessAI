@@ -2426,7 +2426,7 @@ Do not skip visible questions unless the image is unreadable.
     st.markdown("""
 <div style="background:linear-gradient(135deg,#07152f,#111c48,#29105c);padding:24px;border-radius:20px;margin-bottom:20px;border:1px solid rgba(100,180,255,0.3);">
     <div style="color:white;font-size:30px;font-weight:700;line-height:1.2;">
-        📷 Vision Lab — ClyxessChat AI
+        📷 Vision Lab — Doubt Intelligene
     </div>
     <div style="color:#b8d8ff;margin-top:10px;font-size:14px;line-height:1.6;">
         Book • Homework • Exam • Diagram • Graph • Question • Doubt — Everything Explained
