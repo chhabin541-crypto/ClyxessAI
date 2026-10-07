@@ -1205,290 +1205,250 @@ Return ONLY valid JSON with this format:
 
 def render_play_and_learn(client):
     import random
-    import time
-    from datetime import datetime
 
+    # DUOLINGO STYLE 5 GAMES - Jaise screenshot me hai
     GAME_TYPES = {
-        "🎯 Classic Quiz": "quiz",
-        "⚡ True / False": "true_false",
-        "🖼️ Image Match": "image_match",
-        "🧠 Memory Flip": "memory_flip",
-        "🔊 Listen & Choose": "listen_choose",
-        "🧩 Pattern Complete": "pattern",
-        "🌍 Word Scramble": "scramble",
-        "📝 Sentence Build": "sentence",
-        "🔬 Virtual Lab": "virtual_lab",
-        "⏱️ Speed Round": "speed_round",
+        "🖼️ Select Image": "select_image",
+        "🔗 Match Pairs": "match_pairs",
+        "👂 Tap What You Hear": "tap_hear",
+        "🧩 Build Sentence": "build_sentence",
+        "🥛 Which Is This?": "which_is",
     }
 
-    # --- HELPER INSIDE - Isse NameError khatam ---
-    def check_answer(user_ans, correct, game_type):
-        if user_ans is None: return False
-        u = str(user_ans).strip().lower()
-        c = str(correct).strip().lower()
-        u = " ".join(u.split()); c = " ".join(c.split())
-        if not u: return False
-        if game_type == "true_false":
-            true_w = ["true", "सही", "yes", "हाँ", "ha", "1", "t"]
-            false_w = ["false", "गलत", "no", "नहीं", "nahi", "0", "f"]
-            if (u in true_w and c in true_w) or (u in false_w and c in false_w): return True
-            return u == c
-        if game_type in ["scramble", "sentence"]:
-            if u == c: return True
-            if len(u)>=3 and (u in c or c in u): return True # lenient for kids
-            return False
-        return u == c
-
-    def learning_report():
-        completed = st.session_state.get("play_completed_levels", [])
-        best_scores = st.session_state.get("play_best_scores", {})
-        best_score = max(best_scores.values()) if best_scores else 0
-        return {"completed_levels": len(completed), "best_score": best_score, "current_level": st.session_state.get("play_age", "1-2 Years")}
-
-    def get_emoji_for_option(option):
-        m = {"apple":"🍎","banana":"🍌","cat":"🐱","dog":"🐕","sun":"☀️","moon":"🌙","star":"⭐","book":"📚","car":"🚗","tree":"🌳","fish":"🐟","ball":"⚽"}
-        ol = str(option).lower()
-        for k,e in m.items():
-            if k in ol: return e
-        return "🔹"
-
-    # --- CSS SAME ---
     st.markdown("""
     <style>
-       .play-hero { background: linear-gradient(135deg, #58CC02 0%, #1CB0F6 50%, #FF9600 100%); padding: 2rem; border-radius: 25px; text-align: center; color: white; margin-bottom: 1.5rem; }
-       .play-hero h1 { color: white; font-size: 2.5rem; margin: 0; }
-       .play-card { background: white; padding: 2rem; border-radius: 20px; border: 3px solid #E5E5E5; margin: 1rem 0; }
-       .stats-bar-duo { background: #fff; padding: 1rem; border-radius: 15px; border: 2px solid #E5E5E5; display: flex; justify-content: space-around; font-weight: bold; }
-       .question-box-duo { background: linear-gradient(135deg, #E3F2FD, #BBDEFB); padding: 2rem; border-radius: 20px; border: 3px solid #1CB0F6; margin: 1rem 0; text-align: center; font-size: 1.4rem; font-weight: bold; }
-       .correct-flash { background: #D7FFB8; padding: 1rem; border-radius: 15px; border-left: 6px solid #58CC02; }
-       .wrong-flash { background: #FFF3CD; padding: 1rem; border-radius: 15px; border-left: 6px solid #FFC800; }
-       .game-over-box { background: linear-gradient(135deg, #FF4B4B, #FF6B6B); color: white; padding: 2rem; border-radius: 20px; text-align: center; }
-       .victory-box { background: linear-gradient(135deg, #58CC02, #89E219); color: white; padding: 2rem; border-radius: 20px; text-align: center; }
+     .duo-hero { background: #1a1a1a; padding: 1rem; border-radius: 15px; color: white; }
+     .duo-progress { height: 16px; background: #333; border-radius: 20px; overflow: hidden; }
+     .duo-progress-fill { height: 100%; background: #58CC02; border-radius: 20px; }
+     .duo-card { background: #1e2a3a; border: 3px solid #2d3d52; border-radius: 16px; padding: 1.5rem; text-align: center; cursor: pointer; transition: 0.2s; min-height: 160px; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+     .duo-card:hover { border-color: #1CB0F6; transform: scale(1.02); }
+     .duo-card.selected { border-color: #1CB0F6; background: #1a3a5a; box-shadow: 0 0 0 2px #1CB0F6; }
+     .duo-card.correct { border-color: #58CC02; background: #1a4a1a; }
+     .duo-emoji { font-size: 4rem; margin-bottom: 0.5rem; }
+     .duo-label { color: white; font-size: 1.1rem; margin-top: 0.5rem; }
+     .word-chip { display: inline-block; background: #2d3d52; color: white; border: 2px solid #3d4d62; padding: 0.6rem 1.2rem; border-radius: 12px; margin: 0.3rem; cursor: pointer; font-size: 1.2rem; }
+     .word-chip:hover { background: #3d5d82; }
+     .word-chip.selected { background: #1CB0F6; border-color: #1CB0F6; }
+     .check-btn { background: #58CC02; color: #0a0a0a; font-weight: 900; font-size: 1.2rem; padding: 1rem; border-radius: 16px; border: none; width: 100%; margin-top: 1rem; }
+     .match-box { background: white; border: 2px solid #e5e5e5; border-radius: 12px; padding: 1rem; text-align: center; min-height: 90px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.3rem; cursor: pointer; }
+     .match-box.sel { background: #D7FFB8; border-color: #58CC02; }
     </style>
     """, unsafe_allow_html=True)
 
-    st.markdown('<div class="play-hero"><h1>🎮 ClyxessChat AI — Play & Learn</h1><p>Smart • Fun • No Frustration</p></div>', unsafe_allow_html=True)
-
-    # --- SESSION ---
-    age_levels = PLAY_AGE_LEVELS if 'PLAY_AGE_LEVELS' in globals() else ["1-2 Years", "3-4 Years", "5-6 Years", "7-8 Years"]
-
-    def get_next_age(curr):
-        try:
-            i = age_levels.index(curr)
-            return age_levels[i+1] if i+1 < len(age_levels) else None
-        except: return None
-
+    # Session init
     defaults = {
-        "play_hearts": 5, "play_streak": 0, "play_best_streak": 0, "play_xp": 0,
-        "play_game_type": None, "play_show_game_selector": False, "play_game_started": False,
-        "play_question_index": 0, "play_score": 0, "play_answered": False,
-        "play_last_correct": False, "play_last_explanation": "", "play_age": age_levels[0],
-        "play_completed_levels": [], "play_best_scores": {}, "play_unlocked_levels": [age_levels[0]],
-        "play_subject": "General", "play_language": "English",
-        "mem_board": [], "mem_flipped": [], "mem_matched": [], "sentence_built": []
+        "play_age": "1-2 Years", "play_game_type": None, "play_show": False, "play_started": False,
+        "play_q_idx": 0, "play_score": 0, "play_answered": False, "play_hearts": 5, "play_xp": 0,
+        "play_qs": [], "play_selected_card": None, "play_word_built": [], "play_word_bank": [],
+        "play_match_left": None, "play_match_right": None, "play_matched_pairs": {}
     }
     for k,v in defaults.items():
         if k not in st.session_state: st.session_state[k]=v
 
-    col1, col2, col3 = st.columns(3)
-    with col1:
-        play_age = st.selectbox("👶 Age", age_levels, index=age_levels.index(st.session_state.play_age) if st.session_state.play_age in age_levels else 0, key="pl_age_sel")
-    with col2:
-        lang_keys = list(PLAY_LANGUAGES.keys()) if 'PLAY_LANGUAGES' in globals() else ["English", "हिंदी"]
-        lang_label = st.selectbox("🌐 Language", lang_keys, key="pl_lang_sel")
+    age_levels = PLAY_AGE_LEVELS if 'PLAY_AGE_LEVELS' in globals() else ["1-2 Years", "3-4 Years", "5-6 Years"]
+
+    c1,c2 = st.columns(2)
+    with c1: play_age = st.selectbox("👶 Age", age_levels, key="duo_age")
+    with c2:
+        lang_keys = list(PLAY_LANGUAGES.keys()) if 'PLAY_LANGUAGES' in globals() else ["Hindi", "English"]
+        lang_label = st.selectbox("🌐 Bhasha", lang_keys, key="duo_lang")
         play_language = PLAY_LANGUAGES[lang_label] if 'PLAY_LANGUAGES' in globals() else lang_label
-    with col3:
-        subjects = get_play_subjects(play_age) if 'get_play_subjects' in globals() else ["Math", "GK", "English"]
-        play_subject = st.selectbox("📚 Subject", subjects, key="pl_subj_sel")
 
     st.session_state.play_age = play_age
-    is_little = play_age in ["1-2 Years", "2-3 Years", "2-4 Years", "3-5 Years"]
-    PASS_MARKS = 6 if is_little else 8
-    if is_little: st.session_state.play_hearts = 99 # Chote baccho ke liye infinite
+    is_hindi = "Hindi" in play_language or "हिंदी" in lang_label or "Hindi" in lang_label
 
-    if play_age not in st.session_state.play_unlocked_levels:
-        st.error(f"🔒 {play_age} Locked hai")
-        st.info(f"{PASS_MARKS}/10 lao previous level me unlock karne ke liye")
-        return
-
-    # Sidebar
-    with st.sidebar:
-        st.markdown("### 🏆 Stats")
-        h_txt = "🌈 Fun" if is_little else f"{st.session_state.play_hearts}/5"
-        st.markdown(f'<div class="stats-bar-duo" style="flex-direction:column"><div>❤️ {h_txt}</div><div>🔥 {st.session_state.play_streak}</div><div>⭐ {st.session_state.play_xp}</div></div>', unsafe_allow_html=True)
-
-    # GAME OVER - Only big kids
-    if not is_little and st.session_state.play_hearts <=0 and st.session_state.play_game_started:
-        st.markdown('<div class="game-over-box"><h1>💔 Hearts Khatam!</h1><p>Refill karo, game chalu rakho!</p></div>', unsafe_allow_html=True)
-        if st.button("❤️ Free Refill", type="primary", use_container_width=True):
-            st.session_state.play_hearts=5
-            st.rerun()
-        return
-
-    # SCREEN 1
-    if not st.session_state.play_show_game_selector and not st.session_state.play_game_started:
-        st.markdown(f"## 🎮 Game Chuno - Pass Marks: **{PASS_MARKS}/10**")
-        if is_little: st.success("🌈 Chote bachon ke liye - No Game Over! Galat pe bhi pyaar se samjhayenge!")
+    # SCREEN 1: Game Select
+    if not st.session_state.play_show and not st.session_state.play_started:
+        st.markdown(f"### Duolingo Style Games")
+        st.info("Screenshot jaisa hi banega - Image select, Pair match, Tap to build")
         cols = st.columns(2)
-        for i,(label,key) in enumerate(GAME_TYPES.items()):
+        for i,(lbl,key) in enumerate(GAME_TYPES.items()):
             with cols[i%2]:
-                if st.button(label, key=f"gt_{key}", use_container_width=True):
-                    st.session_state.play_game_type=key
-                    st.session_state.play_show_game_selector=True
-                    st.session_state.mem_board=[]; st.session_state.mem_flipped=[]; st.session_state.mem_matched=[]; st.session_state.sentence_built=[]
+                if st.button(lbl, key=f"duo_{key}", use_container_width=True):
+                    st.session_state.play_game_type = key
+                    st.session_state.play_show = True
                     st.rerun()
         return
 
-    # SCREEN 2
-    if not st.session_state.play_game_started:
-        st.markdown('<div class="play-card">', unsafe_allow_html=True)
-        st.subheader(f"🎯 {st.session_state.play_game_type}")
-        st.write(f"Age: {play_age} | Pass: {PASS_MARKS}/10 | Hearts: {'Unlimited 🌈' if is_little else '5 ❤️'}")
+    # SCREEN 2: Generate Questions
+    if not st.session_state.play_started:
         if st.button("🚀 Start Game", type="primary", use_container_width=True):
-            with st.spinner("🤖 AI Questions bana raha hai..."):
-                if 'generate_ai_questions' in globals():
-                    qs = generate_ai_questions(client=client, age=play_age, language=play_language, subject=play_subject, count=10)
-                else:
-                    qs = [{"question": f"Q{i+1} - {play_subject}?", "options": ["A","B","C","D"], "answer":"A", "explanation":"Demo"} for i in range(10)]
-            st.session_state.play_questions=qs
-            st.session_state.play_question_index=0; st.session_state.play_score=0; st.session_state.play_answered=False
-            st.session_state.play_game_started=True; st.session_state.mem_board=[]; st.session_state.mem_flipped=[]; st.session_state.mem_matched=[]; st.session_state.sentence_built=[]
-            st.session_state.play_hearts = 99 if is_little else 5
+            qs = []
+            g = st.session_state.play_game_type
+
+            # DATA - Emoji icons (No external images needed)
+            data_pool = [
+                {"hi": "सेब", "en": "Apple", "emoji": "🍎", "trans": "Apple"},
+                {"hi": "औरत", "en": "Woman", "emoji": "👩", "trans": "Woman"},
+                {"hi": "आदमी", "en": "Man", "emoji": "👨", "trans": "Man"},
+                {"hi": "किताब", "en": "Book", "emoji": "📚", "trans": "Book"},
+                {"hi": "गिलास", "en": "Glass", "emoji": "🥛", "trans": "el vaso"},
+                {"hi": "कप", "en": "Cup", "emoji": "☕", "trans": "la taza"},
+                {"hi": "एक", "en": "One", "emoji": "1️⃣", "trans": "One"},
+                {"hi": "पानी", "en": "Water", "emoji": "💧", "trans": "Water"},
+            ]
+
+            for i in range(10):
+                if g == "select_image": # Screenshot 1
+                    correct = random.choice(data_pool)
+                    opts = random.sample(data_pool, 4)
+                    if correct not in opts: opts[0] = correct
+                    random.shuffle(opts)
+                    q_text = correct["hi"] if is_hindi else correct["en"]
+                    qs.append({"type": g, "q": q_text, "correct": correct, "opts": opts, "audio": f"🔊 {q_text}"})
+
+                elif g == "which_is": # Screenshot 6
+                    correct = random.choice(data_pool)
+                    opts = random.sample(data_pool, 4)
+                    if correct not in opts: opts[0] = correct
+                    random.shuffle(opts)
+                    q_text = f'Which of these is "{correct["en"]}"?' if not is_hindi else f'"{correct["hi"]}" kaunsa hai?'
+                    qs.append({"type": g, "q": q_text, "correct": correct, "opts": opts})
+
+                elif g == "match_pairs": # Screenshot 2
+                    # Math pairs
+                    pairs = [(f"{n*2} ÷ 2", "🟦"*n, n) for n in [2,4,5]]
+                    random.shuffle(pairs)
+                    qs.append({"type": g, "q": "Match the pairs", "pairs": pairs})
+
+                elif g == "tap_hear" or g == "build_sentence": # Screenshot 3,4
+                    if is_hindi:
+                        words = ["एक", "सेब", "है", "यह", "पानी"]
+                        target = ["एक", "सेब", "है"]
+                    else:
+                        words = ["I", "want", "a", "salad", "water", "glass"]
+                        target = ["I", "want", "a", "salad"]
+                    random.shuffle(words)
+                    qs.append({"type": g, "q": "Tap what you hear" if g=="tap_hear" else "Translate this sentence", "target": target, "bank": words, "audio": "🔊 I want a salad." if not is_hindi else "🔊 एक सेब है"})
+
+            st.session_state.play_qs = qs
+            st.session_state.play_q_idx = 0
+            st.session_state.play_score = 0
+            st.session_state.play_started = True
+            st.session_state.play_answered = False
+            st.session_state.play_matched_pairs = {}
             st.rerun()
-        if st.button("⬅️ Back"):
-            st.session_state.play_show_game_selector=False
-            st.rerun()
-        st.markdown('</div>', unsafe_allow_html=True)
         return
 
-    # SCREEN 3 - PLAYING
-    qs = st.session_state.play_questions
-    q_idx = st.session_state.play_question_index
-    curr = qs[q_idx]
-    q_text, opts, correct, expl = curr["question"], curr["options"], curr["answer"], curr.get("explanation","")
-    gtype = st.session_state.play_game_type
+    # SCREEN 3: PLAY - DUOLINGO UI
+    qs = st.session_state.play_qs
+    if not qs: return
+    idx = st.session_state.play_q_idx
+    if idx >= len(qs): idx = 0
+    curr = qs[idx]
+    g = curr["type"]
 
-    st.markdown(f'<div class="stats-bar-duo"><div>❤️ { "🌈" if is_little else st.session_state.play_hearts}</div><div>🔥 {st.session_state.play_streak}</div><div>⭐ {st.session_state.play_xp}</div><div>🎯 {q_idx+1}/10</div></div>', unsafe_allow_html=True)
-    st.progress((q_idx+1)/10)
+    # Progress bar like screenshot
+    progress = (idx+1)/10
+    st.markdown(f'<div class="duo-hero"><div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;"><span>❌</span><div style="flex:1; margin:0 1rem;"><div class="duo-progress"><div class="duo-progress-fill" style="width:{progress*100}%"></div></div></div><span>❤️ {st.session_state.play_hearts}</span></div><h2 style="margin:0.5rem 0;">{curr.get("q","")}</h2>{curr.get("audio","")}</div>', unsafe_allow_html=True)
 
-    answer = None
-    st.markdown(f'<div class="question-box-duo">{q_text}</div>', unsafe_allow_html=True)
-
-    if gtype == "memory_flip":
-        # ADVANCED MEMORY LOGIC
-        if not st.session_state.mem_board:
-            base = list(set(opts[:4]))[:2]
-            if len(base)<2: base = [correct, "Apple"]
-            board = base*2
-            random.shuffle(board)
-            st.session_state.mem_board = board
-        board = st.session_state.mem_board
+    # --- GAME RENDER ---
+    if g == "select_image" or g == "which_is":
         cols = st.columns(2)
-        for i,val in enumerate(board):
+        for i, opt in enumerate(curr["opts"]):
             with cols[i%2]:
-                open_card = i in st.session_state.mem_flipped or i in st.session_state.mem_matched
-                label = f"{get_emoji_for_option(val)} {val}" if open_card else "❓"
-                if st.button(label, key=f"mem_{q_idx}_{i}", use_container_width=True, disabled=open_card):
-                    st.session_state.mem_flipped.append(i)
-                    if len(st.session_state.mem_flipped)==2:
-                        a,b = st.session_state.mem_flipped
-                        if board[a]==board[b]:
-                            st.session_state.mem_matched.extend([a,b])
-                            st.toast("🎉 Match!")
-                        time.sleep(0.5)
-                        st.session_state.mem_flipped=[]
+                is_sel = st.session_state.play_selected_card == opt["emoji"]
+                border = "selected" if is_sel else ""
+                st.markdown(f'<div class="duo-card {border}"><div class="duo-emoji">{opt["emoji"]}</div><div class="duo-label">{opt["trans"] if g=="which_is" else opt["en"]}</div></div>', unsafe_allow_html=True)
+                if st.button(f"Select {opt['en']}", key=f"sel_{idx}_{i}", use_container_width=True, label_visibility="collapsed"):
+                    st.session_state.play_selected_card = opt["emoji"]
+                    st.session_state.play_selected_opt = opt
                     st.rerun()
-        st.info(f"Matched: {len(st.session_state.mem_matched)//2}/2")
-        if len(st.session_state.mem_matched)>=4: answer = correct
 
-    elif gtype == "sentence":
-        if isinstance(opts, list):
-            st.write("Click karke sentence banao:")
-            c = st.columns(3)
-            for i,w in enumerate(opts):
-                with c[i%3]:
-                    if st.button(w, key=f"sen_{q_idx}_{i}"):
-                        st.session_state.sentence_built.append(w)
-                        st.rerun()
-            built = " ".join(st.session_state.sentence_built)
-            st.markdown(f"**Tumhara:** `{built}`")
-            if st.button("🗑️ Clear"):
-                st.session_state.sentence_built=[]
-                st.rerun()
-            answer = built
+        if st.session_state.play_selected_card:
+            if st.button("CHECK", type="primary", use_container_width=True):
+                is_correct = st.session_state.play_selected_opt["emoji"] == curr["correct"]["emoji"]
+                if is_correct:
+                    st.success(f"✅ Correct! {curr['correct']['emoji']} {curr['correct']['en']}")
+                    st.session_state.play_score+=1
+                    st.balloons()
+                else:
+                    st.error(f"❌ Correct was {curr['correct']['emoji']} {curr['correct']['en']}")
+                st.session_state.play_answered=True
+                time.sleep(0.8)
+                if idx < 9:
+                    st.session_state.play_q_idx+=1
+                    st.session_state.play_selected_card=None
+                    st.session_state.play_answered=False
+                    st.rerun()
+                else:
+                    st.success(f"🏆 Game Over! Score {st.session_state.play_score}/10")
+                    if st.button("Play Again"):
+                        st.session_state.play_started=False; st.session_state.play_show=False; st.rerun()
 
-    elif gtype == "scramble":
-        scrambled = "".join(random.sample(list(correct), len(correct))) if len(correct)<12 else correct[::-1]
-        st.info(f"Unscramble: **{scrambled.upper()}**")
-        answer = st.text_input("Jawab:", key=f"scr_{q_idx}")
+    elif g == "match_pairs":
+        pairs = curr["pairs"]
+        st.markdown("#### Match left and right")
+        # Simple version - show 3 left, 3 right
+        left_items = [p[0] for p in pairs]
+        right_items = [p[1] for p in pairs]
 
-    elif gtype == "virtual_lab":
-        v = st.slider("Power", 0, 100, 50, key=f"lab_{q_idx}")
-        if v<30: st.write("❄️ Ice!")
-        elif v>70: st.write("🔥 Fire!")
-        else: st.write("💧 Perfect Water!")
-        answer = correct
+        c1,c2 = st.columns(2)
+        with c1:
+            for i, left in enumerate(left_items):
+                if st.button(left, key=f"left_{idx}_{i}", use_container_width=True):
+                    st.session_state.play_match_left = left
+                    st.rerun()
+        with c2:
+            for i, right in enumerate(right_items):
+                if st.button(right, key=f"right_{idx}_{i}", use_container_width=True):
+                    st.session_state.play_match_right = right
+                    st.rerun()
 
-    elif gtype == "listen_choose":
-        st.info("🔊 Audio: (Imagine voice) - " + q_text)
-        answer = st.radio("Choose:", opts, key=f"lis_{q_idx}", label_visibility="collapsed")
-
-    elif gtype == "pattern":
-        st.info("🧩 Pattern dekho aur agla guess karo")
-        answer = st.radio("Next?", opts, key=f"pat_{q_idx}", label_visibility="collapsed")
-
-    else: # quiz, image_match, speed_round, true_false
-        answer = st.radio("Choose:", opts if isinstance(opts,list) else ["True","False"], key=f"ans_{q_idx}", label_visibility="collapsed")
-
-    # SUBMIT
-    if not st.session_state.play_answered:
-        can = answer is not None and str(answer).strip()!=""
-        if gtype=="memory_flip": can = len(st.session_state.mem_matched)>=4
-        if st.button("✅ Submit", type="primary", use_container_width=True, disabled=not can):
-            ok = check_answer(answer, correct, gtype)
-            if gtype in ["memory_flip","virtual_lab"]: ok=True
-            if ok:
-                st.session_state.play_score+=1; st.session_state.play_streak+=1
-                st.session_state.play_best_streak = max(st.session_state.play_best_streak, st.session_state.play_streak)
-                st.session_state.play_xp += 10 + st.session_state.play_streak*2
-                st.session_state.play_last_correct=True
-                st.balloons()
-            else:
-                st.session_state.play_last_correct=False
-                st.session_state.play_streak=0
-                if not is_little: st.session_state.play_hearts-=1
-            st.session_state.play_last_explanation=expl
-            st.session_state.play_answered=True
+        if st.session_state.play_match_left and st.session_state.play_match_right:
+            # Check if match
+            for p in pairs:
+                if p[0]==st.session_state.play_match_left and p[1]==st.session_state.play_match_right:
+                    st.session_state.play_matched_pairs[p[0]] = True
+                    st.success("✅ Matched!")
+                    break
+            st.session_state.play_match_left=None; st.session_state.play_match_right=None
             st.rerun()
-    else:
-        if st.session_state.play_last_correct:
-            st.markdown(f'<div class="correct-flash">✅ Correct! +{10+st.session_state.play_streak*2} XP</div>', unsafe_allow_html=True)
-        else:
-            msg = f"🤗 Koi baat nahi! Sahi: {correct}" if is_little else f"❌ Sahi: {correct} | Hearts: {st.session_state.play_hearts}"
-            st.markdown(f'<div class="wrong-flash">{msg}</div>', unsafe_allow_html=True)
-        if st.session_state.play_last_explanation: st.info(f"💡 {st.session_state.play_last_explanation}")
 
-        if q_idx < 9:
-            if st.button("➡️ Next", type="primary", use_container_width=True):
-                st.session_state.play_question_index+=1; st.session_state.play_answered=False
-                st.session_state.mem_board=[]; st.session_state.mem_flipped=[]; st.session_state.mem_matched=[]; st.session_state.sentence_built=[]
+        st.write(f"Matched: {len(st.session_state.play_matched_pairs)}/3")
+        if len(st.session_state.play_matched_pairs)>=3:
+            if st.button("CONTINUE", type="primary", use_container_width=True):
+                st.session_state.play_q_idx+=1
+                st.session_state.play_matched_pairs={}
                 st.rerun()
-        else:
-            score = st.session_state.play_score
-            if score >= PASS_MARKS:
+
+    elif g == "tap_hear" or g == "build_sentence":
+        # Word chips like screenshot 3 & 4
+        built = st.session_state.get("play_word_built", [])
+
+        # Top area where built words show
+        st.markdown("#### Your sentence:")
+        st.markdown(f'<div style="background:#1e2a3a; padding:1rem; border-radius:12px; min-height:60px; border:2px dashed #333;">{" ".join([f"<span class=\'word-chip selected\'>{w}</span>" for w in built])}</div>', unsafe_allow_html=True)
+
+        # Bank
+        st.markdown("#### Tap words:")
+        bank = curr["bank"]
+        cols = st.columns(3)
+        for i,w in enumerate(bank):
+            if w not in built:
+                with cols[i%3]:
+                    if st.button(w, key=f"word_{idx}_{i}", use_container_width=True):
+                        built.append(w)
+                        st.session_state.play_word_built = built
+                        st.rerun()
+
+        if st.button("🗑️ Clear"):
+            st.session_state.play_word_built=[]
+            st.rerun()
+
+        if st.button("CHECK", type="primary", use_container_width=True):
+            if built == curr["target"]:
+                st.success(f"✅ Correct! Meaning: {' '.join(curr['target'])}")
+                st.session_state.play_score+=1
                 st.balloons()
-                st.markdown(f'<div class="victory-box"><h1>🏆 {score}/10 Pass!</h1><p>Shabaash!</p></div>', unsafe_allow_html=True)
-                if play_age not in st.session_state.play_completed_levels: st.session_state.play_completed_levels.append(play_age)
-                nxt = get_next_age(play_age)
-                if nxt and nxt not in st.session_state.play_unlocked_levels:
-                    st.session_state.play_unlocked_levels.append(nxt)
-                    st.success(f"🔓 Next Unlock: {nxt}")
             else:
-                st.warning(f"Score {score}/10 - Need {PASS_MARKS}. Fir se khelo!")
-            if st.button("🔄 Again", type="primary", use_container_width=True):
-                st.session_state.play_game_started=False; st.session_state.play_show_game_selector=False; st.session_state.play_score=0
-                st.session_state.play_hearts=99 if is_little else 5; st.session_state.play_answered=False
+                st.error(f"Correct: {' '.join(curr['target'])}")
+            if idx < 9:
+                st.session_state.play_q_idx+=1
+                st.session_state.play_word_built=[]
                 st.rerun()
+            else:
+                st.success(f"Score {st.session_state.play_score}/10")
 
 
 # ============================================================
