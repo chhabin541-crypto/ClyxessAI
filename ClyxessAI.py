@@ -5466,10 +5466,10 @@ Now write ENTIRELY in {language}:"""
                         {"role": "system", "content": f"You are ClyxessChat AI. You MUST reply ONLY in {language}. Never switch languages. Always end with: --- ClyxessChat AI | Secure • Fast • Private"},
                         {"role": "user", "content": prompt}
                     ],
-                                model=model,
-            temperature=0.2,
-            max_tokens=900,
-            stream=True
+                    model=model,
+                    temperature=0.2,
+                    max_tokens=900,
+                    stream=True
         )
             text = ""
             for chunk in res:
