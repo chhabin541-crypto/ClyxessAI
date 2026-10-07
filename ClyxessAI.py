@@ -1203,251 +1203,1692 @@ Return ONLY valid JSON with this format:
 # ClyxessChat AI by NeuroClyx Technology
 # ============================================================
 
-def render_play_and_learn(client):
+def render_play_and_learn(client=None):
+    """
+    ClyxessChat AI — Duolingo Style Adaptive Play & Learn
+
+    IMPORTANT:
+    - No Class selector
+    - No Age selector
+    - Language only
+    - Difficulty unlocks automatically by performance
+    - Designed for Streamlit rerun-safe state handling
+    """
+
+    import streamlit as st
     import random
+    import time
+    import html
 
-    # DUOLINGO STYLE 5 GAMES - Jaise screenshot me hai
-    GAME_TYPES = {
-        "🖼️ Select Image": "select_image",
-        "🔗 Match Pairs": "match_pairs",
-        "👂 Tap What You Hear": "tap_hear",
-        "🧩 Build Sentence": "build_sentence",
-        "🥛 Which Is This?": "which_is",
+    # ============================================================
+    # CONFIG
+    # ============================================================
+
+    QUESTIONS_PER_LEVEL = 10
+    PASS_SCORE = 8
+    MAX_HEARTS = 5
+
+    # Existing project language dictionary
+    if "PLAY_LANGUAGES" in globals() and PLAY_LANGUAGES:
+        AVAILABLE_LANGUAGES = PLAY_LANGUAGES
+    else:
+        AVAILABLE_LANGUAGES = {
+            "English": "English",
+            "Hindi": "Hindi",
+            "Marathi": "Marathi",
+            "Bengali": "Bengali",
+            "Tamil": "Tamil",
+            "Telugu": "Telugu",
+            "Gujarati": "Gujarati",
+            "Kannada": "Kannada",
+            "Malayalam": "Malayalam",
+            "Odia": "Odia",
+            "Punjabi": "Punjabi",
+        }
+
+    # ============================================================
+    # LANGUAGE HELPERS
+    # ============================================================
+
+    def language_name(label):
+        """
+        Converts existing PLAY_LANGUAGES value into a clean name.
+        """
+        if isinstance(label, str):
+            return label
+        return str(label)
+
+    selected_language = st.selectbox(
+        "🌐 Language",
+        list(AVAILABLE_LANGUAGES.keys()),
+        key="pal_language"
+    )
+
+    selected_language_value = language_name(
+        AVAILABLE_LANGUAGES[selected_language]
+    )
+
+    # Detect common languages for local language packs.
+    lang_lower = (
+        str(selected_language) + " " +
+        str(selected_language_value)
+    ).lower()
+
+    if "hindi" in lang_lower or "हिंदी" in lang_lower:
+        LANG = "hi"
+    elif "marathi" in lang_lower or "मराठी" in lang_lower:
+        LANG = "mr"
+    elif "bengali" in lang_lower or "বাংলা" in lang_lower:
+        LANG = "bn"
+    elif "tamil" in lang_lower or "தமிழ்" in lang_lower:
+        LANG = "ta"
+    elif "telugu" in lang_lower or "తెలుగు" in lang_lower:
+        LANG = "te"
+    elif "gujarati" in lang_lower or "ગુજરાતી" in lang_lower:
+        LANG = "gu"
+    elif "kannada" in lang_lower or "ಕನ್ನಡ" in lang_lower:
+        LANG = "kn"
+    elif "malayalam" in lang_lower or "മലയാളം" in lang_lower:
+        LANG = "ml"
+    elif "punjabi" in lang_lower or "ਪੰਜਾਬੀ" in lang_lower:
+        LANG = "pa"
+    elif "odia" in lang_lower or "ଓଡ଼ିଆ" in lang_lower:
+        LANG = "or"
+    elif "english" in lang_lower:
+        LANG = "en"
+    else:
+        LANG = "en"
+
+    # ============================================================
+    # UI LANGUAGE PACK
+    # ============================================================
+
+    UI = {
+        "en": {
+            "title": "🎮 Play & Learn",
+            "subtitle": "Learn by playing • Your level grows with you",
+            "start": "🚀 Start Playing",
+            "continue": "CONTINUE",
+            "check": "CHECK",
+            "clear": "🗑️ Clear",
+            "correct": "Correct!",
+            "wrong": "Not quite!",
+            "score": "Score",
+            "level": "Level",
+            "xp": "XP",
+            "hearts": "Hearts",
+            "streak": "Streak",
+            "question": "Question",
+            "choose": "Choose the correct answer",
+            "build": "Build the correct sentence",
+            "match": "Match the pairs",
+            "complete": "Level Complete!",
+            "passed": "Level Unlocked!",
+            "try_again": "Try Again",
+            "new_game": "New Game",
+            "home": "Game Home",
+            "next": "Next Level",
+            "correct_answer": "Correct answer",
+            "your_answer": "Your answer",
+            "easy": "Easy",
+            "medium": "Medium",
+            "hard": "Hard",
+            "expert": "Expert",
+            "master": "Master",
+        },
+
+        "hi": {
+            "title": "🎮 खेलो और सीखो",
+            "subtitle": "खेलते-खेलते सीखो • आपका Level आपके साथ बढ़ेगा",
+            "start": "🚀 खेल शुरू करें",
+            "continue": "आगे बढ़ें",
+            "check": "जाँचें",
+            "clear": "🗑️ साफ करें",
+            "correct": "सही जवाब!",
+            "wrong": "कोशिश अच्छी थी!",
+            "score": "स्कोर",
+            "level": "लेवल",
+            "xp": "XP",
+            "hearts": "जान",
+            "streak": "स्ट्रीक",
+            "question": "प्रश्न",
+            "choose": "सही जवाब चुनें",
+            "build": "सही वाक्य बनाएँ",
+            "match": "जोड़ी मिलाएँ",
+            "complete": "लेवल पूरा!",
+            "passed": "नया लेवल खुल गया!",
+            "try_again": "फिर कोशिश करें",
+            "new_game": "नया गेम",
+            "home": "गेम होम",
+            "next": "अगला लेवल",
+            "correct_answer": "सही उत्तर",
+            "your_answer": "आपका उत्तर",
+            "easy": "आसान",
+            "medium": "मध्यम",
+            "hard": "कठिन",
+            "expert": "एक्सपर्ट",
+            "master": "मास्टर",
+        },
+
+        "mr": {
+            "title": "🎮 खेळा आणि शिका",
+            "subtitle": "खेळता खेळता शिका",
+            "start": "🚀 खेळ सुरू करा",
+            "continue": "पुढे जा",
+            "check": "तपासा",
+            "clear": "🗑️ साफ करा",
+            "correct": "बरोबर!",
+            "wrong": "पुन्हा प्रयत्न करा!",
+            "score": "स्कोअर",
+            "level": "लेव्हल",
+            "xp": "XP",
+            "hearts": "जीव",
+            "streak": "स्ट्रीक",
+            "question": "प्रश्न",
+            "choose": "योग्य उत्तर निवडा",
+            "build": "योग्य वाक्य तयार करा",
+            "match": "जोड्या जुळवा",
+            "complete": "लेव्हल पूर्ण!",
+            "passed": "नवीन लेव्हल अनलॉक!",
+            "try_again": "पुन्हा प्रयत्न",
+            "new_game": "नवीन गेम",
+            "home": "गेम होम",
+            "next": "पुढील लेव्हल",
+            "correct_answer": "योग्य उत्तर",
+            "your_answer": "तुमचे उत्तर",
+            "easy": "सोपे",
+            "medium": "मध्यम",
+            "hard": "कठीण",
+            "expert": "एक्सपर्ट",
+            "master": "मास्टर",
+        },
+
+        "bn": {
+            "title": "🎮 খেলো এবং শেখো",
+            "subtitle": "খেলতে খেলতে শেখো",
+            "start": "🚀 খেলা শুরু করুন",
+            "continue": "এগিয়ে যান",
+            "check": "পরীক্ষা করুন",
+            "clear": "🗑️ পরিষ্কার",
+            "correct": "সঠিক!",
+            "wrong": "আবার চেষ্টা করুন!",
+            "score": "স্কোর",
+            "level": "লেভেল",
+            "xp": "XP",
+            "hearts": "জীবন",
+            "streak": "স্ট্রিক",
+            "question": "প্রশ্ন",
+            "choose": "সঠিক উত্তর নির্বাচন করুন",
+            "build": "সঠিক বাক্য তৈরি করুন",
+            "match": "জোড়া মেলান",
+            "complete": "লেভেল সম্পূর্ণ!",
+            "passed": "নতুন লেভেল আনলক!",
+            "try_again": "আবার চেষ্টা করুন",
+            "new_game": "নতুন গেম",
+            "home": "গেম হোম",
+            "next": "পরবর্তী লেভেল",
+            "correct_answer": "সঠিক উত্তর",
+            "your_answer": "আপনার উত্তর",
+            "easy": "সহজ",
+            "medium": "মাঝারি",
+            "hard": "কঠিন",
+            "expert": "এক্সপার্ট",
+            "master": "মাস্টার",
+        },
+
+        "ta": {
+            "title": "🎮 விளையாடி கற்றுக்கொள்ளுங்கள்",
+            "subtitle": "விளையாடிக்கொண்டே கற்றுக்கொள்ளுங்கள்",
+            "start": "🚀 விளையாட்டை தொடங்கு",
+            "continue": "தொடரவும்",
+            "check": "சரிபார்க்கவும்",
+            "clear": "🗑️ அழி",
+            "correct": "சரியான பதில்!",
+            "wrong": "மீண்டும் முயற்சிக்கவும்!",
+            "score": "மதிப்பெண்",
+            "level": "நிலை",
+            "xp": "XP",
+            "hearts": "வாழ்க்கைகள்",
+            "streak": "தொடர்",
+            "question": "கேள்வி",
+            "choose": "சரியான பதிலை தேர்வு செய்யவும்",
+            "build": "சரியான வாக்கியத்தை உருவாக்கவும்",
+            "match": "ஜோடிகளை பொருத்தவும்",
+            "complete": "நிலை முடிந்தது!",
+            "passed": "புதிய நிலை திறக்கப்பட்டது!",
+            "try_again": "மீண்டும் முயற்சிக்கவும்",
+            "new_game": "புதிய விளையாட்டு",
+            "home": "விளையாட்டு முகப்பு",
+            "next": "அடுத்த நிலை",
+            "correct_answer": "சரியான பதில்",
+            "your_answer": "உங்கள் பதில்",
+            "easy": "எளிது",
+            "medium": "நடுத்தரம்",
+            "hard": "கடினம்",
+            "expert": "நிபுணர்",
+            "master": "மாஸ்டர்",
+        },
     }
 
-    st.markdown("""
-    <style>
-     .duo-hero { background: #1a1a1a; padding: 1rem; border-radius: 15px; color: white; }
-     .duo-progress { height: 16px; background: #333; border-radius: 20px; overflow: hidden; }
-     .duo-progress-fill { height: 100%; background: #58CC02; border-radius: 20px; }
-     .duo-card { background: #1e2a3a; border: 3px solid #2d3d52; border-radius: 16px; padding: 1.5rem; text-align: center; cursor: pointer; transition: 0.2s; min-height: 160px; display: flex; flex-direction: column; justify-content: center; align-items: center; }
-     .duo-card:hover { border-color: #1CB0F6; transform: scale(1.02); }
-     .duo-card.selected { border-color: #1CB0F6; background: #1a3a5a; box-shadow: 0 0 0 2px #1CB0F6; }
-     .duo-card.correct { border-color: #58CC02; background: #1a4a1a; }
-     .duo-emoji { font-size: 4rem; margin-bottom: 0.5rem; }
-     .duo-label { color: white; font-size: 1.1rem; margin-top: 0.5rem; }
-     .word-chip { display: inline-block; background: #2d3d52; color: white; border: 2px solid #3d4d62; padding: 0.6rem 1.2rem; border-radius: 12px; margin: 0.3rem; cursor: pointer; font-size: 1.2rem; }
-     .word-chip:hover { background: #3d5d82; }
-     .word-chip.selected { background: #1CB0F6; border-color: #1CB0F6; }
-     .check-btn { background: #58CC02; color: #0a0a0a; font-weight: 900; font-size: 1.2rem; padding: 1rem; border-radius: 16px; border: none; width: 100%; margin-top: 1rem; }
-     .match-box { background: white; border: 2px solid #e5e5e5; border-radius: 12px; padding: 1rem; text-align: center; min-height: 90px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.3rem; cursor: pointer; }
-     .match-box.sel { background: #D7FFB8; border-color: #58CC02; }
-    </style>
-    """, unsafe_allow_html=True)
+    U = UI.get(LANG, UI["en"])
 
-    # Session init
+    # ============================================================
+    # GAME DATA
+    # ============================================================
+
+    WORDS = [
+        {
+            "emoji": "🍎",
+            "en": "Apple",
+            "hi": "सेब",
+            "mr": "सफरचंद",
+            "bn": "আপেল",
+            "ta": "ஆப்பிள்",
+        },
+        {
+            "emoji": "🐶",
+            "en": "Dog",
+            "hi": "कुत्ता",
+            "mr": "कुत्रा",
+            "bn": "কুকুর",
+            "ta": "நாய்",
+        },
+        {
+            "emoji": "🐱",
+            "en": "Cat",
+            "hi": "बिल्ली",
+            "mr": "मांजर",
+            "bn": "বিড়াল",
+            "ta": "பூனை",
+        },
+        {
+            "emoji": "📚",
+            "en": "Book",
+            "hi": "किताब",
+            "mr": "पुस्तक",
+            "bn": "বই",
+            "ta": "புத்தகம்",
+        },
+        {
+            "emoji": "🌞",
+            "en": "Sun",
+            "hi": "सूरज",
+            "mr": "सूर्य",
+            "bn": "সূর্য",
+            "ta": "சூரியன்",
+        },
+        {
+            "emoji": "🌙",
+            "en": "Moon",
+            "hi": "चाँद",
+            "mr": "चंद्र",
+            "bn": "চাঁদ",
+            "ta": "நிலா",
+        },
+        {
+            "emoji": "💧",
+            "en": "Water",
+            "hi": "पानी",
+            "mr": "पाणी",
+            "bn": "জল",
+            "ta": "தண்ணீர்",
+        },
+        {
+            "emoji": "🌳",
+            "en": "Tree",
+            "hi": "पेड़",
+            "mr": "झाड",
+            "bn": "গাছ",
+            "ta": "மரம்",
+        },
+    ]
+
+    def word_text(item):
+        return item.get(LANG, item.get("en", ""))
+
+    # ============================================================
+    # SESSION STATE
+    # ============================================================
+
     defaults = {
-        "play_age": "1-2 Years", "play_game_type": None, "play_show": False, "play_started": False,
-        "play_q_idx": 0, "play_score": 0, "play_answered": False, "play_hearts": 5, "play_xp": 0,
-        "play_qs": [], "play_selected_card": None, "play_word_built": [], "play_word_bank": [],
-        "play_match_left": None, "play_match_right": None, "play_matched_pairs": {}
+        "pal_level": 1,
+        "pal_xp": 0,
+        "pal_total_correct": 0,
+        "pal_total_wrong": 0,
+        "pal_streak": 0,
+        "pal_hearts": MAX_HEARTS,
+
+        "pal_started": False,
+        "pal_game": None,
+        "pal_questions": [],
+        "pal_index": 0,
+        "pal_score": 0,
+
+        "pal_selected": None,
+        "pal_selected_items": [],
+        "pal_built_words": [],
+
+        "pal_match_left": None,
+        "pal_match_right": None,
+        "pal_matched": [],
+
+        "pal_feedback": None,
+        "pal_game_finished": False,
+        "pal_level_finished": False,
+
+        "pal_completed_levels": 0,
+        "pal_last_language": None,
     }
-    for k,v in defaults.items():
-        if k not in st.session_state: st.session_state[k]=v
 
-    age_levels = PLAY_AGE_LEVELS if 'PLAY_AGE_LEVELS' in globals() else ["1-2 Years", "3-4 Years", "5-6 Years"]
+    for key, value in defaults.items():
+        if key not in st.session_state:
+            st.session_state[key] = value
 
-    c1,c2 = st.columns(2)
-    with c1: play_age = st.selectbox("👶 Age", age_levels, key="duo_age")
-    with c2:
-        lang_keys = list(PLAY_LANGUAGES.keys()) if 'PLAY_LANGUAGES' in globals() else ["Hindi", "English"]
-        lang_label = st.selectbox("🌐 Bhasha", lang_keys, key="duo_lang")
-        play_language = PLAY_LANGUAGES[lang_label] if 'PLAY_LANGUAGES' in globals() else lang_label
+    # Language change = reset current game only.
+    if st.session_state.pal_last_language != selected_language:
+        st.session_state.pal_last_language = selected_language
+        st.session_state.pal_started = False
+        st.session_state.pal_game = None
+        st.session_state.pal_questions = []
+        st.session_state.pal_index = 0
+        st.session_state.pal_score = 0
+        st.session_state.pal_selected = None
+        st.session_state.pal_selected_items = []
+        st.session_state.pal_built_words = []
+        st.session_state.pal_match_left = None
+        st.session_state.pal_match_right = None
+        st.session_state.pal_matched = []
+        st.session_state.pal_feedback = None
+        st.session_state.pal_game_finished = False
+        st.session_state.pal_level_finished = False
 
-    st.session_state.play_age = play_age
-    is_hindi = "Hindi" in play_language or "हिंदी" in lang_label or "Hindi" in lang_label
+    # ============================================================
+    # DIFFICULTY
+    # ============================================================
 
-    # SCREEN 1: Game Select
-    if not st.session_state.play_show and not st.session_state.play_started:
-        st.markdown(f"### Duolingo Style Games")
-        st.info("Screenshot jaisa hi banega - Image select, Pair match, Tap to build")
+    difficulty_map = {
+        1: U["easy"],
+        2: U["easy"],
+        3: U["medium"],
+        4: U["medium"],
+        5: U["hard"],
+        6: U["hard"],
+        7: U["expert"],
+        8: U["expert"],
+        9: U["master"],
+        10: U["master"],
+    }
+
+    difficulty = difficulty_map.get(
+        st.session_state.pal_level,
+        U["master"]
+    )
+
+    # ============================================================
+    # CSS
+    # ============================================================
+
+    st.markdown(
+        """
+        <style>
+        .pal-hero {
+            background: linear-gradient(135deg,#151515,#202020,#111827);
+            padding: 24px;
+            border-radius: 22px;
+            color: white;
+            border: 1px solid rgba(255,255,255,.12);
+            margin-bottom: 18px;
+            box-shadow: 0 12px 35px rgba(0,0,0,.25);
+        }
+
+        .pal-title {
+            font-size: 32px;
+            font-weight: 900;
+            margin: 0;
+        }
+
+        .pal-subtitle {
+            color: #b9c3d0;
+            margin-top: 7px;
+        }
+
+        .pal-stat {
+            background: #202b3b;
+            border: 1px solid #34445a;
+            padding: 12px;
+            border-radius: 14px;
+            text-align: center;
+            color: white;
+        }
+
+        .pal-progress {
+            width: 100%;
+            height: 13px;
+            background: #303030;
+            border-radius: 20px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+
+        .pal-progress-inner {
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                #58cc02,
+                #7ee33b,
+                #58cc02
+            );
+            border-radius: 20px;
+            transition: width .4s ease;
+        }
+
+        .pal-question {
+            background: #172235;
+            border: 2px solid #2e4058;
+            border-radius: 20px;
+            padding: 28px;
+            text-align: center;
+            color: white;
+            margin: 18px 0;
+        }
+
+        .pal-game-card {
+            background: #1d2939;
+            border: 2px solid #33445b;
+            border-radius: 18px;
+            padding: 20px;
+            text-align: center;
+            color: white;
+            min-height: 130px;
+        }
+
+        .pal-game-card:hover {
+            border-color: #1cb0f6;
+            transform: translateY(-2px);
+        }
+
+        .pal-emoji {
+            font-size: 3.4rem;
+        }
+
+        .pal-chip {
+            display: inline-block;
+            background: #26364b;
+            color: white;
+            border: 2px solid #3b4d63;
+            border-radius: 13px;
+            padding: 9px 14px;
+            margin: 4px;
+            font-weight: 700;
+        }
+
+        .pal-reward {
+            text-align: center;
+            padding: 20px;
+            border-radius: 20px;
+            background: linear-gradient(
+                135deg,
+                rgba(88,204,2,.15),
+                rgba(28,176,246,.12)
+            );
+            border: 1px solid rgba(88,204,2,.35);
+            margin: 15px 0;
+        }
+
+        .pal-level {
+            font-weight: 900;
+            font-size: 15px;
+            color: #58cc02;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+
+    # ============================================================
+    # CELEBRATION
+    # ============================================================
+
+    def celebrate():
+        """
+        Streamlit balloons + HTML flower/balloon animation.
+        """
+        try:
+            st.balloons()
+        except Exception:
+            pass
+
+        st.markdown(
+            """
+            <div style="
+                position:relative;
+                height:100px;
+                overflow:hidden;
+                text-align:center;
+                font-size:28px;
+            ">
+                <span style="animation:fall1 2s infinite;">🌸</span>
+                <span style="animation:fall2 2.3s infinite;">🌺</span>
+                <span style="animation:fall3 1.8s infinite;">🌼</span>
+                <span style="animation:fall4 2.5s infinite;">🎈</span>
+                <span style="animation:fall5 2.1s infinite;">🎈</span>
+                <span style="animation:fall6 1.7s infinite;">⭐</span>
+
+                <style>
+                @keyframes fall1 {
+                    0% { transform:translateY(-70px) rotate(0deg); }
+                    100% { transform:translateY(100px) rotate(180deg); }
+                }
+                @keyframes fall2 {
+                    0% { transform:translateY(-80px) rotate(20deg); }
+                    100% { transform:translateY(100px) rotate(200deg); }
+                }
+                @keyframes fall3 {
+                    0% { transform:translateY(-90px) rotate(0deg); }
+                    100% { transform:translateY(100px) rotate(240deg); }
+                }
+                @keyframes fall4 {
+                    0% { transform:translateY(-100px); }
+                    100% { transform:translateY(100px); }
+                }
+                @keyframes fall5 {
+                    0% { transform:translateY(-90px); }
+                    100% { transform:translateY(100px); }
+                }
+                @keyframes fall6 {
+                    0% { transform:translateY(-70px); }
+                    100% { transform:translateY(100px); }
+                }
+                </style>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
+    # ============================================================
+    # HEADER
+    # ============================================================
+
+    st.markdown(
+        f"""
+        <div class="pal-hero">
+            <div class="pal-title">{U["title"]}</div>
+            <div class="pal-subtitle">{U["subtitle"]}</div>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+    # ============================================================
+    # STATS
+    # ============================================================
+
+    s1, s2, s3, s4, s5 = st.columns(5)
+
+    with s1:
+        st.markdown(
+            f'<div class="pal-stat">🏆<br>'
+            f'<b>{U["level"]} {st.session_state.pal_level}</b>'
+            f'</div>',
+            unsafe_allow_html=True
+        )
+
+    with s2:
+        st.markdown(
+            f'<div class="pal-stat">⭐<br>'
+            f'<b>{st.session_state.pal_xp} {U["xp"]}</b>'
+            f'</div>',
+            unsafe_allow_html=True
+        )
+
+    with s3:
+        st.markdown(
+            f'<div class="pal-stat">❤️<br>'
+            f'<b>{st.session_state.pal_hearts}</b>'
+            f'</div>',
+            unsafe_allow_html=True
+        )
+
+    with s4:
+        st.markdown(
+            f'<div class="pal-stat">🔥<br>'
+            f'<b>{st.session_state.pal_streak} {U["streak"]}</b>'
+            f'</div>',
+            unsafe_allow_html=True
+        )
+
+    with s5:
+        st.markdown(
+            f'<div class="pal-stat">🎯<br>'
+            f'<b>{difficulty}</b>'
+            f'</div>',
+            unsafe_allow_html=True
+        )
+
+    st.caption(
+        f"🌐 {selected_language} • "
+        f"🎯 {difficulty} • "
+        f"{U['level']} {st.session_state.pal_level}"
+    )
+
+    # ============================================================
+    # GAME TYPES
+    # ============================================================
+
+    GAME_TYPES = {
+        "select_image": "🖼️ Select Image",
+        "match_pairs": "🔗 Match Pairs",
+        "tap_hear": "👂 Tap What You Hear",
+        "build_sentence": "🧩 Build Sentence",
+        "which_is": "🔎 Which Is This?",
+        "math_challenge": "🔢 Math Challenge",
+        "memory": "🧠 Memory Challenge",
+        "pattern": "🔷 Pattern Challenge",
+        "odd_one": "🎯 Find the Odd One",
+        "logic": "🧩 Logic Puzzle",
+        "finance": "💰 Money Challenge",
+        "tech": "🤖 Tech Challenge",
+    }
+
+    # ============================================================
+    # QUESTION GENERATORS
+    # ============================================================
+
+    def make_select_question():
+        correct = random.choice(WORDS)
+        opts = random.sample(WORDS, min(4, len(WORDS)))
+
+        if correct not in opts:
+            opts[0] = correct
+
+        random.shuffle(opts)
+
+        return {
+            "type": "select_image",
+            "question": word_text(correct),
+            "correct": correct["emoji"],
+            "options": opts,
+        }
+
+    def make_which_question():
+        correct = random.choice(WORDS)
+        opts = random.sample(WORDS, min(4, len(WORDS)))
+
+        if correct not in opts:
+            opts[0] = correct
+
+        random.shuffle(opts)
+
+        return {
+            "type": "which_is",
+            "question": word_text(correct),
+            "correct": correct["emoji"],
+            "options": opts,
+        }
+
+    def make_match_question():
+        selected = random.sample(WORDS, 3)
+
+        pairs = []
+        for item in selected:
+            pairs.append({
+                "left": item["emoji"],
+                "right": word_text(item),
+            })
+
+        shuffled_right = [x["right"] for x in pairs]
+        random.shuffle(shuffled_right)
+
+        return {
+            "type": "match_pairs",
+            "pairs": pairs,
+            "right": shuffled_right,
+        }
+
+    def make_sentence_question():
+        if LANG == "hi":
+            target = ["यह", "एक", "सेब", "है"]
+        elif LANG == "mr":
+            target = ["हे", "एक", "सफरचंद", "आहे"]
+        elif LANG == "bn":
+            target = ["এটি", "একটি", "আপেল"]
+        elif LANG == "ta":
+            target = ["இது", "ஒரு", "ஆப்பிள்"]
+        else:
+            target = ["This", "is", "an", "apple"]
+
+        bank = target + (
+            ["book", "water", "dog"]
+            if LANG == "en"
+            else ["किताब", "पानी", "कुत्ता"]
+        )
+
+        random.shuffle(bank)
+
+        return {
+            "type": "build_sentence",
+            "question": U["build"],
+            "target": target,
+            "bank": bank,
+        }
+
+    def make_math_question():
+        level = st.session_state.pal_level
+
+        if level <= 2:
+            a = random.randint(1, 10)
+            b = random.randint(1, 10)
+            op = random.choice(["+", "-"])
+
+            if op == "+":
+                answer = a + b
+            else:
+                if b > a:
+                    a, b = b, a
+                answer = a - b
+
+            q = f"{a} {op} {b} = ?"
+
+        elif level <= 4:
+            a = random.randint(2, 12)
+            b = random.randint(2, 10)
+            answer = a * b
+            q = f"{a} × {b} = ?"
+
+        elif level <= 6:
+            a = random.randint(20, 100)
+            b = random.randint(2, 10)
+            answer = a // b
+            a = answer * b
+            q = f"{a} ÷ {b} = ?"
+
+        else:
+            a = random.randint(2, 20)
+            b = random.randint(2, 20)
+            answer = a * b + random.randint(1, 20)
+            q = f"{a} × {b} + ? = {answer}"
+
+        options = {answer}
+
+        while len(options) < 4:
+            delta = random.randint(1, 12)
+            fake = answer + random.choice([-delta, delta])
+            if fake >= 0:
+                options.add(fake)
+
+        options = list(options)
+        random.shuffle(options)
+
+        return {
+            "type": "math_challenge",
+            "question": q,
+            "answer": answer,
+            "options": options,
+        }
+
+    def make_memory_question():
+        items = random.sample(WORDS, 4)
+
+        return {
+            "type": "memory",
+            "items": items,
+            "correct": items[0]["emoji"],
+        }
+
+    def make_pattern_question():
+        # Stable patterns; answer is numeric/emoji.
+        patterns = [
+            {
+                "display": "🔴 🔵 🔴 🔵 ?",
+                "options": ["🔴", "🟢", "🟡", "🟣"],
+                "answer": "🔴",
+            },
+            {
+                "display": "⭐ 🌙 ⭐ 🌙 ?",
+                "options": ["⭐", "🌙", "☀️", "🌈"],
+                "answer": "⭐",
+            },
+            {
+                "display": "1️⃣ 2️⃣ 1️⃣ 2️⃣ ?",
+                "options": ["1️⃣", "2️⃣", "3️⃣", "4️⃣"],
+                "answer": "1️⃣",
+            },
+        ]
+
+        return {
+            "type": "pattern",
+            **random.choice(patterns),
+        }
+
+    def make_odd_one_question():
+        normal = "🍎"
+        odd = "🍌"
+
+        items = [normal] * 7
+        odd_index = random.randint(0, 7)
+        items[odd_index] = odd
+        random.shuffle(items)
+
+        return {
+            "type": "odd_one",
+            "items": items,
+            "answer": odd,
+        }
+
+    def make_logic_question():
+        questions = [
+            {
+                "q": "Which number comes next? 2, 4, 6, 8, ?",
+                "options": ["9", "10", "11", "12"],
+                "answer": "10",
+            },
+            {
+                "q": "Which number comes next? 5, 10, 15, 20, ?",
+                "options": ["22", "24", "25", "30"],
+                "answer": "25",
+            },
+            {
+                "q": "If 3 cats have 4 legs each, how many legs?",
+                "options": ["7", "10", "12", "14"],
+                "answer": "12",
+            },
+        ]
+
+        q = random.choice(questions)
+
+        return {
+            "type": "logic",
+            **q,
+        }
+
+    def make_finance_question():
+        questions = [
+            {
+                "q": "You have ₹100 and spend ₹30. How much remains?",
+                "options": ["₹50", "₹60", "₹70", "₹80"],
+                "answer": "₹70",
+            },
+            {
+                "q": "You save ₹20 every day for 5 days. Total saving?",
+                "options": ["₹50", "₹80", "₹100", "₹120"],
+                "answer": "₹100",
+            },
+            {
+                "q": "Which is usually a NEED?",
+                "options": ["Food", "Toy", "Video game", "Fancy sticker"],
+                "answer": "Food",
+            },
+        ]
+
+        q = random.choice(questions)
+
+        return {
+            "type": "finance",
+            **q,
+        }
+
+    def make_tech_question():
+        questions = [
+            {
+                "q": "What does AI stand for?",
+                "options": [
+                    "Artificial Intelligence",
+                    "Automatic Internet",
+                    "Advanced Image",
+                    "Applied Information",
+                ],
+                "answer": "Artificial Intelligence",
+            },
+            {
+                "q": "Which one is a programming language?",
+                "options": ["Python", "Rainbow", "Keyboard", "Battery"],
+                "answer": "Python",
+            },
+            {
+                "q": "Which device is commonly used to take a photo?",
+                "options": ["Camera", "Spoon", "Book", "Chair"],
+                "answer": "Camera",
+            },
+        ]
+
+        q = random.choice(questions)
+
+        return {
+            "type": "tech",
+            **q,
+        }
+
+    def make_tap_hear_question():
+        if LANG == "hi":
+            target = ["यह", "एक", "सेब", "है"]
+        elif LANG == "mr":
+            target = ["हे", "एक", "सफरचंद", "आहे"]
+        elif LANG == "bn":
+            target = ["এটি", "একটি", "আপেল"]
+        elif LANG == "ta":
+            target = ["இது", "ஒரு", "ஆப்பிள்"]
+        else:
+            target = ["This", "is", "an", "apple"]
+
+        bank = list(target)
+
+        if LANG == "en":
+            bank += ["book", "dog"]
+        else:
+            bank += ["किताब", "कुत्ता"]
+
+        random.shuffle(bank)
+
+        return {
+            "type": "tap_hear",
+            "target": target,
+            "bank": bank,
+            "question": "🔊 " + " ".join(target),
+        }
+
+    def generate_question(game_type):
+        generators = {
+            "select_image": make_select_question,
+            "which_is": make_which_question,
+            "match_pairs": make_match_question,
+            "build_sentence": make_sentence_question,
+            "tap_hear": make_tap_hear_question,
+            "math_challenge": make_math_question,
+            "memory": make_memory_question,
+            "pattern": make_pattern_question,
+            "odd_one": make_odd_one_question,
+            "logic": make_logic_question,
+            "finance": make_finance_question,
+            "tech": make_tech_question,
+        }
+
+        return generators[game_type]()
+
+    # ============================================================
+    # HOME SCREEN
+    # ============================================================
+
+    if not st.session_state.pal_started:
+
+        st.markdown(
+            f"### 🏆 {U['level']} {st.session_state.pal_level} "
+            f"• {difficulty}"
+        )
+
+        st.progress(
+            min(
+                st.session_state.pal_completed_levels / 10,
+                1.0
+            )
+        )
+
+        st.info(
+            "🎯 Difficulty automatically increases as you improve."
+            if LANG == "en"
+            else "🎯 जैसे-जैसे आप अच्छा करते हैं, गेम अपने आप कठिन होता जाएगा।"
+        )
+
+        st.markdown("### 🎮 Choose a Game")
+
+        game_items = list(GAME_TYPES.items())
+
         cols = st.columns(2)
-        for i,(lbl,key) in enumerate(GAME_TYPES.items()):
-            with cols[i%2]:
-                if st.button(lbl, key=f"duo_{key}", use_container_width=True):
-                    st.session_state.play_game_type = key
-                    st.session_state.play_show = True
+
+        for i, (game_key, game_name) in enumerate(game_items):
+
+            with cols[i % 2]:
+
+                if st.button(
+                    game_name,
+                    key=f"pal_home_{game_key}",
+                    use_container_width=True
+                ):
+                    st.session_state.pal_game = game_key
+                    st.session_state.pal_questions = [
+                        generate_question(game_key)
+                        for _ in range(QUESTIONS_PER_LEVEL)
+                    ]
+
+                    st.session_state.pal_index = 0
+                    st.session_state.pal_score = 0
+                    st.session_state.pal_hearts = MAX_HEARTS
+                    st.session_state.pal_selected = None
+                    st.session_state.pal_selected_items = []
+                    st.session_state.pal_built_words = []
+                    st.session_state.pal_match_left = None
+                    st.session_state.pal_match_right = None
+                    st.session_state.pal_matched = []
+                    st.session_state.pal_feedback = None
+                    st.session_state.pal_game_finished = False
+                    st.session_state.pal_level_finished = False
+                    st.session_state.pal_started = True
+
                     st.rerun()
+
         return
 
-    # SCREEN 2: Generate Questions
-    if not st.session_state.play_started:
-        if st.button("🚀 Start Game", type="primary", use_container_width=True):
-            qs = []
-            g = st.session_state.play_game_type
+    # ============================================================
+    # ACTIVE GAME
+    # ============================================================
 
-            # DATA - Emoji icons (No external images needed)
-            data_pool = [
-                {"hi": "सेब", "en": "Apple", "emoji": "🍎", "trans": "Apple"},
-                {"hi": "औरत", "en": "Woman", "emoji": "👩", "trans": "Woman"},
-                {"hi": "आदमी", "en": "Man", "emoji": "👨", "trans": "Man"},
-                {"hi": "किताब", "en": "Book", "emoji": "📚", "trans": "Book"},
-                {"hi": "गिलास", "en": "Glass", "emoji": "🥛", "trans": "el vaso"},
-                {"hi": "कप", "en": "Cup", "emoji": "☕", "trans": "la taza"},
-                {"hi": "एक", "en": "One", "emoji": "1️⃣", "trans": "One"},
-                {"hi": "पानी", "en": "Water", "emoji": "💧", "trans": "Water"},
+    questions = st.session_state.pal_questions
+
+    if not questions:
+        st.session_state.pal_started = False
+        st.rerun()
+
+    idx = st.session_state.pal_index
+
+    if idx >= len(questions):
+        idx = len(questions) - 1
+        st.session_state.pal_index = idx
+
+    current = questions[idx]
+    game_type = current["type"]
+
+    progress = (idx + 1) / QUESTIONS_PER_LEVEL
+
+    st.markdown(
+        f"""
+        <div style="
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            background:#171717;
+            padding:14px 18px;
+            border-radius:15px;
+            color:white;
+        ">
+            <b>❤️ {st.session_state.pal_hearts}</b>
+            <b>{U["question"]} {idx + 1}/{QUESTIONS_PER_LEVEL}</b>
+            <b>⭐ {st.session_state.pal_xp} XP</b>
+        </div>
+
+        <div class="pal-progress">
+            <div class="pal-progress-inner"
+                 style="width:{progress * 100}%;">
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+    st.markdown(
+        f"""
+        <div class="pal-question">
+            <div class="pal-level">
+                {U["level"]} {st.session_state.pal_level}
+                • {difficulty}
+            </div>
+            <h2>{html.escape(str(
+                current.get("question", "")
+            ))}</h2>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+    # ============================================================
+    # HELPER: PROCESS ANSWER
+    # ============================================================
+
+    def process_answer(is_correct):
+        if st.session_state.pal_feedback is not None:
+            return
+
+        if is_correct:
+
+            st.session_state.pal_score += 1
+            st.session_state.pal_total_correct += 1
+            st.session_state.pal_streak += 1
+            st.session_state.pal_xp += 10
+
+            st.session_state.pal_feedback = "correct"
+
+        else:
+
+            st.session_state.pal_total_wrong += 1
+            st.session_state.pal_streak = 0
+            st.session_state.pal_hearts = max(
+                0,
+                st.session_state.pal_hearts - 1
+            )
+
+            st.session_state.pal_feedback = "wrong"
+
+    # ============================================================
+    # GAME: SELECT IMAGE
+    # ============================================================
+
+    if game_type in ["select_image", "which_is"]:
+
+        options = current["options"]
+
+        cols = st.columns(2)
+
+        for i, item in enumerate(options):
+
+            with cols[i % 2]:
+
+                if st.button(
+                    f"{item['emoji']}  {word_text(item)}",
+                    key=f"pal_img_{idx}_{i}",
+                    use_container_width=True,
+                    disabled=st.session_state.pal_feedback is not None
+                ):
+
+                    st.session_state.pal_selected = item["emoji"]
+
+                    correct = (
+                        item["emoji"] ==
+                        current["correct"]
+                    )
+
+                    process_answer(correct)
+                    st.rerun()
+
+    # ============================================================
+    # GAME: MATCH PAIRS
+    # ============================================================
+
+    elif game_type == "match_pairs":
+
+        st.write(f"🔗 {U['match']}")
+
+        left = [p["left"] for p in current["pairs"]]
+        right = current["right"]
+
+        c1, c2 = st.columns(2)
+
+        with c1:
+
+            st.markdown("###")
+
+            for i, item in enumerate(left):
+
+                if item in st.session_state.pal_matched:
+                    continue
+
+                if st.button(
+                    item,
+                    key=f"pal_left_{idx}_{i}",
+                    use_container_width=True
+                ):
+                    st.session_state.pal_match_left = item
+                    st.rerun()
+
+        with c2:
+
+            st.markdown("###")
+
+            for i, item in enumerate(right):
+
+                if st.button(
+                    item,
+                    key=f"pal_right_{idx}_{i}",
+                    use_container_width=True
+                ):
+                    st.session_state.pal_match_right = item
+                    st.rerun()
+
+        if (
+            st.session_state.pal_match_left is not None
+            and
+            st.session_state.pal_match_right is not None
+        ):
+
+            selected_left = st.session_state.pal_match_left
+            selected_right = st.session_state.pal_match_right
+
+            valid = False
+
+            for pair in current["pairs"]:
+
+                if (
+                    pair["left"] == selected_left
+                    and
+                    pair["right"] == selected_right
+                ):
+                    valid = True
+                    break
+
+            if valid:
+
+                if selected_left not in st.session_state.pal_matched:
+                    st.session_state.pal_matched.append(
+                        selected_left
+                    )
+
+                st.session_state.pal_match_left = None
+                st.session_state.pal_match_right = None
+
+                st.success("✅ " + U["correct"])
+
+                if len(st.session_state.pal_matched) == len(
+                    current["pairs"]
+                ):
+                    process_answer(True)
+
+                st.rerun()
+
+            else:
+
+                st.session_state.pal_match_left = None
+                st.session_state.pal_match_right = None
+
+                st.session_state.pal_feedback = "wrong"
+                st.session_state.pal_total_wrong += 1
+                st.session_state.pal_streak = 0
+                st.session_state.pal_hearts = max(
+                    0,
+                    st.session_state.pal_hearts - 1
+                )
+
+                st.rerun()
+
+        st.caption(
+            f"Matched: {len(st.session_state.pal_matched)}/"
+            f"{len(current['pairs'])}"
+        )
+
+    # ============================================================
+    # GAME: SENTENCE / HEAR
+    # ============================================================
+
+    elif game_type in ["build_sentence", "tap_hear"]:
+
+        built = st.session_state.pal_built_words
+
+        st.markdown("### 📝")
+
+        if built:
+            chips = " ".join(
+                [
+                    f'<span class="pal-chip">{html.escape(str(w))}</span>'
+                    for w in built
+                ]
+            )
+        else:
+            chips = "..."
+
+        st.markdown(
+            f'<div style="background:#111827;'
+            f'padding:15px;border-radius:15px;'
+            f'min-height:55px;">{chips}</div>',
+            unsafe_allow_html=True
+        )
+
+        st.markdown("### 🔤")
+
+        bank = current["bank"]
+
+        cols = st.columns(3)
+
+        for i, word in enumerate(bank):
+
+            # Allows duplicate words safely by tracking index.
+            token_id = f"{i}:{word}"
+
+            used_indexes = [
+                x.split(":", 1)[0]
+                for x in st.session_state.get(
+                    "pal_used_word_indexes",
+                    []
+                )
             ]
 
-            for i in range(10):
-                if g == "select_image": # Screenshot 1
-                    correct = random.choice(data_pool)
-                    opts = random.sample(data_pool, 4)
-                    if correct not in opts: opts[0] = correct
-                    random.shuffle(opts)
-                    q_text = correct["hi"] if is_hindi else correct["en"]
-                    qs.append({"type": g, "q": q_text, "correct": correct, "opts": opts, "audio": f"🔊 {q_text}"})
+            if str(i) in used_indexes:
+                continue
 
-                elif g == "which_is": # Screenshot 6
-                    correct = random.choice(data_pool)
-                    opts = random.sample(data_pool, 4)
-                    if correct not in opts: opts[0] = correct
-                    random.shuffle(opts)
-                    q_text = f'Which of these is "{correct["en"]}"?' if not is_hindi else f'"{correct["hi"]}" kaunsa hai?'
-                    qs.append({"type": g, "q": q_text, "correct": correct, "opts": opts})
+            with cols[i % 3]:
 
-                elif g == "match_pairs": # Screenshot 2
-                    # Math pairs
-                    pairs = [(f"{n*2} ÷ 2", "🟦"*n, n) for n in [2,4,5]]
-                    random.shuffle(pairs)
-                    qs.append({"type": g, "q": "Match the pairs", "pairs": pairs})
+                if st.button(
+                    word,
+                    key=f"pal_word_{idx}_{i}",
+                    use_container_width=True
+                ):
 
-                elif g == "tap_hear" or g == "build_sentence": # Screenshot 3,4
-                    if is_hindi:
-                        words = ["एक", "सेब", "है", "यह", "पानी"]
-                        target = ["एक", "सेब", "है"]
-                    else:
-                        words = ["I", "want", "a", "salad", "water", "glass"]
-                        target = ["I", "want", "a", "salad"]
-                    random.shuffle(words)
-                    qs.append({"type": g, "q": "Tap what you hear" if g=="tap_hear" else "Translate this sentence", "target": target, "bank": words, "audio": "🔊 I want a salad." if not is_hindi else "🔊 एक सेब है"})
+                    st.session_state.pal_built_words.append(word)
 
-            st.session_state.play_qs = qs
-            st.session_state.play_q_idx = 0
-            st.session_state.play_score = 0
-            st.session_state.play_started = True
-            st.session_state.play_answered = False
-            st.session_state.play_matched_pairs = {}
-            st.rerun()
-        return
+                    if "pal_used_word_indexes" not in st.session_state:
+                        st.session_state.pal_used_word_indexes = []
 
-    # SCREEN 3: PLAY - DUOLINGO UI
-    qs = st.session_state.play_qs
-    if not qs: return
-    idx = st.session_state.play_q_idx
-    if idx >= len(qs): idx = 0
-    curr = qs[idx]
-    g = curr["type"]
+                    st.session_state.pal_used_word_indexes.append(
+                        token_id
+                    )
 
-    # Progress bar like screenshot
-    progress = (idx+1)/10
-    st.markdown(f'<div class="duo-hero"><div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;"><span>❌</span><div style="flex:1; margin:0 1rem;"><div class="duo-progress"><div class="duo-progress-fill" style="width:{progress*100}%"></div></div></div><span>❤️ {st.session_state.play_hearts}</span></div><h2 style="margin:0.5rem 0;">{curr.get("q","")}</h2>{curr.get("audio","")}</div>', unsafe_allow_html=True)
-
-    # --- GAME RENDER ---
-    if g == "select_image" or g == "which_is":
-        cols = st.columns(2)
-        for i, opt in enumerate(curr["opts"]):
-            with cols[i%2]:
-                is_sel = st.session_state.play_selected_card == opt["emoji"]
-                border = "selected" if is_sel else ""
-                st.markdown(f'<div class="duo-card {border}"><div class="duo-emoji">{opt["emoji"]}</div><div class="duo-label">{opt["trans"] if g=="which_is" else opt["en"]}</div></div>', unsafe_allow_html=True)
-                if st.button(f"Select {opt['en']}", key=f"sel_{idx}_{i}", use_container_width=True, label_visibility="collapsed"):
-                    st.session_state.play_selected_card = opt["emoji"]
-                    st.session_state.play_selected_opt = opt
                     st.rerun()
 
-        if st.session_state.play_selected_card:
-            if st.button("CHECK", type="primary", use_container_width=True):
-                is_correct = st.session_state.play_selected_opt["emoji"] == curr["correct"]["emoji"]
-                if is_correct:
-                    st.success(f"✅ Correct! {curr['correct']['emoji']} {curr['correct']['en']}")
-                    st.session_state.play_score+=1
-                    st.balloons()
-                else:
-                    st.error(f"❌ Correct was {curr['correct']['emoji']} {curr['correct']['en']}")
-                st.session_state.play_answered=True
-                time.sleep(0.8)
-                if idx < 9:
-                    st.session_state.play_q_idx+=1
-                    st.session_state.play_selected_card=None
-                    st.session_state.play_answered=False
-                    st.rerun()
-                else:
-                    st.success(f"🏆 Game Over! Score {st.session_state.play_score}/10")
-                    if st.button("Play Again"):
-                        st.session_state.play_started=False; st.session_state.play_show=False; st.rerun()
+        c1, c2 = st.columns(2)
 
-    elif g == "match_pairs":
-        pairs = curr["pairs"]
-        st.markdown("#### Match left and right")
-        # Simple version - show 3 left, 3 right
-        left_items = [p[0] for p in pairs]
-        right_items = [p[1] for p in pairs]
-
-        c1,c2 = st.columns(2)
         with c1:
-            for i, left in enumerate(left_items):
-                if st.button(left, key=f"left_{idx}_{i}", use_container_width=True):
-                    st.session_state.play_match_left = left
-                    st.rerun()
+            if st.button(
+                U["clear"],
+                use_container_width=True
+            ):
+                st.session_state.pal_built_words = []
+                st.session_state.pal_used_word_indexes = []
+                st.rerun()
+
         with c2:
-            for i, right in enumerate(right_items):
-                if st.button(right, key=f"right_{idx}_{i}", use_container_width=True):
-                    st.session_state.play_match_right = right
+
+            if st.button(
+                U["check"],
+                type="primary",
+                use_container_width=True
+            ):
+
+                is_correct = (
+                    st.session_state.pal_built_words
+                    == current["target"]
+                )
+
+                process_answer(is_correct)
+                st.rerun()
+
+    # ============================================================
+    # MATH / LOGIC / FINANCE / TECH / PATTERN
+    # ============================================================
+
+    elif game_type in [
+        "math_challenge",
+        "pattern",
+        "logic",
+        "finance",
+        "tech"
+    ]:
+
+        options = current["options"]
+
+        cols = st.columns(2)
+
+        for i, option in enumerate(options):
+
+            with cols[i % 2]:
+
+                if st.button(
+                    str(option),
+                    key=f"pal_option_{idx}_{i}",
+                    use_container_width=True,
+                    disabled=st.session_state.pal_feedback is not None
+                ):
+
+                    correct = (
+                        str(option) ==
+                        str(current["answer"])
+                    )
+
+                    process_answer(correct)
                     st.rerun()
 
-        if st.session_state.play_match_left and st.session_state.play_match_right:
-            # Check if match
-            for p in pairs:
-                if p[0]==st.session_state.play_match_left and p[1]==st.session_state.play_match_right:
-                    st.session_state.play_matched_pairs[p[0]] = True
-                    st.success("✅ Matched!")
-                    break
-            st.session_state.play_match_left=None; st.session_state.play_match_right=None
-            st.rerun()
+    # ============================================================
+    # ODD ONE OUT
+    # ============================================================
 
-        st.write(f"Matched: {len(st.session_state.play_matched_pairs)}/3")
-        if len(st.session_state.play_matched_pairs)>=3:
-            if st.button("CONTINUE", type="primary", use_container_width=True):
-                st.session_state.play_q_idx+=1
-                st.session_state.play_matched_pairs={}
+    elif game_type == "odd_one":
+
+        items = current["items"]
+
+        cols = st.columns(4)
+
+        for i, item in enumerate(items):
+
+            with cols[i % 4]:
+
+                if st.button(
+                    item,
+                    key=f"pal_odd_{idx}_{i}",
+                    use_container_width=True,
+                    disabled=st.session_state.pal_feedback is not None
+                ):
+
+                    process_answer(
+                        item == current["answer"]
+                    )
+
+                    st.rerun()
+
+    # ============================================================
+    # MEMORY
+    # ============================================================
+
+    elif game_type == "memory":
+
+        st.info(
+            "🧠 Remember the first item, then choose it."
+        )
+
+        items = current["items"]
+
+        cols = st.columns(4)
+
+        for i, item in enumerate(items):
+
+            with cols[i % 4]:
+
+                if st.button(
+                    item["emoji"],
+                    key=f"pal_memory_{idx}_{i}",
+                    use_container_width=True,
+                    disabled=st.session_state.pal_feedback is not None
+                ):
+
+                    process_answer(
+                        item["emoji"] ==
+                        current["correct"]
+                    )
+
+                    st.rerun()
+
+    # ============================================================
+    # FEEDBACK
+    # ============================================================
+
+    if st.session_state.pal_feedback == "correct":
+
+        celebrate()
+
+        st.markdown(
+            f"""
+            <div class="pal-reward">
+                <h2>🎉 {U["correct"]}</h2>
+                <div style="font-size:32px;">
+                    🌸 🌺 🎈 ⭐ 🎈 🌼
+                </div>
+                <b>+10 XP</b>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
+    elif st.session_state.pal_feedback == "wrong":
+
+        st.error(
+            "❌ " + U["wrong"]
+        )
+
+        if st.session_state.pal_hearts <= 0:
+
+            st.warning(
+                "❤️ No hearts left. Don't worry — practice makes you better!"
+            )
+
+    # ============================================================
+    # NEXT QUESTION / LEVEL FINISH
+    # ============================================================
+
+    if st.session_state.pal_feedback is not None:
+
+        st.markdown("---")
+
+        if idx < QUESTIONS_PER_LEVEL - 1:
+
+            if st.button(
+                U["continue"],
+                type="primary",
+                use_container_width=True,
+                key=f"pal_next_{idx}"
+            ):
+
+                st.session_state.pal_index += 1
+                st.session_state.pal_feedback = None
+                st.session_state.pal_selected = None
+                st.session_state.pal_selected_items = []
+                st.session_state.pal_built_words = []
+                st.session_state.pal_used_word_indexes = []
+                st.session_state.pal_match_left = None
+                st.session_state.pal_match_right = None
+                st.session_state.pal_matched = []
+
                 st.rerun()
 
-    elif g == "tap_hear" or g == "build_sentence":
-        # Word chips like screenshot 3 & 4
-        built = st.session_state.get("play_word_built", [])
+        else:
 
-        st.markdown("#### Your sentence:")
-        built_html = " ".join(built)
-        st.markdown(f'<div style="background:#1e2a3a; padding:1rem; border-radius:12px; min-height:60px; border:2px dashed #333; color:white;">{built_html}</div>', unsafe_allow_html=True)
-        # Bank
-        st.markdown("#### Tap words:")
-        bank = curr["bank"]
-        cols = st.columns(3)
-        for i,w in enumerate(bank):
-            if w not in built:
-                with cols[i%3]:
-                    if st.button(w, key=f"word_{idx}_{i}", use_container_width=True):
-                        built.append(w)
-                        st.session_state.play_word_built = built
-                        st.rerun()
+            # ====================================================
+            # LEVEL RESULT
+            # ====================================================
 
-        if st.button("🗑️ Clear"):
-            st.session_state.play_word_built=[]
+            score = st.session_state.pal_score
+
+            st.session_state.pal_level_finished = True
+
+            st.markdown(
+                f"""
+                <div class="pal-reward">
+                    <h1>🏆 {U["complete"]}</h1>
+                    <h2>{U["score"]}: {score}/10</h2>
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+
+            if score >= PASS_SCORE:
+
+                celebrate()
+
+                st.success(
+                    f"🎉 {U['passed']} "
+                    f"{U['level']} {st.session_state.pal_level + 1}"
+                )
+
+                st.session_state.pal_completed_levels += 1
+
+                if st.button(
+                    f"🚀 {U['next']}",
+                    type="primary",
+                    use_container_width=True,
+                    key="pal_next_level"
+                ):
+
+                    st.session_state.pal_level += 1
+                    st.session_state.pal_started = False
+                    st.session_state.pal_game = None
+                    st.session_state.pal_questions = []
+                    st.session_state.pal_index = 0
+                    st.session_state.pal_score = 0
+                    st.session_state.pal_hearts = MAX_HEARTS
+                    st.session_state.pal_feedback = None
+                    st.session_state.pal_level_finished = False
+                    st.session_state.pal_selected = None
+                    st.session_state.pal_built_words = []
+                    st.session_state.pal_used_word_indexes = []
+                    st.session_state.pal_matched = []
+                    st.rerun()
+
+            else:
+
+                st.warning(
+                    f"🎯 {PASS_SCORE}/10 needed to unlock "
+                    f"the next level."
+                )
+
+                if st.button(
+                    f"🔄 {U['try_again']}",
+                    type="primary",
+                    use_container_width=True,
+                    key="pal_retry"
+                ):
+
+                    game_type = st.session_state.pal_game
+
+                    st.session_state.pal_questions = [
+                        generate_question(game_type)
+                        for _ in range(QUESTIONS_PER_LEVEL)
+                    ]
+
+                    st.session_state.pal_index = 0
+                    st.session_state.pal_score = 0
+                    st.session_state.pal_hearts = MAX_HEARTS
+                    st.session_state.pal_feedback = None
+                    st.session_state.pal_level_finished = False
+                    st.session_state.pal_selected = None
+                    st.session_state.pal_built_words = []
+                    st.session_state.pal_used_word_indexes = []
+                    st.session_state.pal_matched = []
+
+                    st.rerun()
+
+    # ============================================================
+    # NEW GAME / HOME
+    # ============================================================
+
+    st.markdown("---")
+
+    c1, c2 = st.columns(2)
+
+    with c1:
+
+        if st.button(
+            "🏠 " + U["home"],
+            use_container_width=True,
+            key="pal_home_bottom"
+        ):
+
+            st.session_state.pal_started = False
+            st.session_state.pal_game = None
+            st.session_state.pal_questions = []
+            st.session_state.pal_index = 0
+            st.session_state.pal_score = 0
+            st.session_state.pal_feedback = None
+            st.session_state.pal_level_finished = False
+            st.session_state.pal_selected = None
+            st.session_state.pal_built_words = []
+            st.session_state.pal_used_word_indexes = []
+            st.session_state.pal_match_left = None
+            st.session_state.pal_match_right = None
+            st.session_state.pal_matched = []
+
             st.rerun()
 
-        if st.button("CHECK", type="primary", use_container_width=True):
-            if built == curr["target"]:
-                st.success(f"✅ Correct! Meaning: {' '.join(curr['target'])}")
-                st.session_state.play_score+=1
-                st.balloons()
-            else:
-                st.error(f"Correct: {' '.join(curr['target'])}")
-            if idx < 9:
-                st.session_state.play_q_idx+=1
-                st.session_state.play_word_built=[]
-                st.rerun()
-            else:
-                st.success(f"Score {st.session_state.play_score}/10")
+    with c2:
+
+        if st.button(
+            "🔄 " + U["new_game"],
+            use_container_width=True,
+            key="pal_new_bottom"
+        ):
+
+            game_type = st.session_state.pal_game
+
+            if game_type:
+
+                st.session_state.pal_questions = [
+                    generate_question(game_type)
+                    for _ in range(QUESTIONS_PER_LEVEL)
+                ]
+
+            st.session_state.pal_index = 0
+            st.session_state.pal_score = 0
+            st.session_state.pal_hearts = MAX_HEARTS
+            st.session_state.pal_feedback = None
+            st.session_state.pal_selected = None
+            st.session_state.pal_built_words = []
+            st.session_state.pal_used_word_indexes = []
+            st.session_state.pal_match_left = None
+            st.session_state.pal_match_right = None
+            st.session_state.pal_matched = []
+
+            st.rerun()
 
 
 # ============================================================
