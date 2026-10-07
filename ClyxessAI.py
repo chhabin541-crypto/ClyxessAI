@@ -2974,15 +2974,203 @@ setTimeout(type, 300);
                 st.session_state.vl_uploaded_name = ""
                 st.rerun()
 
+# ============================================
+# 🧠 HELPER FUNCTIONS (पहले इन्हें define करना ज़रूरी है)
+# ============================================
+
+def get_roleplay():
+    openings = {
+        "Classmate": "हैलो! मैं तुम्हारा classmate हूँ 😊 चलो, आज क्या पढ़ें? कोई भी सवाल पूछो!",
+        "Teacher": "नमस्ते बेटा! मैं तुम्हारी teacher हूँ। चलो, आज कुछ नया सीखेंगे। बताओ कहाँ से शुरू करें?",
+        "Study Buddy": "हेलो दोस्त! 📚 आज क्या revise करना है? मैं तुम्हारे साथ हूँ!",
+        "Interview Partner (HR)": "नमस्ते! मैं HR हूँ। आज तुम्हारा interview लूँगा।\n\n**Tell me about yourself.** (अपने बारे में बताओ)",
+        "Project Teammate": "अरे! project कैसा चल रहा है? 🚀 क्या status है तुम्हारा?",
+        "Boss / Manager": "Good morning! आज की priorities बताओ। क्या status है तुम्हारे काम का?",
+        "University Professor": "Welcome! तुम्हारे research interest क्या हैं? चलो, discussion करते हैं।"
+    }
+    if "Hard" in difficulty and role == "Interview Partner (HR)":
+        return "नमस्ते। मैं Senior HR हूँ। सीधे point पर आते हैं।\n\n**Q1: What's your biggest weakness? And don't give me a cliché answer.**"
+    return openings.get(role, "नमस्ते! चलो बात शुरू करें।")
+
+def build_smart_system_prompt(role, language, difficulty, scenario):
+    diff_map = {
+        "🟢 Easy (Friendly)": "Be very friendly and patient. Use simple language.",
+        "🟡 Medium (Challenging)": "Be professional but push the user to think deeper.",
+        "🔴 Hard (Strict)": "Be strict and demanding. Ask tough questions."
+    }
+    return f"""You are an AGI-powered super-intelligent role-play partner.
+ROLE: Act as **{role}**.
+LANGUAGE: Reply ONLY in **{language}**.
+DIFFICULTY: {diff_map.get(difficulty)}
+SCENARIO: {scenario}
+CORE PRINCIPLES: Speak truth, be compassionate, respect nature & family.
+SMART BEHAVIOR: Remember context, detect emotion, ask smart follow-up questions.
+Keep responses natural, short (2-3 lines max), and always end with a question to keep the conversation going."""
+
+def get_hint(scenario):
+    hints = {
+        "Job Interview (FAANG Style)": "STAR method use करो — Situation, Task, Action, Result।",
+        "University Admission (US/UK)": "अपने research interest और university के बारे में बताओ।",
+        "Class Presentation": "Introduction → 3 main points → conclusion। 2 मिनट में खत्म करो।"
+    }
+    return hints.get(scenario, "अपना point साफ़ और confident तरीके से रखो।")
+
+def generate_feedback(user_input):
+    feedback = []
+    u = user_input.lower()
+    if len(user_input) < 10:
+        feedback.append("थोड़ा और detail में बताओ — 2-3 lines लिखो")
+    if any(w in u for w in ["शायद", "maybe", "नहीं पता"]):
+        feedback.append("Confidence से बोलो — 'maybe' हटाओ")
+    if any(w in u for w in ["सर", "मैम", "sir", "ma'am"]):
+        feedback.append("Respectful tone — अच्छा!")
+    return " | ".join(feedback) if feedback else "Good attempt!"
+
+
+# ============================================
+# 🎭 MAIN ROLEPLAY FUNCTION
+# ============================================
+
 def render_roleplay():
-    st.title("🎭 Peer Roleplay Modes")
-    role=st.selectbox("Role",["Classmate","Teacher","Study Buddy","Interview Partner","Project Teammate"])
-    label=st.selectbox("Language",list(PLAY_LANGUAGES.keys()),key="role_language")
-    prompt=st.text_input("Start the roleplay")
-    if st.button("Start Roleplay",type="primary") and prompt:
-        system=f"Act as {role} for educational practice. Reply ONLY in {PLAY_LANGUAGES[label]}. Be safe, respectful and age-appropriate."
-        ans,_=get_groq_response(client,[{"role":"user","content":prompt}],system,"")
-        st.chat_message("assistant").write(ans.choices[0].message.content if ans else "")
+    import streamlit as st
+    import time
+    from datetime import datetime
+
+    st.title("🎭 Peer Roleplay Modes (AGI-Powered)")
+    st.markdown("---")
+    
+    # CSS
+    st.markdown("""
+    <style>
+        .rp-header { font-size: 2.2rem; font-weight: bold; text-align: center; padding: 1rem; background: linear-gradient(90deg, #FF9933, #138808, #4D96FF); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .feedback-box { background: #E8F5E9; padding: 0.8rem; border-radius: 10px; border-left: 4px solid #4CAF50; margin: 0.5rem 0; font-size: 0.9rem; }
+        .hint-box { background: #FFF9C4; padding: 0.8rem; border-radius: 10px; border-left: 4px solid #FBC02D; margin: 0.5rem 0; }
+        .report-box { background: #E1F5FE; padding: 1.5rem; border-radius: 15px; border-left: 5px solid #0288D1; margin: 1rem 0; }
+    </style>
+    """, unsafe_allow_html=True)
+    
+    # Session State
+    if "rp_messages" not in st.session_state:
+        st.session_state.rp_messages = []
+    if "rp_started" not in st.session_state:
+        st.session_state.rp_started = False
+    if "rp_feedback" not in st.session_state:
+        st.session_state.rp_feedback = []
+    if "show_report" not in st.session_state:
+        st.session_state.show_report = False
+
+    # SETTINGS
+    if not st.session_state.rp_started:
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            role = st.selectbox("🎭 Role", [
+                "Classmate", "Teacher", "Study Buddy", 
+                "Interview Partner (HR)", "Project Teammate",
+                "Boss / Manager", "University Professor"
+            ], key="rp_role")
+            
+            label = st.selectbox("🌐 Language", list(PLAY_LANGUAGES.keys()), key="role_language")
+            
+        with col2:
+            difficulty = st.selectbox("📊 Difficulty Level", [
+                "🟢 Easy (Friendly)", 
+                "🟡 Medium (Challenging)", 
+                "🔴 Hard (Strict)"
+            ], key="rp_difficulty")
+            
+            scenario = st.selectbox("🎬 Scenario Template", [
+                "Free Talk",
+                "Job Interview (FAANG Style)",
+                "University Admission (US/UK)",
+                "Class Presentation"
+            ], key="rp_scenario")
+
+        if st.button("🚀 Start Roleplay", type="primary", use_container_width=True):
+            st.session_state.rp_started = True
+            st.session_state.rp_messages = []
+            opening = get_role_opening(role, scenario, difficulty)
+            st.session_state.rp_messages.append({"role": "assistant", "content": opening})
+            st.rerun()
+
+    # CHAT AREA
+    else:
+        st.markdown(f"**🎭 {role}** | **🌐 {label}** | **📊 {difficulty}** | **🎬 {scenario}**")
+        
+        for msg in st.session_state.rp_messages:
+            with st.chat_message(msg["role"]):
+                st.markdown(msg["content"])
+                
+        if st.session_state.rp_feedback:
+            for fb in st.session_state.rp_feedback[-1:]:
+                st.markdown(f'<div class="feedback-box">🧠 <b>AGI Feedback:</b> {fb}</div>', unsafe_allow_html=True)
+                st.session_state.rp_feedback = []
+
+        # Buttons
+        col_h1, col_h2, col_h3 = st.columns([1, 1, 3])
+        with col_h1:
+            if st.button("💡 Hint", key="rp_hint"):
+                hint = get_hint(scenario)
+                st.markdown(f'<div class="hint-box">💡 <b>Hint:</b> {hint}</div>', unsafe_allow_html=True)
+        with col_h2:
+            if st.button("📊 Report", key="rp_report"):
+                st.session_state.show_report = True
+        with col_h3:
+            if st.button("🔄 New Session", key="rp_reset"):
+                st.session_state.rp_started = False
+                st.session_state.rp_messages = []
+                st.session_state.rp_feedback = []
+                st.rerun()
+
+        # 🚨 MAIN FIX: st.chat_input
+        user_input = st.chat_input("अपना जवाब लिखें...")
+
+        if user_input:
+            st.session_state.rp_messages.append({"role": "user", "content": user_input})
+            with st.chat_message("user"):
+                st.markdown(user_input)
+
+            with st.spinner(f"🎭 {role} सोच रहे हैं..."):
+                try:
+                    system = build_smart_system_prompt(role, PLAY_LANGUAGES[label], difficulty, scenario)
+                    context_messages = [{"role": m["role"], "content": m["content"]} for m in st.session_state.rp_messages[-10:]]
+                    
+                    ans, _ = get_groq_response(client, context_messages, system, "")
+                    ai_response = ans.choices[0].message.content if ans else "⚠️ No response"
+                    
+                    feedback = generate_feedback(user_input)
+                    if feedback:
+                        st.session_state.rp_feedback.append(feedback)
+
+                    st.session_state.rp_messages.append({"role": "assistant", "content": ai_response})
+                    st.rerun()
+                    
+                except Exception as e:
+                    st.error(f"⚠️ Error: {str(e)}")
+                    st.session_state.rp_messages.append({"role": "assistant", "content": "⚠️ कुछ गड़बड़ हुई, कृपया दोबारा प्रयास करें।"})
+                    st.rerun()
+
+        # REPORT CARD
+        if st.session_state.show_report:
+            st.markdown("---")
+            st.markdown("## 📊 Session Report Card")
+            total_turns = len([m for m in st.session_state.rp_messages if m["role"] == "user"])
+            conf_score = min(100, 50 + total_turns * 5)
+            
+            st.markdown(f"""
+            <div class="report-box">
+                <h3>🏆 Performance Report</h3>
+                <p><b>Role:</b> {role} | <b>Scenario:</b> {scenario}</p>
+                <hr>
+                <p>🎯 <b>Confidence:</b> {conf_score}/100</p>
+                <p>💬 <b>Total Turns:</b> {total_turns}</p>
+                <p>💡 <b>Feedback:</b> शानदार प्रयास! ऐसे ही प्रैक्टिस करते रहो।</p>
+            </div>
+            """, unsafe_allow_html=True)
+            
+            if st.button("❌ Close Report"):
+                st.session_state.show_report = False
+                st.rerun()
 
 def render_cyber_security():
     import os
