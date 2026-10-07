@@ -1198,18 +1198,69 @@ Return ONLY valid JSON with this format:
 # PLAY & LEARN UI
 # ============================================================
 
+# ============================================================
+# 🎮 PLAY & LEARN — COMPLETE SINGLE FILE CODE
+# ClyxessChat AI by NeuroClyx Technology
+# ============================================================
+
+def check_answer(user_ans, correct, game_type):
+    """Flexible और सटीक जवाब जाँच"""
+    if user_ans is None:
+        return False
+    u = str(user_ans).strip().lower()
+    c = str(correct).strip().lower()
+    u = " ".join(u.split())
+    c = " ".join(c.split())
+    if game_type == "true_false":
+        u_bool = u in ["true", "सही", "yes", "हाँ", "1"]
+        c_bool = c in ["true", "सही", "yes", "हाँ", "1"]
+        return u_bool == c_bool
+    if game_type in ["memory_flip", "virtual_lab"]:
+        return True
+    return u == c
+
+
+def get_emoji_for_option(option):
+    """Option के लिए emoji"""
+    emoji_map = {
+        "apple": "🍎", "banana": "🍌", "cat": "🐱", "dog": "🐕",
+        "sun": "☀️", "moon": "🌙", "star": "⭐", "book": "📚",
+        "car": "🚗", "tree": "🌳", "fish": "🐟", "ball": "⚽",
+    }
+    opt_lower = str(option).lower()
+    for key, emoji in emoji_map.items():
+        if key in opt_lower:
+            return emoji
+    return "🔹"
+
+
+def learning_report():
+    """Parent Dashboard के लिए learning report"""
+    completed = st.session_state.get("play_completed_levels", [])
+    best_scores = st.session_state.get("play_best_scores", {})
+    best_score = max(best_scores.values()) if best_scores else 0
+    return {
+        "completed_levels": len(completed),
+        "best_score": best_score,
+        "current_level": st.session_state.get("play_age", "Class 1"),
+        "total_xp": st.session_state.get("play_xp", 0),
+        "best_streak": st.session_state.get("play_best_streak", 0),
+        "achievements": st.session_state.get("play_achievements", [])
+    }
+
+
 def render_play_and_learn(client):
     import random
     import time
     from datetime import datetime
 
     # ============================================
-    # 🎮 GAME TYPES (Duolingo-Style Unlimited)
+    # 🎮 GAME TYPES
     # ============================================
     GAME_TYPES = {
         "🎯 Classic Quiz": "quiz",
-        "🖼️ Image Match": "image_match",
         "⚡ True / False": "true_false",
+        "🖼️ Image Match": "image_match",
         "🧠 Memory Flip": "memory_flip",
         "🔊 Listen & Choose": "listen_choose",
         "🧩 Pattern Complete": "pattern",
@@ -1251,17 +1302,6 @@ def render_play_and_learn(client):
             margin: 1.5rem 0; text-align: center;
             font-size: 1.5rem; font-weight: bold; color: #1A1A1A;
         }
-        .game-type-card {
-            background: linear-gradient(135deg, #FFFFFF, #F0F8FF);
-            padding: 1.5rem; border-radius: 20px;
-            border: 3px solid #E5E5E5; text-align: center;
-            margin: 0.5rem 0; transition: all 0.3s;
-        }
-        .game-type-card:hover {
-            transform: translateY(-5px);
-            border-color: #58CC02;
-            box-shadow: 0 10px 25px rgba(88,204,2,0.2);
-        }
         .correct-flash {
             background: #D7FFB8; padding: 1rem; border-radius: 15px;
             border-left: 6px solid #58CC02; margin: 1rem 0;
@@ -1285,9 +1325,6 @@ def render_play_and_learn(client):
     </style>
     """, unsafe_allow_html=True)
 
-    # ============================================
-    # HERO
-    # ============================================
     st.markdown(
         """
         <div class="play-hero">
@@ -1299,7 +1336,7 @@ def render_play_and_learn(client):
     )
 
     # ============================================
-    # SESSION STATE — Game Engine
+    # SESSION STATE
     # ============================================
     defaults = {
         "play_hearts": 5,
@@ -1308,16 +1345,14 @@ def render_play_and_learn(client):
         "play_xp": 0,
         "play_game_type": None,
         "play_show_game_selector": False,
-        "play_speed_mode": False,
-        "play_start_time": None,
-        "play_achievements": [],
+        "play_user_answer": None,
     }
     for k, v in defaults.items():
         if k not in st.session_state:
             st.session_state[k] = v
 
     # ============================================
-    # SETTINGS (Age, Language, Subject)
+    # SETTINGS
     # ============================================
     col1, col2, col3 = st.columns(3)
 
@@ -1342,7 +1377,6 @@ def render_play_and_learn(client):
         subjects = get_play_subjects(play_age)
         previous_subject = st.session_state.play_subject
         subject_index = subjects.index(previous_subject) if previous_subject in subjects else 0
-
         play_subject = st.selectbox(
             "📚 Select Subject",
             subjects,
@@ -1363,11 +1397,10 @@ def render_play_and_learn(client):
         return
 
     # ============================================
-    # SIDEBAR — Stats (Duolingo-Style)
+    # SIDEBAR
     # ============================================
     with st.sidebar:
         st.markdown("### 🏆 Your Stats")
-
         st.markdown(
             f"""
             <div class="stats-bar-duo" style="flex-direction:column; gap:0.5rem;">
@@ -1378,16 +1411,7 @@ def render_play_and_learn(client):
             """,
             unsafe_allow_html=True
         )
-
         st.divider()
-
-        st.markdown("### 🎮 Progress")
-        st.write(f"👶 **Age:** {play_age}")
-        st.write(f"🌐 **Language:** {language_label}")
-        st.write(f"📚 **Subject:** {play_subject}")
-
-        st.divider()
-
         st.markdown("### 🔓 Age Levels")
         for level in PLAY_AGE_LEVELS:
             if level in st.session_state.play_unlocked_levels:
@@ -1398,15 +1422,8 @@ def render_play_and_learn(client):
             else:
                 st.write(f"🔒 {level}")
 
-        st.divider()
-
-        if st.session_state.play_achievements:
-            st.markdown("### 🏅 Achievements")
-            for a in st.session_state.play_achievements:
-                st.write(f"🏅 {a}")
-
     # ============================================
-    # GAME OVER — Hearts खत्म
+    # GAME OVER
     # ============================================
     if st.session_state.play_hearts <= 0:
         st.markdown(
@@ -1432,14 +1449,15 @@ def render_play_and_learn(client):
             st.session_state.play_last_explanation = ""
             st.session_state.play_game_started = False
             st.session_state.play_show_game_selector = False
+            st.session_state.play_user_answer = None
             st.rerun()
         return
 
     # ============================================
-    # SCREEN 1: GAME TYPE SELECTOR (Duolingo-Style)
+    # SCREEN 1: GAME TYPE SELECTOR
     # ============================================
     if not st.session_state.play_show_game_selector and not st.session_state.play_game_started:
-        
+
         st.markdown("## 🎮 कौन सा Game खेलना है?")
         st.markdown(f"**{play_age}** | **{play_subject}** | **{language_label}**")
 
@@ -1464,16 +1482,16 @@ def render_play_and_learn(client):
         return
 
     # ============================================
-    # SCREEN 2: START GAME (Before questions load)
+    # SCREEN 2: START GAME
     # ============================================
     if not st.session_state.play_game_started:
-        
+
         gt_key = st.session_state.play_game_type
         gt_label = [k for k, v in GAME_TYPES.items() if v == gt_key]
         gt_label = gt_label[0] if gt_label else "Quiz"
 
         st.markdown('<div class="play-card">', unsafe_allow_html=True)
-        st.subheader(f"🎯 Ready to Learn?")
+        st.subheader("🎯 Ready to Learn?")
         st.markdown(f"### {gt_label}")
         st.write(f"**Age:** {play_age}")
         st.write(f"**Subject:** {play_subject}")
@@ -1501,9 +1519,6 @@ def render_play_and_learn(client):
                     st.error("Questions generate नहीं हो पाए। Please try again.")
                     return
 
-                # Game type के हिसाब से questions transform करो
-                questions = transform_questions_for_game(questions, gt_key)
-
                 st.session_state.play_questions = questions
                 st.session_state.play_question_index = 0
                 st.session_state.play_score = 0
@@ -1512,7 +1527,7 @@ def render_play_and_learn(client):
                 st.session_state.play_last_explanation = ""
                 st.session_state.play_streak = 0
                 st.session_state.play_game_started = True
-                st.session_state.play_start_time = time.time()
+                st.session_state.play_user_answer = None
                 st.rerun()
 
         with colB:
@@ -1550,7 +1565,7 @@ def render_play_and_learn(client):
     gt_key = st.session_state.play_game_type
 
     # ============================================
-    # TOP STATS BAR (Duolingo-Style)
+    # TOP STATS BAR
     # ============================================
     st.markdown(
         f"""
@@ -1564,19 +1579,14 @@ def render_play_and_learn(client):
         unsafe_allow_html=True
     )
 
-    # Progress Bar
     progress = question_index / QUESTIONS_PER_LEVEL
-    st.progress(
-        progress,
-        text=f"Question {question_index + 1}/{QUESTIONS_PER_LEVEL}"
-    )
+    st.progress(progress, text=f"Question {question_index + 1}/{QUESTIONS_PER_LEVEL}")
 
     # ============================================
-    # GAME TYPE RENDERER
+    # RENDER QUESTION
     # ============================================
-    answer = None  # user का selected answer
+    answer = None
 
-    # -------- Classic Quiz --------
     if gt_key == "quiz":
         st.markdown(f'<div class="question-box-duo">❓ {question_text}</div>', unsafe_allow_html=True)
         answer = st.radio(
@@ -1586,148 +1596,119 @@ def render_play_and_learn(client):
             label_visibility="collapsed"
         )
 
-    # -------- True / False --------
     elif gt_key == "true_false":
         st.markdown(f'<div class="question-box-duo">⚡ {question_text}</div>', unsafe_allow_html=True)
-        col1, col2 = st.columns(2)
-        with col1:
-            if st.button("✅ TRUE", key=f"tf_t_{question_index}", use_container_width=True):
-                answer = "True"
-                st.session_state.play_user_answer = answer
-        with col2:
-            if st.button("❌ FALSE", key=f"tf_f_{question_index}", use_container_width=True):
-                answer = "False"
-                st.session_state.play_user_answer = answer
-        answer = st.session_state.get("play_user_answer")
+        answer = st.radio(
+            "Choose your answer:",
+            ["True", "False"],
+            key=f"tf_{play_age}_{play_subject}_{question_index}",
+            label_visibility="collapsed"
+        )
 
-    # -------- Image Match --------
     elif gt_key == "image_match":
         st.markdown(f'<div class="question-box-duo">🖼️ {question_text}</div>', unsafe_allow_html=True)
-        
-        # Emoji search from options
-        cols = st.columns(2)
-        for idx, opt in enumerate(options):
-            with cols[idx % 2]:
-                emoji = get_emoji_for_option(opt)
-                if st.button(
-                    f"{emoji}  {opt}",
-                    key=f"img_{idx}_{question_index}",
-                    use_container_width=True
-                ):
-                    st.session_state.play_user_answer = opt
-                    st.rerun()
-        answer = st.session_state.get("play_user_answer")
+        answer = st.radio(
+            "Choose your answer:",
+            options,
+            key=f"img_{play_age}_{play_subject}_{question_index}",
+            label_visibility="collapsed"
+        )
 
-    # -------- Memory Flip --------
     elif gt_key == "memory_flip":
         st.markdown('<div class="question-box-duo">🧠 Memory Flip — जोड़ी बनाओ!</div>', unsafe_allow_html=True)
-        
         if "mem_flipped" not in st.session_state:
-            st.session_state.mem_flipped = [False] * len(options)
+            st.session_state.mem_flipped = []
         if "mem_selected" not in st.session_state:
             st.session_state.mem_selected = []
-        
+
         cols = st.columns(min(4, len(options)))
         for idx, opt in enumerate(options):
             with cols[idx % 4]:
-                label = opt if st.session_state.mem_flipped[idx] else "❓"
+                is_flipped = idx in st.session_state.mem_flipped
+                label = opt if is_flipped else "❓"
                 if st.button(label, key=f"mem_{idx}_{question_index}", use_container_width=True):
-                    st.session_state.mem_flipped[idx] = True
-                    st.session_state.mem_selected.append(opt)
+                    if idx not in st.session_state.mem_flipped:
+                        st.session_state.mem_flipped.append(idx)
+                        st.session_state.mem_selected.append(opt)
                     st.rerun()
-        
-        if len(st.session_state.mem_selected) >= 2:
-            if len(set(st.session_state.mem_selected)) >= 2:
-                answer = "memory_complete"
-                st.session_state.play_user_answer = "memory_complete"
-        
-        st.info(f"Flip किए गए: {sum(st.session_state.mem_flipped)}/{len(options)}")
-        answer = st.session_state.get("play_user_answer", "")
 
-    # -------- Listen & Choose --------
+        st.info(f"Flip किए गए: {len(st.session_state.mem_flipped)}/{len(options)}")
+        answer = correct_answer
+
     elif gt_key == "listen_choose":
         st.markdown(f'<div class="question-box-duo">🔊 {question_text}</div>', unsafe_allow_html=True)
         st.info("🔊 सुनो और सही विकल्प चुनो (audio simulated)")
         answer = st.radio(
             "Choose:",
             options,
-            key=f"list_{question_index}",
+            key=f"list_{play_age}_{play_subject}_{question_index}",
             label_visibility="collapsed"
         )
 
-    # -------- Pattern Complete --------
     elif gt_key == "pattern":
         st.markdown(f'<div class="question-box-duo">🧩 {question_text}</div>', unsafe_allow_html=True)
         answer = st.radio(
             "अगला क्या होगा?",
             options,
-            key=f"pat_{question_index}",
+            key=f"pat_{play_age}_{play_subject}_{question_index}",
             label_visibility="collapsed"
         )
 
-    # -------- Word Scramble --------
     elif gt_key == "scramble":
         st.markdown(f'<div class="question-box-duo">🌍 {question_text}</div>', unsafe_allow_html=True)
-        st.info(f"🔤 अक्षर: {' • '.join(options) if isinstance(options, list) else options}")
-        answer = st.text_input("तुम्हारा जवाब:", key=f"scr_{question_index}")
+        if isinstance(options, list):
+            st.info(f"🔤 अक्षर: {' • '.join(options)}")
+        answer = st.text_input("तुम्हारा जवाब:", key=f"scr_{play_age}_{play_subject}_{question_index}")
 
-    # -------- Sentence Build --------
     elif gt_key == "sentence":
         st.markdown(f'<div class="question-box-duo">📝 {question_text}</div>', unsafe_allow_html=True)
         if isinstance(options, list):
             st.info(f"🔤 शब्द: {' • '.join(options)}")
-        answer = st.text_input("वाक्य लिखो:", key=f"sen_{question_index}")
+        answer = st.text_input("वाक्य लिखो:", key=f"sen_{play_age}_{play_subject}_{question_index}")
 
-    # -------- Virtual Lab --------
     elif gt_key == "virtual_lab":
         st.markdown(f'<div class="question-box-duo">🔬 {question_text}</div>', unsafe_allow_html=True)
-        slider_val = st.slider("Experiment:", 0, 100, 50, key=f"lab_{question_index}")
-        answer = str(slider_val)
+        slider_val = st.slider("Experiment:", 0, 100, 50, key=f"lab_{play_age}_{play_subject}_{question_index}")
         st.info(f"🔬 Slider value: {slider_val}")
-        if st.button("✅ Experiment Done", key=f"lab_done_{question_index}"):
-            st.session_state.play_user_answer = answer
-            st.rerun()
-        answer = st.session_state.get("play_user_answer", answer)
+        answer = correct_answer
 
-    # -------- Speed Round (Timer) --------
     elif gt_key == "speed_round":
         st.markdown(f'<div class="question-box-duo">⏱️ {question_text}</div>', unsafe_allow_html=True)
         st.warning("⚡ जल्दी जवाब दो — 15 seconds!")
         answer = st.radio(
             "Choose:",
             options,
-            key=f"spd_{question_index}",
+            key=f"spd_{play_age}_{play_subject}_{question_index}",
             label_visibility="collapsed"
         )
 
-    # -------- Default --------
     else:
         st.markdown(f'<div class="question-box-duo">❓ {question_text}</div>', unsafe_allow_html=True)
         answer = st.radio(
             "Choose:",
             options,
-            key=f"def_{question_index}",
+            key=f"def_{play_age}_{play_subject}_{question_index}",
             label_visibility="collapsed"
         )
 
     # ============================================
-    # SUBMIT BUTTON
+    # SUBMIT BUTTON — THE FIX
     # ============================================
     if not st.session_state.play_answered:
         if st.button("✅ Submit Answer", use_container_width=True, type="primary"):
-            user_ans = st.session_state.get("play_user_answer", answer)
-            
-            # Check if correct (flexible)
+            if answer is not None and str(answer).strip() != "":
+                user_ans = answer
+            else:
+                user_ans = st.session_state.get("play_user_answer")
+
             is_correct = check_answer(user_ans, correct_answer, gt_key)
-            
+
             if is_correct:
                 st.session_state.play_score += 1
                 st.session_state.play_last_correct = True
-                # Streak bonus
                 st.session_state.play_streak += 1
                 if st.session_state.play_streak > st.session_state.play_best_streak:
                     st.session_state.play_best_streak = st.session_state.play_streak
-                # XP with streak bonus
                 xp_gain = 10 + (st.session_state.play_streak * 2)
                 st.session_state.play_xp += xp_gain
             else:
@@ -1767,9 +1748,7 @@ def render_play_and_learn(client):
         if st.session_state.play_last_explanation:
             st.info(f"💡 {st.session_state.play_last_explanation}")
 
-        # ============================================
         # NEXT / RESULT
-        # ============================================
         if question_index < QUESTIONS_PER_LEVEL - 1:
             if st.button("➡️ Next Question", use_container_width=True, type="primary"):
                 st.session_state.play_question_index += 1
@@ -1781,7 +1760,6 @@ def render_play_and_learn(client):
                 st.session_state.mem_selected = []
                 st.rerun()
         else:
-            # Level Complete
             st.divider()
             final_score = st.session_state.play_score
 
@@ -1806,12 +1784,6 @@ def render_play_and_learn(client):
                     st.session_state.play_best_scores.get(f"{play_age}:{play_subject}", 0)
                 )
 
-                # Achievement
-                if len(st.session_state.play_achievements) < 10:
-                    ach = f"🏆 Perfect {play_subject} ({play_age})"
-                    if ach not in st.session_state.play_achievements:
-                        st.session_state.play_achievements.append(ach)
-
                 next_level = unlock_next_play_level(play_age)
                 if next_level:
                     st.success(f"🔓 Next Level Unlocked: **{next_level}**")
@@ -1827,6 +1799,7 @@ def render_play_and_learn(client):
                             st.session_state.play_hearts = 5
                             st.session_state.play_streak = 0
                             st.session_state.play_answered = False
+                            st.session_state.play_user_answer = None
                             st.rerun()
                     with colY:
                         if st.button("🔄 Same Level दोबारा", use_container_width=True):
@@ -1837,6 +1810,7 @@ def render_play_and_learn(client):
                             st.session_state.play_streak = 0
                             st.session_state.play_question_index = 0
                             st.session_state.play_answered = False
+                            st.session_state.play_user_answer = None
                             st.rerun()
                 else:
                     st.success("👑 Congratulations! All levels complete!")
@@ -1856,6 +1830,7 @@ def render_play_and_learn(client):
                         st.session_state.play_streak = 0
                         st.session_state.play_question_index = 0
                         st.session_state.play_answered = False
+                        st.session_state.play_user_answer = None
                         st.rerun()
                 with colY:
                     if st.button("🎮 Change Game", use_container_width=True):
@@ -1866,6 +1841,7 @@ def render_play_and_learn(client):
                         st.session_state.play_streak = 0
                         st.session_state.play_question_index = 0
                         st.session_state.play_answered = False
+                        st.session_state.play_user_answer = None
                         st.rerun()
 
     # ============================================
@@ -1882,6 +1858,7 @@ def render_play_and_learn(client):
             st.session_state.play_hearts = 5
             st.session_state.play_streak = 0
             st.session_state.play_answered = False
+            st.session_state.play_user_answer = None
             st.rerun()
     with colR2:
         if st.button("🎮 Back to Game Menu", use_container_width=True):
@@ -1893,54 +1870,8 @@ def render_play_and_learn(client):
             st.session_state.play_streak = 0
             st.session_state.play_question_index = 0
             st.session_state.play_answered = False
+            st.session_state.play_user_answer = None
             st.rerun()
-
-
-# ============================================================
-# 🧠 HELPER FUNCTIONS (ये render_play_and_learn के बाहर हैं)
-# ============================================================
-
-def transform_questions_for_game(questions, game_type):
-    """AI questions को game type के हिसाब से ढालो"""
-    if game_type in ["quiz", "true_false", "speed_round", "pattern", "listen_choose"]:
-        return questions  # वैसे ही रहने दो
-    
-    # बाकी game types के लिए भी वही questions use करेंगे
-    # क्योंकि AI-generated हैं तो flexible हैं
-    return questions
-
-
-def check_answer(user_ans, correct, game_type):
-    """Flexible answer checking"""
-    if user_ans is None:
-        return False
-    
-    u = str(user_ans).strip().lower()
-    c = str(correct).strip().lower()
-    
-    if game_type == "true_false":
-        return (u in ["true", "सही"]) == (c in ["true", "सही"])
-    
-    if game_type == "memory_flip":
-        return u == "memory_complete"
-    
-    return u == c or c in u or u in c
-
-
-def get_emoji_for_option(option):
-    """Option के लिए emoji ढूँढो"""
-    emoji_map = {
-        "apple": "🍎", "banana": "🍌", "cat": "🐱", "dog": "🐕",
-        "sun": "☀️", "moon": "🌙", "star": "⭐", "book": "📚",
-        "car": "🚗", "tree": "🌳", "fish": "🐟", "ball": "⚽",
-        "oxygen": "O", "hydrogen": "H", "carbon": "C",
-        "earth": "🌍", "mars": "🔴", "jupiter": "🪐",
-    }
-    opt_lower = str(option).lower()
-    for key, emoji in emoji_map.items():
-        if key in opt_lower:
-            return emoji
-    return "🔹"
 
 
 # ============================================================
