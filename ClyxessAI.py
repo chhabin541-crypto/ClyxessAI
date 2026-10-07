@@ -3921,52 +3921,259 @@ def render_cyber_security():
     else:
         render_advanced_cyber_lab() 
         
-    
-def render_homework_test():
-    st.title("📝 Interactive Homework & Test")
-    c1, c2, c3 = st.columns(3)
+def render_homework_test(client):
+    import json
+    import re
+    import time
+    import datetime
+    import streamlit as st
+
+    FOOTER = "\n\n---\n🛡️ **ClyxessChat AI** • Secure • Fast • Private"
+
+    DIAGRAM_RULE = """
+
+📊 DIAGRAM MANDATORY:
+Har answer mein diagram banao using: → ← ↑ ↓ ═ ║ ╔ ╗ ╚ ╝ ● ○ ■ ▲ ▼ ⚫
+
+Rules:
+1. Har response mein KAM SE KAM 1 diagram
+2. Diagram upar: "📊 Diagram:"
+3. Neeche 2-3 line explanation
+4. Chhote bacchon ke liye simple ASCII art
+5. Bade students ke liye labeled diagram
+"""
+
+    LANGUAGES = [
+        "🌐 Auto Detect (Same as question)",
+        "🇬🇧 English", "🇮🇳 हिंदी (Hindi)", "🇮🇳 Hinglish",
+        "🇮🇳 मराठी", "🇮🇳 বাংলা", "🇮🇳 தமிழ்", "🇮🇳 తెలుగు",
+        "🇮🇳 ગુજરાતી", "🇮🇳 ಕನ್ನಡ", "🇮🇳 മലയാളം", "🇮🇳 ਪੰਜਾਬੀ",
+        "🇮🇳 ଓଡ଼ିଆ", "🇮🇳 اردو", "🇮🇳 नेपाली",
+        "🇪🇸 Español", "🇫🇷 Français", "🇩🇪 Deutsch", "🇮🇹 Italiano",
+        "🇵🇹 Português", "🇷🇺 Русский", "🇳🇱 Nederlands", "🇸🇪 Svenska",
+        "🇵🇱 Polski", "🇹🇷 Türkçe", "🇬🇷 Ελληνικά", "🇨🇿 Čeština",
+        "🇷🇴 Română", "🇭🇺 Magyar", "🇺🇦 Українська", "🇩🇰 Dansk",
+        "🇫🇮 Suomi", "🇳🇴 Norsk", "🇯🇵 日本語", "🇨🇳 中文",
+        "🇰🇷 한국어", "🇸🇦 العربية", "🇮🇱 עברית", "🇮🇷 فارسی"
+    ]
+
+    CLASS_AGE_MAP = {
+        "Class 1": "Age 6-7", "Class 2": "Age 7-8", "Class 3": "Age 8-9",
+        "Class 4": "Age 9-10", "Class 5": "Age 10-11", "Class 6": "Age 11-12",
+        "Class 7": "Age 12-13", "Class 8": "Age 13-14", "Class 9": "Age 14-15",
+        "Class 10": "Age 15-16", "Class 11": "Age 16-17", "Class 12": "Age 17-18",
+        "College Year 1": "Age 18-19", "College Year 2": "Age 19-20",
+        "University": "Age 20+"
+    }
+
+    SUBJECTS_BY_LEVEL = {
+        "Class 1": ["Maths", "English", "Hindi", "EVS", "Drawing", "General Knowledge", "Moral Science"],
+        "Class 2": ["Maths", "English", "Hindi", "EVS", "Drawing", "General Knowledge", "Moral Science"],
+        "Class 3": ["Maths", "English", "Hindi", "EVS", "Drawing", "General Knowledge", "Computer Basics"],
+        "Class 4": ["Maths", "English", "Hindi", "EVS", "Science", "Drawing", "Computer Basics"],
+        "Class 5": ["Maths", "English", "Hindi", "EVS", "Science", "Social Studies", "Computer"],
+        "Class 6": ["Maths", "Science", "English", "Hindi", "Social Studies", "Sanskrit", "Computer", "Art"],
+        "Class 7": ["Maths", "Science", "English", "Hindi", "Social Studies", "Sanskrit", "Computer", "Art"],
+        "Class 8": ["Maths", "Science", "English", "Hindi", "Social Studies", "Sanskrit", "Computer", "Art"],
+        "Class 9": ["Maths", "Physics", "Chemistry", "Biology", "English", "Hindi", "History", "Geography", "Economics", "Computer", "IT"],
+        "Class 10": ["Maths", "Physics", "Chemistry", "Biology", "English", "Hindi", "History", "Geography", "Economics", "Computer", "IT"],
+        "Class 11": ["Physics", "Chemistry", "Maths", "Biology", "Computer Science", "Accountancy", "Business Studies", "Economics", "English", "Hindi", "Political Science", "History", "Geography", "Psychology"],
+        "Class 12": ["Physics", "Chemistry", "Maths", "Biology", "Computer Science", "Accountancy", "Business Studies", "Economics", "English", "Hindi", "Political Science", "History", "Geography", "Psychology"],
+        "College Year 1": ["Data Science", "Machine Learning", "Python Programming", "Statistics", "Linear Algebra", "Calculus", "Physics", "Chemistry", "Computer Science", "Economics", "Finance"],
+        "College Year 2": ["Data Science", "Machine Learning", "Deep Learning", "AI", "Python", "Statistics", "Quantum Physics", "Astrophysics", "Robotics", "Cyber Security", "Web Development", "Finance"],
+        "University": ["Data Science", "Machine Learning", "Deep Learning", "AI", "Quantum Physics", "Astrophysics", "Robotics", "Cyber Security", "Web Development", "Mobile Development", "Blockchain", "Biotechnology", "Nanotechnology", "Neuroscience", "Research Methodology", "Financial Modeling"]
+    }
+
+    if "hw_questions" not in st.session_state:
+        st.session_state.hw_questions = []
+    if "hw_answers" not in st.session_state:
+        st.session_state.hw_answers = {}
+    if "hw_result" not in st.session_state:
+        st.session_state.hw_result = None
+    if "hw_ai_response" not in st.session_state:
+        st.session_state.hw_ai_response = ""
+
+    st.markdown("""
+    <div style="background:linear-gradient(135deg,#07152f,#111c48,#29105c);padding:24px;border-radius:20px;margin-bottom:20px;border:1px solid rgba(100,180,255,0.3);">
+        <h1 style="color:white;margin:0;font-size:30px;">📝 Interactive Homework & Test</h1>
+        <p style="color:#b8d8ff;margin:8px 0 0 0;font-size:14px;">AI-powered · Subject-wise · Diagram-based learning</p>
+    </div>
+    """, unsafe_allow_html=True)
+
+    c1, c2, c3, c4 = st.columns([1, 1, 1, 1])
+
     with c1:
-        homework_age = st.selectbox("👶 Age", PLAY_AGE_LEVELS, key="homework_age")
+        class_name = st.selectbox("🎓 Class",
+            ["Class 1","Class 2","Class 3","Class 4","Class 5","Class 6",
+             "Class 7","Class 8","Class 9","Class 10","Class 11","Class 12",
+             "College Year 1","College Year 2","University"],
+            key="hw_class")
+        st.info(f"👶 {CLASS_AGE_MAP.get(class_name, 'Age 6-18')}")
+
     with c2:
-        homework_label = st.selectbox("🌐 Language", list(PLAY_LANGUAGES.keys()), key="homework_language")
-        homework_language = PLAY_LANGUAGES[homework_label]
+        language_label = st.selectbox("🌐 Language", LANGUAGES, key="hw_lang_sel")
+
     with c3:
-        subjects = get_play_subjects(homework_age)
-        subject = st.selectbox("📚 Subject", subjects, key="homework_subject")
+        subjects = SUBJECTS_BY_LEVEL.get(class_name, ["Maths", "Science", "English"])
+        subject = st.selectbox("📚 Subject", subjects, key="hw_subject")
 
-    st.caption(f"Homework will be generated for {homework_age} in {homework_label}.")
-    if st.button("Generate Test", type="primary", use_container_width=True):
-        st.session_state.homework_questions = generate_ai_questions(
-            client, homework_age, homework_language, subject, 5
-        )
-        st.session_state.homework_answers = {}
-        st.session_state.homework_result = None
+    with c4:
+        mode = st.selectbox("🎯 Mode",
+            ["📖 Homework Help", "📝 Test Mode", "🎯 Practice", "📊 Project"],
+            key="hw_mode")
 
-    qs = st.session_state.get("homework_questions", [])
-    if qs:
-        for i, q in enumerate(qs):
-            st.session_state.homework_answers[i] = st.radio(
-                q["question"], q["options"], key=f"hw_{i}"
-            )
-        if st.button("Submit Test", use_container_width=True):
-            score = sum(
-                st.session_state.homework_answers.get(i) == q["answer"]
-                for i, q in enumerate(qs)
-            )
-            st.session_state.homework_result = f"{score}/{len(qs)}"
-            st.success(f"Score: {st.session_state.homework_result}")
+    if "Auto Detect" in language_label:
+        lang_rule = "Reply in the SAME language as the question."
+        clean_lang = "the student's language"
+    else:
+        clean_lang = language_label.split(" ", 1)[-1].split("(")[0].strip()
+        lang_rule = f"ALWAYS reply in {clean_lang} ONLY."
 
-def learning_report():
-    best=max(st.session_state.play_best_scores.values(),default=0)
-    return "\n".join([
-        "ClyxessChat AI — Learning Report",
-        f"Generated: {india_clock_text()}",
-        f"Current Level: {st.session_state.play_age}",
-        f"Language: {next((n for n,c in PLAY_LANGUAGES.items() if c==st.session_state.play_language),'English')}",
-        f"Completed Levels: {len(st.session_state.play_completed_levels)}",
-        f"Best Score: {best}/10",
-        f"Homework/Test: {st.session_state.get('homework_result') or 'Not attempted'}" 
-    ])
+    is_university = "University" in class_name or "College" in class_name
+
+    with st.expander("⏰ Homework Time Table — Auto / Manual", expanded=False):
+        tt_mode = st.radio("Mode", ["🤖 Auto (AI banayega)", "✍️ Manual (Khud set karo)"],
+            horizontal=True, key="hw_tt_mode")
+
+        if "Auto" in tt_mode:
+            if st.button("🎯 Generate Time Table", key="hw_gen_tt"):
+                with st.spinner("AI tumhara time table bana raha hai..."):
+                    tt_prompt = f"""Create a homework time table for a {class_name} student ({CLASS_AGE_MAP.get(class_name)}).
+
+{lang_rule}
+
+Rules:
+- Max homework time for Class 1-2: 30 min
+- Class 3-5: 60 min
+- Class 6-8: 90 min
+- Class 9-12: 2-3 hours
+- Include breaks every 45 min
+- Include subjects: {', '.join(subjects[:5])}
+
+Format as table with Time, Subject, Duration, Break.
+Include a short note at end about balanced study.
+End with footer: --- ClyxessChat AI • Secure • Fast • Private"""
+                    try:
+                        r = client.chat.completions.create(
+                            model="openai/gpt-oss-120b",
+                            messages=[{"role": "user", "content": tt_prompt}],
+                            temperature=0.7, max_tokens=1500)
+                        st.markdown(r.choices[0].message.content)
+                    except Exception as e:
+                        st.error(f"❌ {type(e).__name__}: {str(e)[:150]}")
+        else:
+            st.write("Khud set karo — sliders se:")
+            subjects_tt = subjects[:4]
+            for s in subjects_tt:
+                st.slider(f"⏱️ {s} (minutes)", 0, 120, 30, key=f"tt_{s}")
+            if st.button("💾 Save Time Table", key="hw_save_tt"):
+                st.success("✅ Time table save ho gaya! (Session mein)")
+
+    st.divider()
+
+    if mode == "📖 Homework Help":
+        st.subheader("📖 Ask Any Homework Question")
+        st.caption(f"Class: {class_name} | Subject: {subject} | Language: {clean_lang}")
+
+        question = st.text_area("Your question / doubt:",
+            placeholder="e.g., 2x + 5 = 15 solve karo, ya photosynthesize kya hai?",
+            height=100, key="hw_question")
+
+        if st.button("🚀 Get Answer + Diagram", type="primary", use_container_width=True, key="hw_get_answer"):
+            if not question.strip():
+                st.warning("Pehle question likho!")
+            else:
+                with st.spinner("AI teacher soch raha hai..."):
+                    prompt = f"""You are an expert {subject} Teacher for a {class_name} student ({CLASS_AGE_MAP.get(class_name)}).
+
+{lang_rule}
+
+STUDENT'S QUESTION: {question}
+
+Rules:
+1. Explain step-by-step
+2. Use simple language for the class level
+3. ALWAYS include a diagram
+4. Give a real-world example
+5. End with a practice question
+
+Format:
+📚 Concept
+🎯 Step-by-Step Solution
+📊 Diagram (MANDATORY)
+🌍 Real-Life Example
+❓ Practice Question
+
+{DIAGRAM_RULE}
+
+End with footer: --- ClyxessChat AI • Secure • Fast • Private"""
+
+                    try:
+                        r = client.chat.completions.create(
+                            model="openai/gpt-oss-120b",
+                            messages=[{"role": "user", "content": prompt}],
+                            temperature=0.7, max_tokens=2500)
+                        text = r.choices[0].message.content
+                        if "ClyxessChat AI" not in text:
+                            text += FOOTER
+                        st.session_state.hw_ai_response = text
+                    except Exception as e:
+                        st.error(f"❌ {type(e).__name__}: {str(e)[:200]}")
+
+        if st.session_state.hw_ai_response:
+            st.markdown("---")
+            st.markdown(st.session_state.hw_ai_response)
+            st.download_button("📥 Download Answer",
+                data=st.session_state.hw_ai_response,
+                file_name=f"homework_{subject}_{datetime.datetime.now().strftime('%Y%m%d')}.txt",
+                mime="text/plain", key="hw_dl_ans")
+
+    elif mode == "📝 Test Mode":
+        st.subheader("📝 Auto-Generated Test")
+        st.caption(f"Class: {class_name} | Subject: {subject} | Language: {clean_lang}")
+
+        num_q = st.slider("Number of questions:", 5, 15, 5, key="hw_num_q")
+        difficulty = st.select_slider("Difficulty:",
+            ["Easy", "Medium", "Hard", "Expert"], value="Medium", key="hw_diff")
+
+        if st.button("🎯 Generate Test", type="primary", use_container_width=True, key="hw_gen_test"):
+            with st.spinner("Test ban raha hai..."):
+                quiz_prompt = f"""Create {num_q} MCQ questions for a {class_name} student on {subject}.
+Difficulty: {difficulty}
+
+{lang_rule}
+
+Return ONLY valid JSON array:
+[{{"question":"...","options":["A","B","C","D"],"answer":"A","explanation":"..."}}]
+
+Rules:
+- Age-appropriate
+- Real-world context
+- Exactly 4 options
+- Explanation in {clean_lang}"""
+
+                try:
+                    r = client.chat.completions.create(
+                        model="openai/gpt-oss-120b",
+                        messages=[{"role": "user", "content": quiz_prompt}],
+                        temperature=0.5, max_tokens=3500)
+                    raw = r.choices[0].message.content
+                    match = re.search(r"\[[\s\S]*\]", raw)
+                    if not match:
+                        raise ValueError("No JSON found")
+                    qs = json.loads(match.group(0))
+                    valid = []
+                    for q in qs:
+                        if isinstance(q, dict) and "question" in q and "options" in q and "answer" in q:
+                            if len(q["options"]) == 4 and q["answer"] in q["options"]:
+                                valid.append(q)
+                    st.session_state.hw_questions = valid
+                    st.session_state.hw_answers = {}
+                    st.session_state.hw_result = None
+                    st.rerun()
+                except Exception as e:
+                    st.error(f"❌ Test generation failed: {type(e).__name__}: {str(e)[:200]}")
+
 def render_coding_lab_mod():
     import streamlit.components.v1 as components
     html_code = r'''<!DOCTYPE html>
