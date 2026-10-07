@@ -1416,10 +1416,9 @@ def render_play_and_learn(client):
         # Word chips like screenshot 3 & 4
         built = st.session_state.get("play_word_built", [])
 
-        # Top area where built words show
         st.markdown("#### Your sentence:")
-        st.markdown(f'<div style="background:#1e2a3a; padding:1rem; border-radius:12px; min-height:60px; border:2px dashed #333;">{" ".join([f"<span class=\'word-chip selected\'>{w}</span>" for w in built])}</div>', unsafe_allow_html=True)
-
+        built_html = " ".join(built)
+        st.markdown(f'<div style="background:#1e2a3a; padding:1rem; border-radius:12px; min-height:60px; border:2px dashed #333; color:white;">{built_html}</div>', unsafe_allow_html=True)
         # Bank
         st.markdown("#### Tap words:")
         bank = curr["bank"]
