@@ -5466,26 +5466,30 @@ Now write ENTIRELY in {language}:"""
                         {"role": "system", "content": f"You are ClyxessChat AI. You MUST reply ONLY in {language}. Never switch languages. Always end with: --- ClyxessChat AI | Secure • Fast • Private"},
                         {"role": "user", "content": prompt}
                     ],
-                    model=model,
-                    temperature=0.2,
-                    max_tokens=900,
-                    stream=True
+                               messages=[
+                {"role": "system", "content": f"You are ClyxessChat AI. You MUST reply ONLY in {lang}"},
+                {"role": "user", "content": prompt}
+            ],
+            model=model,
+            temperature=0.2,
+            max_tokens=900,
+            stream=True
         )
-            text = ""
-            for chunk in res:
-                if chunk.choices[0].delta.content:
-                    text += chunk.choices[0].delta.content
-            text = text.strip()
-            if len(text) > 20:
-                if "ClyxessChat AI | Secure" not in text:
-                    text = text.rstrip() + "\n\n--- ClyxessChat AI | Secure • Fast • Private"
-                return text, None
-            last_error = f"{model}: short output"
-        except Exception as e:
-            last_error = f"{model}: {str(e)[:80]}"
-            continue
+        text = ""
+        for chunk in res:
+            if chunk.choices[0].delta.content:
+                text += chunk.choices[0].delta.content
+        text = text.strip()
+        if len(text) > 20:
+            if "ClyxessChat AI | Secure" not in text:
+                text = text.rstrip() + "\n\n--- ClyxessChat AI | Secure • Fast • Private"
+            return text, None
+        last_error = f"{model}: short output"
+    except Exception as e:
+        last_error = f"{model}: {str(e)[:80]}"
+        continue
 
-    return None, last_error or "All models failed"
+return None, last_error or "All models failed"
 
     # ============================================================
     # STYLING
