@@ -5472,14 +5472,9 @@ Now write ENTIRELY in {language}:"""
             ],
             model=model,
             temperature=0.2,
-            max_tokens=900,
-            stream=True
+            max_tokens=900
         )
-        text = ""
-        for chunk in res:
-            if chunk.choices[0].delta.content:
-                text += chunk.choices[0].delta.content
-        text = text.strip()
+        text = res.choices[0].message.content.strip()
         if len(text) > 20:
             if "ClyxessChat AI | Secure" not in text:
                 text = text.rstrip() + "\n\n--- ClyxessChat AI | Secure • Fast • Private"
