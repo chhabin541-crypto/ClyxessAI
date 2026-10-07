@@ -1203,52 +1203,6 @@ Return ONLY valid JSON with this format:
 # ClyxessChat AI by NeuroClyx Technology
 # ============================================================
 
-def check_answer(user_ans, correct, game_type):
-    """Flexible और सटीक जवाब जाँच"""
-    if user_ans is None:
-        return False
-    u = str(user_ans).strip().lower()
-    c = str(correct).strip().lower()
-    u = " ".join(u.split())
-    c = " ".join(c.split())
-    if game_type == "true_false":
-        u_bool = u in ["true", "सही", "yes", "हाँ", "1"]
-        c_bool = c in ["true", "सही", "yes", "हाँ", "1"]
-        return u_bool == c_bool
-    if game_type in ["memory_flip", "virtual_lab"]:
-        return True
-    return u == c
-
-
-def get_emoji_for_option(option):
-    """Option के लिए emoji"""
-    emoji_map = {
-        "apple": "🍎", "banana": "🍌", "cat": "🐱", "dog": "🐕",
-        "sun": "☀️", "moon": "🌙", "star": "⭐", "book": "📚",
-        "car": "🚗", "tree": "🌳", "fish": "🐟", "ball": "⚽",
-    }
-    opt_lower = str(option).lower()
-    for key, emoji in emoji_map.items():
-        if key in opt_lower:
-            return emoji
-    return "🔹"
-
-
-def learning_report():
-    """Parent Dashboard के लिए learning report"""
-    completed = st.session_state.get("play_completed_levels", [])
-    best_scores = st.session_state.get("play_best_scores", {})
-    best_score = max(best_scores.values()) if best_scores else 0
-    return {
-        "completed_levels": len(completed),
-        "best_score": best_score,
-        "current_level": st.session_state.get("play_age", "Class 1"),
-        "total_xp": st.session_state.get("play_xp", 0),
-        "best_streak": st.session_state.get("play_best_streak", 0),
-        "achievements": st.session_state.get("play_achievements", [])
-    }
-
-
 def render_play_and_learn(client):
     import random
     import time
@@ -1269,6 +1223,38 @@ def render_play_and_learn(client):
         "🔬 Virtual Lab": "virtual_lab",
         "⏱️ Speed Round": "speed_round",
     }
+
+    # ============================================
+    # 🧠 HELPER FUNCTIONS (अंदर रखे हैं ताकि कोई NameError न आए)
+    # ============================================
+    def check_answer(user_ans, correct, game_type):
+        if user_ans is None:
+            return False
+        u = str(user_ans).strip().lower()
+        c = str(correct).strip().lower()
+        u = " ".join(u.split())
+        c = " ".join(c.split())
+        
+        if game_type == "true_false":
+            u_bool = u in ["true", "सही", "yes", "हाँ", "1"]
+            c_bool = c in ["true", "सही", "yes", "हाँ", "1"]
+            return u_bool == c_bool
+        if game_type in ["memory_flip", "virtual_lab"]:
+            return True
+        return u == c
+
+    def learning_report():
+        completed = st.session_state.get("play_completed_levels", [])
+        best_scores = st.session_state.get("play_best_scores", {})
+        best_score = max(best_scores.values()) if best_scores else 0
+        return {
+            "completed_levels": len(completed),
+            "best_score": best_score,
+            "current_level": st.session_state.get("play_age", "Class 1"),
+            "total_xp": st.session_state.get("play_xp", 0),
+            "best_streak": st.session_state.get("play_best_streak", 0),
+            "achievements": st.session_state.get("play_achievements", [])
+        }
 
     # ============================================
     # 🎨 CSS
@@ -1322,6 +1308,12 @@ def render_play_and_learn(client):
             color: white; padding: 2rem; border-radius: 20px;
             text-align: center; margin: 1rem 0;
         }
+        .unlock-box {
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            color: #333; padding: 1.5rem; border-radius: 20px;
+            text-align: center; margin: 1rem 0;
+            border: 3px solid #FF8C00;
+        }
     </style>
     """, unsafe_allow_html=True)
 
@@ -1336,7 +1328,7 @@ def render_play_and_learn(client):
     )
 
     # ============================================
-    # SESSION STATE
+    # SESSION STATE INITIALIZATION
     # ============================================
     defaults = {
         "play_hearts": 5,
@@ -1346,10 +1338,36 @@ def render_play_and_learn(client):
         "play_game_type": None,
         "play_show_game_selector": False,
         "play_user_answer": None,
+        "play_game_started": False,
+        "play_question_index": 0,
+        "play_score": 0,
+        "play_answered": False,
+        "play_last_correct": False,
+        "play_last_explanation": "",
+        "play_completed_levels": [],
+        "play_best_scores": {},
+        "play_unlocked_levels": ["1-2 Years"],  # Default first level unlocked
     }
     for k, v in defaults.items():
         if k not in st.session_state:
             st.session_state[k] = v
+
+    # ============================================
+    # AGE LEVEL PROGRESSION MANAGER
+    # ============================================
+    if 'PLAY_AGE_LEVELS' in globals():
+        age_levels = PLAY_AGE_LEVELS
+    else:
+        age_levels = ["1-2 Years", "3-4 Years", "5-6 Years", "7-8 Years", "9-10 Years"]
+
+    def get_next_age(current_age):
+        try:
+            idx = age_levels.index(current_age)
+            if idx + 1 < len(age_levels):
+                return age_levels[idx + 1]
+        except ValueError:
+            pass
+        return None
 
     # ============================================
     # SETTINGS
@@ -1359,22 +1377,35 @@ def render_play_and_learn(client):
     with col1:
         play_age = st.selectbox(
             "👶 Select Age",
-            PLAY_AGE_LEVELS,
-            index=PLAY_AGE_LEVELS.index(st.session_state.play_age),
+            age_levels,
+            index=age_levels.index(st.session_state.play_age) if st.session_state.play_age in age_levels else 0,
             key="pl_age_sel"
         )
 
     with col2:
+        if 'PLAY_LANGUAGES' in globals():
+            lang_keys = list(PLAY_LANGUAGES.keys())
+            lang_vals = list(PLAY_LANGUAGES.values())
+            default_lang_idx = lang_vals.index(st.session_state.play_language) if st.session_state.play_language in lang_vals else 0
+        else:
+            lang_keys = ["हिंदी", "English"]
+            lang_vals = ["Hindi", "English"]
+            default_lang_idx = 0
+            
         language_label = st.selectbox(
             "🌐 Select Language",
-            list(PLAY_LANGUAGES.keys()),
-            index=list(PLAY_LANGUAGES.values()).index(st.session_state.play_language),
+            lang_keys,
+            index=default_lang_idx,
             key="pl_lang_sel"
         )
-        play_language = PLAY_LANGUAGES[language_label]
+        play_language = PLAY_LANGUAGES[language_label] if 'PLAY_LANGUAGES' in globals() else language_label
 
     with col3:
-        subjects = get_play_subjects(play_age)
+        if 'get_play_subjects' in globals():
+            subjects = get_play_subjects(play_age)
+        else:
+            subjects = ["Math", "Science", "Language", "General Knowledge"]
+            
         previous_subject = st.session_state.play_subject
         subject_index = subjects.index(previous_subject) if previous_subject in subjects else 0
         play_subject = st.selectbox(
@@ -1391,9 +1422,11 @@ def render_play_and_learn(client):
     # ============================================
     # AGE LOCK
     # ============================================
-    if not play_level_unlocked(play_age):
+    if play_age not in st.session_state.play_unlocked_levels:
         st.error(f"🔒 {play_age} is locked.")
-        st.info("Complete the previous age level with 10/10 to unlock this level.")
+        st.info("Complete the previous age level with 8/10 to unlock this level.")
+        with st.expander("🔓 See Unlocked Levels"):
+            st.write(st.session_state.play_unlocked_levels)
         return
 
     # ============================================
@@ -1413,7 +1446,7 @@ def render_play_and_learn(client):
         )
         st.divider()
         st.markdown("### 🔓 Age Levels")
-        for level in PLAY_AGE_LEVELS:
+        for level in age_levels:
             if level in st.session_state.play_unlocked_levels:
                 if level == play_age:
                     st.success(f"⭐ {level}")
@@ -1476,7 +1509,7 @@ def render_play_and_learn(client):
         st.markdown("---")
         st.info(
             "🎯 हर game में 10 AI-generated questions हैं। "
-            "10/10 करने पर next age level unlock होगा। "
+            "8/10 करने पर next age level unlock होगा। "
             "गलत जवाब पर ❤️ कम होगा!"
         )
         return
@@ -1507,13 +1540,23 @@ def render_play_and_learn(client):
         with colA:
             if st.button("🚀 Start Game", use_container_width=True, type="primary"):
                 with st.spinner("🤖 AI आपके लिए challenge बना रहा है..."):
-                    questions = generate_ai_questions(
-                        client=client,
-                        age=play_age,
-                        language=play_language,
-                        subject=play_subject,
-                        count=QUESTIONS_PER_LEVEL
-                    )
+                    if 'generate_ai_questions' in globals():
+                        questions = generate_ai_questions(
+                            client=client,
+                            age=play_age,
+                            language=play_language,
+                            subject=play_subject,
+                            count=10
+                        )
+                    else:
+                        questions = []
+                        for i in range(10):
+                            questions.append({
+                                "question": f"Demo Question {i+1} for {play_age}?",
+                                "options": ["Option A", "Option B", "Option C", "Option D"],
+                                "answer": "Option A",
+                                "explanation": "यह एक demo question है।"
+                            })
 
                 if not questions:
                     st.error("Questions generate नहीं हो पाए। Please try again.")
@@ -1579,47 +1622,30 @@ def render_play_and_learn(client):
         unsafe_allow_html=True
     )
 
-    progress = question_index / QUESTIONS_PER_LEVEL
-    st.progress(progress, text=f"Question {question_index + 1}/{QUESTIONS_PER_LEVEL}")
+    progress = question_index / 10
+    st.progress(progress, text=f"Question {question_index + 1}/10")
 
     # ============================================
-    # RENDER QUESTION
+    # RENDER QUESTION BASED ON TYPE
     # ============================================
     answer = None
 
     if gt_key == "quiz":
         st.markdown(f'<div class="question-box-duo">❓ {question_text}</div>', unsafe_allow_html=True)
-        answer = st.radio(
-            "Choose your answer:",
-            options,
-            key=f"pl_ans_{play_age}_{play_subject}_{question_index}",
-            label_visibility="collapsed"
-        )
+        answer = st.radio("Choose your answer:", options, key=f"pl_ans_{play_age}_{play_subject}_{question_index}", label_visibility="collapsed")
 
     elif gt_key == "true_false":
         st.markdown(f'<div class="question-box-duo">⚡ {question_text}</div>', unsafe_allow_html=True)
-        answer = st.radio(
-            "Choose your answer:",
-            ["True", "False"],
-            key=f"tf_{play_age}_{play_subject}_{question_index}",
-            label_visibility="collapsed"
-        )
+        answer = st.radio("Choose your answer:", ["True", "False"], key=f"tf_{play_age}_{play_subject}_{question_index}", label_visibility="collapsed")
 
     elif gt_key == "image_match":
         st.markdown(f'<div class="question-box-duo">🖼️ {question_text}</div>', unsafe_allow_html=True)
-        answer = st.radio(
-            "Choose your answer:",
-            options,
-            key=f"img_{play_age}_{play_subject}_{question_index}",
-            label_visibility="collapsed"
-        )
+        answer = st.radio("Choose your answer:", options, key=f"img_{play_age}_{play_subject}_{question_index}", label_visibility="collapsed")
 
     elif gt_key == "memory_flip":
         st.markdown('<div class="question-box-duo">🧠 Memory Flip — जोड़ी बनाओ!</div>', unsafe_allow_html=True)
-        if "mem_flipped" not in st.session_state:
-            st.session_state.mem_flipped = []
-        if "mem_selected" not in st.session_state:
-            st.session_state.mem_selected = []
+        if "mem_flipped" not in st.session_state: st.session_state.mem_flipped = []
+        if "mem_selected" not in st.session_state: st.session_state.mem_selected = []
 
         cols = st.columns(min(4, len(options)))
         for idx, opt in enumerate(options):
@@ -1631,39 +1657,26 @@ def render_play_and_learn(client):
                         st.session_state.mem_flipped.append(idx)
                         st.session_state.mem_selected.append(opt)
                     st.rerun()
-
         st.info(f"Flip किए गए: {len(st.session_state.mem_flipped)}/{len(options)}")
         answer = correct_answer
 
     elif gt_key == "listen_choose":
         st.markdown(f'<div class="question-box-duo">🔊 {question_text}</div>', unsafe_allow_html=True)
         st.info("🔊 सुनो और सही विकल्प चुनो (audio simulated)")
-        answer = st.radio(
-            "Choose:",
-            options,
-            key=f"list_{play_age}_{play_subject}_{question_index}",
-            label_visibility="collapsed"
-        )
+        answer = st.radio("Choose:", options, key=f"list_{play_age}_{play_subject}_{question_index}", label_visibility="collapsed")
 
     elif gt_key == "pattern":
         st.markdown(f'<div class="question-box-duo">🧩 {question_text}</div>', unsafe_allow_html=True)
-        answer = st.radio(
-            "अगला क्या होगा?",
-            options,
-            key=f"pat_{play_age}_{play_subject}_{question_index}",
-            label_visibility="collapsed"
-        )
+        answer = st.radio("अगला क्या होगा?", options, key=f"pat_{play_age}_{play_subject}_{question_index}", label_visibility="collapsed")
 
     elif gt_key == "scramble":
         st.markdown(f'<div class="question-box-duo">🌍 {question_text}</div>', unsafe_allow_html=True)
-        if isinstance(options, list):
-            st.info(f"🔤 अक्षर: {' • '.join(options)}")
+        if isinstance(options, list): st.info(f"🔤 अक्षर: {' • '.join(options)}")
         answer = st.text_input("तुम्हारा जवाब:", key=f"scr_{play_age}_{play_subject}_{question_index}")
 
     elif gt_key == "sentence":
         st.markdown(f'<div class="question-box-duo">📝 {question_text}</div>', unsafe_allow_html=True)
-        if isinstance(options, list):
-            st.info(f"🔤 शब्द: {' • '.join(options)}")
+        if isinstance(options, list): st.info(f"🔤 शब्द: {' • '.join(options)}")
         answer = st.text_input("वाक्य लिखो:", key=f"sen_{play_age}_{play_subject}_{question_index}")
 
     elif gt_key == "virtual_lab":
@@ -1675,24 +1688,14 @@ def render_play_and_learn(client):
     elif gt_key == "speed_round":
         st.markdown(f'<div class="question-box-duo">⏱️ {question_text}</div>', unsafe_allow_html=True)
         st.warning("⚡ जल्दी जवाब दो — 15 seconds!")
-        answer = st.radio(
-            "Choose:",
-            options,
-            key=f"spd_{play_age}_{play_subject}_{question_index}",
-            label_visibility="collapsed"
-        )
+        answer = st.radio("Choose:", options, key=f"spd_{play_age}_{play_subject}_{question_index}", label_visibility="collapsed")
 
     else:
         st.markdown(f'<div class="question-box-duo">❓ {question_text}</div>', unsafe_allow_html=True)
-        answer = st.radio(
-            "Choose:",
-            options,
-            key=f"def_{play_age}_{play_subject}_{question_index}",
-            label_visibility="collapsed"
-        )
+        answer = st.radio("Choose:", options, key=f"def_{play_age}_{play_subject}_{question_index}", label_visibility="collapsed")
 
     # ============================================
-    # SUBMIT BUTTON — THE FIX
+    # SUBMIT BUTTON
     # ============================================
     if not st.session_state.play_answered:
         if st.button("✅ Submit Answer", use_container_width=True, type="primary"):
@@ -1721,35 +1724,18 @@ def render_play_and_learn(client):
             st.rerun()
 
     # ============================================
-    # FEEDBACK
+    # FEEDBACK & RESULT
     # ============================================
     if st.session_state.play_answered:
         if st.session_state.play_last_correct:
-            st.markdown(
-                f"""
-                <div class="correct-flash">
-                    ✅ Correct! ⭐ +XP: {10 + st.session_state.play_streak * 2} • 
-                    🔥 Streak: {st.session_state.play_streak}
-                </div>
-                """,
-                unsafe_allow_html=True
-            )
+            st.markdown(f'<div class="correct-flash">✅ Correct! ⭐ +XP: {10 + st.session_state.play_streak * 2} • 🔥 Streak: {st.session_state.play_streak}</div>', unsafe_allow_html=True)
         else:
-            st.markdown(
-                f"""
-                <div class="wrong-flash">
-                    ❌ Not quite! Correct: <b>{correct_answer}</b> • 
-                    ❤️ Hearts: {st.session_state.play_hearts}/5
-                </div>
-                """,
-                unsafe_allow_html=True
-            )
+            st.markdown(f'<div class="wrong-flash">❌ Not quite! Correct: <b>{correct_answer}</b> • ❤️ Hearts: {st.session_state.play_hearts}/5</div>', unsafe_allow_html=True)
 
         if st.session_state.play_last_explanation:
             st.info(f"💡 {st.session_state.play_last_explanation}")
 
-        # NEXT / RESULT
-        if question_index < QUESTIONS_PER_LEVEL - 1:
+        if question_index < 9:
             if st.button("➡️ Next Question", use_container_width=True, type="primary"):
                 st.session_state.play_question_index += 1
                 st.session_state.play_answered = False
@@ -1763,13 +1749,14 @@ def render_play_and_learn(client):
             st.divider()
             final_score = st.session_state.play_score
 
-            if final_score == 10:
+            # 🎯 UNLOCK LOGIC: 8/10 or more to unlock next level
+            if final_score >= 8:
                 st.balloons()
                 st.markdown(
                     f"""
                     <div class="victory-box">
-                        <h1>🏆 LEVEL COMPLETE — 10/10!</h1>
-                        <p>🎉 शाबाश! तुमने पूरे 10 सही किए!</p>
+                        <h1>🏆 LEVEL COMPLETE — {final_score}/10!</h1>
+                        <p>🎉 शाबाश! तुमने पास कर लिया!</p>
                         <p>⭐ XP: +{st.session_state.play_xp} | 🔥 Best Streak: {st.session_state.play_best_streak}</p>
                     </div>
                     """,
@@ -1784,11 +1771,14 @@ def render_play_and_learn(client):
                     st.session_state.play_best_scores.get(f"{play_age}:{play_subject}", 0)
                 )
 
-                next_level = unlock_next_play_level(play_age)
-                if next_level:
-                    st.success(f"🔓 Next Level Unlocked: **{next_level}**")
-                    colX, colY = st.columns(2)
-                    with colX:
+                next_level = get_next_age(play_age)
+                if next_level and next_level not in st.session_state.play_unlocked_levels:
+                    st.session_state.play_unlocked_levels.append(next_level)
+                    st.markdown(f'<div class="unlock-box"><h2>🔓 नया Level Unlock हुआ: {next_level}</h2><p>अब आप {next_level} के games खेल सकते हैं!</p></div>', unsafe_allow_html=True)
+
+                colX, colY, colZ = st.columns(3)
+                with colX:
+                    if next_level:
                         if st.button(f"🚀 Play {next_level}", use_container_width=True, type="primary"):
                             st.session_state.play_age = next_level
                             st.session_state.play_game_started = False
@@ -1801,8 +1791,22 @@ def render_play_and_learn(client):
                             st.session_state.play_answered = False
                             st.session_state.play_user_answer = None
                             st.rerun()
-                    with colY:
-                        if st.button("🔄 Same Level दोबारा", use_container_width=True):
+                with colY:
+                    if st.button("🔄 Same Level दोबारा", use_container_width=True):
+                        st.session_state.play_game_started = False
+                        st.session_state.play_show_game_selector = False
+                        st.session_state.play_score = 0
+                        st.session_state.play_hearts = 5
+                        st.session_state.play_streak = 0
+                        st.session_state.play_question_index = 0
+                        st.session_state.play_answered = False
+                        st.session_state.play_user_answer = None
+                        st.rerun()
+                with colZ:
+                    if st.button("⏭️ Skip Level", use_container_width=True):
+                        if next_level:
+                            st.session_state.play_unlocked_levels.append(next_level)
+                            st.session_state.play_age = next_level
                             st.session_state.play_game_started = False
                             st.session_state.play_show_game_selector = False
                             st.session_state.play_score = 0
@@ -1812,12 +1816,10 @@ def render_play_and_learn(client):
                             st.session_state.play_answered = False
                             st.session_state.play_user_answer = None
                             st.rerun()
-                else:
-                    st.success("👑 Congratulations! All levels complete!")
             else:
                 st.warning(f"⭐ Final Score: {final_score}/10")
                 st.info(
-                    "🔒 अगला level unlock करने के लिए 10/10 करना ज़रूरी है। "
+                    "🔒 अगला level unlock करने के लिए कम से कम 8/10 करना ज़रूरी है। "
                     "कोई बात नहीं — फिर से try करो!"
                 )
 
