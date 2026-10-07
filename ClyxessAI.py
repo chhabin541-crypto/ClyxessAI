@@ -2098,19 +2098,20 @@ def render_vision_lab():
     import streamlit.components.v1 as components
 
     # ============================================================
-    # CLYXESSCHAT AI — VISION LAB
+    # CLYXESSCHAT AI — UNIVERSAL VISION LAB
+    #
     # IMPORTANT:
-    # OLD WORKING MODEL IS KEPT:
-    # analyze_image_with_groq(...)
+    # Existing working model is NOT changed.
+    # Only analyze_image_with_groq() is used.
     # ============================================================
 
     FOOTER = "\n\n---\n🛡️ **ClyxessChat AI** • Secure • Fast • Private"
 
     # ============================================================
-    # 50+ LANGUAGES
+    # LANGUAGES
     # ============================================================
 
-    VISION_LANGUAGES = {
+    LANGUAGES = {
         "🌐 Auto Detect": "auto-detected",
 
         "🇬🇧 English": "English",
@@ -2129,11 +2130,6 @@ def render_vision_lab():
         "🇮🇳 संस्कृत (Sanskrit)": "Sanskrit",
         "🇮🇳 नेपाली (Nepali)": "Nepali",
         "🇮🇳 اردو (Urdu)": "Urdu",
-        "🇮🇳 कोंकणी (Konkani)": "Konkani",
-        "🇮🇳 मैथिली (Maithili)": "Maithili",
-        "🇮🇳 कश्मीरी (Kashmiri)": "Kashmiri",
-        "🇮🇳 संथाली (Santali)": "Santali",
-        "🇮🇳 सिंधी (Sindhi)": "Sindhi",
 
         "🇪🇸 Español": "Spanish",
         "🇫🇷 Français": "French",
@@ -2143,19 +2139,10 @@ def render_vision_lab():
         "🇳🇱 Nederlands": "Dutch",
         "🇬🇷 Ελληνικά": "Greek",
         "🇷🇺 Русский": "Russian",
-        "🇺🇦 Українська": "Ukrainian",
         "🇵🇱 Polski": "Polish",
-        "🇨🇿 Čeština": "Czech",
-        "🇸🇪 Svenska": "Swedish",
-        "🇳🇴 Norsk": "Norwegian",
-        "🇩🇰 Dansk": "Danish",
-        "🇫🇮 Suomi": "Finnish",
-        "🇷🇴 Română": "Romanian",
-        "🇭🇺 Magyar": "Hungarian",
         "🇹🇷 Türkçe": "Turkish",
-        "🇮🇱 עברית": "Hebrew",
         "🇸🇦 العربية": "Arabic",
-        "🇮🇷 فارسی": "Persian",
+        "🇮🇱 עברית": "Hebrew",
         "🇮🇩 Bahasa Indonesia": "Indonesian",
         "🇲🇾 Bahasa Melayu": "Malay",
         "🇹🇭 ไทย": "Thai",
@@ -2165,11 +2152,10 @@ def render_vision_lab():
         "🇨🇳 中文 (Chinese)": "Chinese",
         "🇯🇵 日本語 (Japanese)": "Japanese",
         "🇰🇷 한국어 (Korean)": "Korean",
-        "🇹🇼 繁體中文": "Traditional Chinese",
     }
 
     # ============================================================
-    # CLASS + 100+ SUBJECTS
+    # CLASS + SUBJECTS
     # ============================================================
 
     CLASS_SUBJECT_MAP = {
@@ -2188,7 +2174,7 @@ def render_vision_lab():
             "Hindi", "Social Studies", "History",
             "Geography", "Civics", "Economics Basics",
             "Computer Science", "Coding", "Python Basics",
-            "AI Basics", "Cyber Safety", "Sanskrit",
+            "AI Basics", "Cyber Safety",
             "Environmental Science", "General Knowledge",
             "Financial Literacy", "Logical Reasoning"
         ],
@@ -2199,46 +2185,40 @@ def render_vision_lab():
             "Civics", "Political Science", "Economics",
             "Computer Science", "Information Technology",
             "Python", "Programming", "AI Basics",
-            "Machine Learning Basics", "Cyber Security",
-            "Financial Literacy", "Entrepreneurship",
-            "Statistics", "Environmental Science",
-            "Sanskrit", "Logical Reasoning"
+            "Cyber Security", "Financial Literacy",
+            "Entrepreneurship", "Statistics",
+            "Environmental Science", "Logical Reasoning"
         ],
 
         "Class 11-12": [
             "Physics", "Chemistry", "Mathematics", "Biology",
-            "Computer Science", "Informatics Practices",
-            "Python", "Programming", "Artificial Intelligence",
-            "Machine Learning", "Data Science",
-            "Statistics", "English", "Hindi",
+            "Computer Science", "Python", "Programming",
+            "Artificial Intelligence", "Machine Learning",
+            "Data Science", "Statistics", "English", "Hindi",
             "Accountancy", "Business Studies", "Economics",
             "Political Science", "History", "Geography",
             "Psychology", "Sociology", "Entrepreneurship",
             "Financial Management", "Cyber Security",
-            "Environmental Science", "Calculus",
-            "Linear Algebra", "Probability"
+            "Calculus", "Linear Algebra", "Probability"
         ],
 
         "College": [
             "Computer Science", "Programming", "Python",
-            "Java", "C", "C++", "JavaScript", "Web Development",
-            "Software Engineering", "Data Structures",
-            "Algorithms", "Database Systems", "SQL",
-            "Operating Systems", "Computer Networks",
+            "Java", "C", "C++", "JavaScript",
+            "Web Development", "Software Engineering",
+            "Data Structures", "Algorithms", "Database Systems",
+            "SQL", "Operating Systems", "Computer Networks",
             "Cyber Security", "Cloud Computing",
             "Artificial Intelligence", "Machine Learning",
             "Deep Learning", "Data Science", "Statistics",
             "Data Analytics", "NLP", "Computer Vision",
             "Robotics", "IoT", "Blockchain",
             "Mathematics", "Physics", "Chemistry",
-            "Biology", "Biotechnology", "Economics",
-            "Finance", "Accounting", "Business",
-            "Marketing", "Management", "Psychology",
-            "Sociology", "Political Science", "Law",
-            "Education", "Architecture", "Design",
+            "Biology", "Economics", "Finance", "Accounting",
+            "Business", "Marketing", "Management",
+            "Psychology", "Sociology", "Law",
             "Electrical Engineering", "Mechanical Engineering",
-            "Civil Engineering", "Electronics",
-            "Environmental Engineering"
+            "Civil Engineering", "Electronics"
         ],
 
         "University": [
@@ -2259,11 +2239,9 @@ def render_vision_lab():
             "Operating Systems", "Computer Networks",
             "Database Systems", "Algorithms",
             "Python", "C++", "Java", "Rust",
-            "Electrical Engineering", "Mechanical Engineering",
-            "Civil Engineering", "Aerospace Engineering",
-            "Biomedical Engineering", "Biotechnology",
-            "Genetics", "Microbiology", "Chemistry",
-            "Organic Chemistry", "Biochemistry",
+            "Aerospace Engineering", "Biomedical Engineering",
+            "Biotechnology", "Genetics", "Microbiology",
+            "Chemistry", "Organic Chemistry", "Biochemistry",
             "Economics", "Finance", "Business",
             "Accounting", "Marketing", "Management",
             "Psychology", "Sociology", "Political Science",
@@ -2273,142 +2251,176 @@ def render_vision_lab():
     }
 
     # ============================================================
-    # AGI / ASI REASONING
+    # SMART UNIVERSAL VISION LOGIC
     # ============================================================
 
-    AGI_REASONING = """
+    UNIVERSAL_REASONING = """
 
-🧠 CLYXESSCHAT AI ADVANCED REASONING:
+🧠 CLYXESSCHAT AI — UNIVERSAL VISUAL LEARNING ENGINE
 
-1. OBSERVE:
-   Carefully inspect the complete uploaded image.
+IMPORTANT:
+The uploaded image is NOT necessarily an exam paper.
 
-2. IDENTIFY:
-   Determine whether the paper is:
-   BLANK, FILLED, or PARTIAL.
+First understand WHAT is actually visible in the image and
+WHAT the student wants to know.
 
-3. EXTRACT:
-   Read every visible question, option, diagram, formula,
-   student's answer and marks if visible.
+The image may contain:
+• textbook/book page
+• homework
+• handwritten question
+• worksheet
+• exam paper
+• solved paper
+• blank question paper
+• mathematics problem
+• physics/chemistry/biology problem
+• graph/chart
+• map
+• scientific diagram
+• geometry figure
+• circuit
+• formula
+• table
+• coding/programming screenshot
+• educational illustration
+• paragraph or theory
+• multiple questions
+• mixed educational content
 
-4. ANALYZE:
-   If the student has answered:
-   verify the student's answer independently.
+Do NOT force every image into an exam-paper format.
 
-5. SOLVE:
-   If the paper is blank:
-   solve each visible question accurately.
+STEP 1 — OBSERVE
+Carefully inspect the entire image.
 
-6. VERIFY:
-   Recalculate or independently verify important answers
-   before giving the final answer.
+STEP 2 — UNDERSTAND
+Identify the educational content, questions, diagrams,
+formulas, text, answers, graphs and important visual elements.
 
-7. DIAGRAM:
-   If a question contains a diagram, explain what it represents.
-   If useful, describe the required diagram clearly.
+STEP 3 — DETERMINE INTENT
 
-8. CONFIDENCE:
-   Give HIGH, MEDIUM or LOW confidence.
-   Never pretend certainty when the image is unclear.
+If MODE is AUTO DETECT:
+Automatically determine whether the student needs:
+A. Explanation
+B. Question solving
+C. Book/textbook doubt clarification
+D. Homework help
+E. Diagram explanation
+F. Graph/table explanation
+G. Answer verification
+H. Exam-paper checking
+I. Multiple-question solving
 
-9. IMAGE QUALITY:
-   If text is unreadable, explicitly say which question
-   could not be read instead of inventing information.
+Choose the most appropriate response automatically.
 
-10. EDUCATIONAL STYLE:
-   Explain like a helpful teacher.
-   Adapt explanation to the selected class level.
+STEP 4 — READ ACCURATELY
+Read visible text carefully.
+Do NOT invent text that cannot be read.
+
+STEP 5 — SOLVE
+For numerical, mathematical, scientific or logical questions,
+solve independently and show useful steps.
+
+STEP 6 — VERIFY
+Before giving the final answer, check important calculations,
+logic, formulas and conclusions.
+
+STEP 7 — TEACH
+Explain according to the selected class level.
+Use simple language for younger students and deeper technical
+explanations for college/university students.
+
+STEP 8 — DIAGRAM / GRAPH INTELLIGENCE
+If a diagram, graphic, chart, graph, map, circuit or scientific
+figure is present:
+
+1. Identify what it represents.
+2. Explain every important visible component.
+3. Explain the relationship between components.
+4. Explain how it works or should be interpreted.
+5. Explain labels, arrows, axes, symbols and values.
+6. Give a simple real-world example when useful.
+7. If the student selected Hindi, explain the diagram fully in Hindi.
+8. Do not merely say "diagram detected".
+
+STEP 9 — UNCERTAINTY
+If part of the image is blurry, cropped or unreadable,
+say exactly what cannot be read.
+
+Never fabricate missing information.
+
+STEP 10 — CONFIDENCE
+Give HIGH / MEDIUM / LOW confidence when useful.
 """
 
     # ============================================================
-    # OUTPUT FORMAT
+    # EXAM CHECKING LOGIC
     # ============================================================
 
-    OUTPUT_FORMAT = """
+    FILLED_PAPER_LOGIC = """
 
-📋 REQUIRED OUTPUT:
+📝 FILLED PAPER CHECKING MODE
 
-📄 PAPER TYPE: [BLANK / FILLED / PARTIAL]
+This mode is specifically for checking a completed paper.
 
-📊 DETECTED:
-Questions: [N]
-Marks: [M if visible]
-Class: [selected class]
-Subject: [selected subject]
+For every visible question:
 
-For EACH visible question:
+1. Read the question.
+2. Read the student's answer.
+3. Independently solve/verify the question.
+4. Compare the student's answer with the correct answer.
+5. Determine:
+   ✅ CORRECT
+   ❌ WRONG
+   ⚠️ PARTIAL
+6. Give marks only when marks are visible or reasonably
+   determinable.
+7. Explain mistakes.
+8. Identify weak and strong concepts.
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-📌 Q[number]. [Question]
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+At the end provide:
 
-📖 CONCEPT:
-[Concept]
-
-🧠 ANALYSIS:
-[Detailed solution or answer verification]
-
-📊 DIAGRAM:
-[Explain diagram if present. If none: Not required.]
-
-📚 STEP-BY-STEP:
-Step 1: ...
-Step 2: ...
-Step 3: ...
-
-✅ CORRECT ANSWER:
-[Answer]
-
-🎯 CONFIDENCE:
-[HIGH / MEDIUM / LOW]
-
-If the paper is FILLED or PARTIAL:
-
-👤 STUDENT'S ANSWER:
-[Student answer]
-
-STATUS:
-[✅ SAHI / ❌ GALAT / ⚠️ PARTIAL]
-
-MARKS:
-[X/Y if marks can be determined]
-
-💡 REASON:
-[Explain mistake when applicable]
-
-At the end:
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 📊 SUMMARY TABLE
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-| Q# | Question | Student Answer | Correct Answer | Status | Marks |
-|----|----------|----------------|----------------|--------|-------|
-| 1 | ... | ... | ... | ✅/❌/⚠️ | X/Y |
+| Q# | Student Answer | Correct Answer | Status | Marks |
+|----|----------------|----------------|--------|-------|
 
-📊 FINAL RESULT:
+Then:
 
-✅ Correct: [N]
-❌ Wrong: [N]
-⚠️ Partial: [N]
-
-🏆 TOTAL SCORE:
-[X/Y] ([percentage]% if calculable)
-
-📚 WEAK CONCEPTS:
-[list]
-
-💪 STRONG CONCEPTS:
-[list]
-
-🎯 NEXT STEPS:
-[short educational recommendation]
-
-Do not invent questions, marks or answers that cannot be read.
+✅ Correct
+❌ Wrong
+⚠️ Partial
+🏆 Total Score
+📚 Weak Concepts
+💪 Strong Concepts
+🎯 Next Steps
 """
 
     # ============================================================
-    # HEADER
+    # BLANK PAPER LOGIC
+    # ============================================================
+
+    BLANK_PAPER_LOGIC = """
+
+🆕 BLANK PAPER SOLVING MODE
+
+This mode is specifically for solving an unsolved question paper.
+
+For each visible question:
+
+📌 Question
+📖 Concept
+🧠 Explanation
+📚 Step-by-step solution
+✅ Final answer
+🎯 Confidence
+
+If a diagram is required, explain the diagram and its role.
+
+Do not skip visible questions unless the image is unreadable.
+"""
+
+    # ============================================================
+    # UI
     # ============================================================
 
     st.markdown("""
@@ -2419,12 +2431,8 @@ Do not invent questions, marks or answers that cannot be read.
         margin-bottom:20px;
         border:1px solid rgba(100,180,255,0.3);
     ">
-        <h1 style="
-            color:white;
-            margin:0;
-            font-size:30px;
-        ">
-            📷 Vision Lab — AI Exam Paper Checker
+        <h1 style="color:white;margin:0;font-size:30px;">
+            📷 Vision Lab — ClyxessChat AI
         </h1>
 
         <p style="
@@ -2432,8 +2440,8 @@ Do not invent questions, marks or answers that cannot be read.
             margin:8px 0 0 0;
             font-size:14px;
         ">
-            Blank paper solve • Filled paper check •
-            Diagram • Step-by-step • Marks • AI Verification
+            Book • Homework • Exam • Diagram • Graph •
+            Question • Doubt — Everything Explained
         </p>
     </div>
     """, unsafe_allow_html=True)
@@ -2454,17 +2462,14 @@ Do not invent questions, marks or answers that cannot be read.
     with c2:
         subject = st.selectbox(
             "📚 Subject",
-            CLASS_SUBJECT_MAP.get(
-                class_level,
-                ["General"]
-            ),
+            CLASS_SUBJECT_MAP[class_level],
             key="vl_subject"
         )
 
     with c3:
         lang_label = st.selectbox(
             "🌐 Answer Language",
-            list(VISION_LANGUAGES.keys()),
+            list(LANGUAGES.keys()),
             key="vl_lang"
         )
 
@@ -2480,24 +2485,21 @@ Do not invent questions, marks or answers that cannot be read.
         )
 
     # ============================================================
-    # LANGUAGE RULE
+    # LANGUAGE
     # ============================================================
 
-    clean_lang = VISION_LANGUAGES.get(
-        lang_label,
-        "English"
-    )
+    clean_lang = LANGUAGES[lang_label]
 
     if clean_lang == "auto-detected":
         lang_rule = """
-Reply in the same language as the paper whenever possible.
-If the paper contains multiple languages, use the language
-that dominates the question text.
+LANGUAGE:
+Detect the natural language of the student's question/image.
+Reply in the same language whenever practical.
 """
     else:
         lang_rule = f"""
-ALWAYS answer in {clean_lang}.
-Do not switch to another language unless absolutely necessary.
+LANGUAGE:
+Always explain in {clean_lang}.
 """
 
     # ============================================================
@@ -2505,20 +2507,23 @@ Do not switch to another language unless absolutely necessary.
     # ============================================================
 
     uploaded = st.file_uploader(
-        "📷 Upload exam paper / homework / diagram",
+        "📷 Upload book / homework / paper / diagram / question",
         type=["png", "jpg", "jpeg", "webp"],
         key="vl_upload"
     )
 
     user_prompt = st.text_input(
-        "✍️ Any specific instruction? (Optional)",
+        "✍️ What should AI do? (Optional)",
         value="",
-        placeholder="e.g. Check all answers / Solve all questions",
+        placeholder=(
+            "Example: Isko Hindi mein samjhao / "
+            "Question solve karo / Answer check karo"
+        ),
         key="vl_prompt"
     )
 
     # ============================================================
-    # IMAGE PREVIEW
+    # IMAGE
     # ============================================================
 
     if uploaded:
@@ -2528,10 +2533,7 @@ Do not switch to another language unless absolutely necessary.
             unsafe_allow_html=True
         )
 
-        st.image(
-            uploaded,
-            width=500
-        )
+        st.image(uploaded, width=500)
 
         st.markdown(
             '</div>',
@@ -2539,114 +2541,192 @@ Do not switch to another language unless absolutely necessary.
         )
 
         # ========================================================
-        # ANALYZE BUTTON
+        # ANALYZE
         # ========================================================
 
         if st.button(
-            "🧠 Analyze Paper",
+            "🧠 Analyze & Explain",
             type="primary",
             use_container_width=True,
             key="vl_analyze"
         ):
 
-            with st.spinner(
-                "🔄 ClyxessChat AI paper padh raha hai..."
-            ):
+            try:
 
-                try:
+                instruction = (
+                    user_prompt.strip()
+                    if user_prompt.strip()
+                    else
+                    "Understand the uploaded educational image "
+                    "and help the student appropriately."
+                )
 
-                    instruction = (
-                        user_prompt.strip()
-                        if user_prompt.strip()
-                        else
-                        "Analyze the complete uploaded paper carefully."
-                    )
+                # =================================================
+                # MODE-SPECIFIC INTELLIGENCE
+                # =================================================
 
-                    # ====================================================
-                    # IMPORTANT:
-                    # OLD MODEL FUNCTION IS USED.
-                    #
-                    # DO NOT CHANGE THIS:
-                    # analyze_image_with_groq(...)
-                    # ====================================================
+                if mode == "📝 Check Filled Paper":
+                    mode_logic = FILLED_PAPER_LOGIC
 
-                    enhanced_question = f"""
-You are ClyxessChat AI, an expert educational teacher
-and exam-paper evaluator.
+                elif mode == "🆕 Solve Blank Paper":
+                    mode_logic = BLANK_PAPER_LOGIC
+
+                else:
+                    mode_logic = """
+
+🔍 AUTO DETECT MODE
+
+Do NOT assume this is an exam paper.
+
+First classify the uploaded educational content internally.
+
+If it is a textbook/book page:
+→ Explain the relevant content.
+
+If it is a normal question:
+→ Solve and explain it.
+
+If it is a diagram:
+→ Explain the complete diagram in detail.
+
+If it is a graph/chart:
+→ Explain axes, values, trends and conclusion.
+
+If it is homework:
+→ Help solve and teach the concept.
+
+If it is a filled exam paper:
+→ Check answers and provide useful verification.
+
+If it is a blank question paper:
+→ Solve the questions.
+
+If it contains multiple types:
+→ Handle each part according to its actual purpose.
+
+IMPORTANT:
+Do NOT show the internal classification process.
+Just provide the best educational answer.
+"""
+
+                # =================================================
+                # FINAL SMART PROMPT
+                # =================================================
+
+                question = f"""
+
+You are ClyxessChat AI, an advanced educational
+visual-learning teacher.
 
 {lang_rule}
 
-CLASS LEVEL:
+CLASS:
 {class_level}
 
 SUBJECT:
 {subject}
 
-MODE:
+USER SELECTED MODE:
 {mode}
 
-USER INSTRUCTION:
+STUDENT'S REQUEST:
 {instruction}
 
-{AGI_REASONING}
+{UNIVERSAL_REASONING}
 
-{OUTPUT_FORMAT}
+{mode_logic}
 
-IMPORTANT:
-- Read the image carefully.
-- Do not invent unreadable text.
-- Solve mathematically step-by-step.
-- Verify important calculations.
-- Check student answers independently.
-- Clearly identify BLANK / FILLED / PARTIAL.
-- Give confidence for uncertain answers.
-- Keep explanations suitable for {class_level}.
-- Use the requested answer language.
+OUTPUT RULE:
+
+For a normal book/question/doubt:
+Do NOT unnecessarily show exam score, marks or paper summary.
+
+For a diagram:
+Give:
+📊 What is this?
+🔍 What is visible?
+🧩 Components / labels
+⚙️ How it works
+📚 Detailed explanation
+💡 Easy example
+🎯 Important points
+
+For a normal question:
+Give:
+📌 Question
+🧠 Concept
+📚 Step-by-step
+✅ Final answer
+🎯 Confidence when useful
+
+For a textbook concept:
+Give:
+📖 Topic
+🧠 Simple explanation
+🔬 Detailed explanation where useful
+💡 Example
+🎯 Key points
+
+For a coding question:
+Explain the problem, identify errors,
+give corrected code when required,
+and explain the correction.
+
+For an exam paper:
+Use the appropriate checking or solving logic.
+
+Always prioritize teaching and understanding.
+
+Do not invent unreadable information.
+
+Now inspect the uploaded image and answer the student's request.
 """
 
-                    # ====================================================
-                    # OLD WORKING MODEL — UNCHANGED
-                    # ====================================================
+                # =================================================
+                # IMPORTANT:
+                # OLD WORKING MODEL — UNCHANGED
+                # =================================================
+
+                with st.spinner(
+                    "🧠 ClyxessChat AI image ko samajh raha hai..."
+                ):
 
                     answer = analyze_image_with_groq(
                         uploaded.getvalue(),
                         uploaded.type,
-                        enhanced_question,
+                        question,
                         clean_lang
                     )
 
-                    if not answer:
-                        raise ValueError(
-                            "AI returned an empty response."
-                        )
-
-                    # ====================================================
-                    # FOOTER
-                    # ====================================================
-
-                    if "ClyxessChat AI" not in answer:
-                        answer += FOOTER
-
-                    # ====================================================
-                    # SAVE RESULT
-                    # ====================================================
-
-                    st.session_state.vl_analysis = answer
-                    st.session_state.vl_uploaded_name = uploaded.name
-                    st.session_state.vl_class_saved = class_level
-                    st.session_state.vl_subject_saved = subject
-                    st.session_state.vl_lang_saved = lang_label
-
-                except Exception as e:
-
-                    st.error(
-                        f"❌ Vision Lab Analysis Failed\n\n"
-                        f"Error Type: {type(e).__name__}\n\n"
-                        f"Details: {str(e)}"
+                if not answer:
+                    raise ValueError(
+                        "AI returned an empty response."
                     )
 
+                # =================================================
+                # FOOTER
+                # =================================================
+
+                if "ClyxessChat AI" not in answer:
+                    answer += FOOTER
+
+                # =================================================
+                # SAVE
+                # =================================================
+
+                st.session_state.vl_analysis = answer
+                st.session_state.vl_uploaded_name = uploaded.name
+
+            except Exception as e:
+
+                st.error(
+                    "❌ Vision Lab Analysis Failed\n\n"
+                    f"Error Type: {type(e).__name__}\n\n"
+                    f"Details: {str(e)}"
+                )
+
     # ============================================================
-    # SHOW ANALYSIS
+    # RESULT
     # ============================================================
 
     if st.session_state.get("vl_analysis"):
@@ -2654,10 +2734,6 @@ IMPORTANT:
         st.markdown("---")
 
         analysis_text = st.session_state.vl_analysis
-
-        # ========================================================
-        # TYPEWRITER SAFE TEXT
-        # ========================================================
 
         safe_text = html.escape(
             analysis_text
@@ -2672,7 +2748,7 @@ IMPORTANT:
         )
 
         # ========================================================
-        # RESPONDING + TYPEWRITER UI
+        # TYPEWRITER UI
         # ========================================================
 
         typewriter_html = f"""
@@ -2704,90 +2780,40 @@ body {{
     align-items:center;
     gap:10px;
     padding:12px 16px;
-
-    background:
-        linear-gradient(
-            90deg,
-            rgba(16,185,129,0.08),
-            rgba(6,182,212,0.08)
-        );
-
+    background:linear-gradient(
+        90deg,
+        rgba(16,185,129,0.08),
+        rgba(6,182,212,0.08)
+    );
     border:1px solid rgba(16,185,129,0.25);
     border-radius:12px;
     margin-bottom:18px;
-
-    animation:fadeIn 0.4s ease;
-}}
-
-@keyframes fadeIn {{
-    from {{
-        opacity:0;
-        transform:translateY(-6px);
-    }}
-
-    to {{
-        opacity:1;
-        transform:translateY(0);
-    }}
 }}
 
 .pulse-dot {{
     width:10px;
     height:10px;
     border-radius:50%;
-
     background:#10b981;
-
-    box-shadow:
-        0 0 12px #10b981;
-
-    animation:
-        strongPulse 1.2s infinite;
+    box-shadow:0 0 12px #10b981;
+    animation:pulse 1.2s infinite;
 }}
 
-@keyframes strongPulse {{
-
+@keyframes pulse {{
     0%,100% {{
         transform:scale(1);
         opacity:1;
     }}
-
     50% {{
         transform:scale(1.4);
         opacity:0.5;
     }}
-
 }}
 
 .status-text {{
     color:#10b981;
     font-size:13px;
     font-weight:700;
-    letter-spacing:0.3px;
-}}
-
-.shimmer {{
-    background:
-        linear-gradient(
-            90deg,
-            #10b981 0%,
-            #6ee7b7 50%,
-            #10b981 100%
-        );
-
-    background-size:200% auto;
-
-    -webkit-background-clip:text;
-    -webkit-text-fill-color:transparent;
-
-    animation:
-        shimmer 2s linear infinite;
-}}
-
-@keyframes shimmer {{
-    to {{
-        background-position:200% center;
-    }}
 }}
 
 .content {{
@@ -2796,7 +2822,6 @@ body {{
     line-height:1.75;
     white-space:pre-wrap;
     word-wrap:break-word;
-    font-family:Inter,system-ui,sans-serif;
 }}
 
 .cursor {{
@@ -2806,49 +2831,25 @@ body {{
 }}
 
 @keyframes blink {{
-
-    0%,50% {{
-        opacity:1;
-    }}
-
-    51%,100% {{
-        opacity:0;
-    }}
-
+    0%,50% {{ opacity:1; }}
+    51%,100% {{ opacity:0; }}
 }}
 
 .footer {{
     margin-top:22px;
     padding-top:14px;
-
     border-top:1px solid #334155;
-
     text-align:center;
-
     color:#10b981;
-
     font-size:11px;
-
     font-weight:700;
-
     letter-spacing:1px;
-
     opacity:0;
-
     transition:opacity 0.5s ease;
 }}
 
 .footer.show {{
     opacity:1;
-}}
-
-::-webkit-scrollbar {{
-    width:6px;
-}}
-
-::-webkit-scrollbar-thumb {{
-    background:#334155;
-    border-radius:3px;
 }}
 
 </style>
@@ -2859,39 +2860,24 @@ body {{
 
 <div class="container" id="container">
 
-    <div
-        class="responding-status"
-        id="respondingBox"
-    >
+<div class="responding-status" id="respondingBox">
 
-        <div class="pulse-dot"></div>
+<div class="pulse-dot"></div>
 
-        <div class="status-text">
-            ClyxessChat AI is responding
-            <span class="shimmer">...</span>
-        </div>
+<div class="status-text">
+ClyxessChat AI is responding...
+</div>
 
-    </div>
+</div>
 
-    <div class="content">
+<div class="content">
+<span id="typed"></span>
+<span class="cursor" id="cursor">▊</span>
+</div>
 
-        <span id="typed"></span>
-
-        <span
-            class="cursor"
-            id="cursor"
-        >
-            ▊
-        </span>
-
-    </div>
-
-    <div
-        class="footer"
-        id="footer"
-    >
-        🛡️ ClyxessChat AI • Secure • Fast • Private
-    </div>
+<div class="footer" id="footer">
+🛡️ ClyxessChat AI • Secure • Fast • Private
+</div>
 
 </div>
 
@@ -2902,20 +2888,19 @@ const fullText = `{safe_text}`;
 let i = 0;
 
 const target =
-    document.getElementById("typed");
+document.getElementById("typed");
 
 const cursor =
-    document.getElementById("cursor");
+document.getElementById("cursor");
 
 const container =
-    document.getElementById("container");
+document.getElementById("container");
 
 const respondingBox =
-    document.getElementById("respondingBox");
+document.getElementById("respondingBox");
 
 const footer =
-    document.getElementById("footer");
-
+document.getElementById("footer");
 
 function type() {{
 
@@ -2938,23 +2923,12 @@ function type() {{
 
     }} else {{
 
-        cursor.style.display =
-            "none";
+        cursor.style.display = "none";
 
-        respondingBox.style.transition =
-            "opacity 0.4s, transform 0.4s";
-
-        respondingBox.style.opacity =
-            "0";
-
-        respondingBox.style.transform =
-            "translateY(-6px)";
+        respondingBox.style.opacity = "0";
 
         setTimeout(() => {{
-
-            respondingBox.style.display =
-                "none";
-
+            respondingBox.style.display = "none";
         }}, 400);
 
         footer.classList.add("show");
@@ -2979,33 +2953,28 @@ setTimeout(type, 300);
         )
 
         # ========================================================
-        # REPORT ACTIONS
+        # DOWNLOAD + NEW
         # ========================================================
 
         st.markdown("---")
 
-        col_d1, col_d2 = st.columns(2)
+        col1, col2 = st.columns(2)
 
-        with col_d1:
+        with col1:
 
             st.download_button(
                 "📥 Download Report",
-
                 data=analysis_text,
-
                 file_name=(
-                    f"vision_lab_report_"
+                    "vision_lab_"
                     f"{datetime.datetime.now().strftime('%Y%m%d_%H%M')}.txt"
                 ),
-
                 mime="text/plain",
-
                 use_container_width=True,
-
                 key="vl_download"
             )
 
-        with col_d2:
+        with col2:
 
             if st.button(
                 "🔄 New Analysis",
