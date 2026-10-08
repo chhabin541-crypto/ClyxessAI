@@ -6207,6 +6207,8 @@ def render_math_lab(client):
     import json
     import re
     import random
+    import html
+    import time
 
     def clean_json_text(text):
         text = text.strip()
@@ -6221,82 +6223,80 @@ def render_math_lab(client):
         return text
 
     # ============================================================
-    # 1. 50+ LANGUAGES LIST (Global & Indian)
+    # 1. LANGUAGES (50+)
     # ============================================================
     LANGUAGES = {
-        "🇬🇧 English": "en",
-        "🇮🇳 हिंदी (Hindi)": "hi",
-        "🇮🇳 বাংলা (Bengali)": "bn",
-        "🇮🇳 मराठी (Marathi)": "mr",
-        "🇮🇳 తెలుగు (Telugu)": "te",
-        "🇮🇳 தமிழ் (Tamil)": "ta",
-        "🇮🇳 ગુજરાતી (Gujarati)": "gu",
-        "🇮🇳 ಕನ್ನಡ (Kannada)": "kn",
-        "🇮🇳 മലയാളം (Malayalam)": "ml",
-        "🇮🇳 ଓଡ଼ିଆ (Odia)": "or",
-        "🇮🇳 ਪੰਜਾਬੀ (Punjabi)": "pa",
-        "🇮🇳 অসমীয়া (Assamese)": "as",
-        "🇮🇳 اردو (Urdu)": "ur",
-        "🇨🇳 中文 (Chinese)": "zh",
-        "🇯🇵 日本語 (Japanese)": "ja",
-        "🇰🇷 한국어 (Korean)": "ko",
-        "🇪🇸 Español (Spanish)": "es",
-        "🇫🇷 Français (French)": "fr",
-        "🇩🇪 Deutsch (German)": "de",
-        "🇸🇦 العربية (Arabic)": "ar",
-        "🇵🇹 Português (Portuguese)": "pt",
-        "🇷🇺 Русский (Russian)": "ru",
-        "🇮🇹 Italiano (Italian)": "it",
-        "🇹🇷 Türkçe (Turkish)": "tr",
-        "🇮🇩 Bahasa Indonesia": "id",
-        "🇲🇾 Bahasa Melayu": "ms",
-        "🇹🇭 ไทย (Thai)": "th",
-        "🇻🇳 Tiếng Việt (Vietnamese)": "vi",
-        "🇳🇱 Nederlands (Dutch)": "nl",
-        "🇵🇱 Polski (Polish)": "pl",
-        "🇺🇦 Українська (Ukrainian)": "uk",
-        "🇮🇷 فارسی (Persian)": "fa",
-        "🇵🇭 Tagalog (Filipino)": "tl",
-        "🇲🇲 မြန်မာ (Burmese)": "my",
-        "🇬🇷 Ελληνικά (Greek)": "el",
-        "🇸🇪 Svenska (Swedish)": "sv",
-        "🇳🇴 Norsk (Norwegian)": "no",
-        "🇩🇰 Dansk (Danish)": "da",
-        "🇫🇮 Suomi (Finnish)": "fi",
-        "🇷🇴 Română (Romanian)": "ro",
-        "🇭🇺 Magyar (Hungarian)": "hu",
-        "🇨🇿 Čeština (Czech)": "cs",
-        "🇮🇱 עברית (Hebrew)": "he",
-        "🇿🇦 Zulu": "zu",
-        "🇰🇪 Swahili": "sw",
-        "🇳🇬 Yoruba": "yo",
-        "🇵🇰 پښتو (Pashto)": "ps",
-        "🇱🇰 සිංහල (Sinhala)": "si",
-        "🇳🇵 नेपाली (Nepali)": "ne"
+        "🇬🇧 English": "en", "🇮🇳 हिंदी (Hindi)": "hi", "🇮🇳 বাংলা (Bengali)": "bn",
+        "🇮🇳 मराठी (Marathi)": "mr", "🇮🇳 తెలుగు (Telugu)": "te", "🇮🇳 தமிழ் (Tamil)": "ta",
+        "🇮🇳 ગુજરાતી (Gujarati)": "gu", "🇮🇳 ಕನ್ನಡ (Kannada)": "kn", "🇮🇳 മലയാളം (Malayalam)": "ml",
+        "🇮🇳 ଓଡ଼ିଆ (Odia)": "or", "🇮🇳 ਪੰਜਾਬੀ (Punjabi)": "pa", "🇮🇳 অসমীয়া (Assamese)": "as",
+        "🇮🇳 اردو (Urdu)": "ur", "🇨🇳 中文 (Chinese)": "zh", "🇯🇵 日本語 (Japanese)": "ja",
+        "🇰🇷 한국어 (Korean)": "ko", "🇪🇸 Español": "es", "🇫🇷 Français": "fr",
+        "🇩🇪 Deutsch": "de", "🇸🇦 العربية": "ar", "🇵🇹 Português": "pt",
+        "🇷🇺 Русский": "ru", "🇮🇹 Italiano": "it", "🇹🇷 Türkçe": "tr",
+        "🇮🇩 Bahasa Indonesia": "id", "🇲🇾 Bahasa Melayu": "ms", "🇹🇭 ไทย": "th",
+        "🇻🇳 Tiếng Việt": "vi", "🇳🇱 Nederlands": "nl", "🇵🇱 Polski": "pl",
+        "🇺🇦 Українська": "uk", "🇮🇷 فارسی": "fa", "🇵🇭 Tagalog": "tl",
+        "🇲🇲 မြန်မာ": "my", "🇬🇷 Ελληνικά": "el", "🇸🇪 Svenska": "sv",
+        "🇳🇴 Norsk": "no", "🇩🇰 Dansk": "da", "🇫🇮 Suomi": "fi",
+        "🇷🇴 Română": "ro", "🇭🇺 Magyar": "hu", "🇨🇿 Čeština": "cs",
+        "🇮🇱 עברית": "he", "🇿🇦 Zulu": "zu", "🇰🇪 Swahili": "sw",
+        "🇳🇬 Yoruba": "yo", "🇵🇰 پښتو": "ps", "🇱🇰 සිංහල": "si",
+        "🇳🇵 नेपाली": "ne"
     }
-    
-    # UI का अनुवाद (Top 10 भाषाओं के लिए)
+
     UI_TEXTS = {
-        "en": {"title": "Math Game Master", "score": "Total Score", "streak": "Streak", "level": "Level", "submit": "Submit Answer", "next": "Next Question", "reset": "Reset Game", "correct": "Correct!", "wrong": "Wrong! Correct answer:", "explain": "Explanation:"},
-        "hi": {"title": "गणित गेम मास्टर", "score": "कुल स्कोर", "streak": "लगातार सही", "level": "स्तर", "submit": "उत्तर जमा करें", "next": "अगला सवाल", "reset": "गेम रीसेट करें", "correct": "शाबाश! सही जवाब!", "wrong": "गलत जवाब। सही उत्तर:", "explain": "व्याख्या:"},
-        "bn": {"title": "গণিত গেম মাস্টার", "score": "মোট স্কোর", "streak": "স্ট্রিক", "level": "স্তর", "submit": "উত্তর জমা দিন", "next": "পরবর্তী প্রশ্ন", "reset": "গেম রিসেট করুন", "correct": "সঠিক!", "wrong": "ভুল! সঠিক উত্তর:", "explain": "ব্যাখ্যা:"},
-        "ta": {"title": "கணித விளையாட்டு மாஸ்டர்", "score": "மொத்த மதிப்பெண்", "streak": "தொடர் வெற்றி", "level": "நிலை", "submit": "பதிலை சமர்ப்பிக்கவும்", "next": "அடுத்த கேள்வி", "reset": "விளையாட்டை மீட்டமைக்கவும்", "correct": "சரி!", "wrong": "தவறு! சரியான பதில்:", "explain": "விளக்கம்:"},
-        "te": {"title": "గణిత గేమ్ మాస్టర్", "score": "మొత్తం స్కోరు", "streak": "వరుస విజయాలు", "level": "స్థాయి", "submit": "సమాధానం సమర్పించండి", "next": "తదుపరి ప్రశ్న", "reset": "గేమ్ రీసెట్ చేయండి", "correct": "సరైనది!", "wrong": "తప్పు! సరైన సమాధానం:", "explain": "వివరణ:"},
-        "mr": {"title": "गणित गेम मास्टर", "score": "एकूण गुण", "streak": "स्ट्रीक", "level": "स्तर", "submit": "उत्तर सबमिट करा", "next": "पुढील प्रश्न", "reset": "गेम रीसेट करा", "correct": "बरोबर!", "wrong": "चूक! बरोबर उत्तर:", "explain": "स्पष्टीकरण:"},
-        "zh": {"title": "数学游戏大师", "score": "总分", "streak": "连胜", "level": "等级", "submit": "提交答案", "next": "下一题", "reset": "重置游戏", "correct": "正确!", "wrong": "错误! 正确答案:", "explain": "解释:"},
-        "ja": {"title": "数学ゲームマスター", "score": "合計スコア", "streak": "連続正解", "level": "レベル", "submit": "回答を送信", "next": "次の問題", "reset": "ゲームをリセット", "correct": "正解!", "wrong": "不正解! 正しい答え:", "explain": "解説:"},
-        "es": {"title": "Maestro de Matemáticas", "score": "Puntuación Total", "streak": "Racha", "level": "Nivel", "submit": "Enviar Respuesta", "next": "Siguiente Pregunta", "reset": "Reiniciar Juego", "correct": "¡Correcto!", "wrong": "¡Incorrecto! Respuesta correcta:", "explain": "Explicación:"},
-        "fr": {"title": "Maître des Maths", "score": "Score Total", "streak": "Série", "level": "Niveau", "submit": "Soumettre la Réponse", "next": "Question Suivante", "reset": "Réinitialiser le Jeu", "correct": "Correct!", "wrong": "Incorrect! Bonne réponse:", "explain": "Explication:"}
+        "en": {"title": "Math Lab", "score": "Score", "streak": "Streak", "level": "Level",
+               "submit": "Submit", "next": "Next Question", "reset": "Reset", "correct": "Correct!",
+               "wrong": "Wrong! Correct:", "explain": "Explanation:", "hint": "Hint",
+               "solution": "Solution:", "board": "Black Board", "games": "Games", "practice": "Practice",
+               "formulas": "Formula Library", "mode": "Choose Mode"},
+        "hi": {"title": "गणित लैब", "score": "स्कोर", "streak": "स्ट्रीक", "level": "स्तर",
+               "submit": "जमा करें", "next": "अगला सवाल", "reset": "रीसेट", "correct": "शाबाश!",
+               "wrong": "गलत! सही जवाब:", "explain": "व्याख्या:", "hint": "संकेत",
+               "solution": "हल:", "board": "ब्लैक बोर्ड", "games": "गेम्स", "practice": "अभ्यास",
+               "formulas": "फॉर्मूला लाइब्रेरी", "mode": "मोड चुनें"},
+        "bn": {"title": "গণিত ল্যাব", "score": "স্কোর", "streak": "স্ট্রিক", "level": "স্তর",
+               "submit": "জমা দিন", "next": "পরবর্তী", "reset": "রিসেট", "correct": "সঠিক!",
+               "wrong": "ভুল! সঠিক:", "explain": "ব্যাখ্যা:", "hint": "ইঙ্গিত", "solution": "সমাধান:",
+               "board": "ব্ল্যাকবোর্ড", "games": "গেমস", "practice": "অভ্যাস", "formulas": "সূত্র", "mode": "মোড"},
+        "ta": {"title": "கணித ஆய்வகம்", "score": "மதிப்பெண்", "streak": "தொடர்", "level": "நிலை",
+               "submit": "சமர்ப்பிக்கவும்", "next": "அடுத்தது", "reset": "மீட்டமை", "correct": "சரி!",
+               "wrong": "தவறு! சரி:", "explain": "விளக்கம்:", "hint": "குறிப்பு", "solution": "தீர்வு:",
+               "board": "கரும்பலகை", "games": "விளையாட்டு", "practice": "பயிற்சி", "formulas": "சூத்திரங்கள்", "mode": "பயன்முறை"},
+        "te": {"title": "గణిత ల్యాబ్", "score": "స్కోరు", "streak": "స్ట్రీక్", "level": "స్థాయి",
+               "submit": "సమర్పించు", "next": "తదుపరి", "reset": "రీసెట్", "correct": "సరైనది!",
+               "wrong": "తప్పు! సరైనది:", "explain": "వివరణ:", "hint": "సూచన", "solution": "పరిష్కారం:",
+               "board": "బ్లాక్ బోర్డ్", "games": "ఆటలు", "practice": "సాధన", "formulas": "సూత్రాలు", "mode": "మోడ్"},
+        "mr": {"title": "गणित लॅब", "score": "स्कोअर", "streak": "स्ट्रीक", "level": "स्तर",
+               "submit": "सबमिट", "next": "पुढील", "reset": "रीसेट", "correct": "बरोबर!",
+               "wrong": "चूक! बरोबर:", "explain": "स्पष्टीकरण:", "hint": "संकेत", "solution": "उपाय:",
+               "board": "ब्लॅक बोर्ड", "games": "गेम्स", "practice": "सराव", "formulas": "सूत्रे", "mode": "मोड"},
+        "zh": {"title": "数学实验室", "score": "分数", "streak": "连胜", "level": "等级",
+               "submit": "提交", "next": "下一题", "reset": "重置", "correct": "正确!",
+               "wrong": "错误! 正确答案:", "explain": "解释:", "hint": "提示", "solution": "解答:",
+               "board": "黑板", "games": "游戏", "practice": "练习", "formulas": "公式库", "mode": "选择模式"},
+        "ja": {"title": "数学ラボ", "score": "スコア", "streak": "連続正解", "level": "レベル",
+               "submit": "送信", "next": "次の問題", "reset": "リセット", "correct": "正解!",
+               "wrong": "不正解! 正解:", "explain": "解説:", "hint": "ヒント", "solution": "解答:",
+               "board": "黒板", "games": "ゲーム", "practice": "練習", "formulas": "公式集", "mode": "モード"},
+        "es": {"title": "Laboratorio de Matemáticas", "score": "Puntos", "streak": "Racha", "level": "Nivel",
+               "submit": "Enviar", "next": "Siguiente", "reset": "Reiniciar", "correct": "¡Correcto!",
+               "wrong": "¡Incorrecto! Correcto:", "explain": "Explicación:", "hint": "Pista", "solution": "Solución:",
+               "board": "Pizarra", "games": "Juegos", "practice": "Práctica", "formulas": "Fórmulas", "mode": "Modo"},
+        "fr": {"title": "Labo de Maths", "score": "Score", "streak": "Série", "level": "Niveau",
+               "submit": "Soumettre", "next": "Suivant", "reset": "Réinitialiser", "correct": "Correct!",
+               "wrong": "Incorrect! Bonne réponse:", "explain": "Explication:", "hint": "Indice", "solution": "Solution:",
+               "board": "Tableau", "games": "Jeux", "practice": "Pratique", "formulas": "Formules", "mode": "Mode"},
     }
 
     # ============================================================
-    # 2. LANGUAGE & LEVEL SELECTION
+    # 2. HEADER & SELECTORS
     # ============================================================
     col_lang, col_level = st.columns([1, 2])
     with col_lang:
         selected_lang_label = st.selectbox("🌐 Language", list(LANGUAGES.keys()), key="math_lang_select")
         lang_code = LANGUAGES[selected_lang_label]
-    
     with col_level:
         class_level = st.selectbox(
             "🎓 Select Your Level",
@@ -6304,154 +6304,795 @@ def render_math_lab(client):
             key="math_game_level"
         )
 
-    # UI टेक्स्ट लोड करना (अगर भाषा नहीं मिली तो English)
     t = UI_TEXTS.get(lang_code, UI_TEXTS["en"])
     is_junior = class_level.startswith(("Class 1-2", "Class 3-5", "Class 6-8"))
 
     # ============================================================
-    # 3. CSS THEME (Adaptive for Kids vs Teens)
+    # 3. CSS
     # ============================================================
-    if is_junior:
-        st.markdown("""
-        <style>
-        .stApp { background-color: #131F24; }
-        .header-box { background: linear-gradient(90deg, #6a11cb 0%, #2575fc 100%); padding: 15px; border-radius: 15px; color: white; text-align: center; }
-        .metric-card { background: #1e1e2f; border: 2px solid #333; border-radius: 15px; padding: 15px; text-align: center; color: white; }
-        .question-card { background: linear-gradient(135deg, #1f1c2c, #3b3b5c); padding: 25px; border-radius: 15px; border: 1px solid #444; margin: 20px 0; text-align: center; }
-        .question-text { font-size: 26px; font-weight: bold; color: #fff; }
-        .feedback-success { background-color: #D7FFB8; color: #2E7D32; padding: 15px; border-radius: 15px; text-align: center; font-weight: bold; }
-        .feedback-error { background-color: #FFDFE0; color: #C62828; padding: 15px; border-radius: 15px; text-align: center; font-weight: bold; }
-        </style>
-        """, unsafe_allow_html=True)
-        header_title = f"🎮 {t['title']}"
-    else:
-        st.markdown("""
-        <style>
-        .stApp { background-color: #0E1117; }
-        .header-box { background: #1E293B; padding: 20px; border-radius: 8px; border-left: 5px solid #3B82F6; color: white; }
-        .metric-card { background: #1E293B; border: 1px solid #334155; border-radius: 8px; padding: 15px; color: #94A3B8; text-align: left; }
-        .metric-value { font-size: 24px; font-weight: bold; color: #3B82F6; font-family: monospace; }
-        .question-card { background: #1E293B; padding: 30px; border-radius: 8px; border: 1px solid #334155; margin: 20px 0; }
-        .question-text { font-size: 22px; font-weight: 500; color: #F8FAFC; font-family: 'Inter', sans-serif; }
-        .feedback-success { background-color: #064E3B; color: #34D399; padding: 15px; border-radius: 8px; border-left: 4px solid #10B981; }
-        .feedback-error { background-color: #450A0A; color: #F87171; padding: 15px; border-radius: 8px; border-left: 4px solid #EF4444; }
-        </style>
-        """, unsafe_allow_html=True)
-        header_title = f"📊 {t['title']}"
+    st.markdown("""
+    <style>
+        .ml-hero {
+            background: linear-gradient(135deg, #58CC02 0%, #1CB0F6 50%, #FF9600 100%);
+            padding: 1.8rem; border-radius: 22px; text-align: center; color: white;
+            margin-bottom: 1.5rem; box-shadow: 0 10px 30px rgba(88,204,2,0.25);
+        }
+        .ml-hero h1 { color: white; font-size: 2.2rem; margin: 0; font-weight: 900; }
+        .ml-hero p { color: #FFF; font-size: 1rem; margin-top: 0.5rem; opacity: 0.95; }
 
-    st.markdown(f'<div class="header-box"><h2>{header_title}</h2></div>', unsafe_allow_html=True)
+        .ml-stat-bar {
+            display: flex; justify-content: space-around; align-items: center;
+            background: linear-gradient(135deg, #FFFFFF, #F0F8FF);
+            padding: 1rem; border-radius: 18px;
+            border: 3px solid #E5E5E5; margin: 1rem 0;
+            font-weight: bold; font-size: 1.05rem;
+        }
+        .ml-heart { color: #FF4B4B; font-size: 1.5rem; }
+        .ml-fire { color: #FF9600; font-size: 1.5rem; }
+        .ml-xp { color: #FFC800; font-size: 1.5rem; }
+
+        .ml-question-box {
+            background: linear-gradient(135deg, #FFF8E7, #FFF0D4);
+            padding: 2rem; border-radius: 20px;
+            border: 4px solid #FFC800;
+            margin: 1.5rem 0; text-align: center;
+            font-size: 1.6rem; font-weight: bold; color: #1A1A1A;
+            box-shadow: 0 8px 20px rgba(255,200,0,0.2);
+        }
+
+        .ml-game-card {
+            background: linear-gradient(135deg, #FFFFFF, #F0F8FF);
+            padding: 1.4rem 1rem;
+            border-radius: 18px;
+            border: 3px solid #E5E5E5;
+            text-align: center;
+            margin: 0.4rem 0;
+            transition: all 0.3s;
+            min-height: 130px;
+        }
+        .ml-game-card:hover {
+            transform: translateY(-5px);
+            border-color: #58CC02;
+            box-shadow: 0 10px 25px rgba(88,204,2,0.25);
+        }
+
+        .ml-correct {
+            background: #D7FFB8; padding: 1rem; border-radius: 15px;
+            border-left: 6px solid #58CC02; margin: 1rem 0;
+            font-size: 1.05rem; font-weight: bold; color: #2E7D32;
+        }
+        .ml-wrong {
+            background: #FFDFE0; padding: 1rem; border-radius: 15px;
+            border-left: 6px solid #FF4B4B; margin: 1rem 0;
+            font-size: 1.05rem; font-weight: bold; color: #C62828;
+        }
+        .ml-hint {
+            background: #FFF9C4; padding: 0.9rem; border-radius: 15px;
+            border-left: 6px solid #FBC02D; margin: 0.5rem 0;
+            font-size: 1rem;
+        }
+        .ml-solution {
+            background: linear-gradient(135deg, #E3F2FD, #BBDEFB);
+            padding: 1.3rem; border-radius: 15px;
+            border-left: 6px solid #1CB0F6; margin: 1rem 0;
+            font-size: 1rem; line-height: 1.7;
+        }
+        .ml-victory {
+            background: linear-gradient(135deg, #58CC02, #89E219);
+            color: white; padding: 2rem; border-radius: 20px;
+            text-align: center; margin: 1rem 0;
+        }
+        .ml-gameover {
+            background: linear-gradient(135deg, #FF4B4B, #FF6B6B);
+            color: white; padding: 2rem; border-radius: 20px;
+            text-align: center; margin: 1rem 0;
+        }
+        .ml-formula-card {
+            background: linear-gradient(135deg, #F0F8FF, #E3F2FD);
+            padding: 1rem; border-radius: 12px;
+            border-left: 4px solid #1CB0F6;
+            margin: 0.5rem 0; font-size: 0.95rem;
+            font-family: 'Courier New', monospace;
+        }
+        .ml-mode-card {
+            background: linear-gradient(135deg, #FFFFFF, #FFF5E1);
+            padding: 1.8rem 1rem;
+            border-radius: 20px;
+            border: 3px solid #FFC800;
+            text-align: center;
+            margin: 0.5rem 0;
+            transition: all 0.3s;
+            min-height: 160px;
+        }
+        .ml-mode-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 28px rgba(255,200,0,0.35);
+        }
+    </style>
+    """, unsafe_allow_html=True)
+
+    st.markdown(f"""
+        <div class="ml-hero">
+            <h1>🧮 {t['title']} — ClyxessChat AI</h1>
+            <p>Class 1 → University • Games • Black Board • Formulas • Hints • AI Powered</p>
+        </div>
+    """, unsafe_allow_html=True)
 
     # ============================================================
-    # 4. STATE & DASHBOARD
+    # 4. SESSION STATE
     # ============================================================
-    if "math_game_score" not in st.session_state: st.session_state.math_game_score = 0
-    if "math_game_streak" not in st.session_state: st.session_state.math_game_streak = 0
-    if "math_current_question" not in st.session_state: st.session_state.math_current_question = None
-    if "math_game_answered" not in st.session_state: st.session_state.math_game_answered = False
-    if "math_game_q_id" not in st.session_state: st.session_state.math_game_q_id = 0
-
-    col1, col2, col3 = st.columns(3)
-    with col1: st.markdown(f'<div class="metric-card">🏆 {t["score"]}<br><span class="metric-value">{st.session_state.math_game_score}</span></div>', unsafe_allow_html=True)
-    with col2: st.markdown(f'<div class="metric-card">🔥 {t["streak"]}<br><span class="metric-value">{st.session_state.math_game_streak}</span></div>', unsafe_allow_html=True)
-    with col3: st.markdown(f'<div class="metric-card">📚 {t["level"]}<br><span class="metric-value" style="font-size:16px;">{class_level}</span></div>', unsafe_allow_html=True)
-
-    st.write("")
+    state_defaults = {
+        "ml_mode": None, "ml_game_mode": None, "ml_score": 0, "ml_streak": 0,
+        "ml_hearts": 5, "ml_xp": 0, "ml_questions": [], "ml_index": 0,
+        "ml_answered": False, "ml_last_correct": False, "ml_hint_level": 0,
+        "ml_show_solution": False, "ml_current_question": None, "ml_q_id": 0,
+        "ml_matched": [], "ml_match_left": None, "ml_match_right": None,
+    }
+    for k, v in state_defaults.items():
+        if k not in st.session_state:
+            st.session_state[k] = v
 
     # ============================================================
-    # 5. AI QUESTION GENERATION (IN SELECTED LANGUAGE)
+    # 5. HELPER FUNCTIONS
     # ============================================================
-    def generate_math_question(level, is_junior, lang_name):
-        tone = "fun and engaging" if is_junior else "professional and challenging"
-        prompt = f"""
-        You are an expert Math Tutor. Generate ONE multiple-choice math question for a student of level: {level}.
-        The tone should be {tone}.
-        IMPORTANT: The question, options, and explanation MUST be in this language: {lang_name}.
-        Provide the response in STRICT JSON format ONLY:
-        {{
-            "question": "The math question in {lang_name}",
-            "options": ["Option A", "Option B", "Option C", "Option D"],
-            "answer": "The exact correct option",
-            "explanation": "Short explanation in {lang_name}."
-        }}
-        """
+    def get_class_num(cls):
+        try:
+            return int(cls.replace("Class ", "").split("-")[0].strip())
+        except Exception:
+            return 13
+
+    class_num = get_class_num(class_level)
+
+    def celebrate():
+        try: st.balloons()
+        except Exception: pass
+
+    # ============================================================
+    # 6. AI QUESTION GENERATOR
+    # ============================================================
+    def generate_math_question_ai(level, lang_name, mode="practice"):
+        tone = "fun, simple, visual for a young child" if is_junior else "professional and challenging"
+        prompt = f"""You are an expert Math Tutor. Generate ONE multiple-choice math question for {level} in the style: {mode}.
+Tone: {tone}.
+IMPORTANT: Question, options, answer, and explanation MUST be in this language: {lang_name}.
+Also provide a short HINT for the student.
+Return STRICT JSON ONLY:
+{{
+    "question": "question text",
+    "options": ["A", "B", "C", "D"],
+    "answer": "exact correct option",
+    "hint": "small hint",
+    "explanation": "step-by-step explanation"
+}}"""
         try:
             response = client.chat.completions.create(
                 model="openai/gpt-oss-120b",
                 messages=[{"role": "user", "content": prompt}],
-                temperature=0.7, max_tokens=800
+                temperature=0.7, max_tokens=900
             )
-            raw_text = response.choices[0].message.content
-            clean_json = clean_json_text(raw_text)
-            question_data = json.loads(clean_json)
-            if all(k in question_data for k in ["question", "options", "answer", "explanation"]):
-                return question_data
+            raw = response.choices[0].message.content
+            clean = clean_json_text(raw)
+            data = json.loads(clean)
+            if all(k in data for k in ["question", "options", "answer", "explanation"]):
+                if "hint" not in data:
+                    data["hint"] = "Think step by step."
+                return data
         except Exception:
             pass
-        
-        # Fallback (in English if AI fails)
+
         fallbacks = {
-            "Class 1-2": {"question": "2 + 3 = ?", "options": ["4", "5", "6", "7"], "answer": "5", "explanation": "2 + 3 = 5"},
-            "Class 3-5": {"question": "7 x 8 = ?", "options": ["48", "56", "64", "72"], "answer": "56", "explanation": "7 x 8 = 56"},
-            "Class 6-8": {"question": "If 2x + 5 = 15, what is x?", "options": ["5", "10", "15", "20"], "answer": "5", "explanation": "2x = 10, x = 5"},
-            "Class 9-10": {"question": "sin(90°) = ?", "options": ["0", "0.5", "1", "Undefined"], "answer": "1", "explanation": "sin(90°) = 1"},
-            "Class 11-12": {"question": "Derivative of x²?", "options": ["x", "2x", "x³", "2"], "answer": "2x", "explanation": "d/dx(x²) = 2x"},
-            "University": {"question": "RSA: p=3, q=11, n=?", "options": ["14", "33", "44", "22"], "answer": "33", "explanation": "n = p*q = 33"}
+            "Class 1-2": {"question": "2 + 3 = ?", "options": ["4", "5", "6", "7"], "answer": "5",
+                          "hint": "Count on fingers", "explanation": "2 + 3 = 5"},
+            "Class 3-5": {"question": "7 × 8 = ?", "options": ["48", "56", "64", "72"], "answer": "56",
+                          "hint": "Use multiplication table", "explanation": "7 × 8 = 56"},
+            "Class 6-8": {"question": "If 2x + 5 = 15, x = ?", "options": ["5", "10", "15", "20"], "answer": "5",
+                          "hint": "Subtract 5 from both sides", "explanation": "2x = 10, so x = 5"},
+            "Class 9-10": {"question": "sin(90°) = ?", "options": ["0", "0.5", "1", "Undefined"], "answer": "1",
+                          "hint": "Remember unit circle", "explanation": "sin(90°) = 1"},
+            "Class 11-12": {"question": "d/dx (x²) = ?", "options": ["x", "2x", "x³", "2"], "answer": "2x",
+                           "hint": "Power rule", "explanation": "d/dx(x²) = 2x"},
+            "University": {"question": "RSA: p=3, q=11 → n = ?", "options": ["14", "33", "44", "22"], "answer": "33",
+                          "hint": "n = p × q", "explanation": "n = 3 × 11 = 33"},
         }
         return fallbacks.get(class_level, fallbacks["Class 6-8"])
 
-    if st.session_state.math_current_question is None:
-        with st.spinner("Generating..." if not is_junior else "🎲 नया सवाल बन रहा है..."):
-            st.session_state.math_current_question = generate_math_question(class_level, is_junior, selected_lang_label)
-            st.session_state.math_game_answered = False
+    # ============================================================
+    # 7. STATIC QUESTION GENERATORS (For Games - Offline)
+    # ============================================================
+    def gen_count_objects():
+        n = random.randint(1, 9)
+        opts = list({n, n+1, max(1,n-1), n+2})
+        while len(opts) < 4: opts.append(n + random.randint(3, 6))
+        opts = opts[:4]; random.shuffle(opts)
+        return {"type": "count", "question": "How many objects?", "visual": "🔵" * n,
+                "options": [str(o) for o in opts], "answer": str(n),
+                "hint": "Count one by one", "explanation": f"Total {n} objects"}
 
-    q = st.session_state.math_current_question
+    def gen_select_answer():
+        a, b = random.randint(1, 20), random.randint(1, 20)
+        op = random.choice(["+", "-", "×"])
+        if op == "-" and b > a: a, b = b, a
+        ans = {"+": a+b, "-": a-b, "×": a*b}[op]
+        q = f"{a} {op} {b} = ?"
+        opts = {ans}
+        while len(opts) < 4:
+            fake = ans + random.randint(-5, 5)
+            if fake >= 0: opts.add(fake)
+        opts = list(opts); random.shuffle(opts)
+        return {"type": "select", "question": q, "options": [str(o) for o in opts],
+                "answer": str(ans), "hint": "Do it step by step",
+                "explanation": f"{a} {op} {b} = {ans}"}
+
+    def gen_true_false():
+        a, b = random.randint(1, 15), random.randint(1, 15)
+        real = a * b
+        shown = real if random.random() > 0.5 else real + random.choice([-5, -2, 2, 5])
+        q = f"{a} × {b} = {shown}"
+        return {"type": "tf", "question": q, "options": ["True", "False"],
+                "answer": "True" if real == shown else "False",
+                "hint": "Calculate carefully", "explanation": f"{a} × {b} = {real}"}
+
+    def gen_sequence():
+        start = random.randint(1, 20)
+        step = random.randint(2, 9)
+        seq = [start + i*step for i in range(5)]
+        ans = seq[-1]
+        displayed = seq[:-1] + ["?"]
+        q = " → ".join(str(x) for x in displayed)
+        opts = {ans}
+        while len(opts) < 4:
+            fake = ans + random.randint(-6, 6)
+            if fake > 0: opts.add(fake)
+        opts = list(opts); random.shuffle(opts)
+        return {"type": "seq", "question": q, "options": [str(o) for o in opts],
+                "answer": str(ans), "hint": f"Add +{step} each time",
+                "explanation": f"Pattern +{step}: {ans}"}
+
+    def gen_missing():
+        a, b = random.randint(1, 20), random.randint(1, 20)
+        ans = a + b
+        q = f"{a} + ? = {ans}"
+        opts = {b}
+        while len(opts) < 4:
+            fake = b + random.randint(-3, 3)
+            if fake > 0: opts.add(fake)
+        opts = list(opts); random.shuffle(opts)
+        return {"type": "missing", "question": q, "options": [str(o) for o in opts],
+                "answer": str(b), "hint": "Reverse the operation",
+                "explanation": f"{ans} - {a} = {b}"}
+
+    def gen_shape():
+        shapes = [{"e": "⬛", "n": "Square"}, {"e": "🔺", "n": "Triangle"},
+                  {"e": "⭕", "n": "Circle"}, {"e": "🔷", "n": "Diamond"},
+                  {"e": "⭐", "n": "Star"}, {"e": "❤️", "n": "Heart"}]
+        correct = random.choice(shapes)
+        opts = random.sample(shapes, 4)
+        if correct not in opts: opts[0] = correct
+        random.shuffle(opts)
+        return {"type": "shape", "question": f"Which is {correct['n']}?",
+                "visual": correct["e"],
+                "options": [f"{o['e']} {o['n']}" for o in opts],
+                "answer": f"{correct['e']} {correct['n']}",
+                "hint": "Look at sides/corners", "explanation": f"{correct['n']} = {correct['e']}"}
+
+    def gen_fraction():
+        d = random.choice([2, 3, 4, 5, 6, 8])
+        n = random.randint(1, d - 1)
+        bar = "🟦" * n + "⬜" * (d - n)
+        ans = f"{n}/{d}"
+        opts = {ans}
+        while len(opts) < 4:
+            dd = random.choice([2, 3, 4, 5, 6, 8]); nn = random.randint(1, dd - 1)
+            opts.add(f"{nn}/{dd}")
+        opts = list(opts); random.shuffle(opts)
+        return {"type": "fraction", "question": "What fraction is filled? 🟦",
+                "visual": bar, "options": opts, "answer": ans,
+                "hint": "Total boxes = denominator", "explanation": f"{n} of {d} = {n}/{d}"}
+
+    def gen_word_problem():
+        names = ["Riya", "Aarav", "Priya", "Rohan", "Sara", "Vikram"]
+        name = random.choice(names)
+        apples = random.randint(3, 15)
+        more = random.randint(1, 10)
+        ans = apples + more
+        q = f"{name} has {apples} apples. Got {more} more. Total?"
+        opts = {ans}
+        while len(opts) < 4:
+            fake = ans + random.randint(-4, 4)
+            if fake > 0: opts.add(fake)
+        opts = list(opts); random.shuffle(opts)
+        return {"type": "word", "question": q, "options": [str(o) for o in opts],
+                "answer": str(ans), "hint": "What is given? What is asked?",
+                "explanation": f"{apples} + {more} = {ans}"}
+
+    def gen_percentage():
+        total = random.choice([50, 100, 200, 500])
+        pct = random.choice([10, 20, 25, 50])
+        ans = (total * pct) // 100
+        q = f"{pct}% of {total} = ?"
+        opts = {ans}
+        while len(opts) < 4:
+            fake = ans + random.randint(-20, 20)
+            if fake > 0: opts.add(fake)
+        opts = list(opts); random.shuffle(opts)
+        return {"type": "pct", "question": q, "options": [str(o) for o in opts],
+                "answer": str(ans), "hint": f"({total} × {pct}) ÷ 100",
+                "explanation": f"({total} × {pct})/100 = {ans}"}
+
+    def gen_algebra():
+        x = random.randint(2, 15)
+        a, b = random.randint(2, 8), random.randint(1, 15)
+        c = a*x + b
+        q = f"{a}x + {b} = {c} → x = ?"
+        opts = {x}
+        while len(opts) < 4:
+            fake = x + random.randint(-3, 3)
+            if fake > 0: opts.add(fake)
+        opts = list(opts); random.shuffle(opts)
+        return {"type": "alg", "question": q, "options": [str(o) for o in opts],
+                "answer": str(x), "hint": "Isolate x",
+                "explanation": f"{a}x = {c-b}; x = {x}"}
+
+    def gen_match_pairs():
+        pairs = []
+        for _ in range(3):
+            a, b = random.randint(2, 9), random.randint(2, 9)
+            pairs.append({"left": f"{a} × {b}", "right": str(a*b)})
+        right_shuffled = [p["right"] for p in pairs]
+        random.shuffle(right_shuffled)
+        return {"type": "match", "question": "Match the pairs", "pairs": pairs,
+                "right": right_shuffled,
+                "hint": "Solve each equation first",
+                "explanation": " | ".join(f"{p['left']}={p['right']}" for p in pairs)}
+
+    GAMES = {
+        "count": {"icon": "🔢", "name": "Count Objects", "gen": gen_count_objects,
+                  "min": 1, "max": 3},
+        "select": {"icon": "🎯", "name": "Select Answer", "gen": gen_select_answer,
+                   "min": 1, "max": 12},
+        "tf": {"icon": "⚡", "name": "True or False", "gen": gen_true_false,
+               "min": 1, "max": 12},
+        "sequence": {"icon": "🔷", "name": "Sequence", "gen": gen_sequence,
+                     "min": 1, "max": 10},
+        "missing": {"icon": "❓", "name": "Find Missing", "gen": gen_missing,
+                    "min": 1, "max": 8},
+        "shape": {"icon": "🔺", "name": "Shapes", "gen": gen_shape,
+                  "min": 1, "max": 5},
+        "fraction": {"icon": "🍕", "name": "Fractions", "gen": gen_fraction,
+                     "min": 3, "max": 8},
+        "word": {"icon": "📖", "name": "Story Problems", "gen": gen_word_problem,
+                 "min": 3, "max": 12},
+        "pct": {"icon": "💯", "name": "Percentage", "gen": gen_percentage,
+                "min": 5, "max": 10},
+        "alg": {"icon": "🅰️", "name": "Algebra", "gen": gen_algebra,
+                "min": 6, "max": 12},
+        "match": {"icon": "🔗", "name": "Match Pairs", "gen": gen_match_pairs,
+                  "min": 2, "max": 8},
+    }
 
     # ============================================================
-    # 6. QUESTION DISPLAY & SUBMISSION
+    # 8. FORMULA LIBRARY
     # ============================================================
-    st.markdown(f'<div class="question-card"><div class="question-text">{q["question"]}</div></div>', unsafe_allow_html=True)
+    FORMULAS = {
+        "Class 1-2": ["a + b = b + a", "a × 1 = a", "0 + a = a", "Perimeter of square = 4 × side",
+                      "Area of rectangle = length × width"],
+        "Class 3-5": ["Perimeter = sum of all sides", "Area of triangle = ½ × base × height",
+                      "1 km = 1000 m", "1 hour = 60 minutes", "½ + ¼ = ¾",
+                      "a × (b + c) = a×b + a×c"],
+        "Class 6-8": ["LCM(a,b) × HCF(a,b) = a × b",
+                      "Area of circle = πr²", "Circumference = 2πr",
+                      "Simple Interest = (P × R × T) / 100",
+                      "Speed = Distance / Time",
+                      "(a+b)² = a² + 2ab + b²",
+                      "(a-b)² = a² - 2ab + b²",
+                      "a² - b² = (a+b)(a-b)"],
+        "Class 9-10": ["Quadratic: x = [-b ± √(b²-4ac)] / 2a",
+                       "sin²θ + cos²θ = 1",
+                       "Distance = √[(x₂-x₁)² + (y₂-y₁)²]",
+                       "Midpoint = ((x₁+x₂)/2, (y₁+y₂)/2)",
+                       "Area of triangle (Heron) = √[s(s-a)(s-b)(s-c)]",
+                       "Volume of sphere = (4/3)πr³",
+                       "Volume of cone = (1/3)πr²h"],
+        "Class 11-12": ["d/dx (xⁿ) = n·xⁿ⁻¹",
+                        "d/dx (sin x) = cos x",
+                        "d/dx (cos x) = -sin x",
+                        "d/dx (eˣ) = eˣ",
+                        "d/dx (ln x) = 1/x",
+                        "∫xⁿ dx = xⁿ⁺¹/(n+1) + C",
+                        "∫sin x dx = -cos x + C",
+                        "∫eˣ dx = eˣ + C",
+                        "Euler: e^(iθ) = cos θ + i·sin θ",
+                        "Permutation: nPr = n!/(n-r)!",
+                        "Combination: nCr = n!/(r!(n-r)!)"],
+        "University": ["Cauchy-Schwarz: |⟨x,y⟩| ≤ ||x||·||y||",
+                       "Taylor series: f(x) = Σ f⁽ⁿ⁾(a)(x-a)ⁿ/n!",
+                       "Euler-Lagrange: d/dt(∂L/∂q̇) = ∂L/∂q",
+                       "Fourier: f(x) = a₀/2 + Σ(aₙcos(nx) + bₙsin(nx))",
+                       "Stokes: ∮F·dr = ∬(∇×F)·dS",
+                       "Gauss: ∮F·dS = ∭(∇·F)dV",
+                       "Green: ∮(L dx + M dy) = ∬(∂M/∂x - ∂L/∂y)dA",
+                       "Riemann Hypothesis: ζ(s) = 0 → Re(s) = 1/2",
+                       "RSA: c = m^e mod n, m = c^d mod n"],
+    }
 
-    selected_option = st.radio("Choose:", q["options"], key=f"math_opt_{st.session_state.math_game_q_id}", label_visibility="collapsed")
+    # ============================================================
+    # 9. MODE SELECTOR
+    # ============================================================
+    if st.session_state.ml_mode is None:
+        st.markdown(f"### 🎮 {t['mode']}")
 
-    col_btn1, col_btn2 = st.columns([1, 1])
-    with col_btn1:
-        if not st.session_state.math_game_answered:
-            if st.button(f"✅ {t['submit']}", use_container_width=True, type="primary"):
-                st.session_state.math_game_answered = True
-                if selected_option == q["answer"]:
-                    st.session_state.math_game_score += 10
-                    st.session_state.math_game_streak += 1
-                    if is_junior: st.balloons()
+        c1, c2, c3, c4 = st.columns(4)
+        with c1:
+            st.markdown('<div class="ml-mode-card"><h1>🎮</h1><h4>Games</h4><p>Fun games for practice</p></div>', unsafe_allow_html=True)
+            if st.button("▶️ Play Games", use_container_width=True, key="mode_games"):
+                st.session_state.ml_mode = "games"; st.rerun()
+        with c2:
+            st.markdown('<div class="ml-mode-card"><h1>📖</h1><h4>Practice</h4><p>AI-generated questions</p></div>', unsafe_allow_html=True)
+            if st.button("▶️ Practice", use_container_width=True, key="mode_practice"):
+                st.session_state.ml_mode = "practice"; st.rerun()
+        with c3:
+            st.markdown('<div class="ml-mode-card"><h1>📋</h1><h4>Formulas</h4><p>Class-wise formula library</p></div>', unsafe_allow_html=True)
+            if st.button("▶️ Formulas", use_container_width=True, key="mode_formulas"):
+                st.session_state.ml_mode = "formulas"; st.rerun()
+        with c4:
+            st.markdown('<div class="ml-mode-card"><h1>🖊️</h1><h4>Black Board</h4><p>Draw & solve on board</p></div>', unsafe_allow_html=True)
+            if st.button("▶️ Board", use_container_width=True, key="mode_board"):
+                st.session_state.ml_mode = "board"; st.rerun()
+        return
+
+    # Back button
+    col_back, _ = st.columns([1, 4])
+    with col_back:
+        if st.button("⬅️ Back to Mode Menu", use_container_width=True):
+            st.session_state.ml_mode = None
+            st.session_state.ml_game_mode = None
+            st.rerun()
+
+    # ============================================================
+    # 10. MODE: GAMES
+    # ============================================================
+    if st.session_state.ml_mode == "games":
+
+        if st.session_state.ml_game_mode is None:
+            st.markdown("### 🎮 Choose a Game")
+            available = [(k, v) for k, v in GAMES.items() if v["min"] <= class_num <= v["max"]]
+            if not available:
+                st.warning("No games available for this class.")
+                return
+            cols = st.columns(3)
+            for i, (k, v) in enumerate(available):
+                with cols[i % 3]:
+                    st.markdown(f'<div class="ml-game-card"><h1>{v["icon"]}</h1><b>{v["name"]}</b></div>', unsafe_allow_html=True)
+                    if st.button(f"▶️ {v['name']}", use_container_width=True, key=f"gm_{k}"):
+                        st.session_state.ml_game_mode = k
+                        st.session_state.ml_questions = [GAMES[k]["gen"]() for _ in range(10)]
+                        st.session_state.ml_index = 0
+                        st.session_state.ml_score = 0
+                        st.session_state.ml_hearts = 5
+                        st.session_state.ml_streak = 0
+                        st.session_state.ml_answered = False
+                        st.session_state.ml_hint_level = 0
+                        st.rerun()
+            return
+
+        # Active game
+        questions = st.session_state.ml_questions
+        if not questions:
+            st.session_state.ml_game_mode = None
+            st.rerun()
+        idx = st.session_state.ml_index
+        if idx >= len(questions):
+            idx = len(questions) - 1
+            st.session_state.ml_index = idx
+        current = questions[idx]
+
+        # Stats
+        s1, s2, s3 = st.columns(3)
+        with s1: st.markdown(f'<div class="ml-stat-bar"><span class="ml-heart">❤️</span> {st.session_state.ml_hearts}</div>', unsafe_allow_html=True)
+        with s2: st.markdown(f'<div class="ml-stat-bar"><span class="ml-fire">🔥</span> {st.session_state.ml_streak}</div>', unsafe_allow_html=True)
+        with s3: st.markdown(f'<div class="ml-stat-bar">⭐ {st.session_state.ml_score}/10</div>', unsafe_allow_html=True)
+
+        st.progress((idx + 1) / 10, text=f"Question {idx+1}/10")
+
+        st.markdown(f'<div class="ml-question-box">{html.escape(str(current["question"]))}</div>', unsafe_allow_html=True)
+        if current.get("visual"):
+            st.markdown(f'<div style="text-align:center;font-size:3rem;letter-spacing:8px;">{current["visual"]}</div>', unsafe_allow_html=True)
+
+        def submit_answer(is_correct):
+            if st.session_state.ml_answered: return
+            st.session_state.ml_answered = True
+            st.session_state.ml_last_correct = is_correct
+            if is_correct:
+                st.session_state.ml_score += 1
+                st.session_state.ml_streak += 1
+                st.session_state.ml_xp += 10 + st.session_state.ml_streak * 2
+            else:
+                st.session_state.ml_streak = 0
+                st.session_state.ml_hearts = max(0, st.session_state.ml_hearts - 1)
+
+        # Game-specific render
+        if current["type"] == "match":
+            # Special handling
+            c1, c2 = st.columns(2)
+            with c1:
+                for p in current["pairs"]:
+                    if p["left"] in st.session_state.ml_matched:
+                        st.markdown(f"~~{p['left']}~~ ✅")
+                    else:
+                        if st.button(p["left"], key=f"l_{idx}_{p['left']}", use_container_width=True):
+                            st.session_state.ml_match_left = p["left"]; st.rerun()
+            with c2:
+                for r in current["right"]:
+                    if r in st.session_state.ml_matched:
+                        st.markdown(f"~~{r}~~ ✅")
+                    else:
+                        if st.button(r, key=f"r_{idx}_{r}", use_container_width=True):
+                            st.session_state.ml_match_right = r; st.rerun()
+            if st.session_state.ml_match_left and st.session_state.ml_match_right:
+                l, r = st.session_state.ml_match_left, st.session_state.ml_match_right
+                valid = any(p["left"] == l and p["right"] == r for p in current["pairs"])
+                if valid:
+                    st.session_state.ml_matched.append(l); st.session_state.ml_matched.append(r)
+                    st.session_state.ml_match_left = None; st.session_state.ml_match_right = None
+                    if len(st.session_state.ml_matched) >= len(current["pairs"]) * 2:
+                        submit_answer(True)
+                    st.rerun()
                 else:
-                    st.session_state.math_game_streak = 0
-                st.rerun()
-
-    # ============================================================
-    # 7. FEEDBACK & NEXT
-    # ============================================================
-    if st.session_state.math_game_answered:
-        if selected_option == q["answer"]:
-            st.markdown(f'<div class="feedback-success">✅ {t["correct"]} +10</div>', unsafe_allow_html=True)
+                    st.session_state.ml_match_left = None; st.session_state.ml_match_right = None
+                    st.error("❌ Wrong pair!"); st.rerun()
         else:
-            st.markdown(f'<div class="feedback-error">❌ {t["wrong"]} {q["answer"]}</div>', unsafe_allow_html=True)
-        
-        st.info(f"💡 **{t['explain']}** {q['explanation']}")
-        
-        with col_btn2:
-            if st.button(f"➡️ {t['next']}", use_container_width=True, type="primary"):
-                st.session_state.math_current_question = None
-                st.session_state.math_game_answered = False
-                st.session_state.math_game_q_id += 1
-                st.rerun()
+            # Multiple choice
+            cols = st.columns(2)
+            for i, opt in enumerate(current["options"]):
+                with cols[i % 2]:
+                    if st.button(opt, key=f"opt_{idx}_{i}", use_container_width=True,
+                                 disabled=st.session_state.ml_answered):
+                        submit_answer(opt == current["answer"]); st.rerun()
 
-    st.divider()
-    if st.button(f"🔄 {t['reset']}", use_container_width=True):
-        st.session_state.math_game_score = 0
-        st.session_state.math_game_streak = 0
-        st.session_state.math_current_question = None
-        st.session_state.math_game_answered = False
-        st.session_state.math_game_q_id += 1
-        st.rerun()   
+        # Hints
+        if not st.session_state.ml_answered and st.session_state.ml_hint_level < 3:
+            if st.button("💡 Hint"):
+                st.session_state.ml_hint_level += 1; st.rerun()
+        if st.session_state.ml_hint_level > 0:
+            for lvl in range(1, st.session_state.ml_hint_level + 1):
+                if lvl == 1: st.markdown(f'<div class="ml-hint">💡 Hint: {current.get("hint", "")}</div>', unsafe_allow_html=True)
+                elif lvl == 2: st.markdown(f'<div class="ml-hint">💡 Hint 2: Look at the pattern carefully</div>', unsafe_allow_html=True)
+                elif lvl == 3: st.markdown(f'<div class="ml-hint">💡 Answer: {current["answer"]}</div>', unsafe_allow_html=True)
+
+        # Feedback
+        if st.session_state.ml_answered:
+            if st.session_state.ml_last_correct:
+                st.markdown(f'<div class="ml-correct">✅ {t["correct"]} 🔥 Streak: {st.session_state.ml_streak}</div>', unsafe_allow_html=True)
+                celebrate()
+            else:
+                st.markdown(f'<div class="ml-wrong">❌ {t["wrong"]} <b>{current["answer"]}</b></div>', unsafe_allow_html=True)
+            st.markdown(f'<div class="ml-solution"><b>📝 {t["explain"]}</b> {current.get("explanation", "")}</div>', unsafe_allow_html=True)
+
+            st.markdown("---")
+            if idx < 9:
+                if st.button("➡️ " + t["next"], type="primary", use_container_width=True, key=f"nxt_{idx}"):
+                    st.session_state.ml_index += 1
+                    st.session_state.ml_answered = False
+                    st.session_state.ml_hint_level = 0
+                    st.session_state.ml_matched = []
+                    st.session_state.ml_match_left = None
+                    st.session_state.ml_match_right = None
+                    st.rerun()
+            else:
+                if st.session_state.ml_score >= 8:
+                    st.markdown(f'<div class="ml-victory"><h1>🏆 Level Complete!</h1><h2>{st.session_state.ml_score}/10</h2></div>', unsafe_allow_html=True)
+                    celebrate()
+                else:
+                    st.markdown(f'<div class="ml-gameover"><h1>⭐ {st.session_state.ml_score}/10</h1></div>', unsafe_allow_html=True)
+                c1, c2 = st.columns(2)
+                with c1:
+                    if st.button("🔄 Retry", use_container_width=True, key="retry_g"):
+                        st.session_state.ml_questions = [GAMES[st.session_state.ml_game_mode]["gen"]() for _ in range(10)]
+                        st.session_state.ml_index = 0; st.session_state.ml_score = 0
+                        st.session_state.ml_hearts = 5; st.session_state.ml_streak = 0
+                        st.session_state.ml_answered = False; st.session_state.ml_matched = []
+                        st.rerun()
+                with c2:
+                    if st.button("🏠 Games Menu", use_container_width=True, key="home_g"):
+                        st.session_state.ml_game_mode = None; st.rerun()
+        return
+
+    # ============================================================
+    # 11. MODE: PRACTICE (AI-Generated)
+    # ============================================================
+    if st.session_state.ml_mode == "practice":
+        st.markdown("### 📖 Practice with AI-Generated Questions")
+
+        if st.session_state.ml_current_question is None:
+            with st.spinner("🤖 AI आपके लिए सवाल बना रहा है..."):
+                st.session_state.ml_current_question = generate_math_question_ai(
+                    class_level, selected_lang_label, "practice"
+                )
+                st.session_state.ml_answered = False
+                st.session_state.ml_hint_level = 0
+
+        q = st.session_state.ml_current_question
+
+        st.markdown(f'<div class="ml-question-box">{html.escape(str(q["question"]))}</div>', unsafe_allow_html=True)
+
+        selected_opt = st.radio("Choose:", q["options"], key=f"prac_{st.session_state.ml_q_id}",
+                                label_visibility="collapsed")
+
+        # Hint
+        if not st.session_state.ml_answered:
+            if st.button("💡 " + t["hint"]):
+                st.session_state.ml_hint_level += 1
+            if st.session_state.ml_hint_level >= 1:
+                st.markdown(f'<div class="ml-hint">💡 {q.get("hint", "")}</div>', unsafe_allow_html=True)
+            if st.session_state.ml_hint_level >= 2:
+                st.markdown(f'<div class="ml-hint">💡 Correct option starts with: {q["answer"][:2]}...</div>', unsafe_allow_html=True)
+
+        c1, c2 = st.columns(2)
+        with c1:
+            if not st.session_state.ml_answered:
+                if st.button("✅ " + t["submit"], use_container_width=True, type="primary", key="prac_sub"):
+                    st.session_state.ml_answered = True
+                    if selected_opt == q["answer"]:
+                        st.session_state.ml_last_correct = True
+                        st.session_state.ml_score += 1
+                        st.session_state.ml_streak += 1
+                        st.session_state.ml_xp += 10 + st.session_state.ml_streak * 2
+                        celebrate()
+                    else:
+                        st.session_state.ml_last_correct = False
+                        st.session_state.ml_streak = 0
+                        st.session_state.ml_hearts = max(0, st.session_state.ml_hearts - 1)
+                    st.rerun()
+
+        if st.session_state.ml_answered:
+            if st.session_state.ml_last_correct:
+                st.markdown(f'<div class="ml-correct">✅ {t["correct"]} +10 XP</div>', unsafe_allow_html=True)
+            else:
+                st.markdown(f'<div class="ml-wrong">❌ {t["wrong"]} <b>{q["answer"]}</b></div>', unsafe_allow_html=True)
+
+            st.markdown(f'<div class="ml-solution"><b>📝 {t["explain"]}</b><br>{q.get("explanation", "")}</div>', unsafe_allow_html=True)
+
+            with c2:
+                if st.button("➡️ " + t["next"], use_container_width=True, type="primary", key="prac_next"):
+                    st.session_state.ml_current_question = None
+                    st.session_state.ml_answered = False
+                    st.session_state.ml_hint_level = 0
+                    st.session_state.ml_q_id += 1
+                    st.rerun()
+
+        # Stats
+        s1, s2, s3 = st.columns(3)
+        with s1: st.markdown(f'<div class="ml-stat-bar">🏆 {t["score"]}: <b>{st.session_state.ml_score}</b></div>', unsafe_allow_html=True)
+        with s2: st.markdown(f'<div class="ml-stat-bar">🔥 {t["streak"]}: <b>{st.session_state.ml_streak}</b></div>', unsafe_allow_html=True)
+        with s3: st.markdown(f'<div class="ml-stat-bar">❤️ {st.session_state.ml_hearts}</div>', unsafe_allow_html=True)
+        return
+
+    # ============================================================
+    # 12. MODE: FORMULA LIBRARY
+    # ============================================================
+    if st.session_state.ml_mode == "formulas":
+        st.markdown(f"### 📋 {t['formulas']} — {class_level}")
+        formulas = FORMULAS.get(class_level, FORMULAS["Class 6-8"])
+        for i, f in enumerate(formulas, 1):
+            st.markdown(f'<div class="ml-formula-card"><b>{i}.</b> {f}</div>', unsafe_allow_html=True)
+        return
+
+    # ============================================================
+    # 13. MODE: BLACK BOARD (Interactive Canvas)
+    # ============================================================
+    if st.session_state.ml_mode == "board":
+        st.markdown(f"### 🖊️ {t['board']} — Draw & Solve!")
+
+        # HTML5 Canvas with drawing
+        board_html = """
+        <div style="text-align:center; margin-bottom: 10px;">
+            <button id="blackBtn" onclick="setColor('#000000')" style="background:#000;color:#fff;padding:8px 16px;border:none;border-radius:8px;margin:2px;cursor:pointer;">⬛ Black</button>
+            <button id="redBtn" onclick="setColor('#FF0000')" style="background:#FF0000;color:#fff;padding:8px 16px;border:none;border-radius:8px;margin:2px;cursor:pointer;">🔴 Red</button>
+            <button id="blueBtn" onclick="setColor('#0066FF')" style="background:#0066FF;color:#fff;padding:8px 16px;border:none;border-radius:8px;margin:2px;cursor:pointer;">🔵 Blue</button>
+            <button id="greenBtn" onclick="setColor('#00AA00')" style="background:#00AA00;color:#fff;padding:8px 16px;border:none;border-radius:8px;margin:2px;cursor:pointer;">🟢 Green</button>
+            <button id="clearBtn" onclick="clearBoard()" style="background:#888;color:#fff;padding:8px 16px;border:none;border-radius:8px;margin:2px;cursor:pointer;">🧽 Clear</button>
+            <button id="eraserBtn" onclick="setEraser()" style="background:#FFA500;color:#fff;padding:8px 16px;border:none;border-radius:8px;margin:2px;cursor:pointer;">✏️ Eraser</button>
+        </div>
+
+        <canvas id="board" width="800" height="500" style="background:#FFFFFF; border:4px solid #333; border-radius:12px; cursor:crosshair; touch-action:none; max-width:100%;"></canvas>
+
+        <p style="color:#888; font-size:14px; margin-top:8px;">🖊️ Use mouse or finger to draw • Pick color • Erase • Clear</p>
+
+        <script>
+            const canvas = document.getElementById('board');
+            const ctx = canvas.getContext('2d');
+            let drawing = false;
+            let color = '#000000';
+            let isEraser = false;
+            let lineWidth = 3;
+
+            function getPos(e) {
+                const rect = canvas.getBoundingClientRect();
+                const scaleX = canvas.width / rect.width;
+                const scaleY = canvas.height / rect.height;
+                if (e.touches) {
+                    return {
+                        x: (e.touches[0].clientX - rect.left) * scaleX,
+                        y: (e.touches[0].clientY - rect.top) * scaleY
+                    };
+                }
+                return {
+                    x: (e.clientX - rect.left) * scaleX,
+                    y: (e.clientY - rect.top) * scaleY
+                };
+            }
+
+            function start(e) {
+                e.preventDefault();
+                drawing = true;
+                const pos = getPos(e);
+                ctx.beginPath();
+                ctx.moveTo(pos.x, pos.y);
+            }
+
+            function draw(e) {
+                if (!drawing) return;
+                e.preventDefault();
+                const pos = getPos(e);
+                ctx.lineTo(pos.x, pos.y);
+                ctx.strokeStyle = isEraser ? '#FFFFFF' : color;
+                ctx.lineWidth = isEraser ? 20 : lineWidth;
+                ctx.lineCap = 'round';
+                ctx.lineJoin = 'round';
+                ctx.stroke();
+            }
+
+            function stop(e) {
+                if (drawing) {
+                    e.preventDefault();
+                    drawing = false;
+                    ctx.closePath();
+                }
+            }
+
+            function setColor(c) {
+                color = c;
+                isEraser = false;
+            }
+
+            function setEraser() {
+                isEraser = true;
+            }
+
+            function clearBoard() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+            }
+
+            canvas.addEventListener('mousedown', start);
+            canvas.addEventListener('mousemove', draw);
+            canvas.addEventListener('mouseup', stop);
+            canvas.addEventListener('mouseleave', stop);
+
+            canvas.addEventListener('touchstart', start);
+            canvas.addEventListener('touchmove', draw);
+            canvas.addEventListener('touchend', stop);
+        </script>
+        """
+
+        import streamlit.components.v1 as components
+        components.html(board_html, height=650)
+
+        st.markdown("---")
+        st.markdown("### 📐 Ready-Made Formulas (click to see)")
+        formulas = FORMULAS.get(class_level, FORMULAS["Class 6-8"])
+        with st.expander(f"📚 {class_level} Formulas — Reference"):
+            for f in formulas:
+                st.markdown(f"- `{f}`")
+
+        st.markdown("### 🧮 Quick Calculator")
+        calc_expr = st.text_input("Enter expression (e.g., 2+3*4):", key="board_calc")
+        if calc_expr:
+            try:
+                result = eval(calc_expr, {"__builtins__": {}}, {})
+                st.success(f"= **{result}**")
+            except Exception:
+                st.warning("Invalid expression. Use numbers and + - * / ( )")
+        return  
         
 def render_art_machinedesign():
     import streamlit.components.v1 as components
