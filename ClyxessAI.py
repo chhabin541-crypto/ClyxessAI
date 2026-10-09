@@ -8874,7 +8874,81 @@ Give: Situation, Problem, Two possible decisions, ask student what they'd do, as
         <p style="color:#7089aa; font-size:13px;">From first AI concept to advanced AI research.</p>
     </div>
     """, unsafe_allow_html=True)    
+def learning_report():
+    """
+    📊 Learning Report — काम करेगा पुराने और नए Play & Learn दोनों के साथ
+    कोई भी session_state key हो, fallback के साथ safe read करेगा
+    """
+    ss = st.session_state
 
+    def safe_get(*keys, default=0):
+        """अगर कोई भी key मिल जाए, पहली available value return करेगा"""
+        for k in keys:
+            if k in ss:
+                return ss[k]
+        return default
+
+    # ---------- Best Score ----------
+    best_scores = safe_get("play_best_scores", "ml_best_scores", default={})
+    best = max(best_scores.values()) if isinstance(best_scores, dict) and best_scores else 0
+
+    # ---------- Completed Levels ----------
+    completed = safe_get("play_completed_levels", "ml_completed_levels", default=[])
+
+    # ---------- Current Level / Age ----------
+    current = safe_get("play_age", "ml_age", "ml_class", "play_level", default="Class 1-2")
+
+    # ---------- XP ----------
+    xp = safe_get("play_xp", "ml_xp", default=0)
+
+    # ---------- Best Streak ----------
+    streak = safe_get("play_best_streak", "ml_best_streak", "ml_streak", default=0)
+
+    # ---------- Hearts ----------
+    hearts = safe_get("play_hearts", "ml_hearts", default=5)
+
+    # ---------- Achievements ----------
+    ach = safe_get("play_achievements", "ml_achievements", default=[])
+
+    # ---------- Total Questions ----------
+    correct = safe_get("play_total_correct", "ml_correct_q", "ml_score", default=0)
+    total = safe_get("play_total_q", "ml_total_q", default=1) or 1
+    accuracy = round((correct / total) * 100, 1) if total else 0
+
+    # ---------- Screen Time (Parent Dashboard से) ----------
+    screen_time = safe_get("total_screen_time", default=0)
+    screen_min = int(screen_time // 60) if isinstance(screen_time, (int, float)) else 0
+
+    # ---------- Activity Log ----------
+    activity_log = safe_get("activity_log", default=[])
+    log_count = len(activity_log) if isinstance(activity_log, list) else 0
+
+    from datetime import datetime as _dt
+    report = f"""
+========================================
+📊 CLYXESSCHAT AI — LEARNING REPORT
+========================================
+📅 Date: {_dt.now().strftime('%d %B %Y, %I:%M %p')}
+
+🎓 Current Level : {current}
+🏆 Levels Completed: {len(completed) if isinstance(completed, list) else 0}
+⭐ Best Score    : {best}/10
+💎 Total XP      : {xp}
+🔥 Best Streak   : {streak}
+❤️ Current Hearts: {hearts}
+🎯 Accuracy      : {accuracy}%
+⏱️ Screen Time   : {screen_min} mins
+📋 Total Activities: {log_count}
+
+🏅 Achievements  : {len(ach) if isinstance(ach, list) else 0}
+
+========================================
+🕉️ ClyxessChat AI by NeuroClyx Technology
+"हर बच्चा AI सीख सके — यही हमारा सपना"
+========================================
+"""
+    return report
+ 
 def render_parent_dashboard():
     st.title("👨‍👩‍👦 Parent Dashboard")
     best=max(st.session_state.play_best_scores.values(),default=0)
