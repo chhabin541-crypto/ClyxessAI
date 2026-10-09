@@ -7490,9 +7490,6 @@ function addMath(s) {
     o.style.color = currentColor;
     o.style.fontSize = '26px';
     o.style.fontWeight = 'bold';
-    o.style.display = 'flex';
-    o.style.alignItems = 'center';
-    o.style.
         
 def render_art_machinedesign():
     import streamlit.components.v1 as components
