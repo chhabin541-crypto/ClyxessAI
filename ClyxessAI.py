@@ -6205,27 +6205,29 @@ Now write ENTIRELY in {language}:"""
  
 def render_math_lab(client):
     """
-    🧮 ClyxessChat Math Lab — ULTIMATE EDITION (117+ Tools Board)
-    Complete Working Version
+    🧮 ClyxessChat Math Lab — ULTIMATE EDITION
+    Class 1 → University • All Puzzles • Real Math • Black Board
+    ClyxessChat AI by NeuroClyx Technology
     """
     import json, re, random, html, math
     import streamlit as st
     import streamlit.components.v1 as components
 
     # ============================================================
-    # HELPER
+    # HELPER: Clean AI JSON
     # ============================================================
     def clean_json_text(text):
         text = text.strip()
         text = re.sub(r"^```(?:json)?\s*", "", text, flags=re.IGNORECASE)
         text = re.sub(r"\s*```$", "", text)
-        for s_char, e_char in [("[", "]"), ("{", "}")]:
-            s = text.find(s_char); e = text.rfind(e_char)
-            if s != -1 and e != -1: return text[s:e+1].strip()
+        for start_char, end_char in [("[", "]"), ("{", "}")]:
+            s = text.find(start_char); e = text.rfind(end_char)
+            if s != -1 and e != -1:
+                return text[s:e+1].strip()
         return text
 
     # ============================================================
-    # LANGUAGES
+    # LANGUAGES (50+)
     # ============================================================
     LANGUAGES = {
         "🇬🇧 English": "en", "🇮🇳 हिंदी (Hindi)": "hi", "🇮🇳 বাংলা (Bengali)": "bn",
@@ -6239,13 +6241,67 @@ def render_math_lab(client):
         "🇮🇩 Bahasa Indonesia": "id", "🇲🇾 Bahasa Melayu": "ms", "🇹🇭 ไทย": "th",
         "🇻🇳 Tiếng Việt": "vi", "🇳🇱 Nederlands": "nl", "🇵🇱 Polski": "pl",
         "🇺🇦 Українська": "uk", "🇮🇷 فارسی": "fa", "🇵🇭 Tagalog": "tl",
+        "🇲🇲 မြန်မာ": "my", "🇬🇷 Ελληνικά": "el", "🇸🇪 Svenska": "sv",
+        "🇳🇴 Norsk": "no", "🇩🇰 Dansk": "da", "🇫🇮 Suomi": "fi",
+        "🇷🇴 Română": "ro", "🇭🇺 Magyar": "hu", "🇨🇿 Čeština": "cs",
+        "🇮🇱 עברית": "he", "🇿🇦 Zulu": "zu", "🇰🇪 Swahili": "sw",
+        "🇳🇬 Yoruba": "yo", "🇵🇰 پښتو": "ps", "🇱🇰 සිංහල": "si",
+        "🇳🇵 नेपाली": "ne"
     }
 
     UI = {
-        "en": {"title": "Math Lab", "mode": "Choose Your Mode", "puzzle": "Puzzle Games",
-               "real_math": "Real Math", "board": "Design Board", "formula": "Formula Reference"},
-        "hi": {"title": "गणित लैब", "mode": "मोड चुनें", "puzzle": "पहेली खेल",
-               "real_math": "असली गणित", "board": "डिज़ाइन बोर्ड", "formula": "फॉर्मूला संदर्भ"},
+        "en": {"title": "Math Lab", "score": "Score", "streak": "Streak", "level": "Level",
+               "submit": "Submit", "next": "Next", "reset": "Reset", "correct": "Correct!",
+               "wrong": "Wrong! Answer:", "explain": "Explanation:", "hint": "Hint",
+               "puzzle": "Puzzle Games", "real_math": "Real Math",
+               "board": "Design Board", "formula": "Formula Reference",
+               "mode": "Choose Your Mode", "class": "Class", "university": "University"},
+        "hi": {"title": "गणित लैब", "score": "स्कोर", "streak": "स्ट्रीक", "level": "स्तर",
+               "submit": "जमा करें", "next": "अगला", "reset": "रीसेट", "correct": "शाबाश!",
+               "wrong": "गलत! सही जवाब:", "explain": "व्याख्या:", "hint": "संकेत",
+               "puzzle": "पहेली खेल", "real_math": "असली गणित",
+               "board": "डिज़ाइन बोर्ड", "formula": "फॉर्मूला संदर्भ",
+               "mode": "मोड चुनें", "class": "क्लास", "university": "यूनिवर्सिटी"},
+        "bn": {"title": "গণিত ল্যাব", "score": "স্কোর", "streak": "স্ট্রিক", "level": "স্তর",
+               "submit": "জমা", "next": "পরবর্তী", "reset": "রিসেট", "correct": "সঠিক!",
+               "wrong": "ভুল! সঠিক:", "explain": "ব্যাখ্যা:", "hint": "ইঙ্গিত",
+               "puzzle": "ধাঁধা", "real_math": "আসল গণিত", "board": "বোর্ড",
+               "formula": "সূত্র", "mode": "মোড", "class": "শ্রেণী", "university": "বিশ্ববিদ্যালয়"},
+        "ta": {"title": "கணித ஆய்வகம்", "score": "மதிப்பெண்", "streak": "தொடர்", "level": "நிலை",
+               "submit": "சமர்ப்பி", "next": "அடுத்து", "reset": "மீட்டமை", "correct": "சரி!",
+               "wrong": "தவறு! சரி:", "explain": "விளக்கம்:", "hint": "குறிப்பு",
+               "puzzle": "புதிர்", "real_math": "உண்மை கணிதம்", "board": "பலகை",
+               "formula": "சூத்திரம்", "mode": "பயன்முறை", "class": "வகுப்பு", "university": "பல்கலைக்கழகம்"},
+        "mr": {"title": "गणित लॅब", "score": "स्कोअर", "streak": "स्ट्रीक", "level": "स्तर",
+               "submit": "सबमिट", "next": "पुढील", "reset": "रीसेट", "correct": "बरोबर!",
+               "wrong": "चूक! बरोबर:", "explain": "स्पष्टीकरण:", "hint": "संकेत",
+               "puzzle": "कोडे", "real_math": "खरे गणित", "board": "बोर्ड",
+               "formula": "सूत्र", "mode": "मोड", "class": "वर्ग", "university": "विद्यापीठ"},
+        "te": {"title": "గణిత ల్యాబ్", "score": "స్కోరు", "streak": "స్ట్రీక్", "level": "స్థాయి",
+               "submit": "సమర్పించు", "next": "తదుపరి", "reset": "రీసెట్", "correct": "సరైనది!",
+               "wrong": "తప్పు! సరైనది:", "explain": "వివరణ:", "hint": "సూచన",
+               "puzzle": "పజిల్", "real_math": "నిజమైన గణితం", "board": "బోర్డ్",
+               "formula": "సూత్రం", "mode": "మోడ్", "class": "తరగతి", "university": "విశ్వవిద్యాలయం"},
+        "zh": {"title": "数学实验室", "score": "分数", "streak": "连胜", "level": "等级",
+               "submit": "提交", "next": "下一题", "reset": "重置", "correct": "正确!",
+               "wrong": "错误! 答案:", "explain": "解释:", "hint": "提示",
+               "puzzle": "谜题", "real_math": "真正的数学", "board": "设计板",
+               "formula": "公式", "mode": "模式", "class": "班级", "university": "大学"},
+        "ja": {"title": "数学ラボ", "score": "スコア", "streak": "連続", "level": "レベル",
+               "submit": "送信", "next": "次へ", "reset": "リセット", "correct": "正解!",
+               "wrong": "不正解! 答え:", "explain": "解説:", "hint": "ヒント",
+               "puzzle": "パズル", "real_math": "本物の数学", "board": "ボード",
+               "formula": "公式", "mode": "モード", "class": "クラス", "university": "大学"},
+        "es": {"title": "Lab de Mate", "score": "Puntos", "streak": "Racha", "level": "Nivel",
+               "submit": "Enviar", "next": "Siguiente", "reset": "Reiniciar", "correct": "¡Correcto!",
+               "wrong": "¡Incorrecto! Respuesta:", "explain": "Explicación:", "hint": "Pista",
+               "puzzle": "Puzzles", "real_math": "Matemáticas Reales", "board": "Tablero",
+               "formula": "Fórmulas", "mode": "Modo", "class": "Clase", "university": "Universidad"},
+        "fr": {"title": "Labo Maths", "score": "Score", "streak": "Série", "level": "Niveau",
+               "submit": "Envoyer", "next": "Suivant", "reset": "Réinitialiser", "correct": "Correct!",
+               "wrong": "Incorrect! Réponse:", "explain": "Explication:", "hint": "Indice",
+               "puzzle": "Jeux", "real_math": "Vraies Maths", "board": "Tableau",
+               "formula": "Formules", "mode": "Mode", "class": "Classe", "university": "Université"},
     }
 
     # ============================================================
@@ -6258,57 +6314,122 @@ def render_math_lab(client):
     with col2:
         class_level = st.selectbox(
             "🎓 Select Your Level",
-            ["Class 1-2", "Class 3-5", "Class 6-8", "Class 9-10", "Class 11-12", "University"],
+            ["Class 1-2", "Class 3-5", "Class 6-8", "Class 9-10",
+             "Class 11-12", "University"],
             key="ml_class_sel"
         )
 
     t = UI.get(lang_code, UI["en"])
     is_junior = class_level.startswith(("Class 1-2", "Class 3-5", "Class 6-8"))
     is_senior = class_level in ["Class 11-12", "University"]
+    is_university = class_level == "University"
 
     # ============================================================
-    # CSS
+    # CSS — FULLY OPAQUE (No transparency)
     # ============================================================
     st.markdown("""
     <style>
-        .ml-hero { background: linear-gradient(135deg, #58CC02 0%, #1CB0F6 50%, #FF9600 100%);
-                   padding: 1.8rem; border-radius: 22px; text-align: center; color: #FFFFFF;
-                   margin-bottom: 1.5rem; box-shadow: 0 10px 30px rgba(88,204,2,0.3); }
+        .ml-hero {
+            background: linear-gradient(135deg, #58CC02 0%, #1CB0F6 50%, #FF9600 100%);
+            padding: 1.8rem; border-radius: 22px; text-align: center; color: #FFFFFF;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 10px 30px rgba(88,204,2,0.3);
+        }
         .ml-hero h1 { color: #FFFFFF; font-size: 2.2rem; margin: 0; font-weight: 900; }
-        .ml-hero p { color: #FFFFFF; font-size: 1rem; margin-top: 0.5rem; }
-        .ml-stat { background: #FFFFFF; border: 3px solid #E5E5E5; border-radius: 15px;
-                   padding: 1rem; text-align: center; color: #1A1A1A; font-weight: bold; }
-        .ml-puzzle-box { background: #FFFFFF; padding: 2rem; border-radius: 20px;
-                         border: 3px solid #1CB0F6; margin: 1rem 0; text-align: center;
-                         font-size: 1.5rem; font-weight: bold; color: #1A1A1A; line-height: 2.2; }
-        .ml-correct { background: #D7FFB8; padding: 1rem; border-radius: 15px;
-                      border-left: 6px solid #58CC02; margin: 1rem 0; color: #2E7D32; font-weight: bold; }
-        .ml-wrong { background: #FFDFE0; padding: 1rem; border-radius: 15px;
-                    border-left: 6px solid #FF4B4B; margin: 1rem 0; color: #C62828; font-weight: bold; }
-        .ml-hint { background: #FFF9C4; padding: 1rem; border-radius: 15px;
-                   border-left: 6px solid #FBC02D; margin: 0.5rem 0; color: #1A1A1A; }
-        .ml-solution { background: #E3F2FD; padding: 1.3rem; border-radius: 15px;
-                       border-left: 6px solid #1CB0F6; margin: 1rem 0; color: #1A1A1A; }
-        .ml-concept { background: #F3E5F5; padding: 1.5rem; border-radius: 15px;
-                      border-left: 6px solid #9C27B0; margin: 1rem 0; color: #1A1A1A; }
-        .ml-example { background: #E8F5E9; padding: 1.2rem; border-radius: 12px;
-                      border-left: 5px solid #4CAF50; margin: 0.8rem 0; color: #1A1A1A;
-                      font-family: 'Courier New', monospace; }
-        .ml-mode-card { background: #FFFFFF; padding: 1.8rem 1rem; border-radius: 20px;
-                        border: 3px solid #E5E5E5; text-align: center; margin: 0.5rem 0;
-                        min-height: 170px; }
-        .ml-game-card { background: #F0F8FF; padding: 1.5rem; border-radius: 18px;
-                        border: 3px solid #1CB0F6; text-align: center; margin: 0.5rem 0; min-height: 130px; }
-        .ml-formula { background: #F5F3FF; border-left: 5px solid #8B5CF6;
-                      padding: 0.8rem 1rem; border-radius: 10px; margin: 0.4rem 0;
-                      color: #4C1D95; font-family: 'Courier New', monospace; }
+        .ml-hero p { color: #FFFFFF; font-size: 1rem; margin-top: 0.5rem; opacity: 1; }
+
+        .ml-stat {
+            background: #FFFFFF; border: 3px solid #E5E5E5;
+            border-radius: 15px; padding: 1rem; text-align: center;
+            color: #1A1A1A; font-weight: bold;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+        }
+
+        .ml-question {
+            background: #FFF8E7; padding: 2rem; border-radius: 20px;
+            border: 4px solid #FFC800; margin: 1.5rem 0;
+            text-align: center; font-size: 1.6rem;
+            font-weight: bold; color: #1A1A1A;
+        }
+
+        .ml-puzzle-box {
+            background: #FFFFFF; padding: 2rem; border-radius: 20px;
+            border: 3px solid #1CB0F6; margin: 1rem 0;
+            text-align: center; font-size: 1.5rem;
+            font-weight: bold; color: #1A1A1A; line-height: 2.2;
+        }
+
+        .ml-correct {
+            background: #D7FFB8; padding: 1rem; border-radius: 15px;
+            border-left: 6px solid #58CC02; margin: 1rem 0;
+            color: #2E7D32; font-weight: bold;
+        }
+        .ml-wrong {
+            background: #FFDFE0; padding: 1rem; border-radius: 15px;
+            border-left: 6px solid #FF4B4B; margin: 1rem 0;
+            color: #C62828; font-weight: bold;
+        }
+        .ml-hint {
+            background: #FFF9C4; padding: 1rem; border-radius: 15px;
+            border-left: 6px solid #FBC02D; margin: 0.5rem 0;
+            color: #1A1A1A;
+        }
+        .ml-solution {
+            background: #E3F2FD; padding: 1.3rem; border-radius: 15px;
+            border-left: 6px solid #1CB0F6; margin: 1rem 0;
+            color: #1A1A1A; line-height: 1.8;
+        }
+        .ml-victory {
+            background: #58CC02; color: #FFFFFF;
+            padding: 2rem; border-radius: 20px;
+            text-align: center; margin: 1rem 0;
+        }
+        .ml-gameover {
+            background: #FF4B4B; color: #FFFFFF;
+            padding: 2rem; border-radius: 20px;
+            text-align: center; margin: 1rem 0;
+        }
+        .ml-concept {
+            background: #F3E5F5; padding: 1.5rem; border-radius: 15px;
+            border-left: 6px solid #9C27B0;
+            margin: 1rem 0; color: #1A1A1A; line-height: 1.8;
+        }
+        .ml-example {
+            background: #E8F5E9; padding: 1.2rem; border-radius: 12px;
+            border-left: 5px solid #4CAF50;
+            margin: 0.8rem 0; color: #1A1A1A;
+            font-family: 'Courier New', monospace;
+        }
+        .ml-mode-card {
+            background: #FFFFFF; padding: 1.8rem 1rem;
+            border-radius: 20px; border: 3px solid #E5E5E5;
+            text-align: center; margin: 0.5rem 0;
+            transition: all 0.3s; min-height: 170px;
+        }
+        .ml-mode-card:hover {
+            transform: translateY(-5px);
+            border-color: #58CC02;
+            box-shadow: 0 12px 28px rgba(88,204,2,0.25);
+        }
+        .ml-game-card {
+            background: #F0F8FF; padding: 1.5rem;
+            border-radius: 18px; border: 3px solid #1CB0F6;
+            text-align: center; margin: 0.5rem 0;
+            min-height: 130px;
+        }
+        .ml-formula {
+            background: #F5F3FF; border-left: 5px solid #8B5CF6;
+            padding: 0.8rem 1rem; border-radius: 10px;
+            margin: 0.4rem 0; color: #4C1D95;
+            font-family: 'Courier New', monospace; font-size: 1rem;
+        }
     </style>
     """, unsafe_allow_html=True)
 
     st.markdown(f"""
         <div class="ml-hero">
             <h1>🧮 {t['title']} — ClyxessChat AI</h1>
-            <p>Puzzles • Real Math • 117+ Tools Design Board • Class 1 → University</p>
+            <p>Puzzles • Real Math • Design Board • Class 1 → University</p>
         </div>
     """, unsafe_allow_html=True)
 
@@ -6325,12 +6446,18 @@ def render_math_lab(client):
             st.session_state[k] = v
 
     # ============================================================
-    # PUZZLE GENERATORS
+    # PUZZLE GENERATORS (ALL FROM SCREENSHOTS)
     # ============================================================
+
     def p_fruit_equation():
-        a, b, c = random.randint(2, 10), random.randint(2, 10), random.randint(1, 8)
-        q = (f"🍎 + 🍎 + 🍎 = {3*a}<br>🍎 + 🍌 + 🍌 = {a + 2*b}<br>"
-             f"🍌 − 🥥 = {b - c}<br>🥥 + 🍎 × 🍌 = ?")
+        """🍎+🍎+🍎=30 type"""
+        a = random.randint(2, 10)
+        b = random.randint(2, 10)
+        c = random.randint(1, 8)
+        q = (f"🍎 + 🍎 + 🍎 = {3*a}<br>"
+             f"🍎 + 🍌 + 🍌 = {a + 2*b}<br>"
+             f"🍌 − 🥥 = {b - c}<br>"
+             f"🥥 + 🍎 × 🍌 = ?")
         answer = c + a * b
         opts = {answer}
         while len(opts) < 4:
@@ -6338,68 +6465,99 @@ def render_math_lab(client):
             if fake > 0: opts.add(fake)
         opts = list(opts); random.shuffle(opts)
         return {"type": "puzzle", "question": q, "options": [str(o) for o in opts],
-                "answer": str(answer), "hint": "हर फल की value निकालो",
-                "solution": f"🍎={a}, 🍌={b}, 🥥={c} → {answer}"}
+                "answer": str(answer),
+                "hint": "हर फल की value पहले निकालो (पहले line से शुरू करो)",
+                "solution": f"🍎={a}, 🍌={b}, 🥥={c} → {c} + {a}×{b} = {answer}"}
 
     def p_sports_equation():
-        s, b, tn = random.randint(2, 8), random.randint(2, 10), random.randint(2, 6)
-        q = (f"⚽ + ⚽ + ⚽ = {3*s}<br>⚽ + 🏀 + 🏀 = {s + 2*b}<br>"
-             f"🏀 − 🎾 = {b - tn}<br>🎾 + ⚽ × 🏀 = ?")
-        answer = tn + s * b
+        """⚽+⚽+⚽=27 type"""
+        soccer = random.randint(2, 8)
+        basket = random.randint(2, 10)
+        tennis = random.randint(2, 6)
+        q = (f"⚽ + ⚽ + ⚽ = {3*soccer}<br>"
+             f"⚽ + 🏀 + 🏀 = {soccer + 2*basket}<br>"
+             f"🏀 − 🎾 = {basket - tennis}<br>"
+             f"🎾 + ⚽ × 🏀 = ?")
+        answer = tennis + soccer * basket
         opts = {answer}
         while len(opts) < 4:
             fake = answer + random.randint(-20, 20)
             if fake > 0: opts.add(fake)
         opts = list(opts); random.shuffle(opts)
         return {"type": "puzzle", "question": q, "options": [str(o) for o in opts],
-                "answer": str(answer), "hint": "हर ball की value निकालो",
-                "solution": f"⚽={s}, 🏀={b}, 🎾={tn} → {answer}"}
+                "answer": str(answer),
+                "hint": "हर ball की value निकालो",
+                "solution": f"⚽={soccer}, 🏀={basket}, 🎾={tennis} → {answer}"}
 
     def p_vehicles_equation():
-        c, t2, b = random.randint(5, 12), random.randint(3, 10), random.randint(2, 8)
-        q = (f"🚗 + 🚗 + 🚗 = {3*c}<br>🚗 + 🚚 + 🚚 = {c + 2*t2}<br>"
-             f"🚚 − 🚌 = {t2 - b}<br>🚌 + 🚗 × 🚚 = ?")
-        answer = b + c * t2
+        """🚗+🚗+🚗=30 type"""
+        car = random.randint(5, 12)
+        truck = random.randint(3, 10)
+        bus = random.randint(2, 8)
+        q = (f"🚗 + 🚗 + 🚗 = {3*car}<br>"
+             f"🚗 + 🚚 + 🚚 = {car + 2*truck}<br>"
+             f"🚚 − 🚌 = {truck - bus}<br>"
+             f"🚌 + 🚗 × 🚚 = ?")
+        answer = bus + car * truck
         opts = {answer}
         while len(opts) < 4:
             fake = answer + random.randint(-30, 30)
             if fake > 0: opts.add(fake)
         opts = list(opts); random.shuffle(opts)
         return {"type": "puzzle", "question": q, "options": [str(o) for o in opts],
-                "answer": str(answer), "hint": "पहले 🚗, फिर 🚚, फिर 🚌",
-                "solution": f"🚗={c}, 🚚={t2}, 🚌={b} → {answer}"}
+                "answer": str(answer),
+                "hint": "पहले 🚗 निकालो, फिर 🚚, फिर 🚌",
+                "solution": f"🚗={car}, 🚚={truck}, 🚌={bus} → {answer}"}
 
     def p_animal_weights():
-        d, c, r = random.randint(15, 25), random.randint(5, 12), random.randint(1, 5)
-        q = (f"🐕 + 🐀 = {d+r} kg<br>🐈 + 🐀 = {c+r} kg<br>"
-             f"🐕 + 🐈 = {d+c} kg<br>🐕 + 🐈 + 🐀 = ? kg")
-        answer = d + c + r
+        """🐕+🐀=20kg, 🐈+🐀=10kg, 🐕+🐈=24kg"""
+        dog = random.randint(15, 25)
+        cat = random.randint(5, 12)
+        rat = random.randint(1, 5)
+        q = (f"🐕 + 🐀 = {dog+rat} kg<br>"
+             f"🐈 + 🐀 = {cat+rat} kg<br>"
+             f"🐕 + 🐈 = {dog+cat} kg<br>"
+             f"🐕 + 🐈 + 🐀 = ? kg")
+        answer = dog + cat + rat
         opts = {answer}
         while len(opts) < 4:
             fake = answer + random.randint(-8, 8)
             if fake > 0: opts.add(fake)
         opts = list(opts); random.shuffle(opts)
         return {"type": "puzzle", "question": q, "options": [str(o) for o in opts],
-                "answer": str(answer), "hint": "तीनों जोड़ो, 2 से divide",
-                "solution": f"Total = {answer} kg"}
+                "answer": str(answer),
+                "hint": "तीनों equations जोड़ो और 2 से divide करो",
+                "solution": f"🐕={dog}, 🐈={cat}, 🐀={rat} → Total = {answer} kg"}
 
     def p_animal_weights2():
-        r, c, d = random.randint(5, 12), random.randint(3, 8), random.randint(15, 25)
-        q = (f"🦝 + 🐈 = {r+c} kg<br>🦝 + 🐕 = {r+d} kg<br>"
-             f"🐈 + 🐕 = {c+d} kg<br>🦝 + 🐈 + 🐕 = ? kg")
-        answer = r + c + d
+        """Raccoon, cat, dog"""
+        raccoon = random.randint(5, 12)
+        cat = random.randint(3, 8)
+        dog = random.randint(15, 25)
+        q = (f"🦝 + 🐈 = {raccoon+cat} kg<br>"
+             f"🦝 + 🐕 = {raccoon+dog} kg<br>"
+             f"🐈 + 🐕 = {cat+dog} kg<br>"
+             f"🦝 + 🐈 + 🐕 = ? kg")
+        answer = raccoon + cat + dog
         opts = {answer}
         while len(opts) < 4:
             fake = answer + random.randint(-10, 10)
             if fake > 0: opts.add(fake)
         opts = list(opts); random.shuffle(opts)
         return {"type": "puzzle", "question": q, "options": [str(o) for o in opts],
-                "answer": str(answer), "hint": "तीनों जोड़ो, 2 से divide",
-                "solution": f"Total = {answer} kg"}
+                "answer": str(answer),
+                "hint": "तीनों को जोड़ो, फिर 2 से divide करो",
+                "solution": f"🦝={raccoon}, 🐈={cat}, 🐕={dog} → {answer} kg"}
 
     def p_triangles_count():
-        levels = {1: 5, 2: 13, 3: 27}
-        n = random.choice([1, 2, 3]); total = levels[n]
+        """Count triangles"""
+        levels = {
+            1: {"total": 5, "desc": "1 छोटा + 4 बड़े"},
+            2: {"total": 13, "desc": "13 triangles"},
+            3: {"total": 27, "desc": "27 triangles"},
+        }
+        n = random.choice([1, 2, 3])
+        total = levels[n]["total"]
         q = f"🔺 Triangle में कितने triangles हैं? (Level {n})<br>" + "🔺" * n
         opts = {total}
         while len(opts) < 4:
@@ -6407,37 +6565,46 @@ def render_math_lab(client):
             if fake > 0: opts.add(fake)
         opts = list(opts); random.shuffle(opts)
         return {"type": "puzzle", "question": q, "options": [str(o) for o in opts],
-                "answer": str(total), "hint": "सब गिनो",
+                "answer": str(total),
+                "hint": "छोटे + मध्यम + बड़े — सब गिनो",
                 "solution": f"Total = {total} triangles"}
 
     def p_count_cubes():
+        """How many cubes"""
         layers = random.randint(2, 4)
         total = sum(i*i for i in range(1, layers+1))
-        q = f"🧊 {layers} layer cube में कुल कितने cubes?<br>"
+        q = f"🧊 {layers} layer वाले cube में कुल कितने छोटे cubes?<br>(Bottom layer = {layers}×{layers})"
         opts = {total}
         while len(opts) < 4:
             fake = total + random.randint(-5, 5)
             if fake > 0: opts.add(fake)
         opts = list(opts); random.shuffle(opts)
         return {"type": "puzzle", "question": q, "options": [str(o) for o in opts],
-                "answer": str(total), "hint": "हर layer अलग गिनो",
-                "solution": f"Total = {total}"}
+                "answer": str(total),
+                "hint": "हर layer को अलग-अलग गिनो और जोड़ो",
+                "solution": f"1² + 2² + ... + {layers}² = {total}"}
 
     def p_truck_braking():
+        """Which truck is braking (Physics)"""
         q = ("🚚 Which truck is braking?<br><br>"
-             "**Truck 1:** Liquid पीछे<br>**Truck 2:** Liquid आगे<br>**Truck 3:** Liquid समान")
+             "**Truck 1:** Liquid पीछे जा रहा है<br>"
+             "**Truck 2:** Liquid आगे जा रहा है<br>"
+             "**Truck 3:** Liquid समान है")
         return {"type": "puzzle", "question": q,
-                "options": ["Truck 1", "Truck 2", "Truck 3"], "answer": "Truck 2",
-                "hint": "Brake पर liquid inertia से आगे",
-                "solution": "Truck 2"}
+                "options": ["Truck 1", "Truck 2", "Truck 3"],
+                "answer": "Truck 2",
+                "hint": "जब brake लगाते हैं, liquid inertia से आगे झुकता है",
+                "solution": "🚚 Braking → Liquid आगे → Truck 2"}
 
     def p_pattern_complete():
+        """Pattern sequences"""
         patterns = [
-            {"seq": "2, 4, 6, 8, ?", "ans": "10", "hint": "+2"},
-            {"seq": "1, 4, 9, 16, ?", "ans": "25", "hint": "Squares"},
+            {"seq": "2, 4, 6, 8, ?", "ans": "10", "hint": "+2 हर बार"},
+            {"seq": "1, 4, 9, 16, ?", "ans": "25", "hint": "Perfect squares"},
             {"seq": "1, 1, 2, 3, 5, ?", "ans": "8", "hint": "Fibonacci"},
             {"seq": "3, 6, 12, 24, ?", "ans": "48", "hint": "×2"},
-            {"seq": "2, 3, 5, 7, 11, ?", "ans": "13", "hint": "Primes"},
+            {"seq": "2, 3, 5, 7, 11, ?", "ans": "13", "hint": "Prime numbers"},
+            {"seq": "10, 20, 30, 40, ?", "ans": "50", "hint": "+10"},
         ]
         p = random.choice(patterns)
         opts = {p["ans"]}
@@ -6445,69 +6612,98 @@ def render_math_lab(client):
             fake = int(p["ans"]) + random.randint(-5, 10)
             if fake > 0: opts.add(str(fake))
         opts = list(opts); random.shuffle(opts)
-        return {"type": "puzzle", "question": f"🔷 अगला: {p['seq']}",
-                "options": opts, "answer": p["ans"], "hint": p["hint"],
-                "solution": f"{p['hint']} → {p['ans']}"}
+        return {"type": "puzzle", "question": f"🔷 अगला number: {p['seq']}",
+                "options": opts, "answer": p["ans"],
+                "hint": p["hint"],
+                "solution": f"Pattern: {p['hint']} → {p['ans']}"}
 
     def p_odd_one():
+        """Find odd one out"""
         sets = [
-            {"items": ["2", "3", "5", "7", "9"], "ans": "9", "why": "9 prime नहीं"},
-            {"items": ["4", "9", "16", "20", "25"], "ans": "20", "why": "Perfect square नहीं"},
-            {"items": ["3", "6", "9", "11", "12"], "ans": "11", "why": "3 का multiple नहीं"},
+            {"items": ["2", "3", "5", "7", "9"], "ans": "9", "why": "9 prime नहीं है"},
+            {"items": ["4", "9", "16", "20", "25"], "ans": "20", "why": "20 perfect square नहीं"},
+            {"items": ["3", "6", "9", "11", "12"], "ans": "11", "why": "11, 3 का multiple नहीं"},
+            {"items": ["🍎", "🍌", "🥕", "🍇"], "ans": "🥕", "why": "🥕 सब्जी है, बाकी फल"},
+            {"items": ["🟥", "🟦", "🟩", "⚫"], "ans": "⚫", "why": "⚫ सिर्फ black है, बाकी रंगीन"},
         ]
         s = random.choice(sets)
         return {"type": "puzzle", "question": f"🎯 Odd one out: {' • '.join(s['items'])}",
                 "options": s["items"], "answer": s["ans"],
-                "hint": "Pattern ढूँढो", "solution": s["why"]}
+                "hint": "Pattern ढूँढो",
+                "solution": s["why"]}
 
     def p_shape_match():
+        """Shape pattern completion"""
         sets = [
             {"main": "🔴 🔵 🔴 🔵 🔴 ?", "ans": "🔵", "opts": ["🔴", "🔵", "🟢", "🟡"]},
             {"main": "⭐ 🌙 ⭐ 🌙 ⭐ ?", "ans": "🌙", "opts": ["⭐", "🌙", "☀️", "🌈"]},
+            {"main": "1️⃣ 2️⃣ 1️⃣ 2️⃣ 1️⃣ ?", "ans": "2️⃣", "opts": ["1️⃣", "2️⃣", "3️⃣", "4️⃣"]},
+            {"main": "⬛ ⬜ ⬛ ⬜ ⬛ ?", "ans": "⬜", "opts": ["⬛", "⬜", "🟥", "🟦"]},
         ]
         s = random.choice(sets)
         return {"type": "puzzle", "question": f"🎨 Pattern: {s['main']}",
                 "options": s["opts"], "answer": s["ans"],
-                "hint": "Alternate देखो", "solution": f"Pattern: {s['ans']}"}
+                "hint": "देखो क्या alternate हो रहा है",
+                "solution": f"Pattern: {s['ans']}"}
 
     def p_cube_missing():
-        q = ("🧊 3D Cube में piece missing है।<br>**A:** Green top, Blue left, Red front<br>"
-             "**B:** Blue top, Red front, Green right<br>**C:** Green top, Red front, Blue right")
-        return {"type": "puzzle", "question": q, "options": ["A", "B", "C"],
-                "answer": "C", "hint": "Adjacent colors check करो",
-                "solution": "C"}
+        """Rubik's cube missing piece"""
+        q = ("🧊 3D Cube में एक piece missing है (white hole)।<br>"
+             "Neeche wale 3D cubes mein se kaun sa piece sahi fit hoga?<br><br>"
+             "**A:** Green top, Blue left, Red front<br>"
+             "**B:** Blue top, Red front, Green right<br>"
+             "**C:** Green top, Red front, Blue right")
+        return {"type": "puzzle", "question": q,
+                "options": ["A", "B", "C"], "answer": "C",
+                "hint": "हर face का color देखो और adjacent colors check करो",
+                "solution": "सही piece: Green top, Red front, Blue right → C"}
 
     def p_puzzle_shape_fill():
-        q = ("🔵 Square का missing piece complete करो<br>"
-             "**A:** Blue circle + yellow<br>**B:** Yellow + blue<br>**C:** Green + yellow")
-        return {"type": "puzzle", "question": q, "options": ["A", "B", "C"],
-                "answer": "B", "hint": "Corner shapes match करो", "solution": "B"}
+        """Complete missing shape"""
+        q = ("🔵 Neeche wale shape se square ke missing piece ko complete karo<br><br>"
+             "**A:** Blue circle + yellow<br>"
+             "**B:** Yellow + blue<br>"
+             "**C:** Green + yellow")
+        return {"type": "puzzle", "question": q,
+                "options": ["A", "B", "C"], "answer": "B",
+                "hint": "Corner ke shapes को match करो",
+                "solution": "सही: Yellow + blue pattern → B"}
 
     def p_parrot_height():
-        man = random.randint(150, 180); parrot = random.randint(30, 50)
+        """Calculate height"""
+        man = random.randint(150, 180)
+        parrot = random.randint(30, 50)
         total = man + parrot
-        q = f"👨 Man = {man} cm<br>🦜 Man + Parrot = {total} cm<br>🦜 Parrot = ? cm"
-        opts = {parrot}
+        q = (f"👨 Man = {man} cm<br>"
+             f"🦜 Man + Parrot = {total} cm<br>"
+             f"🦜 Parrot = ? cm")
+        answer = parrot
+        opts = {answer}
         while len(opts) < 4:
-            fake = parrot + random.randint(-15, 15)
+            fake = answer + random.randint(-15, 15)
             if fake > 0: opts.add(fake)
         opts = list(opts); random.shuffle(opts)
         return {"type": "puzzle", "question": q, "options": [str(o) for o in opts],
-                "answer": str(parrot), "hint": "Total − Man",
+                "answer": str(answer),
+                "hint": f"Total − Man = Parrot",
                 "solution": f"{total} − {man} = {parrot} cm"}
 
     def p_count_objects():
+        """Count objects visual"""
         n = random.randint(3, 15)
-        q = "🔵" * n + "<br>कुल कितने objects?"
+        q = "🔵" * n + "<br>कुल कितने objects हैं?"
         opts = {n}
         while len(opts) < 4:
             fake = n + random.randint(-3, 4)
             if fake > 0: opts.add(fake)
         opts = list(opts); random.shuffle(opts)
         return {"type": "puzzle", "question": q, "options": [str(o) for o in opts],
-                "answer": str(n), "hint": "एक-एक गिनो", "solution": f"Total = {n}"}
+                "answer": str(n),
+                "hint": "एक-एक करके गिनो",
+                "solution": f"Total = {n}"}
 
     def p_addition_simple():
+        """Simple addition"""
         a, b = random.randint(1, 20), random.randint(1, 20)
         ans = a + b
         opts = {ans}
@@ -6517,9 +6713,11 @@ def render_math_lab(client):
         opts = list(opts); random.shuffle(opts)
         return {"type": "puzzle", "question": f"🔢 {a} + {b} = ?",
                 "options": [str(o) for o in opts], "answer": str(ans),
-                "hint": "एक-एक जोड़ो", "solution": f"{a} + {b} = {ans}"}
+                "hint": "एक-एक करके जोड़ो",
+                "solution": f"{a} + {b} = {ans}"}
 
     def p_subtraction_simple():
+        """Simple subtraction"""
         a = random.randint(5, 30); b = random.randint(1, a)
         ans = a - b
         opts = {ans}
@@ -6529,9 +6727,11 @@ def render_math_lab(client):
         opts = list(opts); random.shuffle(opts)
         return {"type": "puzzle", "question": f"🔢 {a} − {b} = ?",
                 "options": [str(o) for o in opts], "answer": str(ans),
-                "hint": "उल्टा जोड़ो", "solution": f"{a} − {b} = {ans}"}
+                "hint": "उल्टा जोड़ो check करने के लिए",
+                "solution": f"{a} − {b} = {ans}"}
 
     def p_multiplication():
+        """Simple multiplication"""
         a, b = random.randint(2, 12), random.randint(2, 12)
         ans = a * b
         opts = {ans}
@@ -6541,10 +6741,12 @@ def render_math_lab(client):
         opts = list(opts); random.shuffle(opts)
         return {"type": "puzzle", "question": f"✖️ {a} × {b} = ?",
                 "options": [str(o) for o in opts], "answer": str(ans),
-                "hint": f"{a} को {b} बार जोड़ो", "solution": f"{a} × {b} = {ans}"}
+                "hint": f"{a} को {b} बार जोड़ो",
+                "solution": f"{a} × {b} = {ans}"}
 
     def p_missing_number():
-        a, b = random.randint(1, 15), random.randint(1, 15)
+        """Missing number"""
+        a = random.randint(1, 15); b = random.randint(1, 15)
         ans = a + b
         q = f"❓ {a} + ? = {ans}"
         opts = {b}
@@ -6553,114 +6755,253 @@ def render_math_lab(client):
             if fake > 0: opts.add(fake)
         opts = list(opts); random.shuffle(opts)
         return {"type": "puzzle", "question": q, "options": [str(o) for o in opts],
-                "answer": str(b), "hint": f"{ans} − {a}",
+                "answer": str(b),
+                "hint": f"{ans} − {a} = ?",
                 "solution": f"{ans} − {a} = {b}"}
 
     def p_true_false():
+        """True/False"""
         a, b = random.randint(1, 15), random.randint(1, 15)
         real = a * b
         shown = real if random.random() > 0.5 else real + random.choice([-5, -2, 2, 5])
         q = f"⚡ {a} × {b} = {shown} — सही या गलत?"
-        return {"type": "puzzle", "question": q, "options": ["True", "False"],
+        return {"type": "puzzle", "question": q,
+                "options": ["True", "False"],
                 "answer": "True" if real == shown else "False",
-                "hint": "ध्यान से calculate", "solution": f"{a} × {b} = {real}"}
+                "hint": "ध्यान से calculate करो",
+                "solution": f"{a} × {b} = {real} (shown: {shown})"}
 
+    # ============================================================
+    # PUZZLE REGISTRY
+    # ============================================================
     PUZZLES = {
-        "count_obj": {"icon": "🔢", "name": "Count Objects", "gen": p_count_objects, "range": ["Class 1-2"]},
-        "add": {"icon": "➕", "name": "Addition", "gen": p_addition_simple, "range": ["Class 1-2", "Class 3-5"]},
-        "sub": {"icon": "➖", "name": "Subtraction", "gen": p_subtraction_simple, "range": ["Class 1-2", "Class 3-5"]},
-        "mul": {"icon": "✖️", "name": "Multiplication", "gen": p_multiplication, "range": ["Class 3-5", "Class 6-8"]},
-        "missing": {"icon": "❓", "name": "Find Missing", "gen": p_missing_number, "range": ["Class 1-2", "Class 3-5"]},
-        "tf": {"icon": "⚡", "name": "True/False", "gen": p_true_false, "range": ["Class 3-5", "Class 6-8"]},
-        "pattern": {"icon": "🔷", "name": "Number Pattern", "gen": p_pattern_complete, "range": ["Class 1-2", "Class 3-5", "Class 6-8"]},
-        "odd": {"icon": "🎯", "name": "Odd One Out", "gen": p_odd_one, "range": ["Class 3-5", "Class 6-8"]},
-        "shape": {"icon": "🎨", "name": "Shape Pattern", "gen": p_shape_match, "range": ["Class 1-2", "Class 3-5"]},
-        "fruit": {"icon": "🍎", "name": "Fruit Math", "gen": p_fruit_equation, "range": ["Class 3-5", "Class 6-8", "Class 9-10"]},
-        "sports": {"icon": "⚽", "name": "Sports Ball", "gen": p_sports_equation, "range": ["Class 3-5", "Class 6-8"]},
-        "vehicles": {"icon": "🚗", "name": "Vehicle Math", "gen": p_vehicles_equation, "range": ["Class 3-5", "Class 6-8", "Class 9-10"]},
-        "animals": {"icon": "🐕", "name": "Animal Weights", "gen": p_animal_weights, "range": ["Class 3-5", "Class 6-8", "Class 9-10"]},
-        "animals2": {"icon": "🦝", "name": "Pet Weights", "gen": p_animal_weights2, "range": ["Class 6-8", "Class 9-10"]},
-        "triangles": {"icon": "🔺", "name": "Count Triangles", "gen": p_triangles_count, "range": ["Class 6-8", "Class 9-10"]},
-        "cubes": {"icon": "🧊", "name": "Count Cubes", "gen": p_count_cubes, "range": ["Class 6-8", "Class 9-10"]},
-        "truck": {"icon": "🚚", "name": "Physics Puzzle", "gen": p_truck_braking, "range": ["Class 6-8", "Class 9-10"]},
-        "cube_piece": {"icon": "🎲", "name": "Cube Missing Piece", "gen": p_cube_missing, "range": ["Class 6-8", "Class 9-10"]},
-        "shape_fill": {"icon": "🔵", "name": "Shape Fill", "gen": p_puzzle_shape_fill, "range": ["Class 6-8", "Class 9-10"]},
-        "parrot": {"icon": "🦜", "name": "Height Puzzle", "gen": p_parrot_height, "range": ["Class 3-5", "Class 6-8"]},
+        "count_obj": {"icon": "🔢", "name": "Count Objects", "gen": p_count_objects,
+                      "range": ["Class 1-2"]},
+        "add": {"icon": "➕", "name": "Addition", "gen": p_addition_simple,
+                "range": ["Class 1-2", "Class 3-5"]},
+        "sub": {"icon": "➖", "name": "Subtraction", "gen": p_subtraction_simple,
+                "range": ["Class 1-2", "Class 3-5"]},
+        "mul": {"icon": "✖️", "name": "Multiplication", "gen": p_multiplication,
+                "range": ["Class 3-5", "Class 6-8"]},
+        "missing": {"icon": "❓", "name": "Find Missing", "gen": p_missing_number,
+                    "range": ["Class 1-2", "Class 3-5"]},
+        "tf": {"icon": "⚡", "name": "True/False", "gen": p_true_false,
+               "range": ["Class 3-5", "Class 6-8"]},
+        "pattern": {"icon": "🔷", "name": "Number Pattern", "gen": p_pattern_complete,
+                    "range": ["Class 1-2", "Class 3-5", "Class 6-8"]},
+        "odd": {"icon": "🎯", "name": "Odd One Out", "gen": p_odd_one,
+                "range": ["Class 3-5", "Class 6-8"]},
+        "shape": {"icon": "🎨", "name": "Shape Pattern", "gen": p_shape_match,
+                  "range": ["Class 1-2", "Class 3-5"]},
+        "fruit": {"icon": "🍎", "name": "Fruit Math", "gen": p_fruit_equation,
+                  "range": ["Class 3-5", "Class 6-8", "Class 9-10"]},
+        "sports": {"icon": "⚽", "name": "Sports Ball", "gen": p_sports_equation,
+                   "range": ["Class 3-5", "Class 6-8"]},
+        "vehicles": {"icon": "🚗", "name": "Vehicle Math", "gen": p_vehicles_equation,
+                     "range": ["Class 3-5", "Class 6-8", "Class 9-10"]},
+        "animals": {"icon": "🐕", "name": "Animal Weights", "gen": p_animal_weights,
+                    "range": ["Class 3-5", "Class 6-8", "Class 9-10"]},
+        "animals2": {"icon": "🦝", "name": "Pet Weights", "gen": p_animal_weights2,
+                     "range": ["Class 6-8", "Class 9-10"]},
+        "triangles": {"icon": "🔺", "name": "Count Triangles", "gen": p_triangles_count,
+                      "range": ["Class 6-8", "Class 9-10"]},
+        "cubes": {"icon": "🧊", "name": "Count Cubes", "gen": p_count_cubes,
+                  "range": ["Class 6-8", "Class 9-10"]},
+        "truck": {"icon": "🚚", "name": "Physics Puzzle", "gen": p_truck_braking,
+                  "range": ["Class 6-8", "Class 9-10"]},
+        "cube_piece": {"icon": "🎲", "name": "Cube Missing Piece", "gen": p_cube_missing,
+                       "range": ["Class 6-8", "Class 9-10"]},
+        "shape_fill": {"icon": "🔵", "name": "Shape Fill", "gen": p_puzzle_shape_fill,
+                       "range": ["Class 6-8", "Class 9-10"]},
+        "parrot": {"icon": "🦜", "name": "Height Puzzle", "gen": p_parrot_height,
+                   "range": ["Class 3-5", "Class 6-8"]},
     }
 
+    # ============================================================
+    # UNIVERSITY REAL MATH
+    # ============================================================
     UNIVERSITY = {
         "Calculus I — Derivatives": {
-            "concept": "Limits, Rate of Change",
-            "theory": "**Rate of Change:** dy/dx = lim(Δx→0) [f(x+Δx) − f(x)]/Δx = f'(x)\n\n**Increasing:** f'(x) > 0\n**Decreasing:** f'(x) < 0\n**Constant:** f'(x) = 0",
+            "concept": "Limits, Rate of Change, Increasing/Decreasing Functions",
+            "theory": """
+            **Rate of Change:** If y = f(x), then dy/dx represents rate of change of y w.r.t x at x = x₀.
+
+            **Differentials:** dy/dx = lim(Δx→0) [f(x+Δx) − f(x)]/Δx = f'(x)
+            → dy = f'(x) dx (differential of the function)
+
+            **Increasing/Decreasing Functions:**
+            - f is **increasing** on (a,b) if x₁ < x₂ → f(x₁) ≤ f(x₂)
+            - f is **decreasing** on (a,b) if x₁ < x₂ → f(x₁) ≥ f(x₂)
+
+            **Theorem 1:**
+            - f increasing on [a,b] if f'(x) > 0
+            - f decreasing on [a,b] if f'(x) < 0
+            - f constant on [a,b] if f'(x) = 0
+            """,
             "examples": [
-                {"q": "d/dx (x³ + 2x² − 5x + 7)", "steps": "Power rule", "ans": "3x² + 4x − 5"},
-                {"q": "d/dx (sin x · cos x)", "steps": "Product rule", "ans": "cos(2x)"},
-                {"q": "lim(x→2) (x²−4)/(x−2)", "steps": "Factor", "ans": "4"},
+                {"q": "d/dx (x³ + 2x² − 5x + 7)", "steps": "3x² + 4x − 5 (Power rule)", "ans": "3x² + 4x − 5"},
+                {"q": "d/dx (sin x · cos x)", "steps": "cos x·cos x + sin x·(−sin x) = cos²x − sin²x = cos(2x)", "ans": "cos(2x)"},
+                {"q": "lim(x→2) (x²−4)/(x−2)", "steps": "(x−2)(x+2)/(x−2) = x+2 → 2+2 = 4", "ans": "4"},
             ]
         },
         "Calculus II — Integrals": {
             "concept": "Integration, Types, Properties",
-            "theory": "**∫f(x)dx = F(x) + C**\n\n**Power:** ∫xⁿ dx = xⁿ⁺¹/(n+1) + C\n**1/x:** ∫(1/x)dx = ln|x| + C",
+            "theory": """
+            **Definition:** Integration is reverse process of differentiation.
+            If d/dx[F(x)] = f(x), then ∫f(x)dx = F(x) + C
+
+            **Types:**
+            1. **Indefinite Integration:** ∫f(x)dx = F(x) + C
+            2. **Definite Integration:** ∫ₐᵇ f(x)dx = F(b) − F(a)
+
+            **Properties:**
+            1. Linearity: ∫(af+bg)dx = a∫f dx + b∫g dx
+            2. Constant Multiple: ∫a·f dx = a∫f dx
+            3. Sum/Difference: ∫(f±g)dx = ∫f dx ± ∫g dx
+            4. Power Rule: ∫xⁿ dx = xⁿ⁺¹/(n+1) + C
+            5. Integral of 1/x: ∫(1/x)dx = ln|x| + C
+            6. Definite: ∫ₐᵃ = 0; ∫ₐᵇ = −∫ᵦᵃ
+            """,
             "examples": [
-                {"q": "∫(2x+3)dx", "steps": "Split", "ans": "x² + 3x + C"},
-                {"q": "∫x² dx", "steps": "Power rule", "ans": "x³/3 + C"},
-                {"q": "∫sin x dx", "steps": "Standard", "ans": "−cos x + C"},
+                {"q": "∫(2x+3)dx", "steps": "2∫x dx + 3∫1 dx = 2(x²/2) + 3x + C = x² + 3x + C", "ans": "x² + 3x + C"},
+                {"q": "∫x² dx", "steps": "x³/3 + C", "ans": "x³/3 + C"},
+                {"q": "∫sin x dx", "steps": "−cos x + C", "ans": "−cos x + C"},
             ]
         },
         "Probability": {
-            "concept": "Conditional Probability, Multiplication",
-            "theory": "**P(E|F) = P(E∩F)/P(F)**\n**P(E∩F) = P(E)·P(F|E)**\n**Independent:** P(E∩F) = P(E)·P(F)\n**Bayes:** P(A|B) = P(B|A)·P(A)/P(B)",
+            "concept": "Conditional Probability, Multiplication Theorem, Independent Events",
+            "theory": """
+            **Conditional Probability:**
+            P(E|F) = P(E∩F) / P(F), where P(F) ≠ 0
+            Note: 0 ≤ P(E|F) ≤ 1
+
+            **Properties:**
+            - P(S|F) = P(F|F) = 1
+            - P((A∪B)|F) = P(A|F) + P(B|F) − P((A∩B)|F)
+            - P(E'|F) = 1 − P(E|F)
+
+            **Multiplication Theorem:**
+            P(E∩F) = P(E)·P(F|E) = P(F)·P(E|F)
+            For 3 events: P(E∩F∩G) = P(E)·P(F|E)·P(G|E∩F)
+
+            **Independent Events:**
+            If E and F are independent: P(E∩F) = P(E)·P(F)
+            Also: P(E|F) = P(E), P(F|E) = P(F)
+            """,
             "examples": [
-                {"q": "2 heads in 3 flips", "steps": "C(3,2)·(1/2)³", "ans": "3/8"},
-                {"q": "E[X] for die", "steps": "Mean", "ans": "3.5"},
+                {"q": "2 heads in 3 coin flips", "steps": "C(3,2)·(1/2)³ = 3/8", "ans": "3/8"},
+                {"q": "E[X] for die roll", "steps": "(1+2+3+4+5+6)/6 = 21/6", "ans": "3.5"},
             ]
         },
         "Linear Algebra": {
-            "concept": "Matrices, Determinants, Eigenvalues",
-            "theory": "**det(2×2):** ad − bc\n**Inverse:** (1/det)·[[d,−b],[−c,a]]\n**Eigen:** det(A − λI) = 0",
+            "concept": "Matrices, Determinants, Eigenvalues, Vector Spaces",
+            "theory": """
+            **Matrix Operations:**
+            - Addition: Same dimensions
+            - Multiplication: (m×n)(n×p) = m×p
+            - Determinant (2×2): det(A) = ad − bc
+            - Inverse (2×2): A⁻¹ = (1/det(A))·[[d, −b], [−c, a]]
+
+            **Eigenvalues:**
+            Av = λv → det(A − λI) = 0
+
+            **Rank-Nullity Theorem:**
+            Rank(A) + Nullity(A) = number of columns
+            """,
             "examples": [
-                {"q": "det([[2,3],[1,4]])", "steps": "8 − 3", "ans": "5"},
-                {"q": "Eigenvalues of [[2,0],[0,3]]", "steps": "Diagonal", "ans": "2, 3"},
+                {"q": "det([[2,3],[1,4]])", "steps": "2×4 − 3×1 = 8 − 3", "ans": "5"},
+                {"q": "Eigenvalues of [[2,0],[0,3]]", "steps": "Diagonal → λ = 2, λ = 3", "ans": "2, 3"},
             ]
         },
         "Differential Equations": {
-            "concept": "ODE Solutions",
-            "theory": "**First Order:** dy/dx + P(x)y = Q(x)\n**Second Order:** ay'' + by' + cy = 0\nAux: ar² + br + c = 0",
+            "concept": "First & Second Order ODEs",
+            "theory": """
+            **First Order Linear:** dy/dx + P(x)y = Q(x)
+            Solution: y·e^(∫P dx) = ∫Q·e^(∫P dx) dx + C
+
+            **Second Order Homogeneous:** ay'' + by' + cy = 0
+            Auxiliary equation: ar² + br + c = 0
+            - r₁, r₂ distinct → y = C₁e^(r₁x) + C₂e^(r₂x)
+            - r₁ = r₂ → y = (C₁ + C₂x)e^(r₁x)
+            - Complex → y = e^(αx)(C₁cos βx + C₂sin βx)
+            """,
             "examples": [
-                {"q": "dy/dx = 2x", "steps": "Integrate", "ans": "y = x² + C"},
-                {"q": "dy/dx + y = 0", "steps": "Separate", "ans": "y = Ce⁻ˣ"},
+                {"q": "Solve: dy/dx = 2x", "steps": "y = x² + C", "ans": "y = x² + C"},
+                {"q": "Solve: dy/dx + y = 0", "steps": "y = Ce^(−x)", "ans": "y = Ce^(−x)"},
             ]
         },
         "Real Analysis": {
             "concept": "Sequences, Series, Convergence",
-            "theory": "**Σ1/n² = π²/6** (Basel)\n**Σ1/n = ∞** (Harmonic)\n**Theorems:** Bolzano-Weierstrass, IVT, MVT, Taylor",
+            "theory": """
+            **Sequence Convergence:**
+            aₙ → L if ∀ε>0, ∃N such that |aₙ − L| < ε for n > N
+
+            **Series:**
+            - Σ1/n² = π²/6 (Basel problem, convergent)
+            - Σ1/n = ∞ (Harmonic series, divergent)
+
+            **Theorems:**
+            - Bolzano-Weierstrass
+            - Intermediate Value
+            - Mean Value
+            - Taylor's Theorem
+            """,
             "examples": [
-                {"q": "Σ(1/n²)", "steps": "Basel", "ans": "π²/6"},
-                {"q": "Σ(1/n)", "steps": "Harmonic", "ans": "Divergent"},
+                {"q": "Σ(1/n²) from n=1 to ∞", "steps": "Basel problem → π²/6", "ans": "π²/6"},
+                {"q": "Is Σ(1/n) convergent?", "steps": "Harmonic series → Divergent", "ans": "Divergent"},
             ]
         },
         "Complex Analysis": {
-            "concept": "Euler's Formula, Cauchy-Riemann",
-            "theory": "**|z| = √(a²+b²)**\n**Euler:** e^(iθ) = cos θ + i sin θ\n**Identity:** e^(iπ) + 1 = 0\n**Cauchy-Riemann:** ∂u/∂x = ∂v/∂y",
+            "concept": "Complex Numbers, Euler's Formula, Cauchy-Riemann",
+            "theory": """
+            **Complex Number:** z = a + bi
+            - |z| = √(a² + b²)
+            - arg(z) = arctan(b/a)
+
+            **Euler's Formula:** e^(iθ) = cos θ + i·sin θ
+            **Euler's Identity:** e^(iπ) + 1 = 0
+
+            **Cauchy-Riemann Equations:**
+            ∂u/∂x = ∂v/∂y, ∂u/∂y = −∂v/∂x
+
+            **Cauchy's Theorem:**
+            ∮_C f(z) dz = 0 (for analytic f)
+            """,
             "examples": [
-                {"q": "e^(iπ)", "steps": "Euler", "ans": "−1"},
-                {"q": "|3 + 4i|", "steps": "√25", "ans": "5"},
+                {"q": "e^(iπ) = ?", "steps": "Euler: cos π + i sin π = −1", "ans": "−1"},
+                {"q": "|3 + 4i|", "steps": "√(9 + 16) = √25", "ans": "5"},
             ]
         },
         "Number Theory": {
-            "concept": "Primes, RSA",
-            "theory": "**Euler:** a^(φ(n)) ≡ 1 (mod n)\n**RSA:** n = pq; φ(n) = (p−1)(q−1); c = m^e mod n; m = c^d mod n",
+            "concept": "Primes, Modular Arithmetic, RSA",
+            "theory": """
+            **Euler's Theorem:** a^(φ(n)) ≡ 1 (mod n) for gcd(a,n) = 1
+
+            **RSA Algorithm:**
+            1. Choose primes p, q
+            2. n = p × q
+            3. φ(n) = (p−1)(q−1)
+            4. Choose e: gcd(e, φ(n)) = 1
+            5. d = e⁻¹ mod φ(n)
+            6. Encrypt: c = m^e mod n
+            7. Decrypt: m = c^d mod n
+            """,
             "examples": [
-                {"q": "RSA p=3,q=11,e=3", "steps": "n=33, φ=20", "ans": "n=33, φ=20"},
-                {"q": "gcd(48,36)", "steps": "Euclidean", "ans": "12"},
+                {"q": "RSA: p=3, q=11, e=3 → n, φ(n)", "steps": "n = 33, φ = (3−1)(11−1) = 20", "ans": "n=33, φ=20"},
+                {"q": "gcd(48, 36)", "steps": "Euclidean: gcd(48,36) = gcd(36,12) = 12", "ans": "12"},
             ]
         },
         "Numerical Methods": {
-            "concept": "Newton-Raphson, Bisection",
-            "theory": "**Newton:** xₙ₊₁ = xₙ − f(xₙ)/f'(xₙ)\n**Bisection:** mid = (a+b)/2",
+            "concept": "Newton-Raphson, Bisection, Trapezoid",
+            "theory": """
+            **Newton-Raphson:** xₙ₊₁ = xₙ − f(xₙ)/f'(xₙ)
+            **Bisection:** Repeat: mid = (a+b)/2
+            **Trapezoid Rule:** (b−a)/2 · [f(a) + f(b)]
+            **Euler's Method:** yₙ₊₁ = yₙ + h·f(xₙ, yₙ)
+            """,
             "examples": [
-                {"q": "Newton x²−2=0, x₀=1", "steps": "Iterate", "ans": "1.5"},
-                {"q": "Bisection [1,2]", "steps": "mid", "ans": "1.5"},
+                {"q": "Newton: x²−2=0, x₀=1", "steps": "x₁ = 1 − (1−2)/(2) = 1.5", "ans": "1.5"},
+                {"q": "Bisection on [1,2] for x²−2=0", "steps": "Mid = 1.5, f(1.5) > 0 → [1,1.5]", "ans": "1.5"},
             ]
         },
     }
@@ -6669,51 +7010,55 @@ def render_math_lab(client):
     # MODE SELECTOR
     # ============================================================
     if st.session_state.ml_mode is None:
+
         st.markdown(f"### 🎯 {t['mode']}")
 
         if is_senior:
             c1, c2, c3, c4 = st.columns(4)
             with c1:
-                st.markdown('<div class="ml-mode-card"><h1>📐</h1><h4>Real Math</h4></div>', unsafe_allow_html=True)
+                st.markdown('<div class="ml-mode-card"><h1>📐</h1><h4>Real Math</h4><p>Calculus • Linear Algebra</p></div>', unsafe_allow_html=True)
                 if st.button("▶️ Real Math", use_container_width=True, type="primary", key="m_rm"):
                     st.session_state.ml_mode = "real"; st.rerun()
             with c2:
-                st.markdown('<div class="ml-mode-card"><h1>🎮</h1><h4>Puzzles</h4></div>', unsafe_allow_html=True)
+                st.markdown('<div class="ml-mode-card"><h1>🎮</h1><h4>Puzzles</h4><p>Brain teasers</p></div>', unsafe_allow_html=True)
                 if st.button("▶️ Puzzles", use_container_width=True, key="m_pz"):
                     st.session_state.ml_mode = "puzzle"; st.rerun()
             with c3:
-                st.markdown('<div class="ml-mode-card"><h1>🎨</h1><h4>Design Board</h4></div>', unsafe_allow_html=True)
+                st.markdown('<div class="ml-mode-card"><h1>🎨</h1><h4>Design Board</h4><p>Drag • Draw • Design</p></div>', unsafe_allow_html=True)
                 if st.button("▶️ Board", use_container_width=True, key="m_bd"):
                     st.session_state.ml_mode = "board"; st.rerun()
             with c4:
-                st.markdown('<div class="ml-mode-card"><h1>📋</h1><h4>Formulas</h4></div>', unsafe_allow_html=True)
+                st.markdown('<div class="ml-mode-card"><h1>📋</h1><h4>Formulas</h4><p>Quick reference</p></div>', unsafe_allow_html=True)
                 if st.button("▶️ Formulas", use_container_width=True, key="m_fm"):
                     st.session_state.ml_mode = "formula"; st.rerun()
         else:
             c1, c2, c3 = st.columns(3)
             with c1:
-                st.markdown('<div class="ml-mode-card"><h1>🎮</h1><h4>Puzzle Games</h4></div>', unsafe_allow_html=True)
+                st.markdown('<div class="ml-mode-card"><h1>🎮</h1><h4>Puzzle Games</h4><p>20+ Fun Puzzles</p></div>', unsafe_allow_html=True)
                 if st.button("▶️ Puzzles", use_container_width=True, type="primary", key="m_pz2"):
                     st.session_state.ml_mode = "puzzle"; st.rerun()
             with c2:
-                st.markdown('<div class="ml-mode-card"><h1>🎨</h1><h4>Design Board</h4></div>', unsafe_allow_html=True)
+                st.markdown('<div class="ml-mode-card"><h1>🎨</h1><h4>Design Board</h4><p>Draw & Learn</p></div>', unsafe_allow_html=True)
                 if st.button("▶️ Board", use_container_width=True, key="m_bd2"):
                     st.session_state.ml_mode = "board"; st.rerun()
             with c3:
-                st.markdown('<div class="ml-mode-card"><h1>📋</h1><h4>Formulas</h4></div>', unsafe_allow_html=True)
+                st.markdown('<div class="ml-mode-card"><h1>📋</h1><h4>Formulas</h4><p>Reference</p></div>', unsafe_allow_html=True)
                 if st.button("▶️ Formulas", use_container_width=True, key="m_fm2"):
                     st.session_state.ml_mode = "formula"; st.rerun()
         return
 
+    # Back button
     if st.button("⬅️ Back to Menu", key="ml_back_btn"):
         st.session_state.ml_mode = None
         st.session_state.ml_gtype = None
+        st.session_state.ml_topic = None
         st.rerun()
 
     # ============================================================
-    # PUZZLES MODE
+    # MODE: PUZZLES
     # ============================================================
     if st.session_state.ml_mode == "puzzle":
+
         if st.session_state.ml_gtype is None:
             st.markdown("### 🎮 Choose Puzzle Game")
             available = [(k, v) for k, v in PUZZLES.items() if class_level in v["range"]]
@@ -6732,10 +7077,13 @@ def render_math_lab(client):
                         st.rerun()
             return
 
+        # Active puzzle
         q = st.session_state.ml_q
         if not q:
-            st.session_state.ml_gtype = None; st.rerun()
+            st.session_state.ml_gtype = None
+            st.rerun()
 
+        # Stats
         s1, s2, s3, s4 = st.columns(4)
         with s1: st.markdown(f'<div class="ml-stat">❤️ {st.session_state.ml_hearts}</div>', unsafe_allow_html=True)
         with s2: st.markdown(f'<div class="ml-stat">🔥 {st.session_state.ml_streak}</div>', unsafe_allow_html=True)
@@ -6744,14 +7092,17 @@ def render_math_lab(client):
 
         st.markdown(f'<div class="ml-puzzle-box">{q["question"]}</div>', unsafe_allow_html=True)
 
+        # Hint button
         if not st.session_state.ml_answered and st.session_state.ml_hint < 2:
             if st.button("💡 Hint", key="pz_hint_btn"):
-                st.session_state.ml_hint += 1; st.rerun()
+                st.session_state.ml_hint += 1
+                st.rerun()
         if st.session_state.ml_hint >= 1:
             st.markdown(f'<div class="ml-hint">💡 {q["hint"]}</div>', unsafe_allow_html=True)
         if st.session_state.ml_hint >= 2:
             st.markdown(f'<div class="ml-hint">💡 Answer: <b>{q["answer"]}</b></div>', unsafe_allow_html=True)
 
+        # Options
         cols = st.columns(2)
         for i, opt in enumerate(q["options"]):
             with cols[i % 2]:
@@ -6771,12 +7122,14 @@ def render_math_lab(client):
                     st.session_state.ml_answered = True
                     st.rerun()
 
+        # Feedback
         if st.session_state.ml_answered:
             if st.session_state.ml_correct:
                 st.markdown(f'<div class="ml-correct">✅ शाबाश! 🔥 Streak: {st.session_state.ml_streak}</div>', unsafe_allow_html=True)
             else:
-                st.markdown(f'<div class="ml-wrong">❌ गलत! सही: <b>{q["answer"]}</b></div>', unsafe_allow_html=True)
+                st.markdown(f'<div class="ml-wrong">❌ गलत! सही जवाब: <b>{q["answer"]}</b></div>', unsafe_allow_html=True)
             st.markdown(f'<div class="ml-solution">📝 <b>Solution:</b> {q["solution"]}</div>', unsafe_allow_html=True)
+
             st.markdown("---")
             c1, c2 = st.columns(2)
             with c1:
@@ -6791,705 +7144,210 @@ def render_math_lab(client):
         return
 
     # ============================================================
-    # REAL MATH MODE
+    # MODE: REAL MATH
     # ============================================================
     if st.session_state.ml_mode == "real":
         st.markdown(f"### 📐 Real Math — {class_level}")
+
         topic = st.selectbox("📚 Choose Topic", list(UNIVERSITY.keys()), key="rm_topic_sel")
         data = UNIVERSITY[topic]
 
+        # Concept
         st.markdown(f'<div class="ml-concept"><h3>📖 {topic}</h3><p><b>{data["concept"]}</b></p></div>', unsafe_allow_html=True)
 
+        # Theory
         with st.expander("📚 Complete Theory", expanded=True):
             st.markdown(data["theory"])
 
+        # Solved Examples
         st.markdown("### 📝 Solved Examples")
         for i, ex in enumerate(data["examples"], 1):
             with st.expander(f"Example {i}: {ex['q']}", expanded=(i == 1)):
-                st.markdown(f'<div class="ml-example"><b>Q:</b> {ex["q"]}<br><b>Steps:</b> {ex["steps"]}<br><b>Answer:</b> <b>{ex["ans"]}</b></div>', unsafe_allow_html=True)
+                st.markdown(f'<div class="ml-example"><b>Q:</b> {ex["q"]}<br><br><b>Steps:</b> {ex["steps"]}<br><br><b>Answer:</b> <b>{ex["ans"]}</b></div>', unsafe_allow_html=True)
+
+        # Practice
+        st.markdown("---")
+        st.markdown("### 🎯 Practice Problems")
+        st.info("अपने हाथों से solve करें — Design Board use करें!")
+
+        for i in range(1, 4):
+            with st.expander(f"Practice Problem {i}"):
+                st.markdown(f"**Q{i}:** {topic} से related problem solve करें")
+                st.code(f"Practice example {i} for {topic}", language="text")
+                if st.button(f"💡 Hint {i}", key=f"rm_hint_{i}"):
+                    st.info(f"Hint: {data['concept']} के rules apply करें")
         return
 
     # ============================================================
-    # FORMULA MODE
+    # MODE: FORMULA REFERENCE
     # ============================================================
     if st.session_state.ml_mode == "formula":
         st.markdown(f"### 📋 Formula Reference — {class_level}")
+
         formulas = {
-            "Class 1-2": ["a + b = b + a", "a × 1 = a", "0 + a = a"],
-            "Class 3-5": ["Area of triangle = ½ × b × h", "(a+b)² = a² + 2ab + b²"],
-            "Class 6-8": ["Circle Area = πr²", "SI = PRT/100", "a² − b² = (a+b)(a−b)"],
-            "Class 9-10": ["Quadratic: x = [−b ± √(b²−4ac)]/2a", "sin²θ + cos²θ = 1"],
-            "Class 11-12": ["d/dx(xⁿ) = nxⁿ⁻¹", "∫xⁿ dx = xⁿ⁺¹/(n+1) + C", "nCr = n!/(r!(n−r)!)"],
-            "University": ["Cauchy-Schwarz", "Taylor Series", "Euler-Lagrange", "Fourier Series", "Stokes Theorem", "RSA Algorithm"],
+            "Class 1-2": ["a + b = b + a", "a × 1 = a", "0 + a = a",
+                          "Perimeter of square = 4 × side", "Area of rectangle = l × w"],
+            "Class 3-5": ["Area of triangle = ½ × b × h", "1 km = 1000 m",
+                          "(a+b)² = a² + 2ab + b²", "a × (b+c) = a×b + a×c"],
+            "Class 6-8": ["LCM × HCF = a × b", "Circle Area = πr²", "Circumference = 2πr",
+                          "SI = PRT/100", "(a+b)² = a² + 2ab + b²", "a² − b² = (a+b)(a−b)"],
+            "Class 9-10": ["Quadratic: x = [−b ± √(b²−4ac)]/2a", "sin²θ + cos²θ = 1",
+                           "Distance = √[(x₂−x₁)² + (y₂−y₁)²]", "Sphere V = (4/3)πr³",
+                           "Cone V = (1/3)πr²h"],
+            "Class 11-12": ["d/dx(xⁿ) = nxⁿ⁻¹", "d/dx(sin x) = cos x",
+                            "∫xⁿ dx = xⁿ⁺¹/(n+1) + C", "∫eˣ dx = eˣ + C",
+                            "nPr = n!/(n−r)!", "nCr = n!/(r!(n−r)!)",
+                            "e^(iθ) = cos θ + i·sin θ"],
+            "University": ["Cauchy-Schwarz: |⟨x,y⟩| ≤ ||x||·||y||",
+                           "Taylor: f(x) = Σ f⁽ⁿ⁾(a)(x−a)ⁿ/n!",
+                           "Euler-Lagrange: d/dt(∂L/∂q̇) = ∂L/∂q",
+                           "Fourier: f(x) = a₀/2 + Σ(aₙcos(nx) + bₙsin(nx))",
+                           "Stokes: ∮F·dr = ∬(∇×F)·dS",
+                           "Gauss: ∮F·dS = ∭(∇·F)dV",
+                           "RSA: c = m^e mod n, m = c^d mod n"],
         }
+
         for f in formulas.get(class_level, []):
             st.markdown(f'<div class="ml-formula">📐 {f}</div>', unsafe_allow_html=True)
         return
 
     # ============================================================
-    # BOARD MODE — Ultimate Design Board
+    # MODE: DESIGN BOARD (Interactive)
     # ============================================================
     if st.session_state.ml_mode == "board":
-        st.markdown("### 🎨 Ultimate Design Board — 117+ Tools")
+        st.markdown("### 🎨 Interactive Math Design Board")
+        st.info("💡 Shapes जोड़ें • Drag करें • Resize करें • Rotate करें • Layers • Colors")
 
         board_html = """
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<style>
-* { box-sizing: border-box; font-family: Arial, sans-serif; }
-#app { display: flex; height: 720px; gap: 8px; background: #F1F5F9; padding: 8px; border-radius: 12px; }
-#sidebar { width: 220px; background: #FFFFFF; border-radius: 12px; overflow-y: auto; padding: 10px; border: 1px solid #E2E8F0; flex-shrink: 0; }
-.side-section { margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid #E2E8F0; }
-.side-title { font-size: 11px; font-weight: 800; color: #1E293B; margin-bottom: 6px; text-transform: uppercase; }
-.side-btn { display: block; width: 100%; padding: 6px 8px; margin: 3px 0; background: #F8FAFC; border: 1px solid #CBD5E1; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600; color: #1E293B; text-align: left; }
-.side-btn:hover { background: #E0E7FF; }
-#center { flex: 1; display: flex; flex-direction: column; gap: 6px; min-width: 0; }
-#topbar { background: #FFFFFF; border-radius: 10px; padding: 8px; border: 1px solid #E2E8F0; display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }
-.tool-btn { padding: 6px 10px; border: 1px solid #CBD5E1; background: #FFFFFF; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 700; color: #1E293B; }
-.tool-btn:hover { background: #E0E7FF; }
-.tool-btn.danger { background: #FEE2E2; color: #991B1B; }
-.tool-btn.success { background: #DCFCE7; color: #166534; }
-.divider { width: 1px; height: 22px; background: #CBD5E1; margin: 0 4px; }
-#canvasWrap { flex: 1; position: relative; background: #FFFFFF; border: 2px solid #1E293B; border-radius: 10px; overflow: hidden; background-image: linear-gradient(rgba(0,0,0,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.06) 1px, transparent 1px); background-size: 25px 25px; touch-action: none; }
-#drawLayer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 5; pointer-events: none; }
-#drawLayer.active { pointer-events: auto; cursor: crosshair; }
-.obj { position: absolute; cursor: move; user-select: none; }
-.obj.selected { box-shadow: 0 0 0 2px #0EA5E9; }
-.handle { position: absolute; width: 11px; height: 11px; background: #0EA5E9; border: 2px solid #FFFFFF; border-radius: 50%; z-index: 100; }
-.handle-br { bottom: -6px; right: -6px; cursor: nwse-resize; }
-.handle-rotate { top: -25px; left: 50%; transform: translateX(-50%); background: #F59E0B; width: 13px; height: 13px; cursor: grab; }
-#rightbar { width: 200px; background: #FFFFFF; border-radius: 12px; padding: 10px; border: 1px solid #E2E8F0; overflow-y: auto; flex-shrink: 0; }
-.layer-item { padding: 5px 8px; margin: 3px 0; background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 5px; font-size: 11px; cursor: pointer; }
-.layer-item.selected { background: #6366F1; color: #FFFFFF; }
-.color-input { width: 100%; height: 28px; border: 1px solid #CBD5E1; border-radius: 6px; cursor: pointer; }
-.dialog { display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #FFFFFF; border-radius: 12px; padding: 16px; border: 2px solid #1E293B; z-index: 1000; min-width: 300px; }
-.dialog.open { display: block; }
-.dialog button { padding: 8px 14px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 12px; border: none; margin-right: 6px; }
-.dialog .primary { background: #6366F1; color: #FFFFFF; }
-.dialog .secondary { background: #E2E8F0; color: #1E293B; }
-</style>
-</head>
-<body>
-<div id="app">
-    <div id="sidebar">
-        <div class="side-section">
-            <div class="side-title">🎯 Select & Pan</div>
-            <button class="side-btn" onclick="setTool('select')">🖱️ Select / Move</button>
-            <button class="side-btn" onclick="setTool('pan')">✋ Hand Pan</button>
-        </div>
-        <div class="side-section">
-            <div class="side-title">✏️ Draw Tools</div>
-            <button class="side-btn" onclick="setTool('pencil')">✏️ Pencil</button>
-            <button class="side-btn" onclick="setTool('pen')">🖊️ Smooth Pen</button>
-            <button class="side-btn" onclick="setTool('highlighter')">🖍️ Highlighter</button>
-            <button class="side-btn" onclick="setTool('line')">📏 Line</button>
-            <button class="side-btn" onclick="setTool('arrow')">→ Arrow</button>
-            <button class="side-btn" onclick="setTool('eraser')">🧽 Eraser</button>
-        </div>
-        <div class="side-section">
-            <div class="side-title">🔷 Shapes</div>
-            <button class="side-btn" onclick="addShape('square')">◼ Square</button>
-            <button class="side-btn" onclick="addShape('rect')">▭ Rectangle</button>
-            <button class="side-btn" onclick="addShape('circle')">● Circle</button>
-            <button class="side-btn" onclick="addShape('oval')">⬭ Oval</button>
-            <button class="side-btn" onclick="addShape('triangle')">▲ Triangle</button>
-            <button class="side-btn" onclick="addShape('pentagon')">⬟ Pentagon</button>
-            <button class="side-btn" onclick="addShape('hexagon')">⬢ Hexagon</button>
-            <button class="side-btn" onclick="addShape('star')">★ Star</button>
-            <button class="side-btn" onclick="addShape('diamond')">◆ Diamond</button>
-        </div>
-        <div class="side-section">
-            <div class="side-title">🌐 3D Shapes</div>
-            <button class="side-btn" onclick="add3D('cube')">🧊 Cube</button>
-            <button class="side-btn" onclick="add3D('sphere')">⚪ Sphere</button>
-            <button class="side-btn" onclick="add3D('cylinder')">🛢️ Cylinder</button>
-            <button class="side-btn" onclick="add3D('cone')">🔺 Cone</button>
-        </div>
-        <div class="side-section">
-            <div class="side-title">📝 Text</div>
-            <button class="side-btn" onclick="addText('title')">📢 Title</button>
-            <button class="side-btn" onclick="addText('heading')">H Heading</button>
-            <button class="side-btn" onclick="addText('text')">🅣 Text</button>
-            <button class="side-btn" onclick="addSticky()">📒 Sticky</button>
-            <button class="side-btn" onclick="addCallout()">💬 Callout</button>
-            <button class="side-btn" onclick="addNumbering()">1️⃣ Number</button>
-            <button class="side-btn" onclick="addLettering()">🅰️ Letter</button>
-        </div>
-        <div class="side-section">
-            <div class="side-title">🧮 Math</div>
-            <button class="side-btn" onclick="addMath('∫')">∫ Integral</button>
-            <button class="side-btn" onclick="addMath('∑')">∑ Sigma</button>
-            <button class="side-btn" onclick="addMath('√')">√ Root</button>
-            <button class="side-btn" onclick="addMath('π')">π Pi</button>
-            <button class="side-btn" onclick="addMath('θ')">θ Theta</button>
-            <button class="side-btn" onclick="addMath('∞')">∞ Infinity</button>
-            <button class="side-btn" onclick="addMath('∂')">∂ Partial</button>
-            <button class="side-btn" onclick="addMath('∇')">∇ Nabla</button>
-            <button class="side-btn" onclick="openFormulaDialog()">📐 Formula</button>
-            <button class="side-btn" onclick="plotFunction()">📈 Graph</button>
-            <button class="side-btn" onclick="addProtractor()">📐 Protractor</button>
-        </div>
-        <div class="side-section">
-            <div class="side-title">⚛️ Physics</div>
-            <button class="side-btn" onclick="addEmoji('🔋')">🔋 Battery</button>
-            <button class="side-btn" onclick="addEmoji('💡')">💡 Bulb</button>
-            <button class="side-btn" onclick="addEmoji('🔌')">🔌 Switch</button>
-            <button class="side-btn" onclick="addEmoji('🧲')">🧲 Magnet</button>
-            <button class="side-btn" onclick="addEmoji('⚡')">⚡ Resistor</button>
-            <button class="side-btn" onclick="addWave()">〰️ Sine Wave</button>
-            <button class="side-btn" onclick="addSpring()">🌀 Spring</button>
-            <button class="side-btn" onclick="addLens('convex')">🔍 Convex</button>
-            <button class="side-btn" onclick="addLens('concave')">🔍 Concave</button>
-        </div>
-        <div class="side-section">
-            <div class="side-title">🧪 Chemistry</div>
-            <button class="side-btn" onclick="addEmoji('🧪')">🧪 Test Tube</button>
-            <button class="side-btn" onclick="addEmoji('⚗️')">⚗️ Flask</button>
-            <button class="side-btn" onclick="addEmoji('🥼')">🥼 Beaker</button>
-            <button class="side-btn" onclick="addEmoji('🔥')">🔥 Burner</button>
-            <button class="side-btn" onclick="addBond('single')">— Single</button>
-            <button class="side-btn" onclick="addBond('double')">= Double</button>
-            <button class="side-btn" onclick="addBond('triple')">≡ Triple</button>
-            <button class="side-btn" onclick="addBenzene()">⬡ Benzene</button>
-        </div>
-        <div class="side-section">
-            <div class="side-title">🧬 Biology</div>
-            <button class="side-btn" onclick="addEmoji('❤️')">❤️ Heart</button>
-            <button class="side-btn" onclick="addEmoji('🧠')">🧠 Brain</button>
-            <button class="side-btn" onclick="addEmoji('🫁')">🫁 Lungs</button>
-            <button class="side-btn" onclick="addEmoji('🦴')">🦴 Bone</button>
-            <button class="side-btn" onclick="addEmoji('🧬')">🧬 DNA</button>
-            <button class="side-btn" onclick="addEmoji('🦠')">🦠 Cell</button>
-            <button class="side-btn" onclick="addEmoji('🌿')">🌿 Leaf</button>
-            <button class="side-btn" onclick="addBranch()">🌳 Branch</button>
-        </div>
-        <div class="side-section">
-            <div class="side-title">📊 Charts</div>
-            <button class="side-btn" onclick="addChart('bar')">📊 Bar</button>
-            <button class="side-btn" onclick="addChart('line')">📈 Line</button>
-            <button class="side-btn" onclick="addChart('pie')">🥧 Pie</button>
-        </div>
-        <div class="side-section">
-            <div class="side-title">📚 Templates</div>
-            <button class="side-btn" onclick="loadTemplate('cell')">🔬 Plant Cell</button>
-            <button class="side-btn" onclick="loadTemplate('atom')">⚛️ Atom</button>
-            <button class="side-btn" onclick="loadTemplate('solar')">🌌 Solar</button>
-        </div>
-    </div>
-
-    <div id="center">
-        <div id="topbar">
-            <button class="tool-btn" onclick="undo()">↶ Undo</button>
-            <button class="tool-btn" onclick="redo()">↷ Redo</button>
-            <div class="divider"></div>
-            <button class="tool-btn" onclick="bringForward()">⬆ Fwd</button>
-            <button class="tool-btn" onclick="sendBackward()">⬇ Bwd</button>
-            <div class="divider"></div>
-            <button class="tool-btn" onclick="duplicateObj()">📋 Copy</button>
-            <button class="tool-btn" onclick="alignCenter()">⊥</button>
-            <div class="divider"></div>
-            <button class="tool-btn" onclick="toggleGrid()">📏 Grid</button>
-            <div class="divider"></div>
-            <button class="tool-btn" onclick="openImageDialog()">📤 Image</button>
-            <div class="divider"></div>
-            <button class="tool-btn success" onclick="saveProject()">💾 Save</button>
-            <button class="tool-btn" onclick="loadProject()">📂 Load</button>
-            <button class="tool-btn danger" onclick="deleteObj()">🗑 Del</button>
-            <button class="tool-btn danger" onclick="clearAll()">✖ Clear</button>
-        </div>
-        <div id="canvasWrap">
-            <canvas id="drawLayer"></canvas>
-        </div>
-    </div>
-
-    <div id="rightbar">
-        <div class="side-section">
-            <div class="side-title">🎨 Color</div>
-            <input type="color" class="color-input" id="colorPicker" value="#2563EB" onchange="setColor(this.value)">
-            <div style="display:flex; flex-wrap:wrap; gap:4px; margin-top:6px;">
-                <div onclick="setColor('#000000')" style="width:22px;height:22px;background:#000;border-radius:50%;cursor:pointer;"></div>
-                <div onclick="setColor('#DC2626')" style="width:22px;height:22px;background:#DC2626;border-radius:50%;cursor:pointer;"></div>
-                <div onclick="setColor('#2563EB')" style="width:22px;height:22px;background:#2563EB;border-radius:50%;cursor:pointer;"></div>
-                <div onclick="setColor('#16A34A')" style="width:22px;height:22px;background:#16A34A;border-radius:50%;cursor:pointer;"></div>
-                <div onclick="setColor('#CA8A04')" style="width:22px;height:22px;background:#CA8A04;border-radius:50%;cursor:pointer;"></div>
-                <div onclick="setColor('#9333EA')" style="width:22px;height:22px;background:#9333EA;border-radius:50%;cursor:pointer;"></div>
-                <div onclick="setColor('#EA580C')" style="width:22px;height:22px;background:#EA580C;border-radius:50%;cursor:pointer;"></div>
-                <div onclick="setColor('#EC4899')" style="width:22px;height:22px;background:#EC4899;border-radius:50%;cursor:pointer;"></div>
+        <!DOCTYPE html><html><head><style>
+        * { box-sizing: border-box; }
+        #container { background:#F8FAFC; border-radius:15px; padding:12px; border:2px solid #E2E8F0; }
+        .toolbar { display:flex; flex-wrap:wrap; gap:6px; justify-content:center; margin-bottom:8px; padding:8px; background:#FFFFFF; border-radius:12px; border:1px solid #E2E8F0; }
+        .toolbar button { padding:8px 14px; border:none; border-radius:8px; cursor:pointer; font-weight:bold; font-size:13px; }
+        .btn-add { background:#0EA5E9; color:white; }
+        .btn-action { background:#64748B; color:white; }
+        .btn-danger { background:#EF4444; color:white; }
+        .btn-success { background:#16A34A; color:white; }
+        .color-dot { width:28px; height:28px; border-radius:50%; border:2px solid #fff; box-shadow:0 2px 6px rgba(0,0,0,0.2); cursor:pointer; }
+        #canvasWrap { position:relative; background:#FFFFFF; border:3px solid #1E293B; border-radius:12px; overflow:hidden; min-height:550px; background-image: linear-gradient(rgba(0,0,0,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.04) 1px, transparent 1px); background-size: 25px 25px; touch-action:none; }
+        .obj { position:absolute; cursor:move; user-select:none; }
+        .obj.selected { box-shadow:0 0 0 2px #0EA5E9, 0 0 0 6px rgba(14,165,233,0.2); }
+        .handle { position:absolute; width:12px; height:12px; background:#0EA5E9; border:2px solid #FFFFFF; border-radius:50%; z-index:100; }
+        .handle-br { bottom:-6px; right:-6px; cursor:nwse-resize; }
+        .handle-rotate { top:-25px; left:50%; transform:translateX(-50%); background:#F59E0B; cursor:grab; width:14px; height:14px; }
+        .handle-rotate::after { content:'↻'; position:absolute; top:-18px; left:50%; transform:translateX(-50%); font-size:14px; color:#F59E0B; }
+        .info-bar { margin-top:8px; padding:8px; background:#F1F5F9; border-radius:8px; font-size:12px; color:#475569; text-align:center; }
+        </style></head><body>
+        <div id="container">
+            <div class="toolbar">
+                <button class="btn-add" onclick="addShape('square')">◼ Square</button>
+                <button class="btn-add" onclick="addShape('circle')">● Circle</button>
+                <button class="btn-add" onclick="addShape('triangle')">▲ Triangle</button>
+                <button class="btn-add" onclick="addShape('rect')">▭ Rect</button>
+                <button class="btn-add" onclick="addShape('star')">★ Star</button>
+                <button class="btn-add" onclick="addShape('pentagon')">⬟ Pentagon</button>
+                <button class="btn-add" onclick="addShape('hexagon')">⬢ Hexagon</button>
+                <button class="btn-add" onclick="addShape('arrow')">→ Arrow</button>
+                <button class="btn-add" onclick="addShape('line')">━ Line</button>
+                <button class="btn-add" onclick="addShape('text')">🅣 Text</button>
+                <button class="btn-add" onclick="addShape('formula')">∫ Formula</button>
             </div>
+            <div class="toolbar">
+                <span style="color:#333;font-weight:bold;align-self:center;padding:0 6px;">🎨</span>
+                <div class="color-dot" onclick="setColor('#000000')" style="background:#000000;"></div>
+                <div class="color-dot" onclick="setColor('#DC2626')" style="background:#DC2626;"></div>
+                <div class="color-dot" onclick="setColor('#2563EB')" style="background:#2563EB;"></div>
+                <div class="color-dot" onclick="setColor('#16A34A')" style="background:#16A34A;"></div>
+                <div class="color-dot" onclick="setColor('#CA8A04')" style="background:#CA8A04;"></div>
+                <div class="color-dot" onclick="setColor('#9333EA')" style="background:#9333EA;"></div>
+                <div class="color-dot" onclick="setColor('#EA580C')" style="background:#EA580C;"></div>
+                <div class="color-dot" onclick="setColor('#EC4899')" style="background:#EC4899;"></div>
+                <div class="color-dot" onclick="setColor('#06B6D4')" style="background:#06B6D4;"></div>
+                <div class="color-dot" onclick="setColor('#84CC16')" style="background:#84CC16;"></div>
+            </div>
+            <div class="toolbar">
+                <button class="btn-action" onclick="bringForward()">⬆ Forward</button>
+                <button class="btn-action" onclick="sendBackward()">⬇ Backward</button>
+                <button class="btn-action" onclick="duplicateObj()">📋 Duplicate</button>
+                <button class="btn-danger" onclick="deleteObj()">🗑 Delete</button>
+                <button class="btn-danger" onclick="clearAll()">✖ Clear All</button>
+            </div>
+            <div id="canvasWrap" onclick="deselectAll(event)"></div>
+            <div class="info-bar">💡 Click diagram to select • Drag to move • Corner handle to resize • Top handle to rotate</div>
         </div>
-        <div class="side-section">
-            <div class="side-title">⚙️ Style</div>
-            <button class="side-btn" onclick="setStrokeStyle('solid')">▬ Solid</button>
-            <button class="side-btn" onclick="setStrokeStyle('dashed')">▬▬ Dashed</button>
-            <button class="side-btn" onclick="setStrokeStyle('dotted')">•• Dotted</button>
-            <button class="side-btn" onclick="setFillMode('fill')">🟦 Fill</button>
-            <button class="side-btn" onclick="setFillMode('outline')">⬜ Line</button>
-        </div>
-        <div class="side-section">
-            <div class="side-title">📐 Rotate</div>
-            <button class="side-btn" onclick="rotateBy(-15)">↺ 15°</button>
-            <button class="side-btn" onclick="rotateBy(15)">↻ 15°</button>
-            <button class="side-btn" onclick="rotateBy(90)">↻ 90°</button>
-        </div>
-        <div class="side-section">
-            <div class="side-title">📋 Layers</div>
-            <div id="layersList"></div>
-        </div>
-        <div class="side-section">
-            <div class="side-title">✏️ Text Format</div>
-            <button class="side-btn" onclick="formatText('bold')"><b>Bold</b></button>
-            <button class="side-btn" onclick="formatText('italic')"><i>Italic</i></button>
-            <button class="side-btn" onclick="formatText('bigger')">A+</button>
-            <button class="side-btn" onclick="formatText('smaller')">A-</button>
-        </div>
-    </div>
-
-    <div class="dialog" id="formulaDialog">
-        <h3>📐 Formula Input</h3>
-        <input type="text" id="formulaInput" placeholder="e.g., E = mc²" value="f(x) = x²" style="width:100%;padding:8px;margin:4px 0;border:1px solid #CBD5E1;border-radius:6px;">
-        <div style="margin-top:8px;text-align:right;">
-            <button class="secondary" onclick="closeDialog('formulaDialog')">Cancel</button>
-            <button class="primary" onclick="insertFormula()">Insert</button>
-        </div>
-    </div>
-    <div class="dialog" id="imageDialog">
-        <h3>📤 Upload Image</h3>
-        <input type="file" id="imageFile" accept="image/*" style="width:100%;padding:8px;">
-        <div style="margin-top:8px;text-align:right;">
-            <button class="secondary" onclick="closeDialog('imageDialog')">Cancel</button>
-            <button class="primary" onclick="insertImage()">Insert</button>
-        </div>
-    </div>
-</div>
-
-<script>
-var wrap = document.getElementById('canvasWrap');
-var canvas = document.getElementById('drawLayer');
-var ctx = canvas.getContext('2d');
-var currentColor = '#2563EB';
-var fillMode = 'fill';
-var strokeStyle = 'solid';
-var currentTool = 'select';
-var zIndexCounter = 100;
-var selectedObj = null;
-var numberingCounter = 1;
-var letterCounter = 0;
-var history = [];
-var historyIdx = -1;
-var isDrawing = false;
-var offsetX = 0, offsetY = 0;
-var isResizing = false, isRotating = false;
-var startW = 0, startH = 0, sX = 0, sY = 0;
-var startAngle = 0, startRotation = 0, sCx = 0, sCy = 0;
-var drawingPaths = [];
-var currentPath = null;
-
-function saveHistory() {
-    history = history.slice(0, historyIdx + 1);
-    var state = {
-        drawing: JSON.parse(JSON.stringify(drawingPaths)),
-        objects: Array.from(wrap.querySelectorAll('.obj')).map(function(o) {
-            return { html: o.innerHTML, style: o.getAttribute('style'), type: o.dataset.type, rotation: o.dataset.rotation, color: o.dataset.color };
-        })
-    };
-    history.push(JSON.stringify(state));
-    historyIdx = history.length - 1;
-    if (history.length > 50) { history.shift(); historyIdx--; }
-    updateLayersList();
-}
-
-function restoreFromState(json) {
-    var d = JSON.parse(json);
-    wrap.querySelectorAll('.obj').forEach(function(o) { o.remove(); });
-    drawingPaths = d.drawing || [];
-    redrawCanvas();
-    (d.objects || []).forEach(function(o) {
-        var el = document.createElement('div');
-        el.className = 'obj';
-        el.dataset.type = o.type;
-        el.dataset.rotation = o.rotation;
-        el.dataset.color = o.color;
-        el.setAttribute('style', o.style);
-        el.innerHTML = o.html;
-        addHandles(el);
-        el.addEventListener('mousedown', startDrag);
-        wrap.appendChild(el);
-    });
-    updateLayersList();
-}
-
-function undo() { if (historyIdx > 0) { historyIdx--; restoreFromState(history[historyIdx]); } }
-function redo() { if (historyIdx < history.length - 1) { historyIdx++; restoreFromState(history[historyIdx]); } }
-
-function resizeCanvas() {
-    canvas.width = wrap.offsetWidth;
-    canvas.height = wrap.offsetHeight;
-    redrawCanvas();
-}
-window.addEventListener('load', resizeCanvas);
-window.addEventListener('resize', resizeCanvas);
-
-function setTool(tool) {
-    currentTool = tool;
-    if (tool === 'select' || tool === 'pan') {
-        canvas.classList.remove('active');
-        wrap.style.cursor = tool === 'pan' ? 'grab' : 'default';
-    } else {
-        canvas.classList.add('active');
-        wrap.style.cursor = 'crosshair';
-    }
-}
-
-canvas.addEventListener('mousedown', startDraw);
-canvas.addEventListener('mousemove', drawMove);
-canvas.addEventListener('mouseup', endDraw);
-canvas.addEventListener('mouseleave', endDraw);
-canvas.addEventListener('touchstart', startDraw, {passive: false});
-canvas.addEventListener('touchmove', drawMove, {passive: false});
-canvas.addEventListener('touchend', endDraw);
-
-function getCP(e) {
-    var r = canvas.getBoundingClientRect();
-    if (e.touches) return {x: e.touches[0].clientX - r.left, y: e.touches[0].clientY - r.top};
-    return {x: e.clientX - r.left, y: e.clientY - r.top};
-}
-
-function startDraw(e) {
-    if (currentTool === 'select' || currentTool === 'pan') return;
-    e.preventDefault();
-    isDrawing = true;
-    var p = getCP(e);
-    currentPath = { tool: currentTool, color: currentColor, size: currentTool === 'highlighter' ? 20 : 3, style: strokeStyle, points: [{x: p.x, y: p.y}], alpha: currentTool === 'highlighter' ? 0.35 : 1.0 };
-}
-
-function drawMove(e) {
-    if (!isDrawing || !currentPath) return;
-    e.preventDefault();
-    var p = getCP(e);
-    currentPath.points.push({x: p.x, y: p.y});
-    redrawCanvas();
-    drawPath(currentPath);
-}
-
-function endDraw() {
-    if (!isDrawing || !currentPath) return;
-    isDrawing = false;
-    if (currentPath.points.length > 1) drawingPaths.push(currentPath);
-    currentPath = null;
-    saveHistory();
-    redrawCanvas();
-}
-
-function drawPath(p) {
-    var pts = p.points;
-    if (pts.length < 2) return;
-    ctx.globalAlpha = p.alpha || 1;
-    ctx.strokeStyle = p.color;
-    ctx.fillStyle = p.color;
-    ctx.lineWidth = p.size;
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
-    if (p.style === 'dashed') ctx.setLineDash([10, 5]);
-    else if (p.style === 'dotted') ctx.setLineDash([2, 5]);
-    else ctx.setLineDash([]);
-    if (p.tool === 'pencil' || p.tool === 'eraser' || p.tool === 'highlighter') {
-        ctx.globalCompositeOperation = p.tool === 'eraser' ? 'destination-out' : 'source-over';
-        ctx.beginPath();
-        ctx.moveTo(pts[0].x, pts[0].y);
-        for (var i = 1; i < pts.length; i++) ctx.lineTo(pts[i].x, pts[i].y);
-        ctx.lineWidth = p.tool === 'eraser' ? 20 : p.size;
-        ctx.stroke();
-        ctx.globalCompositeOperation = 'source-over';
-    } else if (p.tool === 'pen') {
-        ctx.beginPath();
-        ctx.moveTo(pts[0].x, pts[0].y);
-        for (var i = 1; i < pts.length - 1; i++) {
-            var xc = (pts[i].x + pts[i+1].x) / 2;
-            var yc = (pts[i].y + pts[i+1].y) / 2;
-            ctx.quadraticCurveTo(pts[i].x, pts[i].y, xc, yc);
+        <script>
+        const wrap = document.getElementById('canvasWrap');
+        let currentColor = '#2563EB';
+        let zIndexCounter = 10;
+        let selectedObj = null;
+        let offsetX = 0, offsetY = 0;
+        let isResizing = false, isRotating = false;
+        let startW = 0, startH = 0, startX = 0, startY = 0;
+        let startAngle = 0, startRotation = 0, startCenterX = 0, startCenterY = 0;
+        function setColor(color) { currentColor = color; if (selectedObj) { if (selectedObj.dataset.type === 'text' || selectedObj.dataset.type === 'formula') { selectedObj.style.color = color; } else { selectedObj.style.background = color; } } }
+        function addShape(type) {
+            const obj = document.createElement('div');
+            obj.className = 'obj'; obj.dataset.type = type; obj.dataset.rotation = 0;
+            let w = 90, h = 90;
+            if (type === 'rect') { w = 140; h = 80; }
+            if (type === 'line') { w = 150; h = 6; }
+            if (type === 'text') { w = 130; h = 60; }
+            if (type === 'formula') { w = 180; h = 80; }
+            if (type === 'arrow') { w = 130; h = 50; }
+            obj.style.width = w + 'px'; obj.style.height = h + 'px';
+            obj.style.left = '60px'; obj.style.top = '60px';
+            obj.style.position = 'absolute'; obj.style.zIndex = ++zIndexCounter;
+            if (type === 'square') { obj.style.background = currentColor; obj.style.borderRadius = '6px'; }
+            else if (type === 'rect') { obj.style.background = currentColor; obj.style.borderRadius = '6px'; }
+            else if (type === 'circle') { obj.style.background = currentColor; obj.style.borderRadius = '50%'; }
+            else if (type === 'triangle') { obj.style.width = '0'; obj.style.height = '0'; obj.style.background = 'transparent'; obj.style.borderLeft = w/2 + 'px solid transparent'; obj.style.borderRight = w/2 + 'px solid transparent'; obj.style.borderBottom = h + 'px solid ' + currentColor; }
+            else if (type === 'star') { obj.style.background = currentColor; obj.style.clipPath = 'polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)'; }
+            else if (type === 'pentagon') { obj.style.background = currentColor; obj.style.clipPath = 'polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%)'; }
+            else if (type === 'hexagon') { obj.style.background = currentColor; obj.style.clipPath = 'polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)'; }
+            else if (type === 'arrow') { obj.innerHTML = '<svg width="100%" height="100%" viewBox="0 0 130 50"><defs><marker id="ah" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="' + currentColor + '"/></marker></defs><line x1="5" y1="25" x2="120" y2="25" stroke="' + currentColor + '" stroke-width="4" marker-end="url(#ah)"/></svg>'; }
+            else if (type === 'line') { obj.style.background = currentColor; obj.style.borderRadius = '3px'; }
+            else if (type === 'text') { obj.style.background = '#FFFFFF'; obj.style.border = '2px solid ' + currentColor; obj.style.borderRadius = '8px'; obj.style.color = currentColor; obj.style.display = 'flex'; obj.style.alignItems = 'center'; obj.style.justifyContent = 'center'; obj.style.fontWeight = 'bold'; obj.style.fontSize = '16px'; obj.textContent = 'Text'; obj.ondblclick = (e) => { e.stopPropagation(); obj.contentEditable = 'true'; obj.focus(); }; obj.onblur = () => { obj.contentEditable = 'false'; }; }
+            else if (type === 'formula') { obj.style.background = '#FFFFFF'; obj.style.border = '2px solid ' + currentColor; obj.style.borderRadius = '8px'; obj.style.color = currentColor; obj.style.display = 'flex'; obj.style.alignItems = 'center'; obj.style.justifyContent = 'center'; obj.style.fontWeight = 'bold'; obj.style.fontSize = '20px'; obj.style.fontFamily = 'Courier New, monospace'; obj.textContent = '∫f(x)dx'; obj.ondblclick = (e) => { e.stopPropagation(); obj.contentEditable = 'true'; obj.focus(); }; obj.onblur = () => { obj.contentEditable = 'false'; }; }
+            const hBR = document.createElement('div'); hBR.className = 'handle handle-br'; obj.appendChild(hBR);
+            const hRot = document.createElement('div'); hRot.className = 'handle handle-rotate'; obj.appendChild(hRot);
+            obj.addEventListener('mousedown', startDrag); obj.addEventListener('touchstart', startDrag, {passive:false});
+            hBR.addEventListener('mousedown', startResize); hBR.addEventListener('touchstart', startResize, {passive:false});
+            hRot.addEventListener('mousedown', startRotate); hRot.addEventListener('touchstart', startRotate, {passive:false});
+            wrap.appendChild(obj); selectObj(obj);
         }
-        ctx.stroke();
-    } else if (p.tool === 'line') {
-        ctx.beginPath();
-        ctx.moveTo(pts[0].x, pts[0].y);
-        ctx.lineTo(pts[pts.length-1].x, pts[pts.length-1].y);
-        ctx.stroke();
-    } else if (p.tool === 'arrow') {
-        var l = pts[pts.length-1];
-        ctx.beginPath();
-        ctx.moveTo(pts[0].x, pts[0].y);
-        ctx.lineTo(l.x, l.y);
-        ctx.stroke();
-        var a = Math.atan2(l.y - pts[0].y, l.x - pts[0].x);
-        ctx.beginPath();
-        ctx.moveTo(l.x, l.y);
-        ctx.lineTo(l.x - 15 * Math.cos(a - Math.PI/6), l.y - 15 * Math.sin(a - Math.PI/6));
-        ctx.moveTo(l.x, l.y);
-        ctx.lineTo(l.x - 15 * Math.cos(a + Math.PI/6), l.y - 15 * Math.sin(a + Math.PI/6));
-        ctx.stroke();
-    }
-    ctx.setLineDash([]);
-    ctx.globalAlpha = 1;
-}
+        function selectObj(obj) { deselectAll(); selectedObj = obj; obj.classList.add('selected'); obj.style.zIndex = ++zIndexCounter; }
+        function deselectAll(e) { if (e && e.target !== wrap) return; document.querySelectorAll('.obj').forEach(o => o.classList.remove('selected')); selectedObj = null; }
+        function startDrag(e) { if (e.target.classList.contains('handle')) return; e.stopPropagation(); selectObj(e.currentTarget); const obj = e.currentTarget; const point = getPoint(e); offsetX = point.x - obj.offsetLeft; offsetY = point.y - obj.offsetTop; document.addEventListener('mousemove', onDrag); document.addEventListener('mouseup', stopDrag); document.addEventListener('touchmove', onDrag, {passive:false}); document.addEventListener('touchend', stopDrag); }
+        function onDrag(e) { if (!selectedObj) return; e.preventDefault(); const point = getPoint(e); selectedObj.style.left = (point.x - offsetX) + 'px'; selectedObj.style.top = (point.y - offsetY) + 'px'; }
+        function stopDrag() { document.removeEventListener('mousemove', onDrag); document.removeEventListener('mouseup', stopDrag); document.removeEventListener('touchmove', onDrag); document.removeEventListener('touchend', stopDrag); }
+        function startResize(e) { e.stopPropagation(); isResizing = true; const obj = e.currentTarget.parentElement; const point = getPoint(e); startW = obj.offsetWidth; startH = obj.offsetHeight; startX = point.x; startY = point.y; document.addEventListener('mousemove', onResize); document.addEventListener('mouseup', stopResize); document.addEventListener('touchmove', onResize, {passive:false}); document.addEventListener('touchend', stopResize); }
+        function onResize(e) { if (!isResizing || !selectedObj) return; e.preventDefault(); const point = getPoint(e); selectedObj.style.width = Math.max(30, startW + (point.x - startX)) + 'px'; selectedObj.style.height = Math.max(30, startH + (point.y - startY)) + 'px'; }
+        function stopResize() { isResizing = false; document.removeEventListener('mousemove', onResize); document.removeEventListener('mouseup', stopResize); document.removeEventListener('touchmove', onResize); document.removeEventListener('touchend', stopResize); }
+        function startRotate(e) { e.stopPropagation(); isRotating = true; const obj = e.currentTarget.parentElement; const point = getPoint(e); const rect = obj.getBoundingClientRect(); startCenterX = rect.left + rect.width/2; startCenterY = rect.top + rect.height/2; startAngle = Math.atan2(point.y - startCenterY, point.x - startCenterX); startRotation = parseFloat(obj.dataset.rotation) || 0; document.addEventListener('mousemove', onRotate); document.addEventListener('mouseup', stopRotate); document.addEventListener('touchmove', onRotate, {passive:false}); document.addEventListener('touchend', stopRotate); }
+        function onRotate(e) { if (!isRotating || !selectedObj) return; e.preventDefault(); const point = getPoint(e); const angle = Math.atan2(point.y - startCenterY, point.x - startCenterX); const delta = (angle - startAngle) * (180/Math.PI); const newRot = startRotation + delta; selectedObj.dataset.rotation = newRot; selectedObj.style.transform = 'rotate(' + newRot + 'deg)'; }
+        function stopRotate() { isRotating = false; document.removeEventListener('mousemove', onRotate); document.removeEventListener('mouseup', stopRotate); document.removeEventListener('touchmove', onRotate); document.removeEventListener('touchend', stopRotate); }
+        function bringForward() { if (selectedObj) selectedObj.style.zIndex = ++zIndexCounter; }
+        function sendBackward() { if (selectedObj) selectedObj.style.zIndex = Math.max(1, --zIndexCounter); }
+        function duplicateObj() { if (!selectedObj) return; const clone = selectedObj.cloneNode(true); clone.style.left = (selectedObj.offsetLeft + 30) + 'px'; clone.style.top = (selectedObj.offsetTop + 30) + 'px'; clone.style.zIndex = ++zIndexCounter; clone.classList.remove('selected'); clone.querySelectorAll('.handle').forEach(h => h.remove()); const hBR = document.createElement('div'); hBR.className = 'handle handle-br'; clone.appendChild(hBR); const hRot = document.createElement('div'); hRot.className = 'handle handle-rotate'; clone.appendChild(hRot); clone.addEventListener('mousedown', startDrag); hBR.addEventListener('mousedown', startResize); hRot.addEventListener('mousedown', startRotate); wrap.appendChild(clone); selectObj(clone); }
+        function deleteObj() { if (selectedObj) { selectedObj.remove(); selectedObj = null; } }
+        function clearAll() { if (confirm('Clear all?')) { wrap.innerHTML = ''; selectedObj = null; } }
+        function getPoint(e) { const rect = wrap.getBoundingClientRect(); if (e.touches) return {x: e.touches[0].clientX - rect.left, y: e.touches[0].clientY - rect.top}; return {x: e.clientX - rect.left, y: e.clientY - rect.top}; }
+        </script></body></html>
+        """
+        components.html(board_html, height=850)
 
-function redrawCanvas() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    drawingPaths.forEach(drawPath);
-}
-
-function addShape(type) {
-    var o = document.createElement('div');
-    o.className = 'obj';
-    o.dataset.type = type;
-    o.dataset.rotation = 0;
-    o.dataset.color = currentColor;
-    var w = 90, h = 90;
-    if (type === 'rect') { w = 140; h = 80; }
-    if (type === 'oval') { w = 130; h = 80; }
-    o.style.width = w + 'px';
-    o.style.height = h + 'px';
-    o.style.left = (60 + Math.random() * 250) + 'px';
-    o.style.top = (60 + Math.random() * 250) + 'px';
-    o.style.position = 'absolute';
-    o.style.zIndex = ++zIndexCounter;
-    if (type === 'square' || type === 'rect') o.style.borderRadius = '6px';
-    if (type === 'circle' || type === 'oval') o.style.borderRadius = '50%';
-    applyShapeStyle(o, currentColor);
-    addHandles(o);
-    o.addEventListener('mousedown', startDrag);
-    wrap.appendChild(o);
-    selectObj(o);
-    saveHistory();
-}
-
-function applyShapeStyle(o, c) {
-    o.dataset.color = c;
-    var t = o.dataset.type;
-    o.innerHTML = '';
-    o.style.background = 'transparent';
-    o.style.border = 'none';
-    var isFill = fillMode === 'fill';
-    var fill = isFill ? c : 'none';
-    var stroke = c;
-    var d = '0';
-    if (strokeStyle === 'dashed') d = '10,5';
-    else if (strokeStyle === 'dotted') d = '2,5';
-    if (t === 'triangle') o.innerHTML = '<svg width="100%" height="100%" viewBox="0 0 100 100"><polygon points="50,5 95,95 5,95" fill="' + fill + '" stroke="' + stroke + '" stroke-width="3" stroke-dasharray="' + d + '"/></svg>';
-    else if (t === 'star') o.innerHTML = '<svg width="100%" height="100%" viewBox="0 0 100 100"><polygon points="50,5 61,35 95,35 66,57 78,90 50,70 22,90 34,57 5,35 39,35" fill="' + fill + '" stroke="' + stroke + '" stroke-width="2" stroke-dasharray="' + d + '"/></svg>';
-    else if (t === 'pentagon') o.innerHTML = '<svg width="100%" height="100%" viewBox="0 0 100 100"><polygon points="50,5 95,38 78,95 22,95 5,38" fill="' + fill + '" stroke="' + stroke + '" stroke-width="2" stroke-dasharray="' + d + '"/></svg>';
-    else if (t === 'hexagon') o.innerHTML = '<svg width="100%" height="100%" viewBox="0 0 100 100"><polygon points="25,5 75,5 95,50 75,95 25,95 5,50" fill="' + fill + '" stroke="' + stroke + '" stroke-width="2" stroke-dasharray="' + d + '"/></svg>';
-    else if (t === 'diamond') o.innerHTML = '<svg width="100%" height="100%" viewBox="0 0 100 100"><polygon points="50,5 95,50 50,95 5,50" fill="' + fill + '" stroke="' + stroke + '" stroke-width="2" stroke-dasharray="' + d + '"/></svg>';
-    else if (t === '3d' || t === 'graph' || t === 'image') { }
-    else {
-        if (isFill) o.style.background = c;
-        else o.style.border = '3px ' + (strokeStyle === 'dashed' ? 'dashed' : strokeStyle === 'dotted' ? 'dotted' : 'solid') + ' ' + c;
-    }
-    addHandles(o);
-}
-
-function add3D(t) {
-    var o = document.createElement('div');
-    o.className = 'obj';
-    o.dataset.type = '3d';
-    o.style.width = '120px';
-    o.style.height = '120px';
-    o.style.left = '100px';
-    o.style.top = '100px';
-    o.style.position = 'absolute';
-    o.style.zIndex = ++zIndexCounter;
-    var s = '';
-    var c = currentColor;
-    if (t === 'cube') s = '<svg width="100%" height="100%" viewBox="0 0 100 100"><polygon points="20,40 60,40 60,80 20,80" fill="' + c + '" stroke="#333" stroke-width="1.5"/><polygon points="20,40 40,20 80,20 60,40" fill="' + c + '" opacity="0.7" stroke="#333" stroke-width="1.5"/><polygon points="60,40 80,20 80,60 60,80" fill="' + c + '" opacity="0.5" stroke="#333" stroke-width="1.5"/></svg>';
-    else if (t === 'sphere') s = '<svg width="100%" height="100%" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="' + c + '" stroke="#333" stroke-width="1.5"/><ellipse cx="40" cy="40" rx="15" ry="10" fill="#FFF" opacity="0.5"/></svg>';
-    else if (t === 'cylinder') s = '<svg width="100%" height="100%" viewBox="0 0 100 100"><ellipse cx="50" cy="25" rx="30" ry="10" fill="' + c + '" opacity="0.7" stroke="#333" stroke-width="1.5"/><rect x="20" y="25" width="60" height="50" fill="' + c + '"/><ellipse cx="50" cy="75" rx="30" ry="10" fill="' + c + '" opacity="0.5" stroke="#333" stroke-width="1.5"/></svg>';
-    else if (t === 'cone') s = '<svg width="100%" height="100%" viewBox="0 0 100 100"><polygon points="50,10 80,80 20,80" fill="' + c + '" stroke="#333" stroke-width="1.5"/><ellipse cx="50" cy="80" rx="30" ry="8" fill="' + c + '" opacity="0.5" stroke="#333" stroke-width="1.5"/></svg>';
-    o.innerHTML = s;
-    addHandles(o);
-    o.addEventListener('mousedown', startDrag);
-    wrap.appendChild(o);
-    selectObj(o);
-    saveHistory();
-}
-
-function addText(kind) {
-    var o = document.createElement('div');
-    o.className = 'obj';
-    o.dataset.type = 'text';
-    var w = 200, h = 55, fs = '17px', txt = 'Text';
-    if (kind === 'title') { w = 380; h = 65; fs = '30px'; txt = '📢 Title'; o.style.fontWeight = '900'; }
-    else if (kind === 'heading') { w = 280; h = 55; fs = '22px'; txt = 'Heading'; o.style.fontWeight = 'bold'; }
-    o.style.width = w + 'px';
-    o.style.height = h + 'px';
-    o.style.left = (80 + Math.random() * 200) + 'px';
-    o.style.top = (80 + Math.random() * 200) + 'px';
-    o.style.position = 'absolute';
-    o.style.zIndex = ++zIndexCounter;
-    o.style.background = '#FFFFFF';
-    o.style.border = '2px solid ' + currentColor;
-    o.style.borderRadius = '8px';
-    o.style.color = currentColor;
-    o.style.fontSize = fs;
-    o.style.display = 'flex';
-    o.style.alignItems = 'center';
-    o.style.justifyContent = 'center';
-    o.style.padding = '6px';
-    o.style.textAlign = 'center';
-    o.dataset.color = currentColor;
-    o.textContent = txt;
-    o.addEventListener('dblclick', function(e) {
-        e.stopPropagation();
-        var v = prompt('Edit:', o.textContent);
-        if (v !== null) o.textContent = v;
-    });
-    addHandles(o);
-    o.addEventListener('mousedown', startDrag);
-    wrap.appendChild(o);
-    selectObj(o);
-    saveHistory();
-}
-
-function addSticky() {
-    var o = document.createElement('div');
-    o.className = 'obj';
-    o.dataset.type = 'text';
-    o.style.width = '180px';
-    o.style.height = '140px';
-    o.style.left = '150px';
-    o.style.top = '150px';
-    o.style.position = 'absolute';
-    o.style.zIndex = ++zIndexCounter;
-    o.style.background = '#FEF3C7';
-    o.style.border = '2px solid #F59E0B';
-    o.style.borderRadius = '4px';
-    o.style.color = '#78350F';
-    o.style.fontSize = '14px';
-    o.style.padding = '12px';
-    o.style.boxShadow = '4px 4px 12px rgba(0,0,0,0.15)';
-    o.textContent = 'Sticky note...';
-    o.addEventListener('dblclick', function(e) {
-        e.stopPropagation();
-        var v = prompt('Edit:', o.textContent);
-        if (v !== null) o.textContent = v;
-    });
-    addHandles(o);
-    o.addEventListener('mousedown', startDrag);
-    wrap.appendChild(o);
-    selectObj(o);
-    saveHistory();
-}
-
-function addCallout() {
-    var o = document.createElement('div');
-    o.className = 'obj';
-    o.dataset.type = 'callout';
-    o.style.width = '180px';
-    o.style.height = '80px';
-    o.style.left = '150px';
-    o.style.top = '150px';
-    o.style.position = 'absolute';
-    o.style.zIndex = ++zIndexCounter;
-    o.style.background = '#FFFFFF';
-    o.style.border = '3px solid ' + currentColor;
-    o.style.borderRadius = '20px';
-    o.style.color = currentColor;
-    o.style.fontSize = '15px';
-    o.style.display = 'flex';
-    o.style.alignItems = 'center';
-    o.style.justifyContent = 'center';
-    o.style.padding = '10px';
-    o.textContent = '💬 Info';
-    o.addEventListener('dblclick', function(e) {
-        e.stopPropagation();
-        var v = prompt('Edit:', o.textContent);
-        if (v !== null) o.textContent = v;
-    });
-    addHandles(o);
-    o.addEventListener('mousedown', startDrag);
-    wrap.appendChild(o);
-    selectObj(o);
-    saveHistory();
-}
-
-function addNumbering() {
-    var o = document.createElement('div');
-    o.className = 'obj';
-    o.dataset.type = 'number';
-    o.style.width = '34px';
-    o.style.height = '34px';
-    o.style.left = (150 + Math.random() * 200) + 'px';
-    o.style.top = (150 + Math.random() * 200) + 'px';
-    o.style.position = 'absolute';
-    o.style.zIndex = ++zIndexCounter;
-    o.style.background = currentColor;
-    o.style.borderRadius = '50%';
-    o.style.color = '#FFFFFF';
-    o.style.fontSize = '17px';
-    o.style.fontWeight = 'bold';
-    o.style.display = 'flex';
-    o.style.alignItems = 'center';
-    o.style.justifyContent = 'center';
-    o.style.border = '3px solid #FFFFFF';
-    o.style.boxShadow = '0 2px 8px rgba(0,0,0,0.3)';
-    o.textContent = numberingCounter++;
-    o.addEventListener('dblclick', function(e) {
-        e.stopPropagation();
-        var v = prompt('Edit:', o.textContent);
-        if (v !== null) o.textContent = v;
-    });
-    addHandles(o);
-    o.addEventListener('mousedown', startDrag);
-    wrap.appendChild(o);
-    selectObj(o);
-    saveHistory();
-}
-
-function addLettering() {
-    var o = document.createElement('div');
-    o.className = 'obj';
-    o.dataset.type = 'number';
-    o.style.width = '34px';
-    o.style.height = '34px';
-    o.style.left = (150 + Math.random() * 200) + 'px';
-    o.style.top = (150 + Math.random() * 200) + 'px';
-    o.style.position = 'absolute';
-    o.style.zIndex = ++zIndexCounter;
-    o.style.background = currentColor;
-    o.style.borderRadius = '50%';
-    o.style.color = '#FFFFFF';
-    o.style.fontSize = '16px';
-    o.style.fontWeight = 'bold';
-    o.style.display = 'flex';
-    o.style.alignItems = 'center';
-    o.style.justifyContent = 'center';
-    o.style.border = '3px solid #FFFFFF';
-    o.style.boxShadow = '0 2px 8px rgba(0,0,0,0.3)';
-    o.textContent = String.fromCharCode(65 + letterCounter++);
-    if (letterCounter > 26) letterCounter = 0;
-    addHandles(o);
-    o.addEventListener('mousedown', startDrag);
-    wrap.appendChild(o);
-    selectObj(o);
-    saveHistory();
-}
-
-function addMath(s) {
-    var o = document.createElement('div');
-    o.className = 'obj';
-    o.dataset.type = 'math';
-    o.style.width = '55px';
-    o.style.height = '55px';
-    o.style.left = (200 + Math.random() * 150) + 'px';
-    o.style.top = (200 + Math.random() * 150) + 'px';
-    o.style.position = 'absolute';
-    o.style.zIndex = ++zIndexCounter;
-    o.style.background = '#FFFFFF';
-    o.style.border = '2px solid ' + currentColor;
-    o.style.borderRadius = '8px';
-    o.style.color = currentColor;
-    o.style.fontSize = '26px';
-    o.style.fontWeight = 'bold';
+        st.markdown("---")
+        st.markdown("### 🧮 Quick Calculator")
+        expr = st.text_input("Expression (e.g., 2+3*4, sin(0.5), sqrt(16)):", key="ml_calc_inp")
+        if expr:
+            try:
+                allowed = {k: getattr(math, k) for k in dir(math) if not k.startswith("_")}
+                allowed.update({"__builtins__": {}})
+                result = eval(expr, allowed, {})
+                st.success(f"= **{result}**")
+            except Exception as e:
+                st.error(f"Invalid: {e}")
+        return
         
 def render_art_machinedesign():
     import streamlit.components.v1 as components
@@ -9016,81 +8874,7 @@ Give: Situation, Problem, Two possible decisions, ask student what they'd do, as
         <p style="color:#7089aa; font-size:13px;">From first AI concept to advanced AI research.</p>
     </div>
     """, unsafe_allow_html=True)    
-def learning_report():
-    """
-    📊 Learning Report — काम करेगा पुराने और नए Play & Learn दोनों के साथ
-    कोई भी session_state key हो, fallback के साथ safe read करेगा
-    """
-    ss = st.session_state
 
-    def safe_get(*keys, default=0):
-        """अगर कोई भी key मिल जाए, पहली available value return करेगा"""
-        for k in keys:
-            if k in ss:
-                return ss[k]
-        return default
-
-    # ---------- Best Score ----------
-    best_scores = safe_get("play_best_scores", "ml_best_scores", default={})
-    best = max(best_scores.values()) if isinstance(best_scores, dict) and best_scores else 0
-
-    # ---------- Completed Levels ----------
-    completed = safe_get("play_completed_levels", "ml_completed_levels", default=[])
-
-    # ---------- Current Level / Age ----------
-    current = safe_get("play_age", "ml_age", "ml_class", "play_level", default="Class 1-2")
-
-    # ---------- XP ----------
-    xp = safe_get("play_xp", "ml_xp", default=0)
-
-    # ---------- Best Streak ----------
-    streak = safe_get("play_best_streak", "ml_best_streak", "ml_streak", default=0)
-
-    # ---------- Hearts ----------
-    hearts = safe_get("play_hearts", "ml_hearts", default=5)
-
-    # ---------- Achievements ----------
-    ach = safe_get("play_achievements", "ml_achievements", default=[])
-
-    # ---------- Total Questions ----------
-    correct = safe_get("play_total_correct", "ml_correct_q", "ml_score", default=0)
-    total = safe_get("play_total_q", "ml_total_q", default=1) or 1
-    accuracy = round((correct / total) * 100, 1) if total else 0
-
-    # ---------- Screen Time (Parent Dashboard से) ----------
-    screen_time = safe_get("total_screen_time", default=0)
-    screen_min = int(screen_time // 60) if isinstance(screen_time, (int, float)) else 0
-
-    # ---------- Activity Log ----------
-    activity_log = safe_get("activity_log", default=[])
-    log_count = len(activity_log) if isinstance(activity_log, list) else 0
-
-    from datetime import datetime as _dt
-    report = f"""
-========================================
-📊 CLYXESSCHAT AI — LEARNING REPORT
-========================================
-📅 Date: {_dt.now().strftime('%d %B %Y, %I:%M %p')}
-
-🎓 Current Level : {current}
-🏆 Levels Completed: {len(completed) if isinstance(completed, list) else 0}
-⭐ Best Score    : {best}/10
-💎 Total XP      : {xp}
-🔥 Best Streak   : {streak}
-❤️ Current Hearts: {hearts}
-🎯 Accuracy      : {accuracy}%
-⏱️ Screen Time   : {screen_min} mins
-📋 Total Activities: {log_count}
-
-🏅 Achievements  : {len(ach) if isinstance(ach, list) else 0}
-
-========================================
-🕉️ ClyxessChat AI by NeuroClyx Technology
-"हर बच्चा AI सीख सके — यही हमारा सपना"
-========================================
-"""
-    return report
- 
 def render_parent_dashboard():
     st.title("👨‍👩‍👦 Parent Dashboard")
     best=max(st.session_state.play_best_scores.values(),default=0)
