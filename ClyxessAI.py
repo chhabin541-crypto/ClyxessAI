@@ -7313,7 +7313,6 @@ def render_art_machinedesign():
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 <style>
 *{box-sizing:border-box;} body{margin:0; background:#080a14; font-family:Inter,sans-serif; overflow:hidden;}
-.topbar{height:42px; background:#111326; border-bottom:1px solid #ffffff12; display:flex; align-items:center; justify-content:space-between; padding:0 10px;}
 .mini-btn{font-size:11px; font-weight:800; padding:6px 12px; border-radius:18px; border:1px solid #ffffff15; cursor:pointer;}
 .active-k{background:#ffcc00!important; color:black!important;}.active-p{background:#00ffff!important; color:black!important;}.active-i{background:#ff5c00!important; color:white!important;}
 .ribbon{height:46px; background:#1a1e36; border-bottom:1px solid #ffffff12; display:flex; align-items:center; gap:6px; padding:0 10px; overflow-x:auto;}
