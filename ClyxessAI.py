@@ -8876,13 +8876,540 @@ Give: Situation, Problem, Two possible decisions, ask student what they'd do, as
     """, unsafe_allow_html=True)    
 
 def render_parent_dashboard():
-    st.title("👨‍👩‍👦 Parent Dashboard")
-    best=max(st.session_state.play_best_scores.values(),default=0)
-    c1,c2,c3=st.columns(3); c1.metric("Completed Levels",len(st.session_state.play_completed_levels)); c2.metric("Best Score",f"{best}/10"); c3.metric("Current Level",st.session_state.play_age)
-    report=learning_report()
-    st.markdown('<div class="report-card">',unsafe_allow_html=True); st.text(report); st.markdown('</div>',unsafe_allow_html=True)
-    st.download_button("📄 Save Report",data=report,file_name="clyxesschat_learning_report.txt",mime="text/plain")
-    st.link_button("📤 Share Report", "https://wa.me/?text="+urllib.parse.quote(report))
+    """
+    👨‍👩‍👦 Parent Safety Center — ClyxessChat AI
+    India's First AI School • Safe Student Protection
+    """
+    import json
+    import urllib.parse
+    from datetime import datetime
+
+    # ============================================================
+    # SESSION STATE INIT
+    # ============================================================
+    defaults = {
+        "pd_locked": False,
+        "pd_kid_safe_engine": True,
+        "pd_toxicity_blocker": True,
+        "pd_allow_maps": True,
+        "pd_allow_image_studio": True,
+        "pd_mode_school": True,
+        "pd_mode_science": True,
+        "pd_mode_creative": True,
+        "pd_mode_multilingual": True,
+        "pd_mode_planner": True,
+        "pd_mode_coding": True,
+        "pd_mode_image_gen": True,
+        "pd_mode_sandbox": False,
+        "pd_blocked_keywords": [],
+        "pd_screen_limit": 120,
+        "pd_question_quota": 20,
+        "pd_screen_used": 0,
+        "pd_questions_asked": 1,
+        "pd_curfew_enabled": True,
+        "pd_curfew_start": "21:00",
+        "pd_curfew_end": "07:00",
+        "pd_parent_pin": "1234",
+        "pd_parent_email": "humbotixai@gmail.com",
+        "pd_audit_logs": [
+            {"time": "Oct 09, 09:20 am", "title": "Explain Quantum Physics to 10yo",
+             "prompt": "Explain quantum physics in a fun way with simple Lego analogies.",
+             "status": "safe", "flag": "✅ Safe - Educational"},
+            {"time": "Oct 09, 06:20 am", "title": "Pygame Space Shooter Tutorial",
+             "prompt": "Show me how to build a basic space shooter game in Python.",
+             "status": "safe", "flag": "✅ Safe - Educational"},
+            {"time": "Oct 08, 11:20 am", "title": "Harappa Time Traveler Story",
+             "prompt": "Write a short sci-fi story about a student time traveler visiting Harappa.",
+             "status": "safe", "flag": "✅ Safe - Educational"},
+            {"time": "Oct 07, 11:20 am", "title": "Blocked Attempt: Exam Answers Request",
+             "prompt": "Give me direct answers and cheat sheet for tomorrow's biology quiz",
+             "status": "blocked", "flag": "🚫 Blocked by Safety Filter"},
+            {"time": "Oct 06, 11:20 am", "title": "Volcanic Eruptions & Chemical Reactions",
+             "prompt": "How do high-pressure lava chambers explode violently?",
+             "status": "monitored", "flag": "⚠️ Monitored Topic"},
+        ],
+    }
+    for k, v in defaults.items():
+        if k not in st.session_state:
+            st.session_state[k] = v
+
+    # ============================================================
+    # CSS
+    # ============================================================
+    st.markdown("""
+    <style>
+        .psc-header {
+            background: linear-gradient(135deg, #FFFFFF 0%, #F5F3FF 100%);
+            padding: 1.2rem 1.5rem; border-radius: 16px;
+            border: 2px solid #E9D5FF; margin-bottom: 1rem;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .psc-title { font-size: 1.7rem; font-weight: 900; color: #1E1B4B; margin: 0; }
+        .psc-sub { font-size: 0.85rem; color: #6B7280; margin-top: 0.2rem; }
+        .psc-active-badge {
+            background: #D1FAE5; color: #065F46; padding: 4px 12px;
+            border-radius: 12px; font-size: 0.75rem; font-weight: 800;
+        }
+        .psc-card {
+            background: #FFFFFF; border: 2px solid #F3F4F6;
+            border-radius: 16px; padding: 1.2rem; margin: 0.8rem 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+        }
+        .psc-card-purple {
+            background: linear-gradient(135deg, #F5F3FF, #FFFFFF);
+            border: 2px solid #E9D5FF; border-radius: 16px;
+            padding: 1rem; margin: 0.5rem 0;
+        }
+        .psc-card-orange {
+            background: linear-gradient(135deg, #FFF7ED, #FFFFFF);
+            border: 2px solid #FED7AA; border-radius: 16px;
+            padding: 1rem; margin: 0.5rem 0;
+        }
+        .psc-card-pink {
+            background: linear-gradient(135deg, #FDF2F8, #FFFFFF);
+            border: 2px solid #FBCFE8; border-radius: 16px;
+            padding: 1rem; margin: 0.5rem 0;
+        }
+        .psc-card-blue {
+            background: linear-gradient(135deg, #EFF6FF, #FFFFFF);
+            border: 2px solid #BFDBFE; border-radius: 16px;
+            padding: 1rem; margin: 0.5rem 0;
+        }
+        .psc-card-green {
+            background: linear-gradient(135deg, #ECFDF5, #FFFFFF);
+            border: 2px solid #A7F3D0; border-radius: 16px;
+            padding: 1rem; margin: 0.5rem 0;
+        }
+        .psc-card-cyan {
+            background: linear-gradient(135deg, #ECFEFF, #FFFFFF);
+            border: 2px solid #A5F3FC; border-radius: 16px;
+            padding: 1rem; margin: 0.5rem 0;
+        }
+        .psc-icon-circle {
+            width: 44px; height: 44px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.4rem; flex-shrink: 0;
+        }
+        .psc-row { display: flex; align-items: flex-start; gap: 12px; }
+        .psc-row-title { font-weight: 800; color: #111827; font-size: 1rem; margin: 0; }
+        .psc-row-desc { font-size: 0.85rem; color: #6B7280; margin-top: 4px; line-height: 1.4; }
+        .psc-section-label {
+            font-size: 0.75rem; font-weight: 800; letter-spacing: 1px;
+            color: #9CA3AF; text-transform: uppercase; margin-bottom: 0.6rem;
+        }
+        .psc-stat-big { font-size: 2rem; font-weight: 900; color: #111827; }
+        .psc-tag {
+            display: inline-block; background: #F3F4F6; color: #374151;
+            padding: 6px 14px; border-radius: 20px; margin: 4px 4px 4px 0;
+            font-size: 0.85rem; font-weight: 600; border: 1px solid #E5E7EB;
+        }
+        .psc-tag-active {
+            background: #FEE2E2; color: #991B1B; border-color: #FCA5A5;
+        }
+        .psc-log-entry {
+            background: #FFFFFF; border: 1px solid #E5E7EB;
+            border-radius: 14px; padding: 1rem; margin: 0.6rem 0;
+        }
+        .psc-log-safe { border-left: 5px solid #10B981; }
+        .psc-log-blocked { border-left: 5px solid #EF4444; }
+        .psc-log-monitored { border-left: 5px solid #F59E0B; }
+        .psc-log-title { font-weight: 700; color: #111827; font-size: 1rem; }
+        .psc-log-time { font-size: 0.8rem; color: #9CA3AF; }
+        .psc-log-prompt { font-size: 0.9rem; color: #4B5563; margin: 0.4rem 0; font-style: italic; }
+        .psc-log-flag {
+            display: inline-block; padding: 4px 10px; border-radius: 8px;
+            font-size: 0.75rem; font-weight: 700;
+        }
+        .psc-flag-safe { background: #D1FAE5; color: #065F46; }
+        .psc-flag-blocked { background: #FEE2E2; color: #991B1B; }
+        .psc-flag-monitored { background: #FEF3C7; color: #92400E; }
+    </style>
+    """, unsafe_allow_html=True)
+
+    # ============================================================
+    # HEADER
+    # ============================================================
+    st.markdown(f"""
+    <div class="psc-header">
+        <div>
+            <div class="psc-title">🛡️ Parental Safety Center
+                <span class="psc-active-badge" style="margin-left: 10px;">ACTIVE</span>
+            </div>
+            <div class="psc-sub">India's First AI School • Safe Student Protection</div>
+        </div>
+        <div style="text-align:right;">
+            <span style="font-size:1.8rem;">🔒</span>
+            <div style="font-size:0.75rem; font-weight:700; color:#6B7280;">
+                {'LOCKED' if st.session_state.pd_locked else 'UNLOCKED'}
+            </div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    c_lock1, c_lock2 = st.columns([3, 1])
+    with c_lock2:
+        if st.button("🔒 Lock" if not st.session_state.pd_locked else "🔓 Unlock",
+                     use_container_width=True, key="pd_lock_toggle"):
+            st.session_state.pd_locked = not st.session_state.pd_locked
+            st.rerun()
+
+    # ============================================================
+    # TABS
+    # ============================================================
+    tab1, tab2, tab3, tab4 = st.tabs(["🛡️ Filters", "⏱️ Screen", "📋 Audit", "🔑 Security"])
+
+    # ---------- TAB 1: FILTERS ----------
+    with tab1:
+        st.markdown(f"""
+        <div class="psc-card-purple">
+            <div class="psc-row">
+                <div class="psc-icon-circle" style="background:#E9D5FF;">🛡️</div>
+                <div style="flex:1;">
+                    <p class="psc-row-title">Strict Kid-Safe AI Engine</p>
+                    <p class="psc-row-desc">Forces kid-friendly explanations, enforces school values, and automatically sanitizes AI outputs.</p>
+                </div>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+        st.session_state.pd_kid_safe_engine = st.toggle(
+            "Enable Strict Kid-Safe AI Engine",
+            value=st.session_state.pd_kid_safe_engine, key="pd_tog_ks"
+        )
+
+        st.markdown('<p class="psc-section-label">GUARD TOGGLES</p>', unsafe_allow_html=True)
+
+        c1, c2 = st.columns(2)
+        with c1:
+            st.markdown('<div class="psc-card-orange">', unsafe_allow_html=True)
+            st.markdown("""
+            <div class="psc-row">
+                <div class="psc-icon-circle" style="background:#FED7AA;">⚠️</div>
+                <div style="flex:1;">
+                    <p class="psc-row-title">Strict Toxicity & Profanity Blocker</p>
+                    <p class="psc-row-desc">Blocks bullying, offensive slurs, and harmful prompts.</p>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+            st.session_state.pd_toxicity_blocker = st.toggle(
+                "Toxicity Blocker", value=st.session_state.pd_toxicity_blocker, key="pd_tog_tox"
+            )
+            st.markdown('</div>', unsafe_allow_html=True)
+
+        with c2:
+            st.markdown('<div class="psc-card-green">', unsafe_allow_html=True)
+            st.markdown("""
+            <div class="psc-row">
+                <div class="psc-icon-circle" style="background:#A7F3D0;">🔍</div>
+                <div style="flex:1;">
+                    <p class="psc-row-title">Allow Maps & Geographical Grounding</p>
+                    <p class="psc-row-desc">Allows students to explore educational places and science museums.</p>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+            st.session_state.pd_allow_maps = st.toggle(
+                "Allow Maps", value=st.session_state.pd_allow_maps, key="pd_tog_map"
+            )
+            st.markdown('</div>', unsafe_allow_html=True)
+
+        st.markdown('<div class="psc-card-pink">', unsafe_allow_html=True)
+        st.markdown("""
+        <div class="psc-row">
+            <div class="psc-icon-circle" style="background:#FBCFE8;">🎨</div>
+            <div style="flex:1;">
+                <p class="psc-row-title">Allow AI Image Studio & Visual Art</p>
+                <p class="psc-row-desc">Enables generating creative art with AI image models.</p>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+        st.session_state.pd_allow_image_studio = st.toggle(
+            "Allow Image Studio", value=st.session_state.pd_allow_image_studio, key="pd_tog_img"
+        )
+        st.markdown('</div>', unsafe_allow_html=True)
+
+        st.markdown("---")
+        st.markdown('<p class="psc-section-label">ALLOWED AI LEARNING MODES</p>', unsafe_allow_html=True)
+        st.caption("Uncheck any mode you want to lock from your child's menu.")
+
+        modes = [
+            ("🏫 School Mode (AI Tutor)", "pd_mode_school", "psc-card-purple"),
+            ("🔬 Science & Math Solver", "pd_mode_science", "psc-card-orange"),
+            ("🖌️ Creative Writing Studio", "pd_mode_creative", "psc-card-pink"),
+            ("🌐 Multilingual Language Coach", "pd_mode_multilingual", "psc-card-blue"),
+            ("📅 Study Planner & Timetables", "pd_mode_planner", "psc-card-green"),
+            ("💻 Coding & Tech Labs", "pd_mode_coding", "psc-card-cyan"),
+            ("🎨 AI Image Generator", "pd_mode_image_gen", "psc-card-purple"),
+            ("🧪 Advanced AI Sandbox", "pd_mode_sandbox", "psc-card-pink"),
+        ]
+        for label, key, css_class in modes:
+            with st.container():
+                st.markdown(f'<div class="{css_class}">', unsafe_allow_html=True)
+                st.session_state[key] = st.toggle(label, value=st.session_state[key], key=f"tog_{key}")
+                st.markdown('</div>', unsafe_allow_html=True)
+
+        st.markdown("---")
+        st.markdown('<p class="psc-section-label">CUSTOM BLOCKED TOPICS & KEYWORDS</p>', unsafe_allow_html=True)
+        st.caption("Prompts containing these keywords will be immediately intercepted before reaching AI models.")
+
+        c_input, c_add = st.columns([4, 1])
+        with c_input:
+            new_kw = st.text_input("Add keyword:", placeholder="e.g. video games, scary...",
+                                    key="pd_kw_input", label_visibility="collapsed")
+        with c_add:
+            if st.button("➕ Add", use_container_width=True, key="pd_kw_add"):
+                if new_kw and new_kw.strip() not in st.session_state.pd_blocked_keywords:
+                    st.session_state.pd_blocked_keywords.append(new_kw.strip())
+                    st.rerun()
+
+        st.caption("**Quick Add:**")
+        suggestions = ["gaming", "horror stories", "exam answers", "social media", "violence"]
+        scols = st.columns(len(suggestions))
+        for i, sug in enumerate(suggestions):
+            with scols[i]:
+                if sug not in st.session_state.pd_blocked_keywords:
+                    if st.button(f"+ {sug}", key=f"pd_sug_{i}", use_container_width=True):
+                        st.session_state.pd_blocked_keywords.append(sug)
+                        st.rerun()
+
+        if st.session_state.pd_blocked_keywords:
+            st.markdown("**Currently Blocked:**")
+            for i, kw in enumerate(st.session_state.pd_blocked_keywords):
+                c1, c2 = st.columns([5, 1])
+                with c1:
+                    st.markdown(f'<span class="psc-tag psc-tag-active">{kw} ✕</span>', unsafe_allow_html=True)
+                with c2:
+                    if st.button("🗑️", key=f"pd_del_kw_{i}"):
+                        st.session_state.pd_blocked_keywords.pop(i)
+                        st.rerun()
+
+    # ---------- TAB 2: SCREEN ----------
+    with tab2:
+        pct = int((st.session_state.pd_screen_used / max(1, st.session_state.pd_screen_limit)) * 100)
+        st.markdown(f"""
+        <div class="psc-card">
+            <div class="psc-row">
+                <div class="psc-icon-circle" style="background:#DBEAFE;">⏱️</div>
+                <div style="flex:1;">
+                    <p class="psc-row-title">Today's Student Screen Time</p>
+                    <p class="psc-row-desc">Real-time AI learning activity tracking</p>
+                </div>
+                <div style="text-align:right;">
+                    <span class="psc-active-badge">{pct}% Used</span>
+                </div>
+            </div>
+            <div style="margin-top:1rem;">
+                <div class="psc-stat-big">{st.session_state.pd_screen_used} mins spent</div>
+                <div style="text-align:right; font-size:0.85rem; color:#6B7280;">Limit: {st.session_state.pd_screen_limit} mins</div>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+
+        st.markdown(f"""
+        <div class="psc-card" style="background:#F5F3FF; border-color:#E9D5FF;">
+            <div class="psc-row">
+                <div class="psc-icon-circle" style="background:#DDD6FE;">🎓</div>
+                <div style="flex:1;">
+                    <p class="psc-row-title">Daily Questions Asked</p>
+                </div>
+                <div style="font-size:1.5rem; font-weight:900; color:#7C3AED;">
+                    {st.session_state.pd_questions_asked} / {st.session_state.pd_question_quota}
+                </div>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+
+        st.markdown("---")
+        st.markdown('<p class="psc-section-label">SET DAILY SCREEN TIME LIMIT</p>', unsafe_allow_html=True)
+        time_options = [15, 30, 45, 60, 90, 120]
+        tcols = st.columns(len(time_options))
+        for i, mins in enumerate(time_options):
+            with tcols[i]:
+                is_active = st.session_state.pd_screen_limit == mins
+                if st.button(f"{mins}m", key=f"pd_time_{mins}", use_container_width=True,
+                             type="primary" if is_active else "secondary"):
+                    st.session_state.pd_screen_limit = mins
+                    st.rerun()
+
+        st.markdown('<p class="psc-section-label">SET DAILY QUESTION QUOTA</p>', unsafe_allow_html=True)
+        quota_options = [20, 50, 100, 200, "Unlimited"]
+        qcols = st.columns(len(quota_options))
+        for i, q in enumerate(quota_options):
+            with qcols[i]:
+                q_val = 9999 if q == "Unlimited" else q
+                is_active = st.session_state.pd_question_quota == q_val
+                if st.button(f"{q} Qs" if q != "Unlimited" else "Unlimited",
+                             key=f"pd_quota_{i}", use_container_width=True,
+                             type="primary" if is_active else "secondary"):
+                    st.session_state.pd_question_quota = q_val
+                    st.rerun()
+
+        st.markdown("---")
+        st.markdown(f"""
+        <div class="psc-card">
+            <div class="psc-row">
+                <div class="psc-icon-circle" style="background:#EDE9FE;">🌙</div>
+                <div style="flex:1;">
+                    <p class="psc-row-title">Bedtime Curfew Lock</p>
+                    <p class="psc-row-desc">Automatically locks AI chat at night to support healthy sleep.</p>
+                </div>
+            </div>
+            <div style="margin-top:0.8rem; display:flex; justify-content:space-between;">
+                <span style="font-weight:700; color:#6B7280;">Curfew Window:</span>
+                <span style="font-weight:800; color:#7C3AED;">
+                    {st.session_state.pd_curfew_start} → {st.session_state.pd_curfew_end} (Daily)
+                </span>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+        st.session_state.pd_curfew_enabled = st.toggle(
+            "Enable Bedtime Curfew", value=st.session_state.pd_curfew_enabled, key="pd_curfew_tog"
+        )
+
+    # ---------- TAB 3: AUDIT ----------
+    with tab3:
+        search_query = st.text_input("🔍 Search student chat prompts & subjects...",
+                                      key="pd_search", label_visibility="collapsed")
+
+        fcols = st.columns(4)
+        filters = ["All Chats", "Today", "🛡️ Safety Flagged", "This Week"]
+        for i, f in enumerate(filters):
+            with fcols[i]:
+                st.button(f, key=f"pd_filter_{i}", use_container_width=True,
+                          type="primary" if i == 0 else "secondary")
+
+        st.caption(f"**{len(st.session_state.pd_audit_logs)} Log Entries Found**")
+
+        c_exp, c_clr = st.columns([1, 1])
+        with c_exp:
+            logs_json = json.dumps(st.session_state.pd_audit_logs, indent=2)
+            st.download_button("📤 Export Logs", data=logs_json,
+                                file_name="audit_logs.json", mime="application/json",
+                                use_container_width=True, key="pd_export")
+        with c_clr:
+            if st.button("🗑️ Clear Logs", use_container_width=True, key="pd_clear"):
+                st.session_state.pd_audit_logs = []
+                st.rerun()
+
+        st.markdown("---")
+
+        for i, log in enumerate(st.session_state.pd_audit_logs):
+            status = log.get("status", "safe")
+            css_log = {"safe": "psc-log-safe", "blocked": "psc-log-blocked",
+                       "monitored": "psc-log-monitored"}.get(status, "")
+            css_flag = {"safe": "psc-flag-safe", "blocked": "psc-flag-blocked",
+                        "monitored": "psc-flag-monitored"}.get(status, "")
+
+            if search_query and search_query.lower() not in log["title"].lower() \
+               and search_query.lower() not in log["prompt"].lower():
+                continue
+
+            dot_color = "#10B981" if status == "safe" else "#EF4444" if status == "blocked" else "#F59E0B"
+            st.markdown(f"""
+            <div class="psc-log-entry {css_log}">
+                <div style="display:flex; justify-content:space-between;">
+                    <span class="psc-log-title">
+                        <span style="color:{dot_color};">●</span> {log['title']}
+                    </span>
+                    <span class="psc-log-time">{log['time']}</span>
+                </div>
+                <div class="psc-log-prompt">💬 "{log['prompt']}"</div>
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <span class="psc-log-flag {css_flag}">{log['flag']}</span>
+                    <span style="font-size:0.85rem; color:#7C3AED; font-weight:700;">
+                        Tap to review transcript →
+                    </span>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+
+    # ---------- TAB 4: SECURITY ----------
+    with tab4:
+        st.markdown('<div class="psc-card">', unsafe_allow_html=True)
+        st.markdown("""
+        <div class="psc-row">
+            <div class="psc-icon-circle" style="background:#EDE9FE;">🔑</div>
+            <div style="flex:1;">
+                <p class="psc-row-title">Change 4-Digit Parent PIN</p>
+                <p class="psc-row-desc">Protects dashboard and filter changes</p>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+
+        current_pin = st.text_input("Current PIN (Default: 1234)", type="password",
+                                      key="pd_pin_current", placeholder="Current PIN")
+        new_pin = st.text_input("New 4-Digit PIN", type="password",
+                                 key="pd_pin_new", placeholder="New PIN", max_chars=4)
+        confirm_pin = st.text_input("Confirm New PIN", type="password",
+                                     key="pd_pin_confirm", placeholder="Confirm PIN", max_chars=4)
+
+        if st.button("💜 Update Parent PIN", use_container_width=True,
+                      type="primary", key="pd_pin_update"):
+            if current_pin != st.session_state.pd_parent_pin:
+                st.error("❌ Current PIN is incorrect")
+            elif len(new_pin) != 4 or not new_pin.isdigit():
+                st.error("❌ New PIN must be 4 digits")
+            elif new_pin != confirm_pin:
+                st.error("❌ New PIN and Confirm PIN do not match")
+            else:
+                st.session_state.pd_parent_pin = new_pin
+                st.success("✅ Parent PIN updated successfully!")
+        st.markdown('</div>', unsafe_allow_html=True)
+
+        st.markdown("---")
+        st.markdown('<div class="psc-card">', unsafe_allow_html=True)
+        st.markdown("""
+        <div class="psc-row">
+            <div class="psc-icon-circle" style="background:#D1FAE5;">📧</div>
+            <div style="flex:1;">
+                <p class="psc-row-title">Parent Alert Email</p>
+                <p class="psc-row-desc">Receive safety reports & curfew alerts</p>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+
+        st.caption("Parent Guardian Email")
+        parent_email = st.text_input("Email", value=st.session_state.pd_parent_email,
+                                       key="pd_email_input", label_visibility="collapsed")
+
+        if st.button("💾 Save Email Preferences", use_container_width=True,
+                      key="pd_email_save"):
+            st.session_state.pd_parent_email = parent_email
+            st.success(f"✅ Email saved: {parent_email}")
+        st.markdown('</div>', unsafe_allow_html=True)
+
+        st.markdown("---")
+        st.markdown("### 📊 Quick Stats")
+        best = max(st.session_state.play_best_scores.values(), default=0) if st.session_state.get("play_best_scores") else 0
+        completed = len(st.session_state.get("play_completed_levels", []))
+        xp = st.session_state.get("play_xp", 0)
+        streak = st.session_state.get("play_best_streak", 0)
+
+        c1, c2, c3, c4 = st.columns(4)
+        with c1: st.metric("🏆 Levels", completed)
+        with c2: st.metric("⭐ Best Score", f"{best}/10")
+        with c3: st.metric("💎 XP", xp)
+        with c4: st.metric("🔥 Best Streak", streak)
+
+    # ============================================================
+    # FOOTER: REPORT
+    # ============================================================
+    st.markdown("---")
+    st.markdown("### 📄 Generate Learning Report")
+
+    try:
+        report = learning_report()
+        report_text = str(report)
+    except Exception as e:
+        report_text = f"Report unavailable: {e}"
+
+    c1, c2 = st.columns(2)
+    with c1:
+        st.download_button("📥 Download Report (TXT)", data=report_text,
+                            file_name=f"clyxesschat_report_{datetime.now().strftime('%Y%m%d')}.txt",
+                            mime="text/plain", use_container_width=True, key="pd_dl")
+    with c2:
+        st.link_button("📤 Share on WhatsApp",
+                        "https://wa.me/?text=" + urllib.parse.quote(report_text),
+                        use_container_width=True)
 
 # ============================================================
 # UI START
