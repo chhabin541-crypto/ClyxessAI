@@ -7505,6 +7505,7 @@ setTimeout(function(){resizeCanvas();saveHistory();},300);
         
 def render_art_machinedesign():
     import streamlit.components.v1 as components
+
     HTML = r"""<!DOCTYPE html>
 <html><head>
 <meta charset="UTF-8">
@@ -7515,26 +7516,36 @@ def render_art_machinedesign():
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',system-ui,sans-serif}
 html,body{width:100%;height:100%;overflow:hidden;background:#1a1d24;color:#e0e0e0}
-.app{display:flex;flex-direction:column;height:100vh}
+.app{display:flex;flex-direction:column;height:100vh;overflow:hidden}
 
 /* TOP RIBBON */
-.ribbon{background:#23262f;border-bottom:1px solid #333842;padding:0 10px;display:flex;align-items:center;gap:8px;height:50px;flex-wrap:wrap}
-.logo{font-weight:900;font-size:14px;color:#4a9eff;display:flex;align-items:center;gap:6px}
+.ribbon{background:#23262f;border-bottom:1px solid #333842;padding:0 10px;display:flex;align-items:center;gap:8px;height:50px;flex-shrink:0;overflow-x:auto;overflow-y:hidden;white-space:nowrap}
+.ribbon::-webkit-scrollbar{height:4px}
+.ribbon::-webkit-scrollbar-thumb{background:#3a3f4a;border-radius:2px}
+.logo{font-weight:900;font-size:14px;color:#4a9eff;display:flex;align-items:center;gap:6px;flex-shrink:0}
 .logo .badge{background:#ff5c00;color:#fff;font-size:8px;padding:2px 6px;border-radius:8px;font-weight:800}
-.rib-btn{background:#2e323c;border:1px solid #3a3f4a;color:#e0e0e0;padding:6px 12px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;transition:.15s;display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+.rib-btn{background:#2e323c;border:1px solid #3a3f4a;color:#e0e0e0;padding:6px 12px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;transition:.15s;display:inline-flex;align-items:center;gap:5px;white-space:nowrap;flex-shrink:0}
 .rib-btn:hover{background:#3a4050;border-color:#4a9eff}
 .rib-btn.primary{background:#4a9eff;color:#fff;border-color:#4a9eff}
 .rib-btn.primary:hover{background:#5aaeff}
 .rib-btn.danger{background:#c0392b;color:#fff;border-color:#c0392b}
 .rib-btn.danger:hover{background:#e74c3c}
-.rib-sep{width:1px;height:22px;background:#3a3f4a;margin:0 4px}
-.toolbar-title{font-size:10px;color:#7a7f8a;font-weight:700;text-transform:uppercase;letter-spacing:.5px;padding:0 4px}
+.rib-sep{width:1px;height:22px;background:#3a3f4a;margin:0 4px;flex-shrink:0}
+.toolbar-title{font-size:10px;color:#7a7f8a;font-weight:700;text-transform:uppercase;letter-spacing:.5px;padding:0 4px;flex-shrink:0}
+
+/* MODE SWITCHER — NEW */
+.mode-switch{display:flex;gap:3px;background:#1a1d24;padding:3px;border-radius:8px;border:1px solid #3a3f4a;flex-shrink:0}
+.mode-switch-btn{background:transparent;border:none;color:#7a7f8a;padding:5px 14px;border-radius:6px;font-size:11px;font-weight:800;cursor:pointer;transition:.15s;font-family:inherit}
+.mode-switch-btn:hover{color:#e0e0e0}
+.mode-switch-btn.active{background:#4a9eff;color:#fff;box-shadow:0 0 10px rgba(74,158,255,.4)}
+.mode-switch-btn.active.kids{background:#10b981;box-shadow:0 0 10px rgba(16,185,129,.4)}
 
 /* MAIN */
-.main{flex:1;display:flex;overflow:hidden}
+.main{flex:1;display:flex;overflow:hidden;position:relative;min-height:0}
+.main.hidden{display:none}
 
 /* LEFT PANEL - Components */
-.left{width:230px;background:#23262f;border-right:1px solid #333842;overflow-y:auto;padding:10px}
+.left{width:230px;flex-shrink:0;background:#23262f;border-right:1px solid #333842;overflow-y:auto;padding:10px}
 .section-title{font-size:10px;color:#7a7f8a;font-weight:800;text-transform:uppercase;letter-spacing:.5px;margin:10px 0 6px;display:flex;align-items:center;gap:5px}
 .cat-header{background:#2a2e38;border:1px solid #3a3f4a;border-radius:6px;padding:7px 10px;font-size:11px;font-weight:700;cursor:pointer;display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;user-select:none}
 .cat-header:hover{background:#32384a}
@@ -7554,7 +7565,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#1a1d24;color:#e0e0e
 .tpl-btn .ico{font-size:20px;display:block;margin-bottom:4px}
 
 /* CENTER VIEWPORT */
-.center{flex:1;position:relative;background:linear-gradient(180deg,#181a20 0%,#1f2229 100%)}
+.center{flex:1;position:relative;background:linear-gradient(180deg,#181a20 0%,#1f2229 100%);min-width:0;overflow:hidden}
 #viewport{width:100%;height:100%;display:block;cursor:default}
 #viewport.mode-move{cursor:move}
 #viewport.mode-rotate{cursor:grab}
@@ -7568,7 +7579,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#1a1d24;color:#e0e0e
 .view-btn:hover{background:#4a9eff;color:#fff;border-color:#4a9eff}
 
 /* RIGHT PANEL */
-.right{width:250px;background:#23262f;border-left:1px solid #333842;overflow-y:auto;padding:10px}
+.right{width:250px;flex-shrink:0;background:#23262f;border-left:1px solid #333842;overflow-y:auto;padding:10px}
 .prop-row{margin-bottom:8px}
 .prop-label{font-size:10px;color:#7a7f8a;font-weight:700;display:flex;justify-content:space-between;margin-bottom:3px}
 .prop-label span{color:#4a9eff}
@@ -7584,6 +7595,17 @@ html,body{width:100%;height:100%;overflow:hidden;background:#1a1d24;color:#e0e0e
 .prop-act.red:hover{background:#e74c3c}
 .empty-state{text-align:center;padding:20px 10px;color:#7a7f8a;font-size:11px;line-height:1.6}
 .empty-state .ico{font-size:32px;display:block;margin-bottom:8px;opacity:.5}
+
+/* KIDS MODE — NEW */
+.kids-main{flex:1;overflow-y:auto;background:linear-gradient(135deg,#1e1b4b 0%,#312e81 50%,#4c1d95 100%);padding:30px}
+.kids-header{text-align:center;margin-bottom:30px}
+.kids-header h1{font-size:38px;color:#fbbf24;text-shadow:3px 3px 0 #000;margin-bottom:8px}
+.kids-header p{font-size:16px;color:#e0e7ff}
+.kids-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:20px;max-width:1100px;margin:0 auto}
+.kid-card{background:rgba(255,255,255,0.1);backdrop-filter:blur(10px);border:3px solid rgba(255,255,255,0.25);border-radius:24px;padding:30px 15px;text-align:center;cursor:pointer;transition:all .25s;color:#fff}
+.kid-card:hover{transform:scale(1.08) rotate(-2deg);border-color:#fbbf24;box-shadow:0 15px 30px rgba(251,191,36,0.35)}
+.kid-card .emoji{font-size:56px;display:block;margin-bottom:10px}
+.kid-card .label{font-size:18px;font-weight:800}
 
 /* MODAL */
 .modal{display:none;position:fixed;inset:0;background:#000000cc;backdrop-filter:blur(6px);z-index:9999;justify-content:center;align-items:center;padding:20px}
@@ -7602,7 +7624,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#1a1d24;color:#e0e0e
 .export-opt small{font-size:10px;color:#7a7f8a}
 
 /* STATUS */
-.status{background:#1a1d24;border-top:1px solid #333842;padding:5px 14px;font-size:10px;color:#7a7f8a;display:flex;justify-content:space-between}
+.status{background:#1a1d24;border-top:1px solid #333842;padding:5px 14px;font-size:10px;color:#7a7f8a;display:flex;justify-content:space-between;flex-shrink:0}
 .status b{color:#4a9eff}
 
 /* scrollbar */
@@ -7618,6 +7640,12 @@ html,body{width:100%;height:100%;overflow:hidden;background:#1a1d24;color:#e0e0e
   <!-- TOP RIBBON -->
   <div class="ribbon">
     <div class="logo">🧊 Clyxess Studio <span class="badge">CAD</span></div>
+
+    <div class="mode-switch">
+      <button class="mode-switch-btn active" id="btnModeStudio" onclick="switchAppMode('studio')">🎨 Studio</button>
+      <button class="mode-switch-btn" id="btnModeKids" onclick="switchAppMode('kids')">🧒 Kids</button>
+    </div>
+
     <div class="rib-sep"></div>
     <span class="toolbar-title">Templates:</span>
     <select class="prop-select" id="tplSelect" style="width:170px" onchange="loadTemplate(this.value)">
@@ -7648,7 +7676,8 @@ html,body{width:100%;height:100%;overflow:hidden;background:#1a1d24;color:#e0e0e
     <button class="rib-btn" onclick="toggleGrid()">📐 Grid</button>
   </div>
 
-  <div class="main">
+  <!-- STUDIO MODE LAYOUT -->
+  <div class="main" id="studioMain">
 
     <!-- LEFT: Component Library -->
     <div class="left">
@@ -7686,6 +7715,26 @@ html,body{width:100%;height:100%;overflow:hidden;background:#1a1d24;color:#e0e0e
           <span class="ico">🎯</span>
           Click any object in the 3D scene to edit it
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- KIDS MODE LAYOUT — NEW -->
+  <div class="main hidden" id="kidsMain">
+    <div class="kids-main">
+      <div class="kids-header">
+        <h1>🧒 Kids Mode</h1>
+        <p>Bada buttons, simple shapes, aur bahut maza!</p>
+      </div>
+      <div class="kids-grid">
+        <div class="kid-card" onclick="kidsLoad('car')"><span class="emoji">🚗</span><span class="label">Car Banao</span></div>
+        <div class="kid-card" onclick="kidsLoad('rocket')"><span class="emoji">🚀</span><span class="label">Rocket Banao</span></div>
+        <div class="kid-card" onclick="kidsLoad('robot')"><span class="emoji">🤖</span><span class="label">Robot Banao</span></div>
+        <div class="kid-card" onclick="kidsLoad('airplane')"><span class="emoji">✈️</span><span class="label">Airplane Banao</span></div>
+        <div class="kid-card" onclick="kidsLoad('cycle')"><span class="emoji">🚲</span><span class="label">Cycle Banao</span></div>
+        <div class="kid-card" onclick="kidsLoad('drone')"><span class="emoji">🛸</span><span class="label">Drone Banao</span></div>
+        <div class="kid-card" onclick="kidsLoad('bike')"><span class="emoji">🏍️</span><span class="label">Bike Banao</span></div>
+        <div class="kid-card" onclick="kidsLoad('helicopter')"><span class="emoji">🚁</span><span class="label">Helicopter Banao</span></div>
       </div>
     </div>
   </div>
@@ -7731,7 +7780,38 @@ html,body{width:100%;height:100%;overflow:hidden;background:#1a1d24;color:#e0e0e
   </div>
 </div>
 
-<script> 
+<script>
+// ============================================================
+// APP MODE SWITCHER (Studio <-> Kids)
+// ============================================================
+function switchAppMode(mode) {
+  const studioMain = document.getElementById('studioMain');
+  const kidsMain = document.getElementById('kidsMain');
+  const btnStudio = document.getElementById('btnModeStudio');
+  const btnKids = document.getElementById('btnModeKids');
+
+  if (mode === 'studio') {
+    studioMain.classList.remove('hidden');
+    kidsMain.classList.add('hidden');
+    btnStudio.classList.add('active');
+    btnStudio.classList.remove('kids');
+    btnKids.classList.remove('active');
+    btnKids.classList.remove('kids');
+    setTimeout(resize, 100);
+  } else {
+    kidsMain.classList.remove('hidden');
+    studioMain.classList.add('hidden');
+    btnKids.classList.add('active');
+    btnKids.classList.add('kids');
+    btnStudio.classList.remove('active');
+  }
+}
+
+function kidsLoad(templateId) {
+  switchAppMode('studio');
+  setTimeout(() => { loadTemplate(templateId); }, 150);
+}
+
 // ============================================================
 // CLYXESS STUDIO CAD — Three.js 3D Design Engine
 // ============================================================
@@ -7781,19 +7861,19 @@ selectionBox.visible = false;
 scene.add(selectionBox);
 
 // ---------- STATE ----------
-let mode = 'move';       // move | rotate | scale
+let mode = 'move';
 let selectedObj = null;
 let snapEnabled = true;
 let isDragging = false;
 let dragStart = {x:0, y:0};
 let objStartPos = {x:0, y:0, z:0};
 let objStartRot = {x:0, y:0, z:0};
-let objStartScale = 1;
 let objectCount = 0;
 
 // ---------- RESIZE ----------
 function resize() {
   const rect = canvas.parentElement.getBoundingClientRect();
+  if (rect.width === 0 || rect.height === 0) return;
   renderer.setSize(rect.width, rect.height, false);
   camera.aspect = rect.width / rect.height;
   camera.updateProjectionMatrix();
@@ -8085,14 +8165,12 @@ function addPart(catName, idx) {
   mesh.castShadow = true;
   mesh.receiveShadow = true;
   
-  // Position slightly random to avoid overlap
   mesh.position.set(
     (Math.random() - 0.5) * 4,
     partDef.n.includes('Wheel') || partDef.n.includes('Tire') ? 0.8 : 0.8,
     (Math.random() - 0.5) * 4
   );
   
-  // Snap to grid
   if(snapEnabled) {
     mesh.position.x = Math.round(mesh.position.x * 2) / 2;
     mesh.position.z = Math.round(mesh.position.z * 2) / 2;
@@ -8307,7 +8385,7 @@ canvas.addEventListener('click', (e) => {
 // ---------- DRAG TO MOVE ----------
 canvas.addEventListener('mousedown', (e) => {
   if(e.button !== 0 || !selectedObj) return;
-  if(e.shiftKey) { // Shift+drag = rotate
+  if(e.shiftKey) {
     dragStart = {x: e.clientX, y: e.clientY};
     objStartRot = {...selectedObj.rotation};
     isDragging = true;
@@ -8363,43 +8441,29 @@ function loadTemplate(id) {
   
   const T = {
     cycle: () => {
-      // Wheels
       const w1 = COMPONENTS['🚲 Cycle Parts'][0].f(); w1.position.set(-1.5, 0.8, 0); w1.userData.type='Wheel'; objGroup.add(w1);
       const w2 = COMPONENTS['🚲 Cycle Parts'][0].f(); w2.position.set(1.5, 0.8, 0); w2.userData.type='Wheel'; objGroup.add(w2);
-      // Frame
       const fr = COMPONENTS['🚲 Cycle Parts'][1].f(); fr.position.set(0, 1.2, 0); fr.userData.type='Frame'; objGroup.add(fr);
-      // Handlebar
       const hb = COMPONENTS['🚲 Cycle Parts'][2].f(); hb.position.set(1.5, 2, 0); hb.userData.type='Handlebar'; objGroup.add(hb);
-      // Seat
       const st = COMPONENTS['🚲 Cycle Parts'][3].f(); st.position.set(-0.8, 2, 0); st.userData.type='Seat'; objGroup.add(st);
-      // Pedal
       const pd = COMPONENTS['🚲 Cycle Parts'][4].f(); pd.position.set(0, 0.8, 0); pd.userData.type='Pedal'; objGroup.add(pd);
     },
     bike: () => {
-      // Wheels
       const w1 = COMPONENTS['🚲 Cycle Parts'][0].f(); w1.position.set(-1.6, 0.8, 0); w1.scale.setScalar(1.2); objGroup.add(w1);
       const w2 = COMPONENTS['🚲 Cycle Parts'][0].f(); w2.position.set(1.6, 0.8, 0); w2.scale.setScalar(1.2); objGroup.add(w2);
-      // Engine
       const en = COMPONENTS['🏍️ Motor Bike'][0].f(); en.position.set(0, 1, 0); objGroup.add(en);
-      // Fuel Tank
       const ft = COMPONENTS['🏍️ Motor Bike'][1].f(); ft.position.set(-0.3, 1.9, 0); objGroup.add(ft);
-      // Seat
       const st = COMPONENTS['🏍️ Motor Bike'][2].f(); st.position.set(-1.3, 1.7, 0); objGroup.add(st);
-      // Handlebar
       const hb = COMPONENTS['🚲 Cycle Parts'][2].f(); hb.position.set(1.4, 1.9, 0); objGroup.add(hb);
-      // Exhaust
       const ex = COMPONENTS['🏍️ Motor Bike'][3].f(); ex.position.set(-1, 0.6, 0.5); objGroup.add(ex);
     },
     car: () => {
       const body = COMPONENTS['🚗 Car Parts'][0].f(); body.position.set(0, 0.9, 0); objGroup.add(body);
       const cab = COMPONENTS['🚗 Car Parts'][1].f(); cab.position.set(0, 1.7, 0); objGroup.add(cab);
-      // 4 tires
       const tirePos = [[-1.3,0.35,-0.9],[-1.3,0.35,0.9],[1.3,0.35,-0.9],[1.3,0.35,0.9]];
       tirePos.forEach(p => { const t = COMPONENTS['🚗 Car Parts'][2].f(); t.position.set(...p); objGroup.add(t); });
-      // Headlight
       const hl1 = COMPONENTS['🚗 Car Parts'][3].f(); hl1.position.set(1.3, 0.9, -0.5); objGroup.add(hl1);
       const hl2 = COMPONENTS['🚗 Car Parts'][3].f(); hl2.position.set(1.3, 0.9, 0.5); objGroup.add(hl2);
-      // Spoiler
       const sp = COMPONENTS['🚗 Car Parts'][5].f(); sp.position.set(-1.3, 1.4, 0); objGroup.add(sp);
     },
     airplane: () => {
@@ -8484,7 +8548,6 @@ function exportPNG() {
 
 function exportOBJ() {
   closeExport();
-  // Simple OBJ exporter
   let objStr = '# Clyxess Studio Export\n# ' + new Date().toISOString() + '\n\n';
   let vOffset = 1;
   
@@ -8496,14 +8559,12 @@ function exportOBJ() {
       const idx = child.geometry.index;
       const mat = child.matrixWorld;
       
-      // Vertices
       const v = new THREE.Vector3();
       for(let i = 0; i < pos.count; i++) {
         v.fromBufferAttribute(pos, i).applyMatrix4(mat);
         objStr += `v ${v.x.toFixed(4)} ${v.y.toFixed(4)} ${v.z.toFixed(4)}\n`;
       }
       
-      // Faces
       if(idx) {
         for(let i = 0; i < idx.count; i += 3) {
           objStr += `f ${idx.getX(i)+vOffset} ${idx.getX(i+1)+vOffset} ${idx.getX(i+2)+vOffset}\n`;
@@ -8547,7 +8608,6 @@ function loadProject() {
   try {
     const data = JSON.parse(raw);
     while(objGroup.children.length > 0) objGroup.remove(objGroup.children[0]);
-    // Just restore as basic boxes for now
     data.parts.forEach(p => {
       const m = new THREE.Mesh(new THREE.BoxGeometry(1,1,1), new THREE.MeshStandardMaterial({color: new THREE.Color(p.color)}));
       m.position.set(...p.pos);
@@ -8578,17 +8638,11 @@ setView('iso');
 resize();
 animate();
 
-// Auto-open first category
-setTimeout(() => toggleCat(0), 200);   
+setTimeout(() => toggleCat(0), 200);
 </script>
 </body>
 </html>
 """
-
-    # ============================================================
-    # PART 2 — यह JS भाग ऊपर के <script></script> के बीच जाता है
-    # (नीचे Part 2 दिया है — उसे <script> और </script> के बीच paste करो)
-    # ============================================================
 
     components.html(HTML, height=950, scrolling=False)
     
