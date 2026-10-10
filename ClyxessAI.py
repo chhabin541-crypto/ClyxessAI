@@ -7505,823 +7505,1091 @@ setTimeout(function(){resizeCanvas();saveHistory();},300);
         
 def render_art_machinedesign():
     import streamlit.components.v1 as components
-    HTML = r"""
-<!DOCTYPE html><html><head>
-<meta charset="UTF-8"><script src="https://cdn.tailwindcss.com"></script>
+    HTML = r"""<!DOCTYPE html>
+<html><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clyxess AI — Design Studio</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 <style>
-*{box-sizing:border-box;} body{margin:0; background:#080a14; font-family:Inter,sans-serif; overflow:hidden; color:#fff;}
-.topbar{height:46px; background:#111326; border-bottom:1px solid #ffffff12; display:flex; align-items:center; justify-content:space-between; padding:0 10px;}
-.mini-btn{font-size:11px; font-weight:800; padding:6px 12px; border-radius:18px; border:1px solid #ffffff15; cursor:pointer; background:#1e2238; color:#fff;}
-.active-k{background:#ffcc00!important; color:black!important;}
-.active-p{background:#00ffff!important; color:black!important;}
-.ribbon{height:46px; background:#1a1e36; border-bottom:1px solid #ffffff12; display:flex; align-items:center; gap:6px; padding:0 10px; overflow-x:auto;}
-.rib-btn{background:#242a4d; border:1px solid #ffffff10; padding:6px 10px; border-radius:10px; font-size:10px; cursor:pointer; white-space:nowrap;}
-.rib-on{background:#ff5c00!important; color:white!important;}
-.tool-icon{width:38px; height:38px; background:#1a1e36; border:1px solid #ffffff0f; border-radius:10px; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:16px;}
-.tool-on{outline:2px solid #00ffff; background:#253055!important;}
-.kid-part{background:#1e2648; border:1px solid #ffffff12; padding:6px 4px; border-radius:10px; text-align:center; cursor:pointer; font-size:10px;}
-.kid-part:hover{background:#2e3a6b;}
-.alpha-btn{background:#242a4d; border:1px solid #ffffff15; padding:5px 2px; border-radius:8px; font-size:12px; font-weight:800; cursor:pointer; text-align:center; user-select:none;}
-.alpha-btn:hover{background:#ffcc00; color:black;}
-.block-item{background:#1e2648; border:1px solid #ffffff12; border-radius:12px; padding:10px 4px; text-align:center; cursor:pointer; font-size:9px; line-height:11px;}
-.block-item:hover{background:#2e3a6b; border-color:#ff5c00; transform:translateY(-1px);}
-.block-item b{font-size:10px; display:block;}
-.modal-box{background:#13162c; border:1px solid #ffffff25; border-radius:18px; width:900px; max-height:92vh; display:flex; flex-direction:column; overflow:hidden;}
-.pro-panel{background:#1a1e36; border-radius:12px; padding:8px; border:1px solid #ffffff10; margin-bottom:6px;}
-.label{font-size:9px; color:#aaa; display:flex; justify-content:space-between; margin-top:5px;}
-.slider{width:100%; height:6px;}
-.sec-title{font-size:10px; font-weight:800; color:#00ffff; margin:8px 0 6px 0;}
-.tab-btn{background:#1e2238; color:#aaa; border:none; padding:5px 12px; border-radius:20px; font-size:10px; font-weight:700; cursor:pointer; margin-right:4px;}
-.tab-btn.on{background:#ffcc00; color:black;}
-.text-input{background:#0b0e1e; color:#00ffff; border:1px solid #00ffff55; border-radius:8px; padding:6px; font-size:11px; width:100%; font-family:inherit;}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',system-ui,sans-serif}
+html,body{width:100%;height:100%;overflow:hidden;background:#1a1d24;color:#e0e0e0}
+.app{display:flex;flex-direction:column;height:100vh}
+
+/* TOP RIBBON */
+.ribbon{background:#23262f;border-bottom:1px solid #333842;padding:0 10px;display:flex;align-items:center;gap:8px;height:50px;flex-wrap:wrap}
+.logo{font-weight:900;font-size:14px;color:#4a9eff;display:flex;align-items:center;gap:6px}
+.logo .badge{background:#ff5c00;color:#fff;font-size:8px;padding:2px 6px;border-radius:8px;font-weight:800}
+.rib-btn{background:#2e323c;border:1px solid #3a3f4a;color:#e0e0e0;padding:6px 12px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;transition:.15s;display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+.rib-btn:hover{background:#3a4050;border-color:#4a9eff}
+.rib-btn.primary{background:#4a9eff;color:#fff;border-color:#4a9eff}
+.rib-btn.primary:hover{background:#5aaeff}
+.rib-btn.danger{background:#c0392b;color:#fff;border-color:#c0392b}
+.rib-btn.danger:hover{background:#e74c3c}
+.rib-sep{width:1px;height:22px;background:#3a3f4a;margin:0 4px}
+.toolbar-title{font-size:10px;color:#7a7f8a;font-weight:700;text-transform:uppercase;letter-spacing:.5px;padding:0 4px}
+
+/* MAIN */
+.main{flex:1;display:flex;overflow:hidden}
+
+/* LEFT PANEL - Components */
+.left{width:230px;background:#23262f;border-right:1px solid #333842;overflow-y:auto;padding:10px}
+.section-title{font-size:10px;color:#7a7f8a;font-weight:800;text-transform:uppercase;letter-spacing:.5px;margin:10px 0 6px;display:flex;align-items:center;gap:5px}
+.cat-header{background:#2a2e38;border:1px solid #3a3f4a;border-radius:6px;padding:7px 10px;font-size:11px;font-weight:700;cursor:pointer;display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;user-select:none}
+.cat-header:hover{background:#32384a}
+.cat-header .arrow{font-size:9px;color:#7a7f8a;transition:.2s}
+.cat-header.open .arrow{transform:rotate(90deg)}
+.cat-body{display:none;padding:4px 0 6px 0}
+.cat-body.open{display:block}
+.parts-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:4px}
+.part-btn{background:#2e323c;border:1px solid #3a3f4a;border-radius:8px;padding:8px 4px;font-size:9px;text-align:center;cursor:pointer;transition:.15s;color:#e0e0e0;line-height:1.2}
+.part-btn:hover{background:#3a4050;border-color:#4a9eff;transform:translateY(-1px)}
+.part-btn .ico{font-size:18px;display:block;margin-bottom:3px}
+
+/* TEMPLATES */
+.tpl-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:5px}
+.tpl-btn{background:#2e323c;border:1px solid #3a3f4a;border-radius:8px;padding:10px 4px;font-size:10px;text-align:center;cursor:pointer;font-weight:600;color:#e0e0e0;transition:.15s}
+.tpl-btn:hover{background:#4a9eff;border-color:#4a9eff;color:#fff}
+.tpl-btn .ico{font-size:20px;display:block;margin-bottom:4px}
+
+/* CENTER VIEWPORT */
+.center{flex:1;position:relative;background:linear-gradient(180deg,#181a20 0%,#1f2229 100%)}
+#viewport{width:100%;height:100%;display:block;cursor:default}
+#viewport.mode-move{cursor:move}
+#viewport.mode-rotate{cursor:grab}
+#viewport.mode-scale{cursor:nwse-resize}
+.viewport-overlay{position:absolute;top:10px;left:10px;background:#23262fcc;padding:6px 12px;border-radius:8px;font-size:10px;color:#7a7f8a;border:1px solid #3a3f4a;pointer-events:none}
+.viewport-overlay b{color:#4a9eff}
+.bottom-bar{position:absolute;bottom:10px;left:10px;right:10px;background:#23262fcc;padding:6px 14px;border-radius:10px;font-size:10px;color:#7a7f8a;border:1px solid #3a3f4a;display:flex;justify-content:space-between;align-items:center;pointer-events:none}
+.bottom-bar b{color:#4a9eff}
+.view-btns{position:absolute;top:10px;right:10px;display:flex;gap:5px;background:#23262fcc;padding:5px;border-radius:8px;border:1px solid #3a3f4a}
+.view-btn{background:#2e323c;border:1px solid #3a3f4a;color:#e0e0e0;width:32px;height:28px;border-radius:5px;cursor:pointer;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.view-btn:hover{background:#4a9eff;color:#fff;border-color:#4a9eff}
+
+/* RIGHT PANEL */
+.right{width:250px;background:#23262f;border-left:1px solid #333842;overflow-y:auto;padding:10px}
+.prop-row{margin-bottom:8px}
+.prop-label{font-size:10px;color:#7a7f8a;font-weight:700;display:flex;justify-content:space-between;margin-bottom:3px}
+.prop-label span{color:#4a9eff}
+.prop-slider{width:100%;height:4px;background:#2a2e38;border-radius:2px;-webkit-appearance:none;appearance:none;outline:none}
+.prop-slider::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;background:#4a9eff;border-radius:50%;cursor:pointer;border:2px solid #fff}
+.prop-slider::-moz-range-thumb{width:14px;height:14px;background:#4a9eff;border-radius:50%;cursor:pointer;border:2px solid #fff}
+.prop-color{width:100%;height:30px;border:1px solid #3a3f4a;border-radius:6px;cursor:pointer;background:transparent}
+.prop-select{width:100%;background:#1f2229;color:#e0e0e0;border:1px solid #3a3f4a;border-radius:6px;padding:6px;font-size:11px;cursor:pointer}
+.prop-actions{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-top:8px}
+.prop-act{background:#2e323c;border:1px solid #3a3f4a;color:#e0e0e0;padding:7px;border-radius:6px;font-size:10px;font-weight:700;cursor:pointer;transition:.15s}
+.prop-act:hover{background:#4a9eff;border-color:#4a9eff;color:#fff}
+.prop-act.red{background:#c0392b;border-color:#c0392b;color:#fff}
+.prop-act.red:hover{background:#e74c3c}
+.empty-state{text-align:center;padding:20px 10px;color:#7a7f8a;font-size:11px;line-height:1.6}
+.empty-state .ico{font-size:32px;display:block;margin-bottom:8px;opacity:.5}
+
+/* MODAL */
+.modal{display:none;position:fixed;inset:0;background:#000000cc;backdrop-filter:blur(6px);z-index:9999;justify-content:center;align-items:center;padding:20px}
+.modal.open{display:flex}
+.modal-box{background:#23262f;border:1px solid #3a3f4a;border-radius:14px;width:100%;max-width:520px;max-height:90vh;overflow:hidden;display:flex;flex-direction:column}
+.modal-head{padding:14px 18px;border-bottom:1px solid #333842;display:flex;justify-content:space-between;align-items:center}
+.modal-head h3{font-size:14px;font-weight:800;color:#4a9eff}
+.modal-close{background:transparent;border:none;color:#e0e0e0;font-size:18px;cursor:pointer;width:30px;height:30px;border-radius:6px}
+.modal-close:hover{background:#3a3f4a}
+.modal-body{padding:16px;overflow-y:auto}
+.modal-body p{font-size:12px;color:#a0a5b0;line-height:1.6;margin-bottom:12px}
+.export-opt{background:#2a2e38;border:1px solid #3a3f4a;border-radius:8px;padding:12px;margin-bottom:8px;cursor:pointer;display:flex;align-items:center;gap:12px;transition:.15s}
+.export-opt:hover{background:#3a4050;border-color:#4a9eff}
+.export-opt .ico{font-size:24px}
+.export-opt b{font-size:12px;display:block}
+.export-opt small{font-size:10px;color:#7a7f8a}
+
+/* STATUS */
+.status{background:#1a1d24;border-top:1px solid #333842;padding:5px 14px;font-size:10px;color:#7a7f8a;display:flex;justify-content:space-between}
+.status b{color:#4a9eff}
+
+/* scrollbar */
+::-webkit-scrollbar{width:8px;height:8px}
+::-webkit-scrollbar-track{background:#1a1d24}
+::-webkit-scrollbar-thumb{background:#3a3f4a;border-radius:4px}
+::-webkit-scrollbar-thumb:hover{background:#4a9eff}
 </style>
 </head>
-<body class="h-screen flex flex-col text-white">
+<body>
+<div class="app">
 
-<div class="topbar">
-  <div class="flex items-center gap-3">
-    <div style="width:26px; height:26px; background:#ffcc00; color:black; border-radius:8px; display:flex; align-items:center; justify-content:center; font-weight:900;">C</div>
-    <div><div id="headerTitle" style="font-size:12px; font-weight:900;">🚁 Create Your Future - Kids + Pro Blocks</div><div id="headerSub" style="font-size:8.5px; color:#8e94ab;">A-Z a-z 0-9 Special + Numbers 1 Lakh + Blocks + 60 Languages</div></div>
+  <!-- TOP RIBBON -->
+  <div class="ribbon">
+    <div class="logo">🧊 Clyxess Studio <span class="badge">CAD</span></div>
+    <div class="rib-sep"></div>
+    <span class="toolbar-title">Templates:</span>
+    <select class="prop-select" id="tplSelect" style="width:170px" onchange="loadTemplate(this.value)">
+      <option value="">-- Choose Design --</option>
+      <option value="cycle">🚲 Simple Cycle</option>
+      <option value="bike">🏍️ Motor Bike</option>
+      <option value="car">🚗 Super Car</option>
+      <option value="airplane">✈️ Airplane</option>
+      <option value="helicopter">🚁 Helicopter</option>
+      <option value="rocket">🚀 Rocket</option>
+      <option value="robot">🤖 Robot</option>
+      <option value="drone">🛸 Drone</option>
+      <option value="pcb">🔌 PCB Board</option>
+      <option value="gear">⚙️ Gear Assembly</option>
+    </select>
+    <div class="rib-sep"></div>
+    <span class="toolbar-title">Tools:</span>
+    <button class="rib-btn" onclick="setMode('move')" id="btnMove">↔️ Move</button>
+    <button class="rib-btn" onclick="setMode('rotate')" id="btnRotate">🔄 Rotate</button>
+    <button class="rib-btn" onclick="setMode('scale')" id="btnScale">📏 Scale</button>
+    <div class="rib-sep"></div>
+    <button class="rib-btn" onclick="duplicateSelected()">📋 Copy</button>
+    <button class="rib-btn danger" onclick="deleteSelected()">🗑️ Delete</button>
+    <button class="rib-btn danger" onclick="clearAll()">✖️ Clear</button>
+    <div class="rib-sep"></div>
+    <button class="rib-btn primary" onclick="openExport()">💾 Export / Download</button>
+    <button class="rib-btn" onclick="toggleSnap()" id="btnSnap">🧲 Snap: ON</button>
+    <button class="rib-btn" onclick="toggleGrid()">📐 Grid</button>
   </div>
-  <div class="flex items-center gap-2">
-    <select id="langSel" onchange="changeLang()" style="background:#0b0e1e; color:#00ffff; border:1px solid #00ffff55; border-radius:20px; padding:5px 10px; font-size:11px; font-weight:700; max-width:170px;"></select>
-    <button id="btnKids" onclick="setMain('kids')" class="mini-btn active-k">👶 KIDS</button>
-    <button id="btnPro" onclick="setMain('pro')" class="mini-btn">🚀 PRO BLOCKS</button>
-    <button onclick="clearAll()" class="mini-btn">Clear</button>
-  </div>
-</div>
 
-<div class="flex-1 flex overflow-hidden">
+  <div class="main">
 
-  <!-- KIDS MODE -->
-  <div id="kidsUI" style="display:flex; width:100%; height:100%;">
-    <div style="width:54px; background:#15182e; border-right:1px solid #ffffff0f; display:flex; flex-direction:column; align-items:center; gap:8px; padding:10px 0;">
-      <div id="kSelect" onclick="setKidTool('select')" class="tool-icon tool-on">🖱️</div>
-      <div id="kPen" onclick="setKidTool('pen')" class="tool-icon">✏️</div>
-      <div id="kRect" onclick="setKidTool('rect')" class="tool-icon">⬜</div>
-      <div id="kCircle" onclick="setKidTool('circle')" class="tool-icon">⭕</div>
-      <div onclick="deleteKid()" class="tool-icon" style="background:#3a1a1a;">🗑️</div>
+    <!-- LEFT: Component Library -->
+    <div class="left">
+      <div class="section-title">📚 Readymade Templates</div>
+      <div class="tpl-grid" id="tplGrid"></div>
+
+      <div class="section-title" style="margin-top:14px">🧱 Component Library</div>
+      <div id="catContainer"></div>
     </div>
-    <div style="width:290px; background:#12162a; border-right:1px solid #ffffff0f; padding:8px; overflow-y:auto; display:flex; flex-direction:column; gap:8px;">
 
-      <!-- TABS -->
-      <div>
-        <button class="tab-btn on" id="tabABC" onclick="switchKidTab('abc',this)">🔤 ABC</button>
-        <button class="tab-btn" id="tabNUM" onclick="switchKidTab('num',this)">🔢 123</button>
-        <button class="tab-btn" id="tabTXT" onclick="switchKidTab('txt',this)">📝 Text</button>
+    <!-- CENTER: Viewport -->
+    <div class="center">
+      <canvas id="viewport"></canvas>
+      <div class="viewport-overlay">
+        🖱️ <b>Left Drag</b> = Rotate • <b>Right Drag</b> = Pan • <b>Scroll</b> = Zoom
       </div>
-
-      <!-- ABC TAB -->
-      <div id="kidABC" style="background:#1a1e36; border-radius:12px; padding:8px; border:1px solid #ffcc0030;">
-        <div style="font-size:10px; font-weight:800; color:#ffcc00;">🔤 A-Z + a-z + 0-9 + Special</div>
-        <div style="font-size:8px; color:#888; margin-top:2px;">Click karo — canvas me aayega</div>
-        <div id="abcGrid" style="display:grid; grid-template-columns:repeat(7,1fr); gap:3px; margin-top:6px;"></div>
+      <div class="view-btns">
+        <button class="view-btn" onclick="setView('top')" title="Top View">TOP</button>
+        <button class="view-btn" onclick="setView('front')" title="Front View">FRT</button>
+        <button class="view-btn" onclick="setView('side')" title="Side View">SD</button>
+        <button class="view-btn" onclick="setView('iso')" title="ISO View">ISO</button>
       </div>
-
-      <!-- NUMBER TAB -->
-      <div id="kidNUM" style="display:none; background:#1a1e36; border-radius:12px; padding:8px; border:1px solid #00ffff30;">
-        <div style="font-size:10px; font-weight:800; color:#00ffff;">🔢 Numbers 1 to 1,00,000</div>
-        <div style="font-size:9px; color:#aaa; margin-top:3px;">Kitne numbers chahiye? (max 100000)</div>
-        <input id="numCount" type="number" min="1" max="100000" value="10" class="text-input" style="margin-top:5px;">
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:4px; margin-top:6px;">
-          <button onclick="generateNumbers()" class="mini-btn" style="background:#00ffff; color:black; font-weight:900;">▶️ Generate</button>
-          <button onclick="clearNumbers()" class="mini-btn" style="background:#3a1a1a;">🗑️ Clear Nums</button>
-        </div>
-        <div style="display:grid; grid-template-columns:repeat(5,1fr); gap:3px; margin-top:6px;">
-          <button onclick="quickNum(10)" class="alpha-btn">1-10</button>
-          <button onclick="quickNum(50)" class="alpha-btn">1-50</button>
-          <button onclick="quickNum(100)" class="alpha-btn">1-100</button>
-          <button onclick="quickNum(1000)" class="alpha-btn">1K</button>
-          <button onclick="quickNum(10000)" class="alpha-btn">10K</button>
-        </div>
-      </div>
-
-      <!-- TEXT TAB (Multilingual) -->
-      <div id="kidTXT" style="display:none; background:#1a1e36; border-radius:12px; padding:8px; border:1px solid #ff5c9e30;">
-        <div style="font-size:10px; font-weight:800; color:#ff5c9e;">📝 Apni Bhasha Me Likho</div>
-        <div style="font-size:9px; color:#aaa; margin-top:3px;">Koi bhi language type karo — Hindi, English, Tamil, Arabic, Chinese...</div>
-        <input id="kidText" type="text" placeholder="Yahan likho..." class="text-input" style="margin-top:6px;">
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:4px; margin-top:6px;">
-          <button onclick="addKidText()" class="mini-btn" style="background:#ff5c9e; color:white; font-weight:900;">➕ Add to Canvas</button>
-          <button onclick="document.getElementById('kidText').value=''" class="mini-btn">Clear Input</button>
-        </div>
-      </div>
-
-      <!-- BLOCK LIBRARY -->
-      <div style="background:#1a1e36; border-radius:12px; padding:7px; border:1px solid #00ffff25;">
-        <div style="font-size:10px; font-weight:800; color:#00ffff;">🧱 Blocks Library (Click to Open)</div>
-        <button onclick="openKidBlocks()" class="mini-btn" style="width:100%; background:#00ffff; color:black; margin-top:6px; font-weight:900; padding:10px; border-radius:12px;">
-          📚 200+ Blocks Kholein<br><span style="font-size:8px;">Medical • Bio • Engineering • Nature • Space</span>
-        </button>
-      </div>
-
-      <!-- SPACE TECH -->
-      <div style="background:#1a1e36; border-radius:12px; padding:7px; border:1px solid #00ffff25;">
-        <div style="font-size:10px; font-weight:800; color:#00ffff;">🇨🇳 CHINA SPACE TECH</div>
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-top:6px;">
-          <div onclick="addKidPart('wing')" class="kid-part">🪽 Wing</div>
-          <div onclick="addKidPart('propeller')" class="kid-part">🌀 Prop</div>
-          <div onclick="addKidPart('rocket')" class="kid-part">🚀 Rocket</div>
-          <div onclick="addKidPart('satellite')" class="kid-part">🛰️ Satellite</div>
-          <div onclick="addKidPart('naca')" class="kid-part">📈 NACA</div>
-          <div onclick="addKidPart('solar')" class="kid-part">🔋 Solar</div>
-        </div>
-        <button onclick="startSim()" class="mini-btn" style="width:100%; background:#00ffff; color:black; margin-top:6px; font-weight:900;">▶️ Fly Simulation</button>
-      </div>
-
-      <div style="display:grid; grid-template-columns:1fr 1fr; gap:4px; margin-top:auto;">
-        <button onclick="rotateKid()" class="mini-btn">Rotate</button>
-        <button onclick="duplicateKid()" class="mini-btn">Duplicate</button>
-        <button onclick="deleteKid()" class="mini-btn" style="background:#3a1a1a;">Delete</button>
-        <button onclick="clearK()" class="mini-btn" style="background:#3a1a1a;">Clear</button>
+      <div class="bottom-bar">
+        <span>📦 <b id="statCount">0</b> parts in scene</span>
+        <span>🎯 <b id="statSel">Nothing selected</b></span>
+        <span>🔧 Mode: <b id="statMode">Move</b></span>
       </div>
     </div>
-    <div style="flex:1; background:#e9e9ef; padding:6px; display:flex; flex-direction:column;">
-      <div id="kHint" style="font-size:10px; color:#333; font-weight:800;">KIDS — Click buttons to add • Drag to move • Wheel to resize</div>
-      <canvas id="kCanvas" width="1300" height="750" style="flex:1; width:100%; background:white; border-radius:8px; margin-top:4px; cursor:move;"></canvas>
+
+    <!-- RIGHT: Properties -->
+    <div class="right">
+      <div class="section-title">⚙️ Properties</div>
+      <div id="propPanel">
+        <div class="empty-state">
+          <span class="ico">🎯</span>
+          Click any object in the 3D scene to edit it
+        </div>
+      </div>
     </div>
   </div>
 
-  <!-- PRO MODE -->
-  <div id="proUI" style="display:none; width:100%; height:100%;">
-    <div style="width:56px; background:#111326; border-right:1px solid #ffffff0f; display:flex; flex-direction:column; align-items:center; gap:8px; padding:10px 0;">
-      <div onclick="addProBlock('box')" class="tool-icon">🧱</div>
-      <div onclick="addProBlock('cyl')" class="tool-icon">🛢️</div>
-      <div onclick="addProBlock('plane')" class="tool-icon">🪽</div>
-      <div onclick="addProBlock('sphere')" class="tool-icon">⚪</div>
-      <div onclick="openProLibrary()" class="tool-icon" style="background:#ff5c00; color:white; font-weight:900;">+60</div>
-      <div onclick="deletePro()" class="tool-icon" style="background:#3a1a1a; margin-top:10px;">🗑️</div>
-    </div>
-    <div style="flex:1; background:#05070a; position:relative; display:flex; flex-direction:column; padding:6px;">
-      <div style="font-size:10px; color:#00ffff; font-weight:700;">🚀 PRO — 60+ Blocks + Full Editor + Mouse Drag + Snap</div>
-      <div id="threePro" style="flex:1; width:100%; border-radius:10px; border:1px solid #00ffff15;"></div>
-      <div style="position:absolute; bottom:10px; left:12px; background:#000000cc; padding:6px 12px; border-radius:20px; font-size:9px; color:#aaa;">LEFT DRAG=Move | SCROLL=Size | RIGHT DRAG=Camera</div>
-    </div>
-    <div style="width:300px; background:#15182e; border-left:1px solid #ffffff0f; padding:8px; overflow-y:auto; display:flex; flex-direction:column; gap:6px;">
-      <b style="font-size:12px; color:#00ffff;">PRO EDITOR</b>
-      <button onclick="openProLibrary()" class="mini-btn" style="width:100%; background:#00ffff; color:black; font-weight:900; padding:10px; border-radius:12px;">+60 Blocks Library</button>
-      <div class="pro-panel"><div class="sec-title">🎨 COLOR & MATERIAL</div>
-        <div class="label">Color</div><input id="pCol" type="color" value="#ffcc00" style="width:100%; height:26px;" oninput="updateProColor()">
-        <div class="label">Metalness <span id="metVal">0.2</span></div><input id="metalness" type="range" min="0" max="1" step="0.05" value="0.2" class="slider" oninput="updateProMat()">
-        <div class="label">Roughness <span id="roughVal">0.5</span></div><input id="roughness" type="range" min="0" max="1" step="0.05" value="0.5" class="slider" oninput="updateProMat()">
-        <div class="label">Opacity <span id="opacVal">1.0</span></div><input id="opacity" type="range" min="0.1" max="1" step="0.05" value="1" class="slider" oninput="updateProMat()">
-      </div>
-      <div class="pro-panel"><div class="sec-title">📏 SIZE</div>
-        <div class="label">Uniform <span id="pSizeVal">1.0</span></div><input id="pSize" type="range" min="0.2" max="4" step="0.1" value="1" class="slider" oninput="updateProScale()">
-        <div class="label">X <span id="psxVal">1.0</span></div><input id="pScaleX" type="range" min="0.1" max="5" step="0.1" value="1" class="slider" oninput="updateProScaleXYZ()">
-        <div class="label">Y <span id="psyVal">1.0</span></div><input id="pScaleY" type="range" min="0.1" max="5" step="0.1" value="1" class="slider" oninput="updateProScaleXYZ()">
-        <div class="label">Z <span id="pszVal">1.0</span></div><input id="pScaleZ" type="range" min="0.1" max="5" step="0.1" value="1" class="slider" oninput="updateProScaleXYZ()">
-      </div>
-      <div class="pro-panel"><div class="sec-title">↔️ MOVE</div>
-        <div class="label">X <span id="pmxVal">0</span></div><input id="pMoveX" type="range" min="-10" max="10" step="0.1" value="0" class="slider" oninput="updateProMove()">
-        <div class="label">Y <span id="pmyVal">0.8</span></div><input id="pMoveY" type="range" min="-5" max="10" step="0.1" value="0.8" class="slider" oninput="updateProMove()">
-        <div class="label">Z <span id="pmzVal">0</span></div><input id="pMoveZ" type="range" min="-10" max="10" step="0.1" value="0" class="slider" oninput="updateProMove()">
-      </div>
-      <div class="pro-panel"><div class="sec-title">🔄 ROTATE</div>
-        <div class="label">X <span id="prxVal">0°</span></div><input id="pRotX" type="range" min="0" max="360" step="5" value="0" class="slider" oninput="updateProRot()">
-        <div class="label">Y <span id="pryVal">0°</span></div><input id="pRotY" type="range" min="0" max="360" step="5" value="0" class="slider" oninput="updateProRot()">
-        <div class="label">Z <span id="przVal">0°</span></div><input id="pRotZ" type="range" min="0" max="360" step="5" value="0" class="slider" oninput="updateProRot()">
-      </div>
-      <div class="pro-panel"><div class="sec-title">⚡ ACTIONS</div>
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:4px; font-size:9px;">
-          <button onclick="proAction('duplicate')" class="mini-btn">Copy</button>
-          <button onclick="proAction('pattern3')" class="mini-btn">Pattern x3</button>
-          <button onclick="proAction('resetRot')" class="mini-btn">Reset Rot</button>
-          <button onclick="proAction('resetScale')" class="mini-btn">Reset Size</button>
-          <button onclick="proAction('topView')" class="mini-btn">Top View</button>
-          <button onclick="proAction('frontView')" class="mini-btn">Front View</button>
-        </div>
-      </div>
-      <button onclick="clearPro()" class="mini-btn" style="background:#3a1a1a;">Clear All</button>
-    </div>
+  <!-- STATUS BAR -->
+  <div class="status">
+    <span>🧊 <b>Clyxess Studio CAD</b> — Autodesk-style 3D design for kids</span>
+    <span>Made with ❤️ by Clyxess AI</span>
   </div>
 
 </div>
 
-<!-- KIDS BLOCKS MODAL -->
-<div id="kidBlocksModal" onclick="if(event.target.id==='kidBlocksModal') closeKidBlocks()" style="position:fixed; inset:0; background:#000000d9; backdrop-filter:blur(8px); z-index:99999; display:none; align-items:center; justify-content:center;">
-  <div class="modal-box" style="width:920px;">
-    <div style="padding:14px; border-bottom:1px solid #ffffff12; display:flex; justify-content:space-between;">
-      <b>🧱 Kids Blocks Library — 200+ Blocks</b>
-      <button onclick="closeKidBlocks()" style="background:#2a2a3a; border:none; color:white; width:28px; height:28px; border-radius:50%; cursor:pointer;">✕</button>
-    </div>
-    <div style="padding:12px; overflow-y:auto; flex:1;">
-      <div class="sec-title">🎓 SCHOOL</div>
-      <div id="blockSchool" style="display:grid; grid-template-columns:repeat(6,1fr); gap:6px;"></div>
-
-      <div class="sec-title">🏥 MEDICAL (Body Parts)</div>
-      <div id="blockMedical" style="display:grid; grid-template-columns:repeat(6,1fr); gap:6px;"></div>
-
-      <div class="sec-title">🧬 BIOLOGICAL</div>
-      <div id="blockBio" style="display:grid; grid-template-columns:repeat(6,1fr); gap:6px;"></div>
-
-      <div class="sec-title">🔬 SCIENCE</div>
-      <div id="blockScience" style="display:grid; grid-template-columns:repeat(6,1fr); gap:6px;"></div>
-
-      <div class="sec-title">🔧 ENGINEERING</div>
-      <div id="blockEng" style="display:grid; grid-template-columns:repeat(6,1fr); gap:6px;"></div>
-
-      <div class="sec-title">🌳 NATURE</div>
-      <div id="blockNature" style="display:grid; grid-template-columns:repeat(6,1fr); gap:6px;"></div>
-
-      <div class="sec-title">🚀 SPACE & TECH</div>
-      <div id="blockSpace" style="display:grid; grid-template-columns:repeat(6,1fr); gap:6px;"></div>
-
-      <div class="sec-title">🎨 SHAPES</div>
-      <div id="blockShapes" style="display:grid; grid-template-columns:repeat(6,1fr); gap:6px;"></div>
-    </div>
-  </div>
-</div>
-
-<!-- PRO BLOCKS MODAL -->
-<div id="proBlockModal" onclick="if(event.target.id==='proBlockModal') closeProLibrary()" style="position:fixed; inset:0; background:#000000d9; backdrop-filter:blur(8px); z-index:99999; display:none; align-items:center; justify-content:center;">
+<!-- EXPORT MODAL -->
+<div class="modal" id="exportModal">
   <div class="modal-box">
-    <div style="padding:14px; border-bottom:1px solid #ffffff12; display:flex; justify-content:space-between;">
-      <b>🚀 PRO — 60+ Blocks</b>
-      <button onclick="closeProLibrary()" style="background:#2a2a3a; border:none; color:white; width:28px; height:28px; border-radius:50%; cursor:pointer;">✕</button>
+    <div class="modal-head">
+      <h3>💾 Export / Download Your Design</h3>
+      <button class="modal-close" onclick="closeExport()">✕</button>
     </div>
-    <div style="padding:12px; overflow-y:auto; flex:1;">
-      <div class="sec-title">BASIC</div>
-      <div style="display:grid; grid-template-columns:repeat(5,1fr); gap:7px;">
-        <div onclick="addProBlock('box')" class="block-item">🧱<b>Box</b></div>
-        <div onclick="addProBlock('cyl')" class="block-item">🛢️<b>Cylinder</b></div>
-        <div onclick="addProBlock('sphere')" class="block-item">⚪<b>Sphere</b></div>
-        <div onclick="addProBlock('cone')" class="block-item">🔺<b>Cone</b></div>
-        <div onclick="addProBlock('torus')" class="block-item">⭕<b>Torus</b></div>
-        <div onclick="addProBlock('plane')" class="block-item">▭<b>Plane</b></div>
-        <div onclick="addProBlock('wedge')" class="block-item">📐<b>Wedge</b></div>
-        <div onclick="addProBlock('capsule')" class="block-item">💊<b>Capsule</b></div>
+    <div class="modal-body">
+      <p>Choose how you want to save your design. Show it to the world! 🌍</p>
+
+      <div class="export-opt" onclick="exportPNG()">
+        <div class="ico">🖼️</div>
+        <div><b>Download as Image (PNG)</b><small>Share on WhatsApp, Instagram, school project</small></div>
       </div>
-      <div class="sec-title">AEROSPACE</div>
-      <div style="display:grid; grid-template-columns:repeat(5,1fr); gap:7px;">
-        <div onclick="addProBlock('fuselage')" class="block-item">🟧<b>Fuselage</b></div>
-        <div onclick="addProBlock('cockpit')" class="block-item">🪟<b>Cockpit</b></div>
-        <div onclick="addProBlock('wing')" class="block-item">🪽<b>Wing</b></div>
-        <div onclick="addProBlock('fin')" class="block-item">🚀<b>Fin</b></div>
-        <div onclick="addProBlock('rotor')" class="block-item">🌀<b>Rotor</b></div>
-        <div onclick="addProBlock('propeller')" class="block-item">✈️<b>Propeller</b></div>
-        <div onclick="addProBlock('rocket_body')" class="block-item">🚀<b>Rocket</b></div>
-        <div onclick="addProBlock('satellite')" class="block-item">🛰️<b>Satellite</b></div>
-        <div onclick="addProBlock('airfoil_0012')" class="block-item">📈<b>NACA</b></div>
-        <div onclick="addProBlock('v_tail')" class="block-item">✈️<b>V-Tail</b></div>
+
+      <div class="export-opt" onclick="exportOBJ()">
+        <div class="ico">📦</div>
+        <div><b>Download as 3D Model (OBJ)</b><small>Open in Blender, Maya, or any 3D software</small></div>
       </div>
-      <div class="sec-title">MECHANICAL</div>
-      <div style="display:grid; grid-template-columns:repeat(5,1fr); gap:7px;">
-        <div onclick="addProBlock('gear_spur')" class="block-item">⚙️<b>Gear</b></div>
-        <div onclick="addProBlock('shaft')" class="block-item">📏<b>Shaft</b></div>
-        <div onclick="addProBlock('bolt')" class="block-item">🔩<b>Bolt</b></div>
-        <div onclick="addProBlock('beam_i')" class="block-item">🏗️<b>Beam</b></div>
-        <div onclick="addProBlock('plate')" class="block-item">⬜<b>Plate</b></div>
-        <div onclick="addProBlock('motor_box')" class="block-item">⚡<b>Motor</b></div>
-        <div onclick="addProBlock('battery')" class="block-item">🔋<b>Battery</b></div>
-        <div onclick="addProBlock('ducted_fan')" class="block-item">🌀<b>Ducted</b></div>
+
+      <div class="export-opt" onclick="saveProject()">
+        <div class="ico">💾</div>
+        <div><b>Save Project (Load Later)</b><small>Save all parts, colors, and positions</small></div>
+      </div>
+
+      <div class="export-opt" onclick="loadProject()">
+        <div class="ico">📂</div>
+        <div><b>Load Saved Project</b><small>Continue where you left off</small></div>
       </div>
     </div>
   </div>
 </div>
 
-<script>
+<script> 
 // ============================================================
-// LANGUAGES (60+)
+// CLYXESS STUDIO CAD — Three.js 3D Design Engine
 // ============================================================
-const LANGS = [
-  {c:'hinglish', n:'Hinglish'},
-  {c:'en', n:'English'},
-  {c:'hi', n:'हिंदी'},
-  {c:'bn', n:'বাংলা'},
-  {c:'te', n:'తెలుగు'},
-  {c:'mr', n:'मराठी'},
-  {c:'ta', n:'தமிழ்'},
-  {c:'gu', n:'ગુજરાતી'},
-  {c:'kn', n:'ಕನ್ನಡ'},
-  {c:'ml', n:'മലയാളം'},
-  {c:'pa', n:'ਪੰਜਾਬੀ'},
-  {c:'or', n:'ଓଡ଼ିଆ'},
-  {c:'ur', n:'اردو'},
-  {c:'ne', n:'नेपाली'},
-  {c:'si', n:'සිංහල'},
-  {c:'zh', n:'中文'},
-  {c:'ja', n:'日本語'},
-  {c:'ko', n:'한국어'},
-  {c:'th', n:'ไทย'},
-  {c:'vi', n:'Tiếng Việt'},
-  {c:'id', n:'Bahasa Indonesia'},
-  {c:'ms', n:'Bahasa Melayu'},
-  {c:'tl', n:'Filipino'},
-  {c:'ar', n:'العربية'},
-  {c:'fa', n:'فارسی'},
-  {c:'he', n:'עברית'},
-  {c:'tr', n:'Türkçe'},
-  {c:'ru', n:'Русский'},
-  {c:'uk', n:'Українська'},
-  {c:'bg', n:'Български'},
-  {c:'sr', n:'Српски'},
-  {c:'hr', n:'Hrvatski'},
-  {c:'sl', n:'Slovenščina'},
-  {c:'sk', n:'Slovenčina'},
-  {c:'cs', n:'Čeština'},
-  {c:'pl', n:'Polski'},
-  {c:'hu', n:'Magyar'},
-  {c:'ro', n:'Română'},
-  {c:'el', n:'Ελληνικά'},
-  {c:'de', n:'Deutsch'},
-  {c:'nl', n:'Nederlands'},
-  {c:'sv', n:'Svenska'},
-  {c:'no', n:'Norsk'},
-  {c:'da', n:'Dansk'},
-  {c:'fi', n:'Suomi'},
-  {c:'is', n:'Íslenska'},
-  {c:'et', n:'Eesti'},
-  {c:'lv', n:'Latviešu'},
-  {c:'lt', n:'Lietuvių'},
-  {c:'es', n:'Español'},
-  {c:'pt', n:'Português'},
-  {c:'fr', n:'Français'},
-  {c:'it', n:'Italiano'},
-  {c:'ca', n:'Català'},
-  {c:'eu', n:'Euskara'},
-  {c:'gl', n:'Galego'},
-  {c:'sw', n:'Kiswahili'},
-  {c:'af', n:'Afrikaans'},
-  {c:'zu', n:'Zulu'},
-  {c:'yo', n:'Yorùbá'},
-  {c:'am', n:'አማርኛ'},
-  {c:'hy', n:'Հայերեն'},
-  {c:'ka', n:'ქართული'},
-  {c:'az', n:'Azərbaycan'},
-  {c:'kk', n:'Қазақ'},
-  {c:'uz', n:'Oʻzbek'},
-  {c:'mn', n:'Монгол'},
-  {c:'my', n:'မြန်မာ'},
-  {c:'km', n:'ខ្មែរ'},
-  {c:'lo', n:'ລາວ'},
-  {c:'eo', n:'Esperanto'}
-];
 
-// Fill language dropdown
-(function(){
-  const sel = document.getElementById('langSel');
-  sel.innerHTML = LANGS.map(l=>`<option value="${l.c}">${l.n}</option>`).join('');
-})();
+// ---------- SCENE SETUP ----------
+const canvas = document.getElementById('viewport');
+const renderer = new THREE.WebGLRenderer({canvas, antialias:true, preserveDrawingBuffer:true});
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.shadowMap.enabled = true;
 
-function changeLang(){
-  const c = document.getElementById('langSel').value;
-  const lang = LANGS.find(l=>l.c===c);
-  document.getElementById('headerTitle').innerText = '🚁 ' + lang.n + ' — Kids + Pro Blocks';
-  // RTL for Arabic/Hebrew/Urdu/Persian
-  if(['ar','he','ur','fa'].includes(c)) document.body.style.direction='rtl';
-  else document.body.style.direction='ltr';
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x1f2229);
+scene.fog = new THREE.Fog(0x1f2229, 30, 80);
+
+const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 500);
+camera.position.set(8, 6, 10);
+
+const controls = new THREE.OrbitControls(camera, canvas);
+controls.enableDamping = true;
+controls.dampingFactor = 0.08;
+controls.minDistance = 3;
+controls.maxDistance = 40;
+
+// Lights
+scene.add(new THREE.AmbientLight(0xffffff, 0.55));
+const dirLight = new THREE.DirectionalLight(0xffffff, 0.9);
+dirLight.position.set(10, 15, 10);
+dirLight.castShadow = true;
+scene.add(dirLight);
+const fillLight = new THREE.DirectionalLight(0x88aaff, 0.4);
+fillLight.position.set(-10, 8, -10);
+scene.add(fillLight);
+
+// Grid + Axes
+const grid = new THREE.GridHelper(40, 40, 0x3a4050, 0x2a2e38);
+grid.material.transparent = true;
+grid.material.opacity = 0.7;
+scene.add(grid);
+
+// Objects group
+const objGroup = new THREE.Group();
+scene.add(objGroup);
+
+// Selection outline
+const selectionBox = new THREE.BoxHelper(new THREE.Object3D(), 0x4a9eff);
+selectionBox.visible = false;
+scene.add(selectionBox);
+
+// ---------- STATE ----------
+let mode = 'move';       // move | rotate | scale
+let selectedObj = null;
+let snapEnabled = true;
+let isDragging = false;
+let dragStart = {x:0, y:0};
+let objStartPos = {x:0, y:0, z:0};
+let objStartRot = {x:0, y:0, z:0};
+let objStartScale = 1;
+let objectCount = 0;
+
+// ---------- RESIZE ----------
+function resize() {
+  const rect = canvas.parentElement.getBoundingClientRect();
+  renderer.setSize(rect.width, rect.height, false);
+  camera.aspect = rect.width / rect.height;
+  camera.updateProjectionMatrix();
 }
+window.addEventListener('resize', resize);
+setTimeout(resize, 100);
 
-// ============================================================
-// MAIN MODE SWITCH
-// ============================================================
-let mainMode='kids';
-function setMain(m){
-  mainMode = m;
-  document.getElementById('kidsUI').style.display = m==='kids'?'flex':'none';
-  document.getElementById('proUI').style.display = m==='pro'?'flex':'none';
-  document.getElementById('btnKids').className = m==='kids'?'mini-btn active-k':'mini-btn';
-  document.getElementById('btnPro').className = m==='pro'?'mini-btn active-p':'mini-btn';
-  if(m==='pro') initPro();
-}
-
-// ============================================================
-// KIDS CANVAS
-// ============================================================
-let kObjects = [], selectedIdx = -1, isDown=false, dragOff={x:0,y:0}, kTool='select';
-const kcv = document.getElementById('kCanvas');
-const kctx = kcv.getContext('2d');
-
-function drawKBG(){ kctx.fillStyle='white'; kctx.fillRect(0,0,kcv.width,kcv.height); }
-
-function drawK(){
-  drawKBG();
-  kObjects.forEach((o,i)=>{
-    kctx.save();
-    kctx.translate(o.x, o.y);
-    kctx.rotate((o.rot||0)*Math.PI/180);
-    kctx.fillStyle = o.color;
-    kctx.strokeStyle = i===selectedIdx?'#00aaff':'#222';
-    kctx.lineWidth = i===selectedIdx?3:1.2;
-
-    if(o.type==='text'){
-      kctx.font = 'bold '+(o.size||40)+'px sans-serif';
-      kctx.textAlign='center'; kctx.textBaseline='middle';
-      kctx.fillText(o.char, 0, 0);
-      if(i===selectedIdx){
-        const m = kctx.measureText(o.char);
-        kctx.strokeRect(-m.width/2-8, -(o.size||40)/2-4, m.width+16, (o.size||40)+8);
-      }
-    } else if(o.type==='rect'){
-      kctx.fillRect(-o.w/2, -o.h/2, o.w, o.h);
-    } else if(o.type==='circle'){
-      kctx.beginPath(); kctx.arc(0,0,o.w/2,0,Math.PI*2); kctx.fill();
-    } else if(o.type==='wing'){
-      kctx.beginPath(); kctx.ellipse(0,0,o.w/2,o.h/3,0,0,Math.PI*2); kctx.fill();
-    } else if(o.type==='rocket'){
-      kctx.fillRect(-o.w/3, -o.h/2, o.w*0.66, o.h);
-      kctx.beginPath();
-      kctx.moveTo(0, -o.h/2-12);
-      kctx.lineTo(-o.w/3, -o.h/2);
-      kctx.lineTo(o.w/3, -o.h/2);
-      kctx.closePath();
-      kctx.fillStyle='red'; kctx.fill();
-    } else {
-      kctx.fillRect(-o.w/2, -o.h/2, o.w, o.h);
-    }
-    kctx.restore();
-  });
-}
-
-function addToCanvas(obj){
-  kObjects.push(obj);
-  selectedIdx = kObjects.length-1;
-  drawK();
-}
-
-function addAlpha(ch){
-  const isNum = /[0-9]/.test(ch);
-  const isSpec = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(ch);
-  const color = isNum ? '#0066ff' : isSpec ? '#cc0066' : '#111';
-  addToCanvas({
-    type:'text', char:ch,
-    x: 350 + Math.random()*200,
-    y: 250 + Math.random()*150,
-    size: 42, color: color, rot:0
-  });
-}
-
-function addKidText(){
-  const v = document.getElementById('kidText').value.trim();
-  if(!v) return;
-  addToCanvas({
-    type:'text', char:v,
-    x: 400 + Math.random()*100,
-    y: 300 + Math.random()*100,
-    size: 36, color: '#333', rot:0
-  });
-  document.getElementById('kidText').value='';
-}
-
-function addKidPart(t){
-  const colors = {'rect':'#ff5a5a','circle':'#00aaff','wing':'#22ff66','rocket':'#ffaa00','satellite':'#7ec8ff','naca':'#22ff66','solar':'#001a66','propeller':'#ff8c00'};
-  addToCanvas({
-    type:t, x: 350 + Math.random()*150, y: 300 + Math.random()*80,
-    w: 80, h: 50, color: colors[t]||'#ff8c00', rot:0
-  });
-}
-
-// Number generator
-let numObjects = [];
-function generateNumbers(){
-  const n = Math.min(100000, parseInt(document.getElementById('numCount').value)||10);
-  // Remove old numbers
-  kObjects = kObjects.filter(o => o.type !== 'text' || !/^[0-9]+$/.test(o.char));
-  
-  // Layout in grid
-  const cols = 20;
-  const startX = 60, startY = 60;
-  const cellW = 60, cellH = 32;
-  
-  for(let i=0; i<n; i++){
-    const num = i+1;
-    const col = i % cols;
-    const row = Math.floor(i / cols);
-    kObjects.push({
-      type:'text', char: String(num),
-      x: startX + col*cellW,
-      y: startY + row*cellH,
-      size: 20, color: '#0066ff', rot:0
-    });
-  }
-  drawK();
-  document.getElementById('kHint').innerText = '✅ ' + n + ' numbers canvas me add ho gaye!';
-}
-
-function quickNum(n){
-  document.getElementById('numCount').value = n;
-  generateNumbers();
-}
-
-function clearNumbers(){
-  kObjects = kObjects.filter(o => o.type !== 'text' || !/^[0-9]+$/.test(o.char));
-  drawK();
-}
-
-// Mouse events
-function getPos(e){
-  const r = kcv.getBoundingClientRect();
-  return {x:(e.clientX-r.left)*(kcv.width/r.width), y:(e.clientY-r.top)*(kcv.height/r.height)};
-}
-
-kcv.addEventListener('mousedown', e=>{
-  const p = getPos(e);
-  isDown = true;
-  selectedIdx = -1;
-  for(let i=kObjects.length-1; i>=0; i--){
-    const o = kObjects[i];
-    const w = (o.w || o.size || 40) * 1.2;
-    const h = (o.h || o.size || 40) * 1.2;
-    if(Math.abs(p.x-o.x) < w && Math.abs(p.y-o.y) < h){
-      selectedIdx = i;
-      dragOff = {x:p.x-o.x, y:p.y-o.y};
-      break;
-    }
-  }
-  drawK();
-});
-
-kcv.addEventListener('mousemove', e=>{
-  if(!isDown || selectedIdx < 0) return;
-  const p = getPos(e);
-  kObjects[selectedIdx].x = p.x - dragOff.x;
-  kObjects[selectedIdx].y = p.y - dragOff.y;
-  drawK();
-});
-
-kcv.addEventListener('mouseup', ()=>{ isDown = false; });
-
-kcv.addEventListener('wheel', e=>{
-  if(selectedIdx >= 0){
-    e.preventDefault();
-    const d = e.deltaY > 0 ? -3 : 3;
-    const o = kObjects[selectedIdx];
-    if(o.size) o.size = Math.max(10, Math.min(200, o.size + d));
-    else { o.w = Math.max(20, o.w + d); o.h = Math.max(20, o.h + d*0.7); }
-    drawK();
-  }
-}, {passive:false});
-
-function deleteKid(){ if(selectedIdx >= 0){ kObjects.splice(selectedIdx, 1); selectedIdx = -1; drawK(); } }
-function rotateKid(){ if(selectedIdx >= 0){ kObjects[selectedIdx].rot = (kObjects[selectedIdx].rot||0) + 15; drawK(); } }
-function duplicateKid(){ if(selectedIdx >= 0){ const o = {...kObjects[selectedIdx]}; o.x += 30; o.y += 30; kObjects.push(o); selectedIdx = kObjects.length-1; drawK(); } }
-function clearK(){ kObjects = []; drawKBG(); }
-function setKidTool(t){ kTool = t; document.querySelectorAll('#kidsUI .tool-icon').forEach(e=>e.classList.remove('tool-on')); const m={select:'kSelect', pen:'kPen', rect:'kRect', circle:'kCircle'}; if(m[t]) document.getElementById(m[t]).classList.add('tool-on'); }
-
-function startSim(){
-  let t = 0;
-  const id = setInterval(()=>{
-    t += 0.05;
-    kObjects.forEach(o=>{
-      if(o.type === 'propeller') o.rot = (o.rot||0) + 20;
-      if(o.type === 'wing') o.y += Math.sin(t)*0.4;
-      if(o.type === 'rocket') o.y -= 0.8;
-    });
-    drawK();
-    if(t > 6) clearInterval(id);
-  }, 30);
-}
-
-// ============================================================
-// KIDS BLOCK LIBRARY
-// ============================================================
-const KID_BLOCKS = {
-  school: [
-    {e:'📚', n:'Book'}, {e:'✏️', n:'Pencil'}, {e:'📐', n:'Ruler'}, {e:'🖍️', n:'Crayon'},
-    {e:'🎒', n:'Bag'}, {e:'📓', n:'Notebook'}, {e:'📏', n:'Scale'}, {e:'🖊️', n:'Pen'},
-    {e:'🖇️', n:'Clip'}, {e:'📎', n:'Pin'}, {e:'🏫', n:'School'}, {e:'🖥️', n:'Computer'}
-  ],
-  medical: [
-    {e:'❤️', n:'Heart'}, {e:'🧠', n:'Brain'}, {e:'🫁', n:'Lungs'}, {e:'🦴', n:'Bone'},
-    {e:'👁️', n:'Eye'}, {e:'👂', n:'Ear'}, {e:'👄', n:'Mouth'}, {e:'🦷', n:'Tooth'},
-    {e:'🫀', n:'Heart 2'}, {e:'🩺', n:'Stetho'}, {e:'💊', n:'Medicine'}, {e:'💉', n:'Injection'},
-    {e:'🧬', n:'DNA'}, {e:'🩸', n:'Blood'}, {e:'🦵', n:'Leg'}, {e:'🦶', n:'Foot'},
-    {e:'👋', n:'Hand'}, {e:'🖐️', n:'Palm'}, {e:'💪', n:'Arm'}, {e:'👃', n:'Nose'}
-  ],
-  bio: [
-    {e:'🌱', n:'Seedling'}, {e:'🌿', n:'Leaf'}, {e:'🌳', n:'Tree'}, {e:'🌸', n:'Flower'},
-    {e:'🍎', n:'Apple'}, {e:'🍌', n:'Banana'}, {e:'🥕', n:'Carrot'}, {e:'🌽', n:'Corn'},
-    {e:'🐛', n:'Caterpillar'}, {e:'🦋', n:'Butterfly'}, {e:'🐝', n:'Bee'}, {e:'🐌', n:'Snail'},
-    {e:'🌾', n:'Wheat'}, {e:'🍇', n:'Grapes'}, {e:'🥭', n:'Mango'}, {e:'🌻', n:'Sunflower'},
-    {e:'🍄', n:'Mushroom'}, {e:'🌵', n:'Cactus'}, {e:'🌴', n:'Palm'}, {e:'🍀', n:'Clover'}
-  ],
-  science: [
-    {e:'🔬', n:'Microscope'}, {e:'🔭', n:'Telescope'}, {e:'⚗️', n:'Flask'}, {e:'🧪', n:'Test Tube'},
-    {e:'⚛️', n:'Atom'}, {e:'🧲', n:'Magnet'}, {e:'💡', n:'Bulb'}, {e:'🔋', n:'Battery'},
-    {e:'🔌', n:'Plug'}, {e:'⚡', n:'Electric'}, {e:'🌡️', n:'Thermometer'}, {e:'🧫', n:'Petri'},
-    {e:'🧬', n:'Genes'}, {e:'🩻', n:'X-Ray'}, {e:'💧', n:'Water'}, {e:'💨', n:'Air'},
-    {e:'🔥', n:'Fire'}, {e:'❄️', n:'Ice'}, {e:'🌪️', n:'Tornado'}, {e:'⛈️', n:'Storm'}
-  ],
-  eng: [
-    {e:'⚙️', n:'Gear'}, {e:'🔧', n:'Wrench'}, {e:'🔨', n:'Hammer'}, {e:'🪛', n:'Screwdrv'},
-    {e:'📏', n:'Ruler'}, {e:'🪚', n:'Saw'}, {e:'🔩', n:'Bolt'}, {e:'⚡', n:'Power'},
-    {e:'🏗️', n:'Crane'}, {e:'🚧', n:'Barrier'}, {e:'🛠️', n:'Tools'}, {e:'⚓', n:'Anchor'},
-    {e:'🧰', n:'Toolbox'}, {e:'🔗', n:'Chain'}, {e:'📡', n:'Antenna'}, {e:'🛞', n:'Wheel'}
-  ],
-  nature: [
-    {e:'☀️', n:'Sun'}, {e:'🌙', n:'Moon'}, {e:'⭐', n:'Star'}, {e:'☁️', n:'Cloud'},
-    {e:'🌈', n:'Rainbow'}, {e:'🌊', n:'Wave'}, {e:'🏔️', n:'Mountain'}, {e:'🏝️', n:'Island'},
-    {e:'🌷', n:'Tulip'}, {e:'🍁', n:'Maple'}, {e:'🦅', n:'Eagle'}, {e:'🦁', n:'Lion'},
-    {e:'🐘', n:'Elephant'}, {e:'🐋', n:'Whale'}, {e:'🦜', n:'Parrot'}, {e:'🐢', n:'Turtle'},
-    {e:'🦒', n:'Giraffe'}, {e:'🐼', n:'Panda'}, {e:'🦉', n:'Owl'}, {e:'🦚', n:'Peacock'}
-  ],
-  space: [
-    {e:'🚀', n:'Rocket'}, {e:'🛰️', n:'Satellite'}, {e:'🪐', n:'Saturn'}, {e:'🌍', n:'Earth'},
-    {e:'🌎', n:'Earth 2'}, {e:'🌏', n:'Earth 3'}, {e:'☄️', n:'Comet'}, {e:'🌠', n:'Shooting'},
-    {e:'👨‍🚀', n:'Astronaut'}, {e:'👩‍🚀', n:'Astronaut W'}, {e:'🔭', n:'Telescope'}, {e:'🌌', n:'Galaxy'},
-    {e:'✨', n:'Sparkle'}, {e:'🌟', n:'Star 2'}, {e:'💫', n:'Comet 2'}, {e:'🌞', n:'Sun 2'}
-  ],
-  shapes: [
-    {e:'⬜', n:'Square'}, {e:'⬛', n:'Black Sq'}, {e:'🟥', n:'Red Sq'}, {e:'🟧', n:'Orange Sq'},
-    {e:'🟨', n:'Yellow Sq'}, {e:'🟩', n:'Green Sq'}, {e:'🟦', n:'Blue Sq'}, {e:'🟪', n:'Purple Sq'},
-    {e:'⚪', n:'Circle'}, {e:'⚫', n:'Black C'}, {e:'🔴', n:'Red C'}, {e:'🟠', n:'Orange C'},
-    {e:'🟡', n:'Yellow C'}, {e:'🟢', n:'Green C'}, {e:'🔵', n:'Blue C'}, {e:'🟣', n:'Purple C'},
-    {e:'🔺', n:'Triangle'}, {e:'🔻', n:'Triangle D'}, {e:'⭐', n:'Star'}, {e:'❤️', n:'Heart'},
-    {e:'💛', n:'Yellow H'}, {e:'💚', n:'Green H'}, {e:'💙', n:'Blue H'}, {e:'💜', n:'Purple H'}
-  ]
+// ---------- MATERIAL LIBRARY ----------
+const MATERIALS = {
+  plastic:   new THREE.MeshStandardMaterial({color:0xffcc00, metalness:0.1, roughness:0.6}),
+  metal:     new THREE.MeshStandardMaterial({color:0xc0c5cc, metalness:0.9, roughness:0.25}),
+  chrome:    new THREE.MeshStandardMaterial({color:0xffffff, metalness:1.0, roughness:0.05}),
+  rubber:    new THREE.MeshStandardMaterial({color:0x222222, metalness:0.0, roughness:0.95}),
+  glass:     new THREE.MeshStandardMaterial({color:0x88ccff, metalness:0.1, roughness:0.05, transparent:true, opacity:0.4}),
+  wood:      new THREE.MeshStandardMaterial({color:0x8b5a2b, metalness:0.0, roughness:0.85}),
+  gold:      new THREE.MeshStandardMaterial({color:0xffd700, metalness:0.9, roughness:0.15}),
+  red:       new THREE.MeshStandardMaterial({color:0xe74c3c, metalness:0.2, roughness:0.5}),
+  blue:      new THREE.MeshStandardMaterial({color:0x3498db, metalness:0.2, roughness:0.5}),
+  green:     new THREE.MeshStandardMaterial({color:0x2ecc71, metalness:0.2, roughness:0.5}),
+  black:     new THREE.MeshStandardMaterial({color:0x1a1a1a, metalness:0.3, roughness:0.6}),
 };
 
-function buildBlocksGrid(){
-  for(const [key, arr] of Object.entries(KID_BLOCKS)){
-    const container = document.getElementById('block' + key.charAt(0).toUpperCase() + key.slice(1));
-    if(!container) continue;
-    container.innerHTML = arr.map(b => 
-      `<div class="block-item" onclick="addKidBlock('${b.e}')"><span style="font-size:22px">${b.e}</span><b>${b.n}</b></div>`
-    ).join('');
+function getMat(type) {
+  return MATERIALS[type].clone();
+}
+
+// ---------- COMPONENT LIBRARY ----------
+const COMPONENTS = {
+  '🔧 Basic Shapes': [
+    {n:'Box', i:'🧱', f:()=>new THREE.Mesh(new THREE.BoxGeometry(1.5,1.5,1.5), getMat('plastic'))},
+    {n:'Sphere', i:'⚪', f:()=>new THREE.Mesh(new THREE.SphereGeometry(0.9, 24, 24), getMat('plastic'))},
+    {n:'Cylinder', i:'🛢️', f:()=>new THREE.Mesh(new THREE.CylinderGeometry(0.7,0.7,1.6,24), getMat('plastic'))},
+    {n:'Cone', i:'🔺', f:()=>new THREE.Mesh(new THREE.ConeGeometry(0.8,1.6,24), getMat('plastic'))},
+    {n:'Torus', i:'⭕', f:()=>new THREE.Mesh(new THREE.TorusGeometry(0.7,0.25,16,32), getMat('plastic'))},
+    {n:'Plane', i:'▭', f:()=>new THREE.Mesh(new THREE.BoxGeometry(2,0.1,2), getMat('plastic'))},
+  ],
+  '🚲 Cycle Parts': [
+    {n:'Wheel', i:'⚫', f:()=>{
+      const g = new THREE.Group();
+      const tire = new THREE.Mesh(new THREE.TorusGeometry(0.7, 0.12, 12, 32), getMat('rubber'));
+      g.add(tire);
+      for(let i=0;i<6;i++){
+        const spoke = new THREE.Mesh(new THREE.CylinderGeometry(0.02,0.02,1.3,6), getMat('metal'));
+        spoke.rotation.z = i * Math.PI/6;
+        g.add(spoke);
+      }
+      const hub = new THREE.Mesh(new THREE.CylinderGeometry(0.08,0.08,0.2,12), getMat('metal'));
+      hub.rotation.x = Math.PI/2;
+      g.add(hub);
+      return g;
+    }},
+    {n:'Frame', i:'🚲', f:()=>{
+      const g = new THREE.Group();
+      const tubeMat = getMat('red');
+      const t1 = new THREE.Mesh(new THREE.CylinderGeometry(0.06,0.06,2,8), tubeMat);
+      t1.position.set(0,1,0); g.add(t1);
+      const t2 = new THREE.Mesh(new THREE.CylinderGeometry(0.06,0.06,1.4,8), tubeMat);
+      t2.rotation.z = -Math.PI/4; t2.position.set(0.5,0.5,0); g.add(t2);
+      const t3 = new THREE.Mesh(new THREE.CylinderGeometry(0.06,0.06,1.4,8), tubeMat);
+      t3.rotation.z = Math.PI/4; t3.position.set(-0.5,0.5,0); g.add(t3);
+      return g;
+    }},
+    {n:'Handlebar', i:'🛞', f:()=>{
+      const g = new THREE.Group();
+      const bar = new THREE.Mesh(new THREE.CylinderGeometry(0.05,0.05,1.2,8), getMat('metal'));
+      bar.rotation.z = Math.PI/2;
+      g.add(bar);
+      const stem = new THREE.Mesh(new THREE.CylinderGeometry(0.05,0.05,0.5,8), getMat('metal'));
+      stem.position.y = -0.4;
+      g.add(stem);
+      return g;
+    }},
+    {n:'Seat', i:'💺', f:()=>{
+      const s = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.15, 0.4), getMat('black'));
+      return s;
+    }},
+    {n:'Pedal', i:'🦶', f:()=>{
+      const p = new THREE.Mesh(new THREE.BoxGeometry(0.3,0.1,0.4), getMat('black'));
+      return p;
+    }},
+    {n:'Chain', i:'🔗', f:()=>{
+      const c = new THREE.Mesh(new THREE.TorusGeometry(0.4, 0.03, 8, 32), getMat('metal'));
+      return c;
+    }},
+  ],
+  '🏍️ Motor Bike': [
+    {n:'Engine', i:'⚙️', f:()=>new THREE.Mesh(new THREE.BoxGeometry(1,0.7,0.8), getMat('metal'))},
+    {n:'Fuel Tank', i:'⛽', f:()=>{
+      const t = new THREE.Mesh(new THREE.SphereGeometry(0.6, 16, 12), getMat('red'));
+      t.scale.set(1.4, 0.8, 0.9);
+      return t;
+    }},
+    {n:'Seat Long', i:'💺', f:()=>new THREE.Mesh(new THREE.BoxGeometry(1.4,0.15,0.45), getMat('black'))},
+    {n:'Exhaust', i:'🔧', f:()=>{
+      const e = new THREE.Mesh(new THREE.CylinderGeometry(0.08,0.1,1.4,12), getMat('chrome'));
+      e.rotation.z = Math.PI/2;
+      return e;
+    }},
+  ],
+  '🚗 Car Parts': [
+    {n:'Body', i:'🚗', f:()=>new THREE.Mesh(new THREE.BoxGeometry(2.4,0.7,1.4), getMat('red'))},
+    {n:'Cabin', i:'🏠', f:()=>{
+      const c = new THREE.Mesh(new THREE.BoxGeometry(1.2,0.6,1.3), getMat('blue'));
+      c.position.y = 0.6;
+      return c;
+    }},
+    {n:'Tire', i:'⚫', f:()=>{
+      const t = new THREE.Mesh(new THREE.CylinderGeometry(0.35,0.35,0.25,20), getMat('rubber'));
+      t.rotation.z = Math.PI/2;
+      return t;
+    }},
+    {n:'Headlight', i:'💡', f:()=>new THREE.Mesh(new THREE.SphereGeometry(0.15,12,12), new THREE.MeshStandardMaterial({color:0xffffaa, emissive:0xffff88, emissiveIntensity:0.5}))},
+    {n:'Bumper', i:'🛡️', f:()=>new THREE.Mesh(new THREE.BoxGeometry(0.15,0.3,1.4), getMat('metal'))},
+    {n:'Spoiler', i:'🪽', f:()=>new THREE.Mesh(new THREE.BoxGeometry(0.2,0.08,1.4), getMat('black'))},
+  ],
+  '✈️ Aerospace': [
+    {n:'Fuselage', i:'✈️', f:()=>{
+      const f = new THREE.Mesh(new THREE.CylinderGeometry(0.4,0.4,2.8,16), getMat('metal'));
+      f.rotation.z = Math.PI/2;
+      return f;
+    }},
+    {n:'Wing', i:'🪽', f:()=>{
+      const w = new THREE.Mesh(new THREE.BoxGeometry(2.4,0.08,0.9), getMat('metal'));
+      return w;
+    }},
+    {n:'Tail Fin', i:'🚀', f:()=>new THREE.Mesh(new THREE.BoxGeometry(0.08,0.8,0.7), getMat('red'))},
+    {n:'Cockpit', i:'🪟', f:()=>{
+      const c = new THREE.Mesh(new THREE.SphereGeometry(0.4,16,12,0,Math.PI*2,0,Math.PI/2), getMat('glass'));
+      return c;
+    }},
+    {n:'Propeller', i:'🌀', f:()=>{
+      const g = new THREE.Group();
+      const b1 = new THREE.Mesh(new THREE.BoxGeometry(1.6,0.06,0.15), getMat('metal'));
+      const b2 = b1.clone(); b2.rotation.y = Math.PI/2;
+      g.add(b1, b2);
+      return g;
+    }},
+    {n:'Jet Engine', i:'🔥', f:()=>{
+      const e = new THREE.Mesh(new THREE.CylinderGeometry(0.35,0.45,1,16), getMat('chrome'));
+      return e;
+    }},
+  ],
+  '🚀 Rocket': [
+    {n:'Rocket Body', i:'🚀', f:()=>new THREE.Mesh(new THREE.CylinderGeometry(0.4,0.4,2.2,16), getMat('metal'))},
+    {n:'Nose Cone', i:'🔺', f:()=>new THREE.Mesh(new THREE.ConeGeometry(0.4,0.9,16), getMat('red'))},
+    {n:'Fin', i:'📐', f:()=>{
+      const sh = new THREE.Shape();
+      sh.moveTo(0,0); sh.lineTo(0.5,0.8); sh.lineTo(0.5,0); sh.lineTo(0,0);
+      const g = new THREE.ExtrudeGeometry(sh, {depth:0.06, bevelEnabled:false});
+      return new THREE.Mesh(g, getMat('red'));
+    }},
+    {n:'Nozzle', i:'🔥', f:()=>new THREE.Mesh(new THREE.CylinderGeometry(0.5,0.3,0.5,16), getMat('chrome'))},
+    {n:'Booster', i:'💥', f:()=>new THREE.Mesh(new THREE.CylinderGeometry(0.2,0.2,1.5,12), getMat('gold'))},
+    {n:'Satellite', i:'🛰️', f:()=>new THREE.Mesh(new THREE.BoxGeometry(0.6,0.4,0.4), getMat('metal'))},
+  ],
+  '🤖 Robot': [
+    {n:'Head', i:'🤖', f:()=>new THREE.Mesh(new THREE.BoxGeometry(0.8,0.7,0.7), getMat('chrome'))},
+    {n:'Body', i:'🧊', f:()=>new THREE.Mesh(new THREE.BoxGeometry(1,1.2,0.7), getMat('blue'))},
+    {n:'Arm', i:'💪', f:()=>{
+      const a = new THREE.Mesh(new THREE.CylinderGeometry(0.12,0.12,1,12), getMat('metal'));
+      return a;
+    }},
+    {n:'Leg', i:'🦵', f:()=>new THREE.Mesh(new THREE.BoxGeometry(0.25,1,0.25), getMat('metal'))},
+    {n:'Eye', i:'👁️', f:()=>new THREE.Mesh(new THREE.SphereGeometry(0.1,12,12), new THREE.MeshStandardMaterial({color:0x00ffff, emissive:0x00ffff, emissiveIntensity:0.8}))},
+    {n:'Antenna', i:'📡', f:()=>{
+      const a = new THREE.Mesh(new THREE.CylinderGeometry(0.03,0.03,0.5,8), getMat('metal'));
+      return a;
+    }},
+  ],
+  '⚙️ Mechanical': [
+    {n:'Gear', i:'⚙️', f:()=>{
+      const g = new THREE.Group();
+      const base = new THREE.Mesh(new THREE.CylinderGeometry(0.55,0.55,0.18,24), getMat('metal'));
+      g.add(base);
+      for(let i=0;i<10;i++){
+        const tooth = new THREE.Mesh(new THREE.BoxGeometry(0.12,0.2,0.15), getMat('metal'));
+        tooth.position.set(Math.cos(i*Math.PI/5)*0.6, 0, Math.sin(i*Math.PI/5)*0.6);
+        tooth.rotation.y = -i*Math.PI/5;
+        g.add(tooth);
+      }
+      return g;
+    }},
+    {n:'Shaft', i:'📏', f:()=>new THREE.Mesh(new THREE.CylinderGeometry(0.1,0.1,2,16), getMat('metal'))},
+    {n:'Bolt', i:'🔩', f:()=>{
+      const g = new THREE.Group();
+      const hd = new THREE.Mesh(new THREE.CylinderGeometry(0.2,0.2,0.12,6), getMat('metal'));
+      const sh = new THREE.Mesh(new THREE.CylinderGeometry(0.1,0.1,0.7,8), getMat('metal'));
+      sh.position.y = -0.4;
+      g.add(hd, sh);
+      return g;
+    }},
+    {n:'Beam', i:'🏗️', f:()=>new THREE.Mesh(new THREE.BoxGeometry(2.2,0.35,0.15), getMat('metal'))},
+    {n:'Plate', i:'⬜', f:()=>new THREE.Mesh(new THREE.BoxGeometry(1.6,0.08,1), getMat('metal'))},
+    {n:'Spring', i:'〰️', f:()=>{
+      const pts = [];
+      for(let i=0;i<30;i++){
+        pts.push(new THREE.Vector3(Math.sin(i*0.6)*0.2, i*0.06-0.9, Math.cos(i*0.6)*0.2));
+      }
+      const curve = new THREE.CatmullRomCurve3(pts);
+      const geo = new THREE.TubeGeometry(curve, 80, 0.03, 8, false);
+      return new THREE.Mesh(geo, getMat('metal'));
+    }},
+    {n:'Bearing', i:'⭕', f:()=>new THREE.Mesh(new THREE.TorusGeometry(0.25,0.06,10,24), getMat('chrome'))},
+    {n:'Battery', i:'🔋', f:()=>new THREE.Mesh(new THREE.BoxGeometry(0.6,0.35,0.4), getMat('green'))},
+    {n:'Motor', i:'⚡', f:()=>new THREE.Mesh(new THREE.CylinderGeometry(0.3,0.3,0.5,16), getMat('blue'))},
+  ],
+  '🔌 PCB & Circuit': [
+    {n:'PCB Board', i:'🟩', f:()=>new THREE.Mesh(new THREE.BoxGeometry(2.2,0.06,1.5), getMat('green'))},
+    {n:'Chip IC', i:'🖥️', f:()=>new THREE.Mesh(new THREE.BoxGeometry(0.5,0.08,0.4), getMat('black'))},
+    {n:'Resistor', i:'▪️', f:()=>new THREE.Mesh(new THREE.CylinderGeometry(0.06,0.06,0.25,10), getMat('gold'))},
+    {n:'Capacitor', i:'🔵', f:()=>new THREE.Mesh(new THREE.CylinderGeometry(0.12,0.12,0.25,16), getMat('blue'))},
+    {n:'LED', i:'🔴', f:()=>new THREE.Mesh(new THREE.SphereGeometry(0.08,12,12), new THREE.MeshStandardMaterial({color:0xff0000, emissive:0xff0000, emissiveIntensity:1}))},
+    {n:'Connector', i:'🔌', f:()=>new THREE.Mesh(new THREE.BoxGeometry(0.4,0.15,0.15), getMat('gold'))},
+    {n:'Wire', i:'➰', f:()=>{
+      const pts = [new THREE.Vector3(-1,0,0), new THREE.Vector3(-0.5,0.2,0), new THREE.Vector3(0.5,0.2,0), new THREE.Vector3(1,0,0)];
+      const curve = new THREE.CatmullRomCurve3(pts);
+      const geo = new THREE.TubeGeometry(curve, 40, 0.025, 8, false);
+      return new THREE.Mesh(geo, getMat('red'));
+    }},
+  ],
+  '🏠 Building': [
+    {n:'Wall', i:'🧱', f:()=>new THREE.Mesh(new THREE.BoxGeometry(2,2,0.2), getMat('wood'))},
+    {n:'Roof', i:'🔺', f:()=>{
+      const sh = new THREE.Shape();
+      sh.moveTo(-1.2,0); sh.lineTo(0,1); sh.lineTo(1.2,0); sh.lineTo(-1.2,0);
+      const geo = new THREE.ExtrudeGeometry(sh, {depth:1.5, bevelEnabled:false});
+      return new THREE.Mesh(geo, getMat('red'));
+    }},
+    {n:'Door', i:'🚪', f:()=>new THREE.Mesh(new THREE.BoxGeometry(0.6,1.4,0.1), getMat('wood'))},
+    {n:'Window', i:'🪟', f:()=>new THREE.Mesh(new THREE.BoxGeometry(0.7,0.7,0.08), getMat('glass'))},
+    {n:'Pillar', i:'🏛️', f:()=>new THREE.Mesh(new THREE.CylinderGeometry(0.15,0.15,2,12), getMat('metal'))},
+  ],
+};
+
+// ---------- RENDER COMPONENT LIBRARY ----------
+function buildLibrary() {
+  const container = document.getElementById('catContainer');
+  container.innerHTML = '';
+  let catIdx = 0;
+  for(const [catName, parts] of Object.entries(COMPONENTS)) {
+    const catDiv = document.createElement('div');
+    catDiv.innerHTML = `
+      <div class="cat-header" onclick="toggleCat(${catIdx})" id="cat-h-${catIdx}">
+        <span>${catName}</span><span class="arrow">▶</span>
+      </div>
+      <div class="cat-body" id="cat-b-${catIdx}">
+        <div class="parts-grid">
+          ${parts.map((p, i) => `<div class="part-btn" onclick="addPart('${catName}',${i})"><span class="ico">${p.i}</span>${p.n}</div>`).join('')}
+        </div>
+      </div>
+    `;
+    container.appendChild(catDiv);
+    catIdx++;
   }
 }
-buildBlocksGrid();
 
-function addKidBlock(emoji){
-  addToCanvas({
-    type:'text', char:emoji,
-    x: 400 + Math.random()*150,
-    y: 300 + Math.random()*100,
-    size: 60, color:'#000', rot:0
-  });
-  closeKidBlocks();
+function toggleCat(idx) {
+  const h = document.getElementById('cat-h-'+idx);
+  const b = document.getElementById('cat-b-'+idx);
+  h.classList.toggle('open');
+  b.classList.toggle('open');
 }
 
-function openKidBlocks(){ document.getElementById('kidBlocksModal').style.display='flex'; }
-function closeKidBlocks(){ document.getElementById('kidBlocksModal').style.display='none'; }
+// ---------- TEMPLATES GRID ----------
+const TEMPLATES = [
+  {id:'cycle', n:'Cycle', i:'🚲'},
+  {id:'bike', n:'Motor Bike', i:'🏍️'},
+  {id:'car', n:'Super Car', i:'🚗'},
+  {id:'airplane', n:'Airplane', i:'✈️'},
+  {id:'helicopter', n:'Helicopter', i:'🚁'},
+  {id:'rocket', n:'Rocket', i:'🚀'},
+  {id:'robot', n:'Robot', i:'🤖'},
+  {id:'drone', n:'Drone', i:'🛸'},
+  {id:'pcb', n:'PCB Board', i:'🔌'},
+  {id:'gear', n:'Gears', i:'⚙️'},
+];
 
-// Tab switching in Kids
-function switchKidTab(tab, el){
-  document.querySelectorAll('.tab-btn').forEach(t=>t.classList.remove('on'));
-  el.classList.add('on');
-  document.getElementById('kidABC').style.display = tab==='abc'?'block':'none';
-  document.getElementById('kidNUM').style.display = tab==='num'?'block':'none';
-  document.getElementById('kidTXT').style.display = tab==='txt'?'block':'none';
+function buildTemplates() {
+  const g = document.getElementById('tplGrid');
+  g.innerHTML = TEMPLATES.map(t => `<div class="tpl-btn" onclick="loadTemplate('${t.id}')"><span class="ico">${t.i}</span>${t.n}</div>`).join('');
 }
 
-// Build ABC grid
-(function buildABCGrid(){
-  const upper = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
-  const lower = 'abcdefghijklmnopqrstuvwxyz'.split('');
-  const digits = '0123456789'.split('');
-  const special = ['!','@','#','$','%','^','&','*','(',')','-','_','+','=','[',']','{','}',';',':','\'','"',',','.','<','>','/','?','\\','|','~','`','₹','€','$','£','¥'];
+// ---------- ADD PART ----------
+function addPart(catName, idx) {
+  const partDef = COMPONENTS[catName][idx];
+  const mesh = partDef.f();
+  mesh.userData.type = partDef.n;
+  mesh.userData.baseMaterial = 'plastic';
+  mesh.castShadow = true;
+  mesh.receiveShadow = true;
   
-  const all = [...upper, ...lower, ...digits, ...special];
-  document.getElementById('abcGrid').innerHTML = all.map(c => 
-    `<div class="alpha-btn" onclick="addAlpha('${c.replace(/\\/g, '\\\\').replace(/'/g, "\\'")}')">${c}</div>`
-  ).join('');
-})();
+  // Position slightly random to avoid overlap
+  mesh.position.set(
+    (Math.random() - 0.5) * 4,
+    partDef.n.includes('Wheel') || partDef.n.includes('Tire') ? 0.8 : 0.8,
+    (Math.random() - 0.5) * 4
+  );
+  
+  // Snap to grid
+  if(snapEnabled) {
+    mesh.position.x = Math.round(mesh.position.x * 2) / 2;
+    mesh.position.z = Math.round(mesh.position.z * 2) / 2;
+  }
+  
+  objGroup.add(mesh);
+  objectCount++;
+  selectObject(mesh);
+  updateStats();
+}
 
-drawKBG();
+// ---------- SELECTION ----------
+function selectObject(obj) {
+  if(selectedObj === obj) return;
+  selectedObj = obj;
+  if(obj) {
+    selectionBox.setFromObject(obj);
+    selectionBox.visible = true;
+    buildPropPanel(obj);
+    document.getElementById('statSel').innerText = obj.userData.type || 'Part';
+  } else {
+    selectionBox.visible = false;
+    document.getElementById('statSel').innerText = 'Nothing selected';
+    document.getElementById('propPanel').innerHTML = `
+      <div class="empty-state">
+        <span class="ico">🎯</span>
+        Click any object in the 3D scene to edit it
+      </div>
+    `;
+  }
+}
 
-// ============================================================
-// PRO MODE — 3D
-// ============================================================
-let sceneP, cameraP, rendererP, controlsP, groupP, proInit=false, selP=null, bodiesP=[], isDraggingP=false, dragPlaneP=new THREE.Plane(), dragOffsetP=new THREE.Vector3();
+// ---------- PROPERTIES PANEL ----------
+function buildPropPanel(obj) {
+  const panel = document.getElementById('propPanel');
+  const mat = obj.material || (obj.children[0] && obj.children[0].material);
+  const col = mat && mat.color ? '#' + mat.color.getHexString() : '#ffcc00';
+  
+  panel.innerHTML = `
+    <div style="font-size:11px;color:#4a9eff;font-weight:800;margin-bottom:10px">
+      🎯 ${obj.userData.type || 'Part'}
+    </div>
+    
+    <div class="prop-row">
+      <div class="prop-label">🎨 Color</div>
+      <input type="color" class="prop-color" value="${col}" onchange="changeColor(this.value)">
+    </div>
+    
+    <div class="prop-row">
+      <div class="prop-label">🧱 Material</div>
+      <select class="prop-select" onchange="changeMaterial(this.value)">
+        <option value="plastic">Plastic</option>
+        <option value="metal">Metal</option>
+        <option value="chrome">Chrome</option>
+        <option value="rubber">Rubber</option>
+        <option value="glass">Glass</option>
+        <option value="wood">Wood</option>
+        <option value="gold">Gold</option>
+        <option value="red">Red Plastic</option>
+        <option value="blue">Blue Plastic</option>
+        <option value="green">Green Plastic</option>
+        <option value="black">Black</option>
+      </select>
+    </div>
+    
+    <div class="prop-row">
+      <div class="prop-label">📏 Size <span id="sizeVal">1.0</span></div>
+      <input type="range" class="prop-slider" min="0.2" max="4" step="0.1" value="1" oninput="changeSize(this.value)">
+    </div>
+    
+    <div class="prop-row">
+      <div class="prop-label">↔️ Move X <span id="mxVal">0</span></div>
+      <input type="range" class="prop-slider" min="-10" max="10" step="0.1" value="${obj.position.x}" oninput="moveX(this.value)">
+    </div>
+    <div class="prop-row">
+      <div class="prop-label">↕️ Move Y <span id="myVal">${obj.position.y.toFixed(1)}</span></div>
+      <input type="range" class="prop-slider" min="-2" max="10" step="0.1" value="${obj.position.y}" oninput="moveY(this.value)">
+    </div>
+    <div class="prop-row">
+      <div class="prop-label">↔️ Move Z <span id="mzVal">${obj.position.z.toFixed(1)}</span></div>
+      <input type="range" class="prop-slider" min="-10" max="10" step="0.1" value="${obj.position.z}" oninput="moveZ(this.value)">
+    </div>
+    
+    <div class="prop-row">
+      <div class="prop-label">🔄 Rotate <span id="rotVal">0°</span></div>
+      <input type="range" class="prop-slider" min="0" max="360" step="5" value="0" oninput="rotateY(this.value)">
+    </div>
+    
+    <div class="prop-actions">
+      <button class="prop-act" onclick="duplicateSelected()">📋 Copy</button>
+      <button class="prop-act" onclick="dropToFloor()">⬇️ Floor</button>
+      <button class="prop-act" onclick="centerIt()">🎯 Center</button>
+      <button class="prop-act red" onclick="deleteSelected()">🗑️ Delete</button>
+    </div>
+  `;
+}
 
-function initPro(){
-  if(proInit) return;
-  proInit = true;
-  const c = document.getElementById('threePro');
-  sceneP = new THREE.Scene();
-  sceneP.background = new THREE.Color(0x05070a);
-  cameraP = new THREE.PerspectiveCamera(50, c.clientWidth/c.clientHeight, 0.1, 1000);
-  cameraP.position.set(6,5,7);
-  rendererP = new THREE.WebGLRenderer({antialias:true});
-  rendererP.setSize(c.clientWidth, c.clientHeight);
-  c.appendChild(rendererP.domElement);
-  controlsP = new THREE.OrbitControls(cameraP, rendererP.domElement);
-  controlsP.enableDamping = true;
-  sceneP.add(new THREE.DirectionalLight(0xffffff,1.2));
-  sceneP.add(new THREE.AmbientLight(0xffffff,0.7));
-  groupP = new THREE.Group();
-  sceneP.add(groupP);
-  sceneP.add(new THREE.GridHelper(24, 48, 0x223344, 0x101a2a));
+// Property actions
+function changeColor(hex) {
+  if(!selectedObj) return;
+  const c = new THREE.Color(hex);
+  selectedObj.traverse(o => { if(o.material && o.material.color) o.material.color.set(c); });
+}
+function changeMaterial(type) {
+  if(!selectedObj) return;
+  const newMat = getMat(type);
+  selectedObj.traverse(o => { if(o.material && o.material.color) { o.material.color.copy(newMat.color); o.material.metalness = newMat.metalness; o.material.roughness = newMat.roughness; } });
+  selectedObj.userData.baseMaterial = type;
+}
+function changeSize(val) {
+  if(!selectedObj) return;
+  document.getElementById('sizeVal').innerText = val;
+  selectedObj.scale.setScalar(parseFloat(val));
+  updateSelectionBox();
+}
+function moveX(v) { if(selectedObj) { selectedObj.position.x = parseFloat(v); document.getElementById('mxVal').innerText = parseFloat(v).toFixed(1); updateSelectionBox(); } }
+function moveY(v) { if(selectedObj) { selectedObj.position.y = parseFloat(v); document.getElementById('myVal').innerText = parseFloat(v).toFixed(1); updateSelectionBox(); } }
+function moveZ(v) { if(selectedObj) { selectedObj.position.z = parseFloat(v); document.getElementById('mzVal').innerText = parseFloat(v).toFixed(1); updateSelectionBox(); } }
+function rotateY(v) { if(selectedObj) { selectedObj.rotation.y = parseFloat(v) * Math.PI/180; document.getElementById('rotVal').innerText = v + '°'; updateSelectionBox(); } }
 
-  const ray = new THREE.Raycaster();
-  const mouse = new THREE.Vector2();
+function dropToFloor() { if(selectedObj) { selectedObj.position.y = 0.8; updateSelectionBox(); buildPropPanel(selectedObj); } }
+function centerIt() { if(selectedObj) { selectedObj.position.set(0, 0.8, 0); updateSelectionBox(); buildPropPanel(selectedObj); } }
 
-  rendererP.domElement.addEventListener('mousedown', e=>{
-    const r = rendererP.domElement.getBoundingClientRect();
-    mouse.x = ((e.clientX-r.left)/r.width)*2-1;
-    mouse.y = -((e.clientY-r.top)/r.height)*2+1;
-    ray.setFromCamera(mouse, cameraP);
-    const inter = ray.intersectObjects(groupP.children, true);
-    if(inter.length > 0){
-      selP = inter[0].object;
-      while(selP.parent && selP.parent !== groupP) selP = selP.parent;
-      isDraggingP = true;
-      controlsP.enabled = false;
-      dragPlaneP.setFromNormalAndCoplanarPoint(new THREE.Vector3(0,1,0), new THREE.Vector3(0, selP.position.y, 0));
-      const ip = ray.intersectPlane(dragPlaneP, new THREE.Vector3());
-      if(ip) dragOffsetP.copy(ip).sub(selP.position);
-      syncPro();
+function duplicateSelected() {
+  if(!selectedObj) return;
+  const clone = selectedObj.clone();
+  clone.position.x += 1.5;
+  clone.userData = {...selectedObj.userData};
+  objGroup.add(clone);
+  objectCount++;
+  selectObject(clone);
+  updateStats();
+}
+
+function deleteSelected() {
+  if(!selectedObj) return;
+  objGroup.remove(selectedObj);
+  selectedObj = null;
+  selectionBox.visible = false;
+  objectCount--;
+  updateStats();
+  selectObject(null);
+}
+
+function clearAll() {
+  if(!confirm('Clear all parts? Ye undo nahi hoga!')) return;
+  while(objGroup.children.length > 0) objGroup.remove(objGroup.children[0]);
+  objectCount = 0;
+  selectedObj = null;
+  selectionBox.visible = false;
+  updateStats();
+  selectObject(null);
+}
+
+function updateSelectionBox() {
+  if(selectedObj) selectionBox.setFromObject(selectedObj);
+}
+
+function updateStats() {
+  document.getElementById('statCount').innerText = objectCount;
+}
+
+// ---------- MODE ----------
+function setMode(m) {
+  mode = m;
+  document.getElementById('statMode').innerText = m.charAt(0).toUpperCase() + m.slice(1);
+  document.getElementById('btnMove').classList.toggle('primary', m === 'move');
+  document.getElementById('btnRotate').classList.toggle('primary', m === 'rotate');
+  document.getElementById('btnScale').classList.toggle('primary', m === 'scale');
+  canvas.className = 'mode-' + m;
+}
+
+// ---------- VIEWS ----------
+function setView(v) {
+  const d = 12;
+  if(v === 'top') { camera.position.set(0, d, 0.01); controls.target.set(0,0,0); }
+  else if(v === 'front') { camera.position.set(0, 3, d); controls.target.set(0,1,0); }
+  else if(v === 'side') { camera.position.set(d, 3, 0); controls.target.set(0,1,0); }
+  else { camera.position.set(8, 6, 10); controls.target.set(0,1,0); }
+  controls.update();
+}
+
+// ---------- SNAP ----------
+function toggleSnap() {
+  snapEnabled = !snapEnabled;
+  document.getElementById('btnSnap').innerText = '🧲 Snap: ' + (snapEnabled ? 'ON' : 'OFF');
+}
+
+function toggleGrid() {
+  grid.visible = !grid.visible;
+}
+
+// ---------- RAYCAST SELECTION ----------
+const raycaster = new THREE.Raycaster();
+const mouse = new THREE.Vector2();
+
+canvas.addEventListener('click', (e) => {
+  const rect = canvas.getBoundingClientRect();
+  mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+  mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+  raycaster.setFromCamera(mouse, camera);
+  const intersects = raycaster.intersectObjects(objGroup.children, true);
+  if(intersects.length > 0) {
+    let obj = intersects[0].object;
+    while(obj.parent && obj.parent !== objGroup) obj = obj.parent;
+    selectObject(obj);
+  } else {
+    selectObject(null);
+  }
+});
+
+// ---------- DRAG TO MOVE ----------
+canvas.addEventListener('mousedown', (e) => {
+  if(e.button !== 0 || !selectedObj) return;
+  if(e.shiftKey) { // Shift+drag = rotate
+    dragStart = {x: e.clientX, y: e.clientY};
+    objStartRot = {...selectedObj.rotation};
+    isDragging = true;
+  } else {
+    dragStart = {x: e.clientX, y: e.clientY};
+    objStartPos = {...selectedObj.position};
+    isDragging = true;
+  }
+});
+
+canvas.addEventListener('mousemove', (e) => {
+  if(!isDragging || !selectedObj) return;
+  const dx = (e.clientX - dragStart.x) * 0.02;
+  const dz = (e.clientY - dragStart.y) * 0.02;
+  
+  if(e.shiftKey) {
+    selectedObj.rotation.y = objStartRot.y + dx * 3;
+  } else {
+    selectedObj.position.x = objStartPos.x + dx;
+    selectedObj.position.z = objStartPos.z + dz;
+    if(snapEnabled) {
+      selectedObj.position.x = Math.round(selectedObj.position.x * 2) / 2;
+      selectedObj.position.z = Math.round(selectedObj.position.z * 2) / 2;
+    }
+  }
+  updateSelectionBox();
+});
+
+canvas.addEventListener('mouseup', () => {
+  if(isDragging) {
+    isDragging = false;
+    if(selectedObj) buildPropPanel(selectedObj);
+  }
+});
+
+// ---------- KEYBOARD ----------
+window.addEventListener('keydown', (e) => {
+  if(e.key === 'Delete' && selectedObj) deleteSelected();
+  if(e.ctrlKey && e.key === 'd') { e.preventDefault(); duplicateSelected(); }
+  if(e.key === 'Escape') selectObject(null);
+});
+
+// ---------- TEMPLATES LOADER ----------
+function loadTemplate(id) {
+  if(!id) return;
+  if(objGroup.children.length > 0 && !confirm('Load template? Current design will be cleared.')) {
+    document.getElementById('tplSelect').value = '';
+    return;
+  }
+  
+  while(objGroup.children.length > 0) objGroup.remove(objGroup.children[0]);
+  objectCount = 0;
+  
+  const T = {
+    cycle: () => {
+      // Wheels
+      const w1 = COMPONENTS['🚲 Cycle Parts'][0].f(); w1.position.set(-1.5, 0.8, 0); w1.userData.type='Wheel'; objGroup.add(w1);
+      const w2 = COMPONENTS['🚲 Cycle Parts'][0].f(); w2.position.set(1.5, 0.8, 0); w2.userData.type='Wheel'; objGroup.add(w2);
+      // Frame
+      const fr = COMPONENTS['🚲 Cycle Parts'][1].f(); fr.position.set(0, 1.2, 0); fr.userData.type='Frame'; objGroup.add(fr);
+      // Handlebar
+      const hb = COMPONENTS['🚲 Cycle Parts'][2].f(); hb.position.set(1.5, 2, 0); hb.userData.type='Handlebar'; objGroup.add(hb);
+      // Seat
+      const st = COMPONENTS['🚲 Cycle Parts'][3].f(); st.position.set(-0.8, 2, 0); st.userData.type='Seat'; objGroup.add(st);
+      // Pedal
+      const pd = COMPONENTS['🚲 Cycle Parts'][4].f(); pd.position.set(0, 0.8, 0); pd.userData.type='Pedal'; objGroup.add(pd);
+    },
+    bike: () => {
+      // Wheels
+      const w1 = COMPONENTS['🚲 Cycle Parts'][0].f(); w1.position.set(-1.6, 0.8, 0); w1.scale.setScalar(1.2); objGroup.add(w1);
+      const w2 = COMPONENTS['🚲 Cycle Parts'][0].f(); w2.position.set(1.6, 0.8, 0); w2.scale.setScalar(1.2); objGroup.add(w2);
+      // Engine
+      const en = COMPONENTS['🏍️ Motor Bike'][0].f(); en.position.set(0, 1, 0); objGroup.add(en);
+      // Fuel Tank
+      const ft = COMPONENTS['🏍️ Motor Bike'][1].f(); ft.position.set(-0.3, 1.9, 0); objGroup.add(ft);
+      // Seat
+      const st = COMPONENTS['🏍️ Motor Bike'][2].f(); st.position.set(-1.3, 1.7, 0); objGroup.add(st);
+      // Handlebar
+      const hb = COMPONENTS['🚲 Cycle Parts'][2].f(); hb.position.set(1.4, 1.9, 0); objGroup.add(hb);
+      // Exhaust
+      const ex = COMPONENTS['🏍️ Motor Bike'][3].f(); ex.position.set(-1, 0.6, 0.5); objGroup.add(ex);
+    },
+    car: () => {
+      const body = COMPONENTS['🚗 Car Parts'][0].f(); body.position.set(0, 0.9, 0); objGroup.add(body);
+      const cab = COMPONENTS['🚗 Car Parts'][1].f(); cab.position.set(0, 1.7, 0); objGroup.add(cab);
+      // 4 tires
+      const tirePos = [[-1.3,0.35,-0.9],[-1.3,0.35,0.9],[1.3,0.35,-0.9],[1.3,0.35,0.9]];
+      tirePos.forEach(p => { const t = COMPONENTS['🚗 Car Parts'][2].f(); t.position.set(...p); objGroup.add(t); });
+      // Headlight
+      const hl1 = COMPONENTS['🚗 Car Parts'][3].f(); hl1.position.set(1.3, 0.9, -0.5); objGroup.add(hl1);
+      const hl2 = COMPONENTS['🚗 Car Parts'][3].f(); hl2.position.set(1.3, 0.9, 0.5); objGroup.add(hl2);
+      // Spoiler
+      const sp = COMPONENTS['🚗 Car Parts'][5].f(); sp.position.set(-1.3, 1.4, 0); objGroup.add(sp);
+    },
+    airplane: () => {
+      const fus = COMPONENTS['✈️ Aerospace'][0].f(); fus.position.set(0, 1.5, 0); objGroup.add(fus);
+      const wing = COMPONENTS['✈️ Aerospace'][1].f(); wing.position.set(0, 1.3, 0); wing.scale.set(1, 1, 1.5); objGroup.add(wing);
+      const fin = COMPONENTS['✈️ Aerospace'][2].f(); fin.position.set(-1.4, 2, 0); objGroup.add(fin);
+      const cock = COMPONENTS['✈️ Aerospace'][3].f(); cock.position.set(1.4, 1.7, 0); objGroup.add(cock);
+    },
+    helicopter: () => {
+      const body = COMPONENTS['✈️ Aerospace'][0].f(); body.position.set(0, 1.5, 0); body.scale.set(0.7, 0.7, 0.7); objGroup.add(body);
+      const rotor = COMPONENTS['✈️ Aerospace'][4].f(); rotor.position.set(0, 2.5, 0); rotor.scale.set(1.5, 1.5, 1.5); objGroup.add(rotor);
+      const tail = COMPONENTS['✈️ Aerospace'][2].f(); tail.position.set(-1.2, 1.8, 0); objGroup.add(tail);
+    },
+    rocket: () => {
+      const body = COMPONENTS['🚀 Rocket'][0].f(); body.position.set(0, 2, 0); objGroup.add(body);
+      const nose = COMPONENTS['🚀 Rocket'][1].f(); nose.position.set(0, 3.5, 0); objGroup.add(nose);
+      const f1 = COMPONENTS['🚀 Rocket'][2].f(); f1.position.set(0.4, 0.5, 0); f1.rotation.y = Math.PI/2; objGroup.add(f1);
+      const f2 = COMPONENTS['🚀 Rocket'][2].f(); f2.position.set(-0.4, 0.5, 0); f2.rotation.y = -Math.PI/2; objGroup.add(f2);
+      const f3 = COMPONENTS['🚀 Rocket'][2].f(); f3.position.set(0, 0.5, 0.4); objGroup.add(f3);
+      const f4 = COMPONENTS['🚀 Rocket'][2].f(); f4.position.set(0, 0.5, -0.4); f4.rotation.y = Math.PI; objGroup.add(f4);
+      const nz = COMPONENTS['🚀 Rocket'][3].f(); nz.position.set(0, 0.5, 0); objGroup.add(nz);
+    },
+    robot: () => {
+      const head = COMPONENTS['🤖 Robot'][0].f(); head.position.set(0, 2.4, 0); objGroup.add(head);
+      const body = COMPONENTS['🤖 Robot'][1].f(); body.position.set(0, 1.3, 0); objGroup.add(body);
+      const armL = COMPONENTS['🤖 Robot'][2].f(); armL.position.set(-0.8, 1.4, 0); objGroup.add(armL);
+      const armR = COMPONENTS['🤖 Robot'][2].f(); armR.position.set(0.8, 1.4, 0); objGroup.add(armR);
+      const legL = COMPONENTS['🤖 Robot'][3].f(); legL.position.set(-0.3, 0.4, 0); objGroup.add(legL);
+      const legR = COMPONENTS['🤖 Robot'][3].f(); legR.position.set(0.3, 0.4, 0); objGroup.add(legR);
+      const eyeL = COMPONENTS['🤖 Robot'][4].f(); eyeL.position.set(-0.2, 2.5, 0.35); objGroup.add(eyeL);
+      const eyeR = COMPONENTS['🤖 Robot'][4].f(); eyeR.position.set(0.2, 2.5, 0.35); objGroup.add(eyeR);
+      const ant = COMPONENTS['🤖 Robot'][5].f(); ant.position.set(0, 2.9, 0); objGroup.add(ant);
+    },
+    drone: () => {
+      const body = COMPONENTS['🔧 Basic Shapes'][0].f(); body.scale.setScalar(0.8); body.position.set(0, 1.5, 0); objGroup.add(body);
+      const arms = [[-1,-1],[1,-1],[-1,1],[1,1]];
+      arms.forEach(([x,z]) => {
+        const rotor = COMPONENTS['✈️ Aerospace'][4].f();
+        rotor.position.set(x, 1.5, z);
+        objGroup.add(rotor);
+      });
+    },
+    pcb: () => {
+      const board = COMPONENTS['🔌 PCB & Circuit'][0].f(); board.position.set(0, 0.5, 0); objGroup.add(board);
+      const chip = COMPONENTS['🔌 PCB & Circuit'][1].f(); chip.position.set(-0.3, 0.6, 0); objGroup.add(chip);
+      const res1 = COMPONENTS['🔌 PCB & Circuit'][2].f(); res1.position.set(0.5, 0.6, -0.3); objGroup.add(res1);
+      const res2 = COMPONENTS['🔌 PCB & Circuit'][2].f(); res2.position.set(0.7, 0.6, -0.3); objGroup.add(res2);
+      const cap = COMPONENTS['🔌 PCB & Circuit'][3].f(); cap.position.set(0.5, 0.6, 0.3); objGroup.add(cap);
+      const led = COMPONENTS['🔌 PCB & Circuit'][4].f(); led.position.set(-0.7, 0.6, 0.4); objGroup.add(led);
+      const conn = COMPONENTS['🔌 PCB & Circuit'][5].f(); conn.position.set(-0.9, 0.6, -0.5); objGroup.add(conn);
+    },
+    gear: () => {
+      const g1 = COMPONENTS['⚙️ Mechanical'][0].f(); g1.position.set(-0.8, 1, 0); objGroup.add(g1);
+      const g2 = COMPONENTS['⚙️ Mechanical'][0].f(); g2.position.set(0.8, 1, 0); g2.scale.setScalar(0.8); objGroup.add(g2);
+      const sh = COMPONENTS['⚙️ Mechanical'][1].f(); sh.rotation.z = Math.PI/2; sh.position.set(0, 1, 0); objGroup.add(sh);
+      const br = COMPONENTS['⚙️ Mechanical'][6].f(); br.position.set(-0.8, 1, 0); br.rotation.x = Math.PI/2; objGroup.add(br);
+    }
+  };
+  
+  if(T[id]) {
+    T[id]();
+    objectCount = objGroup.children.length;
+    updateStats();
+    setView('iso');
+  }
+  
+  document.getElementById('tplSelect').value = '';
+}
+
+// ---------- EXPORT ----------
+function openExport() { document.getElementById('exportModal').classList.add('open'); }
+function closeExport() { document.getElementById('exportModal').classList.remove('open'); }
+
+function exportPNG() {
+  closeExport();
+  renderer.render(scene, camera);
+  const link = document.createElement('a');
+  link.download = 'Clyxess-Design-' + Date.now() + '.png';
+  link.href = renderer.domElement.toDataURL('image/png');
+  link.click();
+}
+
+function exportOBJ() {
+  closeExport();
+  // Simple OBJ exporter
+  let objStr = '# Clyxess Studio Export\n# ' + new Date().toISOString() + '\n\n';
+  let vOffset = 1;
+  
+  objStr += 'o ClyxessDesign\n';
+  
+  objGroup.traverse(child => {
+    if(child.isMesh && child.geometry) {
+      const pos = child.geometry.attributes.position;
+      const idx = child.geometry.index;
+      const mat = child.matrixWorld;
+      
+      // Vertices
+      const v = new THREE.Vector3();
+      for(let i = 0; i < pos.count; i++) {
+        v.fromBufferAttribute(pos, i).applyMatrix4(mat);
+        objStr += `v ${v.x.toFixed(4)} ${v.y.toFixed(4)} ${v.z.toFixed(4)}\n`;
+      }
+      
+      // Faces
+      if(idx) {
+        for(let i = 0; i < idx.count; i += 3) {
+          objStr += `f ${idx.getX(i)+vOffset} ${idx.getX(i+1)+vOffset} ${idx.getX(i+2)+vOffset}\n`;
+        }
+      } else {
+        for(let i = 0; i < pos.count; i += 3) {
+          objStr += `f ${i+vOffset} ${i+1+vOffset} ${i+2+vOffset}\n`;
+        }
+      }
+      
+      vOffset += pos.count;
     }
   });
-
-  rendererP.domElement.addEventListener('mousemove', e=>{
-    if(!isDraggingP || !selP) return;
-    const r = rendererP.domElement.getBoundingClientRect();
-    mouse.x = ((e.clientX-r.left)/r.width)*2-1;
-    mouse.y = -((e.clientY-r.top)/r.height)*2+1;
-    ray.setFromCamera(mouse, cameraP);
-    const ip = ray.intersectPlane(dragPlaneP, new THREE.Vector3());
-    if(ip) { selP.position.copy(ip).sub(dragOffsetP); syncPro(); }
-  });
-
-  window.addEventListener('mouseup', ()=>{ isDraggingP = false; controlsP.enabled = true; });
-
-  rendererP.domElement.addEventListener('wheel', e=>{
-    if(selP){
-      e.preventDefault();
-      const d = e.deltaY > 0 ? -0.1 : 0.1;
-      selP.scale.x = Math.max(0.1, Math.min(5, selP.scale.x + d));
-      selP.scale.y = selP.scale.x;
-      selP.scale.z = selP.scale.x;
-      syncPro();
-    }
-  }, {passive:false});
-
-  (function anim(){ requestAnimationFrame(anim); controlsP.update(); rendererP.render(sceneP, cameraP); })();
+  
+  const blob = new Blob([objStr], {type:'text/plain'});
+  const link = document.createElement('a');
+  link.download = 'Clyxess-Design-' + Date.now() + '.obj';
+  link.href = URL.createObjectURL(blob);
+  link.click();
 }
 
-function syncPro(){
-  if(!selP) return;
-  document.getElementById('pMoveX').value = selP.position.x; document.getElementById('pmxVal').innerText = selP.position.x.toFixed(1);
-  document.getElementById('pMoveY').value = selP.position.y; document.getElementById('pmyVal').innerText = selP.position.y.toFixed(1);
-  document.getElementById('pMoveZ').value = selP.position.z; document.getElementById('pmzVal').innerText = selP.position.z.toFixed(1);
-  document.getElementById('pScaleX').value = selP.scale.x; document.getElementById('psxVal').innerText = selP.scale.x.toFixed(1);
-  document.getElementById('pScaleY').value = selP.scale.y; document.getElementById('psyVal').innerText = selP.scale.y.toFixed(1);
-  document.getElementById('pScaleZ').value = selP.scale.z; document.getElementById('pszVal').innerText = selP.scale.z.toFixed(1);
-  document.getElementById('pSize').value = selP.scale.x; document.getElementById('pSizeVal').innerText = selP.scale.x.toFixed(1);
+function saveProject() {
+  closeExport();
+  const data = {
+    parts: objGroup.children.map(c => ({
+      type: c.userData.type,
+      pos: [c.position.x, c.position.y, c.position.z],
+      rot: [c.rotation.x, c.rotation.y, c.rotation.z],
+      scale: c.scale.x,
+      color: c.material && c.material.color ? '#' + c.material.color.getHexString() : '#ffcc00'
+    }))
+  };
+  localStorage.setItem('clyxess_project', JSON.stringify(data));
+  alert('✅ Project saved! ' + data.parts.length + ' parts stored.');
 }
 
-function addProBlock(t){
-  initPro();
-  closeProLibrary();
-  let m;
-  const mat = new THREE.MeshStandardMaterial({color: document.getElementById('pCol').value});
-  if(t==='box') m = new THREE.Mesh(new THREE.BoxGeometry(2, 0.8, 0.9), mat);
-  else if(t==='cyl') m = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.4, 1.5, 16), mat);
-  else if(t==='sphere') m = new THREE.Mesh(new THREE.SphereGeometry(0.6, 16, 16), mat);
-  else if(t==='cone') m = new THREE.Mesh(new THREE.ConeGeometry(0.5, 1, 16), mat);
-  else if(t==='torus') m = new THREE.Mesh(new THREE.TorusGeometry(0.5, 0.15, 10, 20), mat);
-  else if(t==='plane') m = new THREE.Mesh(new THREE.BoxGeometry(2.4, 0.05, 1), mat);
-  else if(t==='wedge'){ m = new THREE.Mesh(new THREE.BoxGeometry(1.5, 0.8, 1), mat); m.scale.x = 0.5; }
-  else if(t==='capsule'){ m = new THREE.Group(); const c1 = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.4, 1.2, 16), mat); const s1 = new THREE.Mesh(new THREE.SphereGeometry(0.4, 12, 12), mat); s1.position.y = 0.6; const s2 = s1.clone(); s2.position.y = -0.6; m.add(c1, s1, s2); }
-  else if(t==='fuselage') m = new THREE.Mesh(new THREE.BoxGeometry(2.8, 0.6, 0.6), mat);
-  else if(t==='cockpit') m = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.4, 0.5), new THREE.MeshStandardMaterial({color:'#7ec8ff', transparent:true, opacity:0.6}));
-  else if(t==='wing'){ const sh = new THREE.Shape(); sh.moveTo(0,0); sh.lineTo(2,0); sh.lineTo(2,0.15); sh.lineTo(0,0.25); sh.lineTo(0,0); m = new THREE.Mesh(new THREE.ExtrudeGeometry(sh, {depth:0.06, bevelEnabled:false}), new THREE.MeshStandardMaterial({color:'#22ff66'})); }
-  else if(t==='fin') m = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.9, 0.7), mat);
-  else if(t==='rotor'){ m = new THREE.Group(); const b1 = new THREE.Mesh(new THREE.BoxGeometry(3.2, 0.06, 0.12), new THREE.MeshStandardMaterial({color:'#00ffff'})); const b2 = b1.clone(); b2.rotation.y = Math.PI/2; m.add(b1, b2); }
-  else if(t==='propeller'){ m = new THREE.Group(); const b = new THREE.Mesh(new THREE.BoxGeometry(2, 0.07, 0.12), mat); const b2 = b.clone(); b2.rotation.y = Math.PI/2; m.add(b, b2); }
-  else if(t==='rocket_body') m = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.3, 1.8, 16), new THREE.MeshStandardMaterial({color:'#ffaa00'}));
-  else if(t==='satellite') m = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.5, 0.5), new THREE.MeshStandardMaterial({color:'#c0c0ff'}));
-  else if(t==='gear_spur') m = new THREE.Mesh(new THREE.CylinderGeometry(0.45, 0.45, 0.18, 16), mat);
-  else if(t==='shaft') m = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 2, 12), mat);
-  else if(t==='bolt'){ m = new THREE.Group(); const hd = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.18, 0.1, 6), mat); const sh = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 0.6, 8), mat); sh.position.y = -0.35; m.add(hd, sh); }
-  else if(t==='beam_i') m = new THREE.Mesh(new THREE.BoxGeometry(2.2, 0.3, 0.12), mat);
-  else if(t==='plate') m = new THREE.Mesh(new THREE.BoxGeometry(1.6, 0.06, 1), mat);
-  else if(t==='motor_box') m = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.4, 0.5), new THREE.MeshStandardMaterial({color:'#00ffff'}));
-  else if(t==='battery') m = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.25, 0.35), new THREE.MeshStandardMaterial({color:'#ff0000'}));
-  else if(t==='airfoil_0012'){ const sh = new THREE.Shape(); sh.moveTo(0,0); sh.bezierCurveTo(0.6,0.18,1.4,0.18,2,0); sh.bezierCurveTo(1.4,-0.08,0.6,-0.05,0,0); m = new THREE.Mesh(new THREE.ExtrudeGeometry(sh,{depth:0.05, bevelEnabled:false}), new THREE.MeshStandardMaterial({color:'#22ff66'})); }
-  else if(t==='ducted_fan'){ m = new THREE.Group(); const duct = new THREE.Mesh(new THREE.TorusGeometry(0.4, 0.08, 8, 20), mat); const fan = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.04, 0.1), mat); m.add(duct, fan); }
-  else if(t==='v_tail'){ m = new THREE.Group(); const f1 = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.8, 0.5), mat); f1.rotation.z = Math.PI/6; const f2 = f1.clone(); f2.rotation.z = -Math.PI/6; m.add(f1, f2); }
-  if(!m) return;
-  m.position.set((Math.random()-0.5)*2, 0.8, (Math.random()-0.5)*2);
-  m.name = t + '_' + (bodiesP.length+1);
-  groupP.add(m);
-  bodiesP.push(m);
-  selP = m;
-  syncPro();
+function loadProject() {
+  closeExport();
+  const raw = localStorage.getItem('clyxess_project');
+  if(!raw) { alert('❌ No saved project found!'); return; }
+  try {
+    const data = JSON.parse(raw);
+    while(objGroup.children.length > 0) objGroup.remove(objGroup.children[0]);
+    // Just restore as basic boxes for now
+    data.parts.forEach(p => {
+      const m = new THREE.Mesh(new THREE.BoxGeometry(1,1,1), new THREE.MeshStandardMaterial({color: new THREE.Color(p.color)}));
+      m.position.set(...p.pos);
+      m.rotation.set(...p.rot);
+      m.scale.setScalar(p.scale);
+      m.userData.type = p.type;
+      objGroup.add(m);
+    });
+    objectCount = objGroup.children.length;
+    updateStats();
+    alert('✅ Project loaded!');
+  } catch(e) { alert('❌ Load failed'); }
 }
 
-function updateProColor(){ if(!selP) return; const c = document.getElementById('pCol').value; if(selP.traverse) selP.traverse(o=>{ if(o.material) o.material.color.set(c); }); else selP.material.color.set(c); }
-function updateProMat(){ if(!selP) return; const met = parseFloat(document.getElementById('metalness').value); const rough = parseFloat(document.getElementById('roughness').value); const op = parseFloat(document.getElementById('opacity').value); document.getElementById('metVal').innerText = met; document.getElementById('roughVal').innerText = rough; document.getElementById('opacVal').innerText = op; if(selP.traverse) selP.traverse(o=>{ if(o.material){ o.material.metalness = met; o.material.roughness = rough; o.material.transparent = op<1; o.material.opacity = op; } }); }
-function updateProScale(){ if(!selP) return; const s = parseFloat(document.getElementById('pSize').value); selP.scale.set(s,s,s); syncPro(); }
-function updateProScaleXYZ(){ if(!selP) return; selP.scale.x = parseFloat(document.getElementById('pScaleX').value); selP.scale.y = parseFloat(document.getElementById('pScaleY').value); selP.scale.z = parseFloat(document.getElementById('pScaleZ').value); syncPro(); }
-function updateProMove(){ if(!selP) return; selP.position.x = parseFloat(document.getElementById('pMoveX').value); selP.position.y = parseFloat(document.getElementById('pMoveY').value); selP.position.z = parseFloat(document.getElementById('pMoveZ').value); syncPro(); }
-function updateProRot(){ if(!selP) return; selP.rotation.x = parseFloat(document.getElementById('pRotX').value) * Math.PI/180; selP.rotation.y = parseFloat(document.getElementById('pRotY').value) * Math.PI/180; selP.rotation.z = parseFloat(document.getElementById('pRotZ').value) * Math.PI/180; syncPro(); }
-function proAction(a){ if(!selP) return; if(a==='duplicate'){ const c = selP.clone(); c.position.x += 0.7; groupP.add(c); bodiesP.push(c); } if(a==='pattern3'){ for(let i=1;i<=2;i++){ const c = selP.clone(); c.position.x += i*1.2; groupP.add(c); bodiesP.push(c); } } if(a==='resetRot') selP.rotation.set(0,0,0); if(a==='resetScale') selP.scale.set(1,1,1); if(a==='topView'){ cameraP.position.set(0,12,0); controlsP.target.set(0,0,0); } if(a==='frontView'){ cameraP.position.set(0,2,8); controlsP.target.set(0,0,0); } syncPro(); }
-function deletePro(){ if(selP){ groupP.remove(selP); selP = null; } }
-function clearPro(){ if(groupP){ while(groupP.children.length>0) groupP.remove(groupP.children[0]); } bodiesP = []; }
-function openProLibrary(){ document.getElementById('proBlockModal').style.display = 'flex'; }
-function closeProLibrary(){ document.getElementById('proBlockModal').style.display = 'none'; }
-function clearAll(){ if(mainMode==='kids') clearK(); if(mainMode==='pro') clearPro(); }
+// ---------- ANIMATION LOOP ----------
+function animate() {
+  requestAnimationFrame(animate);
+  controls.update();
+  if(selectedObj) selectionBox.setFromObject(selectedObj);
+  renderer.render(scene, camera);
+}
 
-// Init
-setMain('kids');
+// ---------- INIT ----------
+buildLibrary();
+buildTemplates();
+setMode('move');
+setView('iso');
+resize();
+animate();
+
+// Auto-open first category
+setTimeout(() => toggleCat(0), 200);   
 </script>
-</body></html>
+</body>
+</html>
 """
+
+    # ============================================================
+    # PART 2 — यह JS भाग ऊपर के <script></script> के बीच जाता है
+    # (नीचे Part 2 दिया है — उसे <script> और </script> के बीच paste करो)
+    # ============================================================
+
     components.html(HTML, height=950, scrolling=False)
     
 def render_kids_logic_lab():
