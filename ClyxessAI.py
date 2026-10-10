@@ -8708,13 +8708,13 @@ def render_kids_logic_lab():
         <section class="max-w-6xl mx-auto mt-6 bg-slate-900 border border-slate-800 rounded-3xl p-6">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-slate-800 pb-4 mb-4 gap-4">
                 <div>
-                    <h3 id="toyTitle" class="text-sm font-bold text-white flex items-center gap-2"><span class="text-lg">🚗</span> Toy & Fruit Counting (Small Kids)</h3>
+                    <h3 id="toyTitle" class="text-sm font-bold text-white flex items-center gap-2"><span class="text-lg">&#128663;</span> Toy & Fruit Counting (Small Kids)</h3>
                     <p id="toyDesc" class="text-xs text-slate-400">Count the toys and type the correct number</p>
                 </div>
                 <select id="toyDropdown" onchange="loadToyGame()" class="bg-slate-950 text-amber-400 text-xs font-bold border border-amber-500/30 rounded-xl p-2 focus:outline-none cursor-pointer">
-                    <option value="cars">1. Count the Cars 🚗</option>
-                    <option value="apples">2. Count the Apples 🍎</option>
-                    <option value="balls">3. Count the Balls ⚽</option>
+                    <option value="cars">1. Count the Cars &#128663;</option>
+                    <option value="apples">2. Count the Apples &#127822;</option>
+                    <option value="balls">3. Count the Balls &#9917;</option>
                 </select>
             </div>
 
