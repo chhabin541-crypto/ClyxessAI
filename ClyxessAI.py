@@ -7533,18 +7533,17 @@ html,body{width:100%;height:100%;overflow:hidden;background:#1a1d24;color:#e0e0e
 .rib-sep{width:1px;height:22px;background:#3a3f4a;margin:0 4px;flex-shrink:0}
 .toolbar-title{font-size:10px;color:#7a7f8a;font-weight:700;text-transform:uppercase;letter-spacing:.5px;padding:0 4px;flex-shrink:0}
 
-/* MODE SWITCHER — NEW */
+/* MODE SWITCHER */
 .mode-switch{display:flex;gap:3px;background:#1a1d24;padding:3px;border-radius:8px;border:1px solid #3a3f4a;flex-shrink:0}
 .mode-switch-btn{background:transparent;border:none;color:#7a7f8a;padding:5px 14px;border-radius:6px;font-size:11px;font-weight:800;cursor:pointer;transition:.15s;font-family:inherit}
 .mode-switch-btn:hover{color:#e0e0e0}
 .mode-switch-btn.active{background:#4a9eff;color:#fff;box-shadow:0 0 10px rgba(74,158,255,.4)}
-.mode-switch-btn.active.kids{background:#10b981;box-shadow:0 0 10px rgba(16,185,129,.4)}
+.mode-switch-btn.active.kids{background:#ffcc00;color:#000;box-shadow:0 0 10px rgba(255,204,0,.5)}
 
 /* MAIN */
 .main{flex:1;display:flex;overflow:hidden;position:relative;min-height:0}
-.main.hidden{display:none}
 
-/* LEFT PANEL - Components */
+/* STUDIO LEFT */
 .left{width:230px;flex-shrink:0;background:#23262f;border-right:1px solid #333842;overflow-y:auto;padding:10px}
 .section-title{font-size:10px;color:#7a7f8a;font-weight:800;text-transform:uppercase;letter-spacing:.5px;margin:10px 0 6px;display:flex;align-items:center;gap:5px}
 .cat-header{background:#2a2e38;border:1px solid #3a3f4a;border-radius:6px;padding:7px 10px;font-size:11px;font-weight:700;cursor:pointer;display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;user-select:none}
@@ -7564,12 +7563,9 @@ html,body{width:100%;height:100%;overflow:hidden;background:#1a1d24;color:#e0e0e
 .tpl-btn:hover{background:#4a9eff;border-color:#4a9eff;color:#fff}
 .tpl-btn .ico{font-size:20px;display:block;margin-bottom:4px}
 
-/* CENTER VIEWPORT */
+/* CENTER */
 .center{flex:1;position:relative;background:linear-gradient(180deg,#181a20 0%,#1f2229 100%);min-width:0;overflow:hidden}
 #viewport{width:100%;height:100%;display:block;cursor:default}
-#viewport.mode-move{cursor:move}
-#viewport.mode-rotate{cursor:grab}
-#viewport.mode-scale{cursor:nwse-resize}
 .viewport-overlay{position:absolute;top:10px;left:10px;background:#23262fcc;padding:6px 12px;border-radius:8px;font-size:10px;color:#7a7f8a;border:1px solid #3a3f4a;pointer-events:none}
 .viewport-overlay b{color:#4a9eff}
 .bottom-bar{position:absolute;bottom:10px;left:10px;right:10px;background:#23262fcc;padding:6px 14px;border-radius:10px;font-size:10px;color:#7a7f8a;border:1px solid #3a3f4a;display:flex;justify-content:space-between;align-items:center;pointer-events:none}
@@ -7578,7 +7574,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#1a1d24;color:#e0e0e
 .view-btn{background:#2e323c;border:1px solid #3a3f4a;color:#e0e0e0;width:32px;height:28px;border-radius:5px;cursor:pointer;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center}
 .view-btn:hover{background:#4a9eff;color:#fff;border-color:#4a9eff}
 
-/* RIGHT PANEL */
+/* RIGHT */
 .right{width:250px;flex-shrink:0;background:#23262f;border-left:1px solid #333842;overflow-y:auto;padding:10px}
 .prop-row{margin-bottom:8px}
 .prop-label{font-size:10px;color:#7a7f8a;font-weight:700;display:flex;justify-content:space-between;margin-bottom:3px}
@@ -7596,18 +7592,51 @@ html,body{width:100%;height:100%;overflow:hidden;background:#1a1d24;color:#e0e0e
 .empty-state{text-align:center;padding:20px 10px;color:#7a7f8a;font-size:11px;line-height:1.6}
 .empty-state .ico{font-size:32px;display:block;margin-bottom:8px;opacity:.5}
 
-/* KIDS MODE — NEW */
-.kids-main{flex:1;overflow-y:auto;background:linear-gradient(135deg,#1e1b4b 0%,#312e81 50%,#4c1d95 100%);padding:30px}
-.kids-header{text-align:center;margin-bottom:30px}
-.kids-header h1{font-size:38px;color:#fbbf24;text-shadow:3px 3px 0 #000;margin-bottom:8px}
-.kids-header p{font-size:16px;color:#e0e7ff}
-.kids-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:20px;max-width:1100px;margin:0 auto}
-.kid-card{background:rgba(255,255,255,0.1);backdrop-filter:blur(10px);border:3px solid rgba(255,255,255,0.25);border-radius:24px;padding:30px 15px;text-align:center;cursor:pointer;transition:all .25s;color:#fff}
-.kid-card:hover{transform:scale(1.08) rotate(-2deg);border-color:#fbbf24;box-shadow:0 15px 30px rgba(251,191,36,0.35)}
-.kid-card .emoji{font-size:56px;display:block;margin-bottom:10px}
-.kid-card .label{font-size:18px;font-weight:800}
+/* ============================================
+   NEW ADVANCED KIDS MODE STYLES
+   ============================================ */
+.kids-root{width:100%;height:100%;display:flex;overflow:hidden;background:#080a14;color:#fff}
 
-/* MODAL */
+/* Kids left toolbar */
+.kids-tools{width:54px;flex-shrink:0;background:#15182e;border-right:1px solid #ffffff0f;display:flex;flex-direction:column;align-items:center;gap:8px;padding:10px 0}
+.tool-icon{width:38px;height:38px;background:#1a1e36;border:1px solid #ffffff0f;border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px}
+.tool-icon:hover{background:#2a3050}
+.tool-on{outline:2px solid #00ffff;background:#253055!important}
+
+/* Kids left panel */
+.kids-panel{width:290px;flex-shrink:0;background:#12162a;border-right:1px solid #ffffff0f;padding:8px;overflow-y:auto;display:flex;flex-direction:column;gap:8px}
+
+.tab-btn{background:#1e2238;color:#aaa;border:none;padding:5px 12px;border-radius:20px;font-size:10px;font-weight:700;cursor:pointer;margin-right:4px;font-family:inherit}
+.tab-btn.on{background:#ffcc00;color:black}
+
+.text-input{background:#0b0e1e;color:#00ffff;border:1px solid #00ffff55;border-radius:8px;padding:6px;font-size:11px;width:100%;font-family:inherit}
+
+.mini-btn{font-size:11px;font-weight:800;padding:6px 12px;border-radius:18px;border:1px solid #ffffff15;cursor:pointer;background:#1e2238;color:#fff;font-family:inherit}
+.mini-btn:hover{background:#2e3a6b}
+
+.alpha-btn{background:#242a4d;border:1px solid #ffffff15;padding:5px 2px;border-radius:8px;font-size:12px;font-weight:800;cursor:pointer;text-align:center;user-select:none;color:#fff;font-family:inherit}
+.alpha-btn:hover{background:#ffcc00;color:black}
+
+.kid-part{background:#1e2648;border:1px solid #ffffff12;padding:6px 4px;border-radius:10px;text-align:center;cursor:pointer;font-size:10px;color:#fff}
+.kid-part:hover{background:#2e3a6b}
+
+.block-item{background:#1e2648;border:1px solid #ffffff12;border-radius:12px;padding:10px 4px;text-align:center;cursor:pointer;font-size:9px;line-height:11px;color:#fff}
+.block-item:hover{background:#2e3a6b;border-color:#ff5c00;transform:translateY(-1px)}
+.block-item b{font-size:10px;display:block}
+
+/* Kids canvas area */
+.kids-canvas-area{flex:1;background:#e9e9ef;padding:6px;display:flex;flex-direction:column;min-width:0}
+#kCanvas{flex:1;width:100%;background:white;border-radius:8px;margin-top:4px;cursor:move}
+
+/* Kids modal */
+.kids-modal{display:none;position:fixed;inset:0;background:#000000d9;backdrop-filter:blur(8px);z-index:99999;justify-content:center;align-items:center;padding:20px}
+.kids-modal.open{display:flex}
+.kids-modal-box{background:#13162c;border:1px solid #ffffff25;border-radius:18px;width:920px;max-height:92vh;display:flex;flex-direction:column;overflow:hidden}
+.kids-modal-head{padding:14px;border-bottom:1px solid #ffffff12;display:flex;justify-content:space-between;align-items:center;color:#fff;font-weight:800}
+.kids-modal-body{padding:12px;overflow-y:auto;flex:1}
+.sec-title{font-size:10px;font-weight:800;color:#00ffff;margin:8px 0 6px 0}
+
+/* STUDIO MODAL */
 .modal{display:none;position:fixed;inset:0;background:#000000cc;backdrop-filter:blur(6px);z-index:9999;justify-content:center;align-items:center;padding:20px}
 .modal.open{display:flex}
 .modal-box{background:#23262f;border:1px solid #3a3f4a;border-radius:14px;width:100%;max-width:520px;max-height:90vh;overflow:hidden;display:flex;flex-direction:column}
@@ -7627,7 +7656,6 @@ html,body{width:100%;height:100%;overflow:hidden;background:#1a1d24;color:#e0e0e
 .status{background:#1a1d24;border-top:1px solid #333842;padding:5px 14px;font-size:10px;color:#7a7f8a;display:flex;justify-content:space-between;flex-shrink:0}
 .status b{color:#4a9eff}
 
-/* scrollbar */
 ::-webkit-scrollbar{width:8px;height:8px}
 ::-webkit-scrollbar-track{background:#1a1d24}
 ::-webkit-scrollbar-thumb{background:#3a3f4a;border-radius:4px}
@@ -7676,10 +7704,9 @@ html,body{width:100%;height:100%;overflow:hidden;background:#1a1d24;color:#e0e0e
     <button class="rib-btn" onclick="toggleGrid()">📐 Grid</button>
   </div>
 
-  <!-- STUDIO MODE LAYOUT -->
+  <!-- ============ STUDIO MODE ============ -->
   <div class="main" id="studioMain">
 
-    <!-- LEFT: Component Library -->
     <div class="left">
       <div class="section-title">📚 Readymade Templates</div>
       <div class="tpl-grid" id="tplGrid"></div>
@@ -7688,17 +7715,16 @@ html,body{width:100%;height:100%;overflow:hidden;background:#1a1d24;color:#e0e0e
       <div id="catContainer"></div>
     </div>
 
-    <!-- CENTER: Viewport -->
     <div class="center">
       <canvas id="viewport"></canvas>
       <div class="viewport-overlay">
         🖱️ <b>Left Drag</b> = Rotate • <b>Right Drag</b> = Pan • <b>Scroll</b> = Zoom
       </div>
       <div class="view-btns">
-        <button class="view-btn" onclick="setView('top')" title="Top View">TOP</button>
-        <button class="view-btn" onclick="setView('front')" title="Front View">FRT</button>
-        <button class="view-btn" onclick="setView('side')" title="Side View">SD</button>
-        <button class="view-btn" onclick="setView('iso')" title="ISO View">ISO</button>
+        <button class="view-btn" onclick="setView('top')">TOP</button>
+        <button class="view-btn" onclick="setView('front')">FRT</button>
+        <button class="view-btn" onclick="setView('side')">SD</button>
+        <button class="view-btn" onclick="setView('iso')">ISO</button>
       </div>
       <div class="bottom-bar">
         <span>📦 <b id="statCount">0</b> parts in scene</span>
@@ -7707,7 +7733,6 @@ html,body{width:100%;height:100%;overflow:hidden;background:#1a1d24;color:#e0e0e
       </div>
     </div>
 
-    <!-- RIGHT: Properties -->
     <div class="right">
       <div class="section-title">⚙️ Properties</div>
       <div id="propPanel">
@@ -7719,22 +7744,105 @@ html,body{width:100%;height:100%;overflow:hidden;background:#1a1d24;color:#e0e0e
     </div>
   </div>
 
-  <!-- KIDS MODE LAYOUT — NEW -->
-  <div class="main hidden" id="kidsMain">
-    <div class="kids-main">
-      <div class="kids-header">
-        <h1>🧒 Kids Mode</h1>
-        <p>Bada buttons, simple shapes, aur bahut maza!</p>
+  <!-- ============ NEW ADVANCED KIDS MODE ============ -->
+  <div class="main" id="kidsMain" style="display:none;">
+    <div class="kids-root">
+
+      <!-- Kids Tool Sidebar -->
+      <div class="kids-tools">
+        <div id="kSelect" onclick="setKidTool('select')" class="tool-icon tool-on">🖱️</div>
+        <div id="kPen" onclick="setKidTool('pen')" class="tool-icon">✏️</div>
+        <div id="kRect" onclick="setKidTool('rect')" class="tool-icon">⬜</div>
+        <div id="kCircle" onclick="setKidTool('circle')" class="tool-icon">⭕</div>
+        <div onclick="deleteKid()" class="tool-icon" style="background:#3a1a1a;">🗑️</div>
       </div>
-      <div class="kids-grid">
-        <div class="kid-card" onclick="kidsLoad('car')"><span class="emoji">🚗</span><span class="label">Car Banao</span></div>
-        <div class="kid-card" onclick="kidsLoad('rocket')"><span class="emoji">🚀</span><span class="label">Rocket Banao</span></div>
-        <div class="kid-card" onclick="kidsLoad('robot')"><span class="emoji">🤖</span><span class="label">Robot Banao</span></div>
-        <div class="kid-card" onclick="kidsLoad('airplane')"><span class="emoji">✈️</span><span class="label">Airplane Banao</span></div>
-        <div class="kid-card" onclick="kidsLoad('cycle')"><span class="emoji">🚲</span><span class="label">Cycle Banao</span></div>
-        <div class="kid-card" onclick="kidsLoad('drone')"><span class="emoji">🛸</span><span class="label">Drone Banao</span></div>
-        <div class="kid-card" onclick="kidsLoad('bike')"><span class="emoji">🏍️</span><span class="label">Bike Banao</span></div>
-        <div class="kid-card" onclick="kidsLoad('helicopter')"><span class="emoji">🚁</span><span class="label">Helicopter Banao</span></div>
+
+      <!-- Kids Left Panel -->
+      <div class="kids-panel">
+
+        <!-- Language Selector -->
+        <div style="background:#1a1e36; border-radius:10px; padding:8px; border:1px solid #ffffff10;">
+          <div style="font-size:10px; font-weight:800; color:#00ffff;">🌍 60+ Languages</div>
+          <select id="langSel" onchange="changeLang()" style="background:#0b0e1e; color:#00ffff; border:1px solid #00ffff55; border-radius:8px; padding:5px; font-size:11px; font-weight:700; width:100%; margin-top:5px;"></select>
+        </div>
+
+        <!-- Tabs -->
+        <div>
+          <button class="tab-btn on" id="tabABC" onclick="switchKidTab('abc',this)">🔤 ABC</button>
+          <button class="tab-btn" id="tabNUM" onclick="switchKidTab('num',this)">🔢 123</button>
+          <button class="tab-btn" id="tabTXT" onclick="switchKidTab('txt',this)">📝 Text</button>
+        </div>
+
+        <!-- ABC TAB -->
+        <div id="kidABC" style="background:#1a1e36; border-radius:12px; padding:8px; border:1px solid #ffcc0030;">
+          <div style="font-size:10px; font-weight:800; color:#ffcc00;">🔤 A-Z + a-z + 0-9 + Special</div>
+          <div style="font-size:8px; color:#888; margin-top:2px;">Click karo — canvas me aayega</div>
+          <div id="abcGrid" style="display:grid; grid-template-columns:repeat(7,1fr); gap:3px; margin-top:6px;"></div>
+        </div>
+
+        <!-- NUMBER TAB -->
+        <div id="kidNUM" style="display:none; background:#1a1e36; border-radius:12px; padding:8px; border:1px solid #00ffff30;">
+          <div style="font-size:10px; font-weight:800; color:#00ffff;">🔢 Numbers 1 to 1,00,000</div>
+          <div style="font-size:9px; color:#aaa; margin-top:3px;">Kitne numbers chahiye? (max 100000)</div>
+          <input id="numCount" type="number" min="1" max="100000" value="10" class="text-input" style="margin-top:5px;">
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:4px; margin-top:6px;">
+            <button onclick="generateNumbers()" class="mini-btn" style="background:#00ffff; color:black; font-weight:900;">▶️ Generate</button>
+            <button onclick="clearNumbers()" class="mini-btn" style="background:#3a1a1a;">🗑️ Clear Nums</button>
+          </div>
+          <div style="display:grid; grid-template-columns:repeat(5,1fr); gap:3px; margin-top:6px;">
+            <button onclick="quickNum(10)" class="alpha-btn">1-10</button>
+            <button onclick="quickNum(50)" class="alpha-btn">1-50</button>
+            <button onclick="quickNum(100)" class="alpha-btn">1-100</button>
+            <button onclick="quickNum(1000)" class="alpha-btn">1K</button>
+            <button onclick="quickNum(10000)" class="alpha-btn">10K</button>
+          </div>
+        </div>
+
+        <!-- TEXT TAB -->
+        <div id="kidTXT" style="display:none; background:#1a1e36; border-radius:12px; padding:8px; border:1px solid #ff5c9e30;">
+          <div style="font-size:10px; font-weight:800; color:#ff5c9e;">📝 Apni Bhasha Me Likho</div>
+          <div style="font-size:9px; color:#aaa; margin-top:3px;">Koi bhi language type karo — Hindi, English, Tamil, Arabic, Chinese...</div>
+          <input id="kidText" type="text" placeholder="Yahan likho..." class="text-input" style="margin-top:6px;">
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:4px; margin-top:6px;">
+            <button onclick="addKidText()" class="mini-btn" style="background:#ff5c9e; color:white; font-weight:900;">➕ Add</button>
+            <button onclick="document.getElementById('kidText').value=''" class="mini-btn">Clear</button>
+          </div>
+        </div>
+
+        <!-- BLOCKS LIBRARY -->
+        <div style="background:#1a1e36; border-radius:12px; padding:7px; border:1px solid #00ffff25;">
+          <div style="font-size:10px; font-weight:800; color:#00ffff;">🧱 Blocks Library</div>
+          <button onclick="openKidBlocks()" class="mini-btn" style="width:100%; background:#00ffff; color:black; margin-top:6px; font-weight:900; padding:10px; border-radius:12px;">
+            📚 200+ Blocks Kholein<br><span style="font-size:8px;">Medical • Bio • Engineering • Nature • Space</span>
+          </button>
+        </div>
+
+        <!-- CHINA SPACE TECH -->
+        <div style="background:#1a1e36; border-radius:12px; padding:7px; border:1px solid #00ffff25;">
+          <div style="font-size:10px; font-weight:800; color:#00ffff;">🇨🇳 CHINA SPACE TECH</div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-top:6px;">
+            <div onclick="addKidPart('wing')" class="kid-part">🪽 Wing</div>
+            <div onclick="addKidPart('propeller')" class="kid-part">🌀 Prop</div>
+            <div onclick="addKidPart('rocket')" class="kid-part">🚀 Rocket</div>
+            <div onclick="addKidPart('satellite')" class="kid-part">🛰️ Satellite</div>
+            <div onclick="addKidPart('naca')" class="kid-part">📈 NACA</div>
+            <div onclick="addKidPart('solar')" class="kid-part">🔋 Solar</div>
+          </div>
+          <button onclick="startSim()" class="mini-btn" style="width:100%; background:#00ffff; color:black; margin-top:6px; font-weight:900;">▶️ Fly Simulation</button>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:4px; margin-top:auto;">
+          <button onclick="rotateKid()" class="mini-btn">Rotate</button>
+          <button onclick="duplicateKid()" class="mini-btn">Duplicate</button>
+          <button onclick="deleteKid()" class="mini-btn" style="background:#3a1a1a;">Delete</button>
+          <button onclick="clearK()" class="mini-btn" style="background:#3a1a1a;">Clear</button>
+        </div>
+      </div>
+
+      <!-- Kids Canvas Area -->
+      <div class="kids-canvas-area">
+        <div id="kHint" style="font-size:10px; color:#333; font-weight:800;">KIDS — Click buttons to add • Drag to move • Wheel to resize</div>
+        <canvas id="kCanvas" width="1300" height="750"></canvas>
       </div>
     </div>
   </div>
@@ -7747,7 +7855,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#1a1d24;color:#e0e0e
 
 </div>
 
-<!-- EXPORT MODAL -->
+<!-- EXPORT MODAL (Studio) -->
 <div class="modal" id="exportModal">
   <div class="modal-box">
     <div class="modal-head">
@@ -7756,22 +7864,18 @@ html,body{width:100%;height:100%;overflow:hidden;background:#1a1d24;color:#e0e0e
     </div>
     <div class="modal-body">
       <p>Choose how you want to save your design. Show it to the world! 🌍</p>
-
       <div class="export-opt" onclick="exportPNG()">
         <div class="ico">🖼️</div>
         <div><b>Download as Image (PNG)</b><small>Share on WhatsApp, Instagram, school project</small></div>
       </div>
-
       <div class="export-opt" onclick="exportOBJ()">
         <div class="ico">📦</div>
         <div><b>Download as 3D Model (OBJ)</b><small>Open in Blender, Maya, or any 3D software</small></div>
       </div>
-
       <div class="export-opt" onclick="saveProject()">
         <div class="ico">💾</div>
         <div><b>Save Project (Load Later)</b><small>Save all parts, colors, and positions</small></div>
       </div>
-
       <div class="export-opt" onclick="loadProject()">
         <div class="ico">📂</div>
         <div><b>Load Saved Project</b><small>Continue where you left off</small></div>
@@ -7780,43 +7884,72 @@ html,body{width:100%;height:100%;overflow:hidden;background:#1a1d24;color:#e0e0e
   </div>
 </div>
 
+<!-- KIDS BLOCKS MODAL (200+ Blocks) -->
+<div class="kids-modal" id="kidBlocksModal" onclick="if(event.target.id==='kidBlocksModal') closeKidBlocks()">
+  <div class="kids-modal-box">
+    <div class="kids-modal-head">
+      <b>🧱 Kids Blocks Library — 200+ Blocks</b>
+      <button onclick="closeKidBlocks()" style="background:#2a2a3a; border:none; color:white; width:28px; height:28px; border-radius:50%; cursor:pointer;">✕</button>
+    </div>
+    <div class="kids-modal-body">
+      <div class="sec-title">🎓 SCHOOL</div>
+      <div id="blockSchool" style="display:grid; grid-template-columns:repeat(6,1fr); gap:6px;"></div>
+
+      <div class="sec-title">🏥 MEDICAL (Body Parts)</div>
+      <div id="blockMedical" style="display:grid; grid-template-columns:repeat(6,1fr); gap:6px;"></div>
+
+      <div class="sec-title">🧬 BIOLOGICAL</div>
+      <div id="blockBio" style="display:grid; grid-template-columns:repeat(6,1fr); gap:6px;"></div>
+
+      <div class="sec-title">🔬 SCIENCE</div>
+      <div id="blockScience" style="display:grid; grid-template-columns:repeat(6,1fr); gap:6px;"></div>
+
+      <div class="sec-title">🔧 ENGINEERING</div>
+      <div id="blockEng" style="display:grid; grid-template-columns:repeat(6,1fr); gap:6px;"></div>
+
+      <div class="sec-title">🌳 NATURE</div>
+      <div id="blockNature" style="display:grid; grid-template-columns:repeat(6,1fr); gap:6px;"></div>
+
+      <div class="sec-title">🚀 SPACE & TECH</div>
+      <div id="blockSpace" style="display:grid; grid-template-columns:repeat(6,1fr); gap:6px;"></div>
+
+      <div class="sec-title">🎨 SHAPES</div>
+      <div id="blockShapes" style="display:grid; grid-template-columns:repeat(6,1fr); gap:6px;"></div>
+    </div>
+  </div>
+</div>
+
 <script>
 // ============================================================
-// APP MODE SWITCHER (Studio <-> Kids)
+// MODE SWITCHER (Studio <-> Kids)
 // ============================================================
 function switchAppMode(mode) {
-  const studioMain = document.getElementById('studioMain');
-  const kidsMain = document.getElementById('kidsMain');
-  const btnStudio = document.getElementById('btnModeStudio');
-  const btnKids = document.getElementById('btnModeKids');
+  var studioMain = document.getElementById('studioMain');
+  var kidsMain = document.getElementById('kidsMain');
+  var btnStudio = document.getElementById('btnModeStudio');
+  var btnKids = document.getElementById('btnModeKids');
 
-  if (mode === 'studio') {
-    studioMain.classList.remove('hidden');
-    kidsMain.classList.add('hidden');
-    btnStudio.classList.add('active');
-    btnStudio.classList.remove('kids');
-    btnKids.classList.remove('active');
-    btnKids.classList.remove('kids');
-    setTimeout(resize, 100);
-  } else {
-    kidsMain.classList.remove('hidden');
-    studioMain.classList.add('hidden');
+  if (mode === 'kids') {
+    studioMain.style.display = 'none';
+    kidsMain.style.display = 'flex';
     btnKids.classList.add('active');
     btnKids.classList.add('kids');
     btnStudio.classList.remove('active');
+    // Init kids canvas size after display
+    setTimeout(function(){ try { drawK(); } catch(e){} }, 100);
+  } else {
+    kidsMain.style.display = 'none';
+    studioMain.style.display = 'flex';
+    btnStudio.classList.add('active');
+    btnKids.classList.remove('active');
+    btnKids.classList.remove('kids');
+    setTimeout(function(){ try { resize(); } catch(e){} }, 100);
   }
 }
 
-function kidsLoad(templateId) {
-  switchAppMode('studio');
-  setTimeout(() => { loadTemplate(templateId); }, 150);
-}
-
 // ============================================================
-// CLYXESS STUDIO CAD — Three.js 3D Design Engine
+// STUDIO CAD — Three.js Engine (UNCHANGED)
 // ============================================================
-
-// ---------- SCENE SETUP ----------
 const canvas = document.getElementById('viewport');
 const renderer = new THREE.WebGLRenderer({canvas, antialias:true, preserveDrawingBuffer:true});
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -7835,7 +7968,6 @@ controls.dampingFactor = 0.08;
 controls.minDistance = 3;
 controls.maxDistance = 40;
 
-// Lights
 scene.add(new THREE.AmbientLight(0xffffff, 0.55));
 const dirLight = new THREE.DirectionalLight(0xffffff, 0.9);
 dirLight.position.set(10, 15, 10);
@@ -7845,22 +7977,18 @@ const fillLight = new THREE.DirectionalLight(0x88aaff, 0.4);
 fillLight.position.set(-10, 8, -10);
 scene.add(fillLight);
 
-// Grid + Axes
 const grid = new THREE.GridHelper(40, 40, 0x3a4050, 0x2a2e38);
 grid.material.transparent = true;
 grid.material.opacity = 0.7;
 scene.add(grid);
 
-// Objects group
 const objGroup = new THREE.Group();
 scene.add(objGroup);
 
-// Selection outline
 const selectionBox = new THREE.BoxHelper(new THREE.Object3D(), 0x4a9eff);
 selectionBox.visible = false;
 scene.add(selectionBox);
 
-// ---------- STATE ----------
 let mode = 'move';
 let selectedObj = null;
 let snapEnabled = true;
@@ -7870,7 +7998,6 @@ let objStartPos = {x:0, y:0, z:0};
 let objStartRot = {x:0, y:0, z:0};
 let objectCount = 0;
 
-// ---------- RESIZE ----------
 function resize() {
   const rect = canvas.parentElement.getBoundingClientRect();
   if (rect.width === 0 || rect.height === 0) return;
@@ -7881,7 +8008,6 @@ function resize() {
 window.addEventListener('resize', resize);
 setTimeout(resize, 100);
 
-// ---------- MATERIAL LIBRARY ----------
 const MATERIALS = {
   plastic:   new THREE.MeshStandardMaterial({color:0xffcc00, metalness:0.1, roughness:0.6}),
   metal:     new THREE.MeshStandardMaterial({color:0xc0c5cc, metalness:0.9, roughness:0.25}),
@@ -7895,12 +8021,8 @@ const MATERIALS = {
   green:     new THREE.MeshStandardMaterial({color:0x2ecc71, metalness:0.2, roughness:0.5}),
   black:     new THREE.MeshStandardMaterial({color:0x1a1a1a, metalness:0.3, roughness:0.6}),
 };
+function getMat(type) { return MATERIALS[type].clone(); }
 
-function getMat(type) {
-  return MATERIALS[type].clone();
-}
-
-// ---------- COMPONENT LIBRARY ----------
 const COMPONENTS = {
   '🔧 Basic Shapes': [
     {n:'Box', i:'🧱', f:()=>new THREE.Mesh(new THREE.BoxGeometry(1.5,1.5,1.5), getMat('plastic'))},
@@ -7946,18 +8068,9 @@ const COMPONENTS = {
       g.add(stem);
       return g;
     }},
-    {n:'Seat', i:'💺', f:()=>{
-      const s = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.15, 0.4), getMat('black'));
-      return s;
-    }},
-    {n:'Pedal', i:'🦶', f:()=>{
-      const p = new THREE.Mesh(new THREE.BoxGeometry(0.3,0.1,0.4), getMat('black'));
-      return p;
-    }},
-    {n:'Chain', i:'🔗', f:()=>{
-      const c = new THREE.Mesh(new THREE.TorusGeometry(0.4, 0.03, 8, 32), getMat('metal'));
-      return c;
-    }},
+    {n:'Seat', i:'💺', f:()=>new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.15, 0.4), getMat('black'))},
+    {n:'Pedal', i:'🦶', f:()=>new THREE.Mesh(new THREE.BoxGeometry(0.3,0.1,0.4), getMat('black'))},
+    {n:'Chain', i:'🔗', f:()=>new THREE.Mesh(new THREE.TorusGeometry(0.4, 0.03, 8, 32), getMat('metal'))},
   ],
   '🏍️ Motor Bike': [
     {n:'Engine', i:'⚙️', f:()=>new THREE.Mesh(new THREE.BoxGeometry(1,0.7,0.8), getMat('metal'))},
@@ -7995,15 +8108,9 @@ const COMPONENTS = {
       f.rotation.z = Math.PI/2;
       return f;
     }},
-    {n:'Wing', i:'🪽', f:()=>{
-      const w = new THREE.Mesh(new THREE.BoxGeometry(2.4,0.08,0.9), getMat('metal'));
-      return w;
-    }},
+    {n:'Wing', i:'🪽', f:()=>new THREE.Mesh(new THREE.BoxGeometry(2.4,0.08,0.9), getMat('metal'))},
     {n:'Tail Fin', i:'🚀', f:()=>new THREE.Mesh(new THREE.BoxGeometry(0.08,0.8,0.7), getMat('red'))},
-    {n:'Cockpit', i:'🪟', f:()=>{
-      const c = new THREE.Mesh(new THREE.SphereGeometry(0.4,16,12,0,Math.PI*2,0,Math.PI/2), getMat('glass'));
-      return c;
-    }},
+    {n:'Cockpit', i:'🪟', f:()=>new THREE.Mesh(new THREE.SphereGeometry(0.4,16,12,0,Math.PI*2,0,Math.PI/2), getMat('glass'))},
     {n:'Propeller', i:'🌀', f:()=>{
       const g = new THREE.Group();
       const b1 = new THREE.Mesh(new THREE.BoxGeometry(1.6,0.06,0.15), getMat('metal'));
@@ -8011,10 +8118,7 @@ const COMPONENTS = {
       g.add(b1, b2);
       return g;
     }},
-    {n:'Jet Engine', i:'🔥', f:()=>{
-      const e = new THREE.Mesh(new THREE.CylinderGeometry(0.35,0.45,1,16), getMat('chrome'));
-      return e;
-    }},
+    {n:'Jet Engine', i:'🔥', f:()=>new THREE.Mesh(new THREE.CylinderGeometry(0.35,0.45,1,16), getMat('chrome'))},
   ],
   '🚀 Rocket': [
     {n:'Rocket Body', i:'🚀', f:()=>new THREE.Mesh(new THREE.CylinderGeometry(0.4,0.4,2.2,16), getMat('metal'))},
@@ -8032,16 +8136,10 @@ const COMPONENTS = {
   '🤖 Robot': [
     {n:'Head', i:'🤖', f:()=>new THREE.Mesh(new THREE.BoxGeometry(0.8,0.7,0.7), getMat('chrome'))},
     {n:'Body', i:'🧊', f:()=>new THREE.Mesh(new THREE.BoxGeometry(1,1.2,0.7), getMat('blue'))},
-    {n:'Arm', i:'💪', f:()=>{
-      const a = new THREE.Mesh(new THREE.CylinderGeometry(0.12,0.12,1,12), getMat('metal'));
-      return a;
-    }},
+    {n:'Arm', i:'💪', f:()=>new THREE.Mesh(new THREE.CylinderGeometry(0.12,0.12,1,12), getMat('metal'))},
     {n:'Leg', i:'🦵', f:()=>new THREE.Mesh(new THREE.BoxGeometry(0.25,1,0.25), getMat('metal'))},
     {n:'Eye', i:'👁️', f:()=>new THREE.Mesh(new THREE.SphereGeometry(0.1,12,12), new THREE.MeshStandardMaterial({color:0x00ffff, emissive:0x00ffff, emissiveIntensity:0.8}))},
-    {n:'Antenna', i:'📡', f:()=>{
-      const a = new THREE.Mesh(new THREE.CylinderGeometry(0.03,0.03,0.5,8), getMat('metal'));
-      return a;
-    }},
+    {n:'Antenna', i:'📡', f:()=>new THREE.Mesh(new THREE.CylinderGeometry(0.03,0.03,0.5,8), getMat('metal'))},
   ],
   '⚙️ Mechanical': [
     {n:'Gear', i:'⚙️', f:()=>{
@@ -8108,7 +8206,6 @@ const COMPONENTS = {
   ],
 };
 
-// ---------- RENDER COMPONENT LIBRARY ----------
 function buildLibrary() {
   const container = document.getElementById('catContainer');
   container.innerHTML = '';
@@ -8137,7 +8234,6 @@ function toggleCat(idx) {
   b.classList.toggle('open');
 }
 
-// ---------- TEMPLATES GRID ----------
 const TEMPLATES = [
   {id:'cycle', n:'Cycle', i:'🚲'},
   {id:'bike', n:'Motor Bike', i:'🏍️'},
@@ -8156,7 +8252,6 @@ function buildTemplates() {
   g.innerHTML = TEMPLATES.map(t => `<div class="tpl-btn" onclick="loadTemplate('${t.id}')"><span class="ico">${t.i}</span>${t.n}</div>`).join('');
 }
 
-// ---------- ADD PART ----------
 function addPart(catName, idx) {
   const partDef = COMPONENTS[catName][idx];
   const mesh = partDef.f();
@@ -8164,25 +8259,21 @@ function addPart(catName, idx) {
   mesh.userData.baseMaterial = 'plastic';
   mesh.castShadow = true;
   mesh.receiveShadow = true;
-  
   mesh.position.set(
     (Math.random() - 0.5) * 4,
-    partDef.n.includes('Wheel') || partDef.n.includes('Tire') ? 0.8 : 0.8,
+    0.8,
     (Math.random() - 0.5) * 4
   );
-  
   if(snapEnabled) {
     mesh.position.x = Math.round(mesh.position.x * 2) / 2;
     mesh.position.z = Math.round(mesh.position.z * 2) / 2;
   }
-  
   objGroup.add(mesh);
   objectCount++;
   selectObject(mesh);
   updateStats();
 }
 
-// ---------- SELECTION ----------
 function selectObject(obj) {
   if(selectedObj === obj) return;
   selectedObj = obj;
@@ -8203,22 +8294,18 @@ function selectObject(obj) {
   }
 }
 
-// ---------- PROPERTIES PANEL ----------
 function buildPropPanel(obj) {
   const panel = document.getElementById('propPanel');
   const mat = obj.material || (obj.children[0] && obj.children[0].material);
   const col = mat && mat.color ? '#' + mat.color.getHexString() : '#ffcc00';
-  
   panel.innerHTML = `
     <div style="font-size:11px;color:#4a9eff;font-weight:800;margin-bottom:10px">
       🎯 ${obj.userData.type || 'Part'}
     </div>
-    
     <div class="prop-row">
       <div class="prop-label">🎨 Color</div>
       <input type="color" class="prop-color" value="${col}" onchange="changeColor(this.value)">
     </div>
-    
     <div class="prop-row">
       <div class="prop-label">🧱 Material</div>
       <select class="prop-select" onchange="changeMaterial(this.value)">
@@ -8235,14 +8322,12 @@ function buildPropPanel(obj) {
         <option value="black">Black</option>
       </select>
     </div>
-    
     <div class="prop-row">
       <div class="prop-label">📏 Size <span id="sizeVal">1.0</span></div>
       <input type="range" class="prop-slider" min="0.2" max="4" step="0.1" value="1" oninput="changeSize(this.value)">
     </div>
-    
     <div class="prop-row">
-      <div class="prop-label">↔️ Move X <span id="mxVal">0</span></div>
+      <div class="prop-label">↔️ Move X <span id="mxVal">${obj.position.x.toFixed(1)}</span></div>
       <input type="range" class="prop-slider" min="-10" max="10" step="0.1" value="${obj.position.x}" oninput="moveX(this.value)">
     </div>
     <div class="prop-row">
@@ -8253,12 +8338,10 @@ function buildPropPanel(obj) {
       <div class="prop-label">↔️ Move Z <span id="mzVal">${obj.position.z.toFixed(1)}</span></div>
       <input type="range" class="prop-slider" min="-10" max="10" step="0.1" value="${obj.position.z}" oninput="moveZ(this.value)">
     </div>
-    
     <div class="prop-row">
       <div class="prop-label">🔄 Rotate <span id="rotVal">0°</span></div>
       <input type="range" class="prop-slider" min="0" max="360" step="5" value="0" oninput="rotateY(this.value)">
     </div>
-    
     <div class="prop-actions">
       <button class="prop-act" onclick="duplicateSelected()">📋 Copy</button>
       <button class="prop-act" onclick="dropToFloor()">⬇️ Floor</button>
@@ -8268,177 +8351,57 @@ function buildPropPanel(obj) {
   `;
 }
 
-// Property actions
-function changeColor(hex) {
-  if(!selectedObj) return;
-  const c = new THREE.Color(hex);
-  selectedObj.traverse(o => { if(o.material && o.material.color) o.material.color.set(c); });
-}
-function changeMaterial(type) {
-  if(!selectedObj) return;
-  const newMat = getMat(type);
-  selectedObj.traverse(o => { if(o.material && o.material.color) { o.material.color.copy(newMat.color); o.material.metalness = newMat.metalness; o.material.roughness = newMat.roughness; } });
-  selectedObj.userData.baseMaterial = type;
-}
-function changeSize(val) {
-  if(!selectedObj) return;
-  document.getElementById('sizeVal').innerText = val;
-  selectedObj.scale.setScalar(parseFloat(val));
-  updateSelectionBox();
-}
+function changeColor(hex) { if(!selectedObj) return; const c = new THREE.Color(hex); selectedObj.traverse(o => { if(o.material && o.material.color) o.material.color.set(c); }); }
+function changeMaterial(type) { if(!selectedObj) return; const newMat = getMat(type); selectedObj.traverse(o => { if(o.material && o.material.color) { o.material.color.copy(newMat.color); o.material.metalness = newMat.metalness; o.material.roughness = newMat.roughness; } }); selectedObj.userData.baseMaterial = type; }
+function changeSize(val) { if(!selectedObj) return; document.getElementById('sizeVal').innerText = val; selectedObj.scale.setScalar(parseFloat(val)); updateSelectionBox(); }
 function moveX(v) { if(selectedObj) { selectedObj.position.x = parseFloat(v); document.getElementById('mxVal').innerText = parseFloat(v).toFixed(1); updateSelectionBox(); } }
 function moveY(v) { if(selectedObj) { selectedObj.position.y = parseFloat(v); document.getElementById('myVal').innerText = parseFloat(v).toFixed(1); updateSelectionBox(); } }
 function moveZ(v) { if(selectedObj) { selectedObj.position.z = parseFloat(v); document.getElementById('mzVal').innerText = parseFloat(v).toFixed(1); updateSelectionBox(); } }
 function rotateY(v) { if(selectedObj) { selectedObj.rotation.y = parseFloat(v) * Math.PI/180; document.getElementById('rotVal').innerText = v + '°'; updateSelectionBox(); } }
-
 function dropToFloor() { if(selectedObj) { selectedObj.position.y = 0.8; updateSelectionBox(); buildPropPanel(selectedObj); } }
 function centerIt() { if(selectedObj) { selectedObj.position.set(0, 0.8, 0); updateSelectionBox(); buildPropPanel(selectedObj); } }
+function duplicateSelected() { if(!selectedObj) return; const clone = selectedObj.clone(); clone.position.x += 1.5; clone.userData = {...selectedObj.userData}; objGroup.add(clone); objectCount++; selectObject(clone); updateStats(); }
+function deleteSelected() { if(!selectedObj) return; objGroup.remove(selectedObj); selectedObj = null; selectionBox.visible = false; objectCount--; updateStats(); selectObject(null); }
+function clearAll() { if(!confirm('Clear all parts? Ye undo nahi hoga!')) return; while(objGroup.children.length > 0) objGroup.remove(objGroup.children[0]); objectCount = 0; selectedObj = null; selectionBox.visible = false; updateStats(); selectObject(null); }
+function updateSelectionBox() { if(selectedObj) selectionBox.setFromObject(selectedObj); }
+function updateStats() { document.getElementById('statCount').innerText = objectCount; }
 
-function duplicateSelected() {
-  if(!selectedObj) return;
-  const clone = selectedObj.clone();
-  clone.position.x += 1.5;
-  clone.userData = {...selectedObj.userData};
-  objGroup.add(clone);
-  objectCount++;
-  selectObject(clone);
-  updateStats();
-}
+function setMode(m) { mode = m; document.getElementById('statMode').innerText = m.charAt(0).toUpperCase() + m.slice(1); document.getElementById('btnMove').classList.toggle('primary', m === 'move'); document.getElementById('btnRotate').classList.toggle('primary', m === 'rotate'); document.getElementById('btnScale').classList.toggle('primary', m === 'scale'); }
+function setView(v) { const d = 12; if(v === 'top') { camera.position.set(0, d, 0.01); controls.target.set(0,0,0); } else if(v === 'front') { camera.position.set(0, 3, d); controls.target.set(0,1,0); } else if(v === 'side') { camera.position.set(d, 3, 0); controls.target.set(0,1,0); } else { camera.position.set(8, 6, 10); controls.target.set(0,1,0); } controls.update(); }
+function toggleSnap() { snapEnabled = !snapEnabled; document.getElementById('btnSnap').innerText = '🧲 Snap: ' + (snapEnabled ? 'ON' : 'OFF'); }
+function toggleGrid() { grid.visible = !grid.visible; }
 
-function deleteSelected() {
-  if(!selectedObj) return;
-  objGroup.remove(selectedObj);
-  selectedObj = null;
-  selectionBox.visible = false;
-  objectCount--;
-  updateStats();
-  selectObject(null);
-}
-
-function clearAll() {
-  if(!confirm('Clear all parts? Ye undo nahi hoga!')) return;
-  while(objGroup.children.length > 0) objGroup.remove(objGroup.children[0]);
-  objectCount = 0;
-  selectedObj = null;
-  selectionBox.visible = false;
-  updateStats();
-  selectObject(null);
-}
-
-function updateSelectionBox() {
-  if(selectedObj) selectionBox.setFromObject(selectedObj);
-}
-
-function updateStats() {
-  document.getElementById('statCount').innerText = objectCount;
-}
-
-// ---------- MODE ----------
-function setMode(m) {
-  mode = m;
-  document.getElementById('statMode').innerText = m.charAt(0).toUpperCase() + m.slice(1);
-  document.getElementById('btnMove').classList.toggle('primary', m === 'move');
-  document.getElementById('btnRotate').classList.toggle('primary', m === 'rotate');
-  document.getElementById('btnScale').classList.toggle('primary', m === 'scale');
-  canvas.className = 'mode-' + m;
-}
-
-// ---------- VIEWS ----------
-function setView(v) {
-  const d = 12;
-  if(v === 'top') { camera.position.set(0, d, 0.01); controls.target.set(0,0,0); }
-  else if(v === 'front') { camera.position.set(0, 3, d); controls.target.set(0,1,0); }
-  else if(v === 'side') { camera.position.set(d, 3, 0); controls.target.set(0,1,0); }
-  else { camera.position.set(8, 6, 10); controls.target.set(0,1,0); }
-  controls.update();
-}
-
-// ---------- SNAP ----------
-function toggleSnap() {
-  snapEnabled = !snapEnabled;
-  document.getElementById('btnSnap').innerText = '🧲 Snap: ' + (snapEnabled ? 'ON' : 'OFF');
-}
-
-function toggleGrid() {
-  grid.visible = !grid.visible;
-}
-
-// ---------- RAYCAST SELECTION ----------
 const raycaster = new THREE.Raycaster();
 const mouse = new THREE.Vector2();
-
 canvas.addEventListener('click', (e) => {
   const rect = canvas.getBoundingClientRect();
   mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
   mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
   raycaster.setFromCamera(mouse, camera);
   const intersects = raycaster.intersectObjects(objGroup.children, true);
-  if(intersects.length > 0) {
-    let obj = intersects[0].object;
-    while(obj.parent && obj.parent !== objGroup) obj = obj.parent;
-    selectObject(obj);
-  } else {
-    selectObject(null);
-  }
+  if(intersects.length > 0) { let obj = intersects[0].object; while(obj.parent && obj.parent !== objGroup) obj = obj.parent; selectObject(obj); } else { selectObject(null); }
 });
-
-// ---------- DRAG TO MOVE ----------
 canvas.addEventListener('mousedown', (e) => {
   if(e.button !== 0 || !selectedObj) return;
-  if(e.shiftKey) {
-    dragStart = {x: e.clientX, y: e.clientY};
-    objStartRot = {...selectedObj.rotation};
-    isDragging = true;
-  } else {
-    dragStart = {x: e.clientX, y: e.clientY};
-    objStartPos = {...selectedObj.position};
-    isDragging = true;
-  }
+  if(e.shiftKey) { dragStart = {x: e.clientX, y: e.clientY}; objStartRot = {...selectedObj.rotation}; isDragging = true; }
+  else { dragStart = {x: e.clientX, y: e.clientY}; objStartPos = {...selectedObj.position}; isDragging = true; }
 });
-
 canvas.addEventListener('mousemove', (e) => {
   if(!isDragging || !selectedObj) return;
   const dx = (e.clientX - dragStart.x) * 0.02;
   const dz = (e.clientY - dragStart.y) * 0.02;
-  
-  if(e.shiftKey) {
-    selectedObj.rotation.y = objStartRot.y + dx * 3;
-  } else {
-    selectedObj.position.x = objStartPos.x + dx;
-    selectedObj.position.z = objStartPos.z + dz;
-    if(snapEnabled) {
-      selectedObj.position.x = Math.round(selectedObj.position.x * 2) / 2;
-      selectedObj.position.z = Math.round(selectedObj.position.z * 2) / 2;
-    }
-  }
+  if(e.shiftKey) { selectedObj.rotation.y = objStartRot.y + dx * 3; }
+  else { selectedObj.position.x = objStartPos.x + dx; selectedObj.position.z = objStartPos.z + dz; if(snapEnabled) { selectedObj.position.x = Math.round(selectedObj.position.x * 2) / 2; selectedObj.position.z = Math.round(selectedObj.position.z * 2) / 2; } }
   updateSelectionBox();
 });
+canvas.addEventListener('mouseup', () => { if(isDragging) { isDragging = false; if(selectedObj) buildPropPanel(selectedObj); } });
+window.addEventListener('keydown', (e) => { if(e.key === 'Delete' && selectedObj) deleteSelected(); if(e.ctrlKey && e.key === 'd') { e.preventDefault(); duplicateSelected(); } if(e.key === 'Escape') selectObject(null); });
 
-canvas.addEventListener('mouseup', () => {
-  if(isDragging) {
-    isDragging = false;
-    if(selectedObj) buildPropPanel(selectedObj);
-  }
-});
-
-// ---------- KEYBOARD ----------
-window.addEventListener('keydown', (e) => {
-  if(e.key === 'Delete' && selectedObj) deleteSelected();
-  if(e.ctrlKey && e.key === 'd') { e.preventDefault(); duplicateSelected(); }
-  if(e.key === 'Escape') selectObject(null);
-});
-
-// ---------- TEMPLATES LOADER ----------
 function loadTemplate(id) {
   if(!id) return;
-  if(objGroup.children.length > 0 && !confirm('Load template? Current design will be cleared.')) {
-    document.getElementById('tplSelect').value = '';
-    return;
-  }
-  
+  if(objGroup.children.length > 0 && !confirm('Load template? Current design will be cleared.')) { document.getElementById('tplSelect').value = ''; return; }
   while(objGroup.children.length > 0) objGroup.remove(objGroup.children[0]);
   objectCount = 0;
-  
   const T = {
     cycle: () => {
       const w1 = COMPONENTS['🚲 Cycle Parts'][0].f(); w1.position.set(-1.5, 0.8, 0); w1.userData.type='Wheel'; objGroup.add(w1);
@@ -8500,11 +8463,7 @@ function loadTemplate(id) {
     drone: () => {
       const body = COMPONENTS['🔧 Basic Shapes'][0].f(); body.scale.setScalar(0.8); body.position.set(0, 1.5, 0); objGroup.add(body);
       const arms = [[-1,-1],[1,-1],[-1,1],[1,1]];
-      arms.forEach(([x,z]) => {
-        const rotor = COMPONENTS['✈️ Aerospace'][4].f();
-        rotor.position.set(x, 1.5, z);
-        objGroup.add(rotor);
-      });
+      arms.forEach(([x,z]) => { const rotor = COMPONENTS['✈️ Aerospace'][4].f(); rotor.position.set(x, 1.5, z); objGroup.add(rotor); });
     },
     pcb: () => {
       const board = COMPONENTS['🔌 PCB & Circuit'][0].f(); board.position.set(0, 0.5, 0); objGroup.add(board);
@@ -8522,85 +8481,42 @@ function loadTemplate(id) {
       const br = COMPONENTS['⚙️ Mechanical'][6].f(); br.position.set(-0.8, 1, 0); br.rotation.x = Math.PI/2; objGroup.add(br);
     }
   };
-  
-  if(T[id]) {
-    T[id]();
-    objectCount = objGroup.children.length;
-    updateStats();
-    setView('iso');
-  }
-  
+  if(T[id]) { T[id](); objectCount = objGroup.children.length; updateStats(); setView('iso'); }
   document.getElementById('tplSelect').value = '';
 }
 
-// ---------- EXPORT ----------
 function openExport() { document.getElementById('exportModal').classList.add('open'); }
 function closeExport() { document.getElementById('exportModal').classList.remove('open'); }
-
-function exportPNG() {
-  closeExport();
-  renderer.render(scene, camera);
-  const link = document.createElement('a');
-  link.download = 'Clyxess-Design-' + Date.now() + '.png';
-  link.href = renderer.domElement.toDataURL('image/png');
-  link.click();
-}
-
+function exportPNG() { closeExport(); renderer.render(scene, camera); const link = document.createElement('a'); link.download = 'Clyxess-Design-' + Date.now() + '.png'; link.href = renderer.domElement.toDataURL('image/png'); link.click(); }
 function exportOBJ() {
   closeExport();
   let objStr = '# Clyxess Studio Export\n# ' + new Date().toISOString() + '\n\n';
   let vOffset = 1;
-  
   objStr += 'o ClyxessDesign\n';
-  
   objGroup.traverse(child => {
     if(child.isMesh && child.geometry) {
       const pos = child.geometry.attributes.position;
       const idx = child.geometry.index;
       const mat = child.matrixWorld;
-      
       const v = new THREE.Vector3();
-      for(let i = 0; i < pos.count; i++) {
-        v.fromBufferAttribute(pos, i).applyMatrix4(mat);
-        objStr += `v ${v.x.toFixed(4)} ${v.y.toFixed(4)} ${v.z.toFixed(4)}\n`;
-      }
-      
-      if(idx) {
-        for(let i = 0; i < idx.count; i += 3) {
-          objStr += `f ${idx.getX(i)+vOffset} ${idx.getX(i+1)+vOffset} ${idx.getX(i+2)+vOffset}\n`;
-        }
-      } else {
-        for(let i = 0; i < pos.count; i += 3) {
-          objStr += `f ${i+vOffset} ${i+1+vOffset} ${i+2+vOffset}\n`;
-        }
-      }
-      
+      for(let i = 0; i < pos.count; i++) { v.fromBufferAttribute(pos, i).applyMatrix4(mat); objStr += `v ${v.x.toFixed(4)} ${v.y.toFixed(4)} ${v.z.toFixed(4)}\n`; }
+      if(idx) { for(let i = 0; i < idx.count; i += 3) { objStr += `f ${idx.getX(i)+vOffset} ${idx.getX(i+1)+vOffset} ${idx.getX(i+2)+vOffset}\n`; } }
+      else { for(let i = 0; i < pos.count; i += 3) { objStr += `f ${i+vOffset} ${i+1+vOffset} ${i+2+vOffset}\n`; } }
       vOffset += pos.count;
     }
   });
-  
   const blob = new Blob([objStr], {type:'text/plain'});
   const link = document.createElement('a');
   link.download = 'Clyxess-Design-' + Date.now() + '.obj';
   link.href = URL.createObjectURL(blob);
   link.click();
 }
-
 function saveProject() {
   closeExport();
-  const data = {
-    parts: objGroup.children.map(c => ({
-      type: c.userData.type,
-      pos: [c.position.x, c.position.y, c.position.z],
-      rot: [c.rotation.x, c.rotation.y, c.rotation.z],
-      scale: c.scale.x,
-      color: c.material && c.material.color ? '#' + c.material.color.getHexString() : '#ffcc00'
-    }))
-  };
+  const data = { parts: objGroup.children.map(c => ({ type: c.userData.type, pos: [c.position.x, c.position.y, c.position.z], rot: [c.rotation.x, c.rotation.y, c.rotation.z], scale: c.scale.x, color: c.material && c.material.color ? '#' + c.material.color.getHexString() : '#ffcc00' })) };
   localStorage.setItem('clyxess_project', JSON.stringify(data));
   alert('✅ Project saved! ' + data.parts.length + ' parts stored.');
 }
-
 function loadProject() {
   closeExport();
   const raw = localStorage.getItem('clyxess_project');
@@ -8610,9 +8526,7 @@ function loadProject() {
     while(objGroup.children.length > 0) objGroup.remove(objGroup.children[0]);
     data.parts.forEach(p => {
       const m = new THREE.Mesh(new THREE.BoxGeometry(1,1,1), new THREE.MeshStandardMaterial({color: new THREE.Color(p.color)}));
-      m.position.set(...p.pos);
-      m.rotation.set(...p.rot);
-      m.scale.setScalar(p.scale);
+      m.position.set(...p.pos); m.rotation.set(...p.rot); m.scale.setScalar(p.scale);
       m.userData.type = p.type;
       objGroup.add(m);
     });
@@ -8622,29 +8536,143 @@ function loadProject() {
   } catch(e) { alert('❌ Load failed'); }
 }
 
-// ---------- ANIMATION LOOP ----------
-function animate() {
-  requestAnimationFrame(animate);
-  controls.update();
-  if(selectedObj) selectionBox.setFromObject(selectedObj);
-  renderer.render(scene, camera);
-}
+function animate() { requestAnimationFrame(animate); controls.update(); if(selectedObj) selectionBox.setFromObject(selectedObj); renderer.render(scene, camera); }
 
-// ---------- INIT ----------
 buildLibrary();
 buildTemplates();
 setMode('move');
 setView('iso');
 resize();
 animate();
-
 setTimeout(() => toggleCat(0), 200);
-</script>
-</body>
-</html>
-"""
 
-    components.html(HTML, height=950, scrolling=False)
+// ============================================================
+// NEW ADVANCED KIDS MODE — ABC / 123 / Blocks / Languages
+// ============================================================
+
+// Languages list (60+)
+const LANGS = [
+  {c:'hinglish', n:'Hinglish'},{c:'en', n:'English'},{c:'hi', n:'हिंदी'},{c:'bn', n:'বাংলা'},
+  {c:'te', n:'తెలుగు'},{c:'mr', n:'मराठी'},{c:'ta', n:'தமிழ்'},{c:'gu', n:'ગુજરાતી'},
+  {c:'kn', n:'ಕನ್ನಡ'},{c:'ml', n:'മലയാളം'},{c:'pa', n:'ਪੰਜਾਬੀ'},{c:'or', n:'ଓଡ଼ିଆ'},
+  {c:'ur', n:'اردو'},{c:'ne', n:'नेपाली'},{c:'si', n:'සිංහල'},{c:'zh', n:'中文'},
+  {c:'ja', n:'日本語'},{c:'ko', n:'한국어'},{c:'th', n:'ไทย'},{c:'vi', n:'Tiếng Việt'},
+  {c:'id', n:'Bahasa Indonesia'},{c:'ms', n:'Bahasa Melayu'},{c:'tl', n:'Filipino'},
+  {c:'ar', n:'العربية'},{c:'fa', n:'فارسی'},{c:'he', n:'עברית'},{c:'tr', n:'Türkçe'},
+  {c:'ru', n:'Русский'},{c:'uk', n:'Українська'},{c:'bg', n:'Български'},{c:'sr', n:'Српски'},
+  {c:'hr', n:'Hrvatski'},{c:'sl', n:'Slovenščina'},{c:'sk', n:'Slovenčina'},{c:'cs', n:'Čeština'},
+  {c:'pl', n:'Polski'},{c:'hu', n:'Magyar'},{c:'ro', n:'Română'},{c:'el', n:'Ελληνικά'},
+  {c:'de', n:'Deutsch'},{c:'nl', n:'Nederlands'},{c:'sv', n:'Svenska'},{c:'no', n:'Norsk'},
+  {c:'da', n:'Dansk'},{c:'fi', n:'Suomi'},{c:'is', n:'Íslenska'},{c:'et', n:'Eesti'},
+  {c:'lv', n:'Latviešu'},{c:'lt', n:'Lietuvių'},{c:'es', n:'Español'},{c:'pt', n:'Português'},
+  {c:'fr', n:'Français'},{c:'it', n:'Italiano'},{c:'ca', n:'Català'},{c:'eu', n:'Euskara'},
+  {c:'gl', n:'Galego'},{c:'sw', n:'Kiswahili'},{c:'af', n:'Afrikaans'},{c:'zu', n:'Zulu'},
+  {c:'yo', n:'Yorùbá'},{c:'am', n:'አማርኛ'},{c:'hy', n:'Հայերեն'},{c:'ka', n:'ქართული'},
+  {c:'az', n:'Azərbaycan'},{c:'kk', n:'Қазақ'},{c:'uz', n:'Oʻzbek'},{c:'mn', n:'Монгол'},
+  {c:'my', n:'မြန်မာ'},{c:'km', n:'ខ្មែរ'},{c:'lo', n:'ລາວ'},{c:'eo', n:'Esperanto'}
+];
+
+(function(){
+  const sel = document.getElementById('langSel');
+  if(sel) sel.innerHTML = LANGS.map(l=>`<option value="${l.c}">${l.n}</option>`).join('');
+})();
+
+function changeLang(){
+  const c = document.getElementById('langSel').value;
+  const lang = LANGS.find(l=>l.c===c);
+  document.getElementById('kHint').innerText = '🌍 ' + lang.n + ' — Click buttons to add';
+  if(['ar','he','ur','fa'].includes(c)) document.body.style.direction='rtl';
+  else document.body.style.direction='ltr';
+}
+
+// Kids Canvas
+let kObjects = [], selectedIdx = -1, isDown=false, dragOff={x:0,y:0}, kTool='select';
+const kcv = document.getElementById('kCanvas');
+const kctx = kcv.getContext('2d');
+
+function drawKBG(){ kctx.fillStyle='white'; kctx.fillRect(0,0,kcv.width,kcv.height); }
+
+function drawK(){
+  drawKBG();
+  kObjects.forEach((o,i)=>{
+    kctx.save();
+    kctx.translate(o.x, o.y);
+    kctx.rotate((o.rot||0)*Math.PI/180);
+    kctx.fillStyle = o.color;
+    kctx.strokeStyle = i===selectedIdx?'#00aaff':'#222';
+    kctx.lineWidth = i===selectedIdx?3:1.2;
+
+    if(o.type==='text'){
+      kctx.font = 'bold '+(o.size||40)+'px sans-serif';
+      kctx.textAlign='center'; kctx.textBaseline='middle';
+      kctx.fillText(o.char, 0, 0);
+      if(i===selectedIdx){
+        const m = kctx.measureText(o.char);
+        kctx.strokeRect(-m.width/2-8, -(o.size||40)/2-4, m.width+16, (o.size||40)+8);
+      }
+    } else if(o.type==='rect'){
+      kctx.fillRect(-o.w/2, -o.h/2, o.w, o.h);
+    } else if(o.type==='circle'){
+      kctx.beginPath(); kctx.arc(0,0,o.w/2,0,Math.PI*2); kctx.fill();
+    } else if(o.type==='wing'){
+      kctx.beginPath(); kctx.ellipse(0,0,o.w/2,o.h/3,0,0,Math.PI*2); kctx.fill();
+    } else if(o.type==='rocket'){
+      kctx.fillRect(-o.w/3, -o.h/2, o.w*0.66, o.h);
+      kctx.beginPath();
+      kctx.moveTo(0, -o.h/2-12);
+      kctx.lineTo(-o.w/3, -o.h/2);
+      kctx.lineTo(o.w/3, -o.h/2);
+      kctx.closePath();
+      kctx.fillStyle='red'; kctx.fill();
+    } else {
+      kctx.fillRect(-o.w/2, -o.h/2, o.w, o.h);
+    }
+    kctx.restore();
+  });
+}
+
+function addToCanvas(obj){ kObjects.push(obj); selectedIdx = kObjects.length-1; drawK(); }
+
+function addAlpha(ch){
+  const isNum = /[0-9]/.test(ch);
+  const isSpec = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(ch);
+  const color = isNum ? '#0066ff' : isSpec ? '#cc0066' : '#111';
+  addToCanvas({ type:'text', char:ch, x: 350 + Math.random()*200, y: 250 + Math.random()*150, size: 42, color: color, rot:0 });
+}
+
+function addKidText(){
+  const v = document.getElementById('kidText').value.trim();
+  if(!v) return;
+  addToCanvas({ type:'text', char:v, x: 400 + Math.random()*100, y: 300 + Math.random()*100, size: 36, color: '#333', rot:0 });
+  document.getElementById('kidText').value='';
+}
+
+function addKidPart(t){
+  const colors = {'rect':'#ff5a5a','circle':'#00aaff','wing':'#22ff66','rocket':'#ffaa00','satellite':'#7ec8ff','naca':'#22ff66','solar':'#001a66','propeller':'#ff8c00'};
+  addToCanvas({ type:t, x: 350 + Math.random()*150, y: 300 + Math.random()*80, w: 80, h: 50, color: colors[t]||'#ff8c00', rot:0 });
+}
+
+let numObjects = [];
+function generateNumbers(){
+  const n = Math.min(100000, parseInt(document.getElementById('numCount').value)||10);
+  kObjects = kObjects.filter(o => o.type !== 'text' || !/^[0-9]+$/.test(o.char));
+  const cols = 20;
+  const startX = 60, startY = 60;
+  const cellW = 60, cellH = 32;
+  for(let i=0; i<n; i++){
+    const num = i+1;
+    const col = i % cols;
+    const row = Math.floor(i / cols);
+    kObjects.push({ type:'text', char: String(num), x: startX + col*cellW, y: startY + row*cellH, size: 20, color: '#0066ff', rot:0 });
+  }
+  drawK();
+  document.getElementById('kHint').innerText = '✅ ' + n + ' numbers canvas me add ho gaye!';
+}
+
+function quickNum(n){ document.getElementById('numCount').value = n; generateNumbers(); }
+function clearNumbers(){ kObjects = kObjects.filter(o => o.type !== 'text' || !/^[0-9]+$/.test(o.char)); drawK(); }
+
+function getPo
     
 def render_kids_logic_lab():
     # ============================================================
