@@ -8723,17 +8723,16 @@ def render_kids_logic_lab():
                         <option value="es">Español (Spanish)</option>
                         <option value="fr">Français (French)</option>
                     </select>
-                </div>
+</div>
 
-                <!-- Class Filter -->
-                <select id="ageFilter" onchange="filterGamesByAge()" class="bg-slate-950 text-emerald-400 text-xs font-bold border border-emerald-500/40 rounded-xl px-3 py-2 focus:outline-none cursor-pointer">
-                    <option value="group1">Class 1-2 (5-7 Yrs) - Visual Puzzles</option>
-                    <option value="group2">Class 3-5 (8-10 Yrs) - Science & Machines</option>
-                    <option value="group3">Class 6-7 (11-13 Yrs) - Advanced Engineering</option>
-                </select>
-            </div>
-        </header>
-
+<!-- Class Filter -->
+<select id="ageFilter" onchange="filterGamesByAge()" class="bg-slate-950 text-emerald-400 text-xs font-bold border">
+  <option value="group1">Class 1-2 (5-7 Yrs) - Visual Puzzles</option>
+  <option value="group2">Class 3-5 (8-10 Yrs) - Science &amp; Machines</option>
+  <option value="group3">Class 6-7 (11-13 Yrs) - Advanced Engineering</option>
+</select>
+</div>
+</header>
         <!-- Main Workspace -->
         <main class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6">
             
