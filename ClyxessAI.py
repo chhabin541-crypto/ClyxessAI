@@ -4569,7 +4569,7 @@ def render_coding_lab_mod():
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 <style>
-:root{--bg:#08080a;--panel:#121215;--panel2:#18181b;--border:#27272a;--text:#fff;--muted:#71717a;--muted2:#a1a1aa;--accent:#6366f1;--success:#22c55e}
+:root{--bg:#08080a;--panel:#121215;--panel2:#18181b;--border:#27272a;--text:#fff;--muted:#71717a;--muted2:#a1a1aa;--accent:#6366f1;--success:#22c55e;--warn:#f59e0b}
 body.light{--bg:#f4f4f7;--panel:#ffffff;--panel2:#f9f9fb;--border:#e4e4e7;--text:#111113;--muted:#71717a;--muted2:#52525b;--accent:#4f46e5}
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:var(--bg);color:var(--text);font-family:'Segoe UI',sans-serif;height:100vh;display:flex;flex-direction:column;overflow:hidden;transition:0.3s}
@@ -4605,18 +4605,18 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',sans-serif;he
 .status{padding:5px 10px;background:var(--bg);font-size:10px;color:var(--muted);display:flex;justify-content:space-between}
 .right{width:290px;background:var(--panel);display:flex;flex-direction:column;border-left:1px solid var(--border);flex-shrink:0}
 .rhead{padding:7px 10px;background:var(--panel2);border-bottom:1px solid var(--border);display:flex;justify-content:space-between;font-size:11px}
-.rwrap{flex:1;padding:12px;overflow:auto;background:linear-gradient(135deg,#2a2a35,#1e1e24);display:flex;justify-content:center;align-items:flex-start}
+.rwrap{flex:1;padding:10px;overflow-y:auto;overflow-x:hidden;background:linear-gradient(135deg,#2a2a35,#1e1e24);display:flex;justify-content:center;align-items:flex-start}
 body.light .rwrap{background:linear-gradient(135deg,#e5e7eb,#d1d5db)}
-.mobileFrame{width:250px;height:490px;background:#000;border-radius:32px;padding:8px;box-shadow:0 20px 60px rgba(0,0,0,0.6);border:3px solid #333}
+.mobileFrame{width:240px;height:470px;background:#000;border-radius:28px;padding:6px;box-shadow:0 15px 40px rgba(0,0,0,0.6);border:2px solid #333;margin:0 auto;flex-shrink:0}
 .mobileFrame .notch{width:70px;height:12px;background:#000;border-radius:20px;margin:0 auto 4px;position:relative;z-index:2}
-#prev{width:100%;height:100%;border:none;background:#fff;border-radius:22px;display:block}
+#prev{width:100%;height:100%;border:none;background:#fff;border-radius:20px;display:block;overflow:auto}
 #qrBox{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:9999;justify-content:center;align-items:center}
 #qrBox .modal{background:var(--panel);padding:18px;border-radius:16px;text-align:center;width:90%;max-width:340px;border:1px solid var(--border)}
 #qrBox h4{color:var(--text);margin-bottom:10px;font-size:14px}
-#qrCanvas{background:#fff;padding:8px;border-radius:10px;display:inline-block}
+#qrCanvas{background:#fff;padding:8px;border-radius:10px;display:inline-block;min-height:216px;min-width:216px}
 #linkInput{width:100%;margin-top:10px;background:var(--bg);border:1px solid var(--border);color:var(--success);padding:7px;border-radius:6px;font-size:10px;font-family:monospace}
-.modalBtns{display:flex;gap:6px;margin-top:10px}
-.modalBtns button{flex:1;padding:9px;border-radius:8px;border:none;cursor:pointer;font-weight:700;font-size:11px}
+.modalBtns{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
+.modalBtns button{flex:1;min-width:80px;padding:9px;border-radius:8px;border:none;cursor:pointer;font-weight:700;font-size:11px}
 #robot{position:fixed;bottom:16px;right:16px;width:54px;height:54px;background:linear-gradient(135deg,#6366f1,#8b5cf6);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;cursor:pointer;z-index:9000;box-shadow:0 8px 24px rgba(99,102,241,0.5);animation:bounce 2s infinite}
 @keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
 #robotChat{display:none;position:fixed;bottom:80px;right:16px;width:290px;background:var(--panel);border:2px solid var(--accent);border-radius:16px;padding:12px;z-index:9001;box-shadow:0 12px 40px rgba(0,0,0,0.5);max-height:380px;overflow:auto}
@@ -4627,6 +4627,22 @@ body.light .rwrap{background:linear-gradient(135deg,#e5e7eb,#d1d5db)}
 #emojiPanel{display:none;position:fixed;background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:8px;z-index:10000;max-width:280px;box-shadow:0 10px 30px rgba(0,0,0,0.5)}
 #emojiPanel span{font-size:20px;cursor:pointer;padding:3px;display:inline-block;border-radius:4px}
 #emojiPanel span:hover{background:var(--accent)}
+
+/* LEARN SECTION */
+#learnPanel{display:none;position:fixed;inset:0;background:var(--bg);z-index:9500;overflow-y:auto;padding:20px}
+#learnPanel.open{display:block}
+.learnHead{display:flex;justify-content:space-between;align-items:center;max-width:1100px;margin:0 auto 20px;padding:12px 16px;background:var(--panel);border-radius:12px;border:1px solid var(--border)}
+.learnHead h2{margin:0;font-size:18px;color:var(--text)}
+.learnGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;max-width:1100px;margin:0 auto}
+.learnCard{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:14px;transition:0.2s}
+.learnCard:hover{border-color:var(--accent);transform:translateY(-2px)}
+.learnCard h3{color:var(--accent);font-size:14px;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.learnPreview{background:#fff;border-radius:10px;padding:12px;min-height:80px;margin-bottom:10px;color:#111;font-size:13px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:6px;overflow:hidden}
+.learnCode{background:#0a0a0f;color:#a5f3fc;font-family:Consolas,monospace;font-size:11px;padding:10px;border-radius:8px;white-space:pre-wrap;word-break:break-all;max-height:140px;overflow:auto;line-height:1.5;position:relative}
+.learnCode .copyBtn{position:absolute;top:6px;right:6px;background:#6366f1;color:#fff;border:none;padding:3px 8px;border-radius:5px;font-size:9px;cursor:pointer;font-family:Arial}
+.learnCode .copyBtn:hover{background:#4f46e5}
+.learnTip{font-size:11px;color:var(--muted2);margin-top:8px;line-height:1.4}
+body.light .learnCode{background:#1e293b;color:#67e8f9}
 </style>
 </head>
 <body>
@@ -4640,6 +4656,7 @@ body.light .rwrap{background:linear-gradient(135deg,#e5e7eb,#d1d5db)}
 <option value="r2">2. My Colour Game</option>
 <option value="r3">3. My Mini Shop</option>
 </select>
+<button class="btn" style="background:#8b5cf6;border-color:#8b5cf6;color:#fff" onclick="openLearn()">📚 Learn</button>
 <button class="btn" onclick="blankPage()">🧹 Blank</button>
 <button class="btn" onclick="downloadCode()">⬇ Download</button>
 <button class="btn" onclick="copyAllCode()">📋 Copy</button>
@@ -4684,17 +4701,27 @@ body.light .rwrap{background:linear-gradient(135deg,#e5e7eb,#d1d5db)}
 <div class="rwrap">
 <div class="mobileFrame">
 <div class="notch"></div>
-<iframe id="prev"></iframe>
+<iframe id="prev" scrolling="yes"></iframe>
 </div>
 </div>
 </div>
 </div>
 
+<!-- LEARN PANEL -->
+<div id="learnPanel">
+<div class="learnHead">
+<h2>📚 Learn Coding — Ek Ek Cheez Seekho!</h2>
+<button class="btn" style="background:#ef4444;border-color:#ef4444;color:#fff" onclick="closeLearn()">✕ Close</button>
+</div>
+<div class="learnGrid" id="learnGrid"></div>
+</div>
+
 <div id="qrBox"><div class="modal">
-<h4>📱 Mobile me dekho (Scan QR)</h4>
+<h4>📱 Mobile me dekho (QR Scan)</h4>
 <div id="qrCanvas"></div>
 <input id="linkInput" readonly placeholder="Link...">
 <div class="modalBtns">
+<button onclick="newQR()" style="background:#f59e0b;color:#fff">🔄 New QR</button>
 <button onclick="copyLink()" style="background:var(--accent);color:#fff">📋 Copy</button>
 <button onclick="closeQR()" style="background:var(--panel2);color:var(--text)">✕ Close</button>
 </div>
@@ -4710,6 +4737,29 @@ body.light .rwrap{background:linear-gradient(135deg,#e5e7eb,#d1d5db)}
 <script>
 const CLS_MAP={"5 Years":"Class 1","6 Years":"Class 1","7 Years":"Class 2","8 Years":"Class 3","9 Years":"Class 4","10 Years":"Class 5","11-12 Years":"Class 6-7","13-14 Years":"Class 8-9","15-16 Years":"Class 10","17-18 Years":"Class 11-12","18+ Years":"College"};
 
+// ============ LEARN CARDS ============
+const LEARN_CARDS = [
+  {title:"📝 Heading (H1)", preview:`<h1 style="font-size:28px;color:#dc2626;margin:0">Hello Duniya!</h1>`, code:`<h1>Hello Duniya!</h1>`, tip:"Bada title likhne ke liye <h1> use karo. h2 chhota, h3 aur chhota."},
+  {title:"📄 Paragraph", preview:`<p style="margin:0;color:#333">Main 5 saal ka hu aur mujhe coding pasand hai!</p>`, code:`<p>Yahan apni baat likho...</p>`, tip:"Kisi bhi text ke liye <p> use karo."},
+  {title:"🎨 Color (Colored Text)", preview:`<span style="color:#2563eb;font-weight:bold">Mera favourite color BLUE hai</span>`, code:`<p style="color:blue">Mera favourite color BLUE hai</p>`, tip:"color: blue ki jagah red, green, orange likho!"},
+  {title:"🔘 Button", preview:`<button style="padding:10px 20px;background:#f59e0b;color:#fff;border:none;border-radius:10px;font-weight:bold">Mujhe Dabao!</button>`, code:`<button>Mujhe Dabao!</button>`, tip:"Button banane ke liye <button> use karo."},
+  {title:"🖼️ Image", preview:`<img src="https://cdn-icons-png.flaticon.com/512/616/616408.png" width="70">`, code:`<img src="IMAGE-LINK" width="100">`, tip:"Image dikhane ke liye <img> use karo. src me link daalo."},
+  {title:"🔗 Link", preview:`<a href="#" style="color:#6366f1;text-decoration:underline">Mere Baare Me Jaano</a>`, code:`<a href="https://google.com">Google</a>`, tip:"Link banane ke liye <a href='...'> use karo."},
+  {title:"📋 List", preview:`<ul style="margin:0;padding-left:20px;color:#333"><li>Class 1 - Drawing</li><li>Class 2 - Coding</li></ul>`, code:`<ul>\n  <li>Class 1 - Drawing</li>\n  <li>Class 2 - Coding</li>\n</ul>`, tip:"List banane ke liye <ul> aur <li> use karo."},
+  {title:"📊 Slider", preview:`<input type="range" min="0" max="100" value="50" style="width:150px">`, code:`<input type="range" min="0" max="100">`, tip:"Slider banane ke liye input type='range' likho."},
+  {title:"✍️ Input Box", preview:`<input type="text" placeholder="Naam likho..." style="padding:8px;border-radius:6px;border:1px solid #ccc">`, code:`<input type="text" placeholder="Naam likho...">`, tip:"User se kuch likhwane ke liye input type='text' use karo."},
+  {title:"🎯 Alert (Click pe popup)", preview:`<button onclick="alert('Wah! 🌟')" style="padding:8px 16px;background:#22c55e;color:#fff;border:none;border-radius:8px">Click Karo</button>`, code:`<button onclick="alert('Wah!')">Click Karo</button>`, tip:"onclick='alert(...)' se click pe popup aata hai."},
+  {title:"🖍️ Background Color", preview:`<div style="background:#fef9c3;padding:15px;border-radius:10px;color:#333;width:100%;text-align:center">Rangila Box!</div>`, code:`<div style="background:#fef9c3;padding:15px">Rangila Box!</div>`, tip:"background: color se box ka rang badal jata hai."},
+  {title:"⬛ Box with Border", preview:`<div style="border:3px solid #dc2626;padding:12px;border-radius:10px;color:#333;width:100%;text-align:center">Mera Box</div>`, code:`<div style="border:3px solid red;padding:12px">Mera Box</div>`, tip:"border: 3px solid red se border lagta hai."},
+  {title:"🎬 Emoji", preview:`<div style="font-size:30px">😀 🚀 ❤️ 🌟 🎉</div>`, code:`😀 🚀 ❤️ 🌟 🎉`, tip:"Emoji seedha code me likh sakte ho!"},
+  {title:"🖼️ Circle Image", preview:`<img src="https://cdn-icons-png.flaticon.com/512/616/616408.png" width="70" style="border-radius:50%">`, code:`<img src="LINK" style="border-radius:50%">`, tip:"border-radius:50% se image gol ho jati hai."},
+  {title:"📐 Center Text", preview:`<div style="text-align:center;color:#333">Yeh Text Center Me Hai</div>`, code:`<div style="text-align:center">Yeh Text Center Me Hai</div>`, tip:"text-align:center se text center me aata hai."},
+  {title:"🎮 Score Game", preview:`<div style="text-align:center"><p style="margin:0;color:#333">Score: <b id="demoScore">0</b></p><button onclick="document.getElementById('demoScore').innerText++" style="padding:6px 12px;background:#f59e0b;color:#fff;border:none;border-radius:6px">+1</button></div>`, code:`<p>Score: <span id="s">0</span></p>\n<button onclick="document.getElementById('s').innerText++">+1</button>`, tip:"Click pe score badhane ka game banao!"},
+  {title:"🌈 Gradient Background", preview:`<div style="background:linear-gradient(135deg,#667eea,#764ba2);padding:15px;color:#fff;border-radius:10px;width:100%;text-align:center">Gradient!</div>`, code:`<div style="background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;padding:15px">Gradient!</div>`, tip:"linear-gradient se 2 rang ka mix background banta hai."},
+  {title:"💬 Sidebar (Div)", preview:`<div style="display:flex;gap:8px"><div style="background:#333;color:#fff;padding:8px;border-radius:8px">Side</div><div style="background:#eee;color:#333;padding:8px;border-radius:8px;flex:1">Main</div></div>`, code:`<div style="display:flex">\n  <div>Side</div>\n  <div>Main</div>\n</div>`, tip:"display:flex se side-by-side boxes bante hain."}
+];
+
+// ============ AGE TEMPLATES ============
 const ageTemplates={
 "5 Years":{html:`<h1>👋 Hello! Mera Naam Aman Hai</h1>\n<p>Main 5 saal ka hu!</p>\n<h2 style="color:blue">Mera favourite color BLUE hai</h2>\n<button onclick="alert('Wah! 🌟')">Mujhe Dabao!</button>`,css:`body{text-align:center;padding:30px;background:#fef9c3;font-family:Comic Sans MS;margin:0}\nh1{background:#fff;padding:15px;border-radius:15px}\nbutton{padding:15px 30px;background:orange;color:#fff;border:none;border-radius:20px;font-size:16px}`,js:`// Sirf click karo!`,tipTitle:"5 Years Tip:",tipText:"Aman ki jagah apna naam likho. Blue ko RED karo!"},
 "6 Years":{html:`<h1>🔤 ABCD</h1>\n<div class="box">A for Apple 🍎</div>\n<div class="box">B for Ball ⚽</div>\n<button onclick="this.innerText='Shabash! 🌟'">Click Karo</button>`,css:`body{text-align:center;padding:20px;background:#dcfce7;margin:0}\n.box{background:#fff;margin:10px;padding:15px;border-radius:15px;font-size:20px}\nbutton{padding:10px 20px;background:#6366f1;color:#fff;border:none;border-radius:10px}`,js:`// Kuch nahi`,tipTitle:"6 Years Tip:",tipText:"Apna fruit likho!"},
@@ -4792,7 +4842,7 @@ function changeLang(){
 }
 function showLangTip(lang){
   document.getElementById('tipTitle').innerText=lang+' Tip:';
-  const tips={'HTML':'Structure - &lt;h1&gt;, &lt;p&gt;, &lt;div&gt;','CSS':'Rang do - color, background','JavaScript':'Magic - click, alert','Python':'print("Hello")','Java':'public class Main','C':'Boss of languages','C++':'C + objects','C#':'Windows + games','PHP':'Backend','Ruby':'Simple + friendly','Go':'Fast - Google','Rust':'Safe + fast','Swift':'Apple apps','Kotlin':'Android apps','TypeScript':'JS + types','SQL':'Database','Scratch (Block)':'Blocks - kids','Block Coding':'No typing','R':'Data science','MATLAB':'Engineering'};
+  const tips={'HTML':'Structure - <h1>, <p>, <div>','CSS':'Rang do - color, background','JavaScript':'Magic - click, alert','Python':'print("Hello")','Java':'public class Main','C':'Boss of languages','C++':'C + objects','C#':'Windows + games','PHP':'Backend','Ruby':'Simple + friendly','Go':'Fast - Google','Rust':'Safe + fast','Swift':'Apple apps','Kotlin':'Android apps','TypeScript':'JS + types','SQL':'Database','Scratch (Block)':'Blocks - kids','Block Coding':'No typing','R':'Data science','MATLAB':'Engineering'};
   document.getElementById('tipText').innerText=tips[lang]||'Try karo!';
 }
 
@@ -4906,24 +4956,92 @@ function copyAllCode(){
   navigator.clipboard.writeText(code).then(()=>alert('✅ Code copy ho gaya!'));
 }
 
+// ============ QR FUNCTIONS ============
 function openQR(){
-  run();
-  const code=buildFullHTML();
   document.getElementById('qrBox').style.display='flex';
-  const box=document.getElementById('qrCanvas');
-  box.innerHTML='';
-  try {
-    new QRCode(box,{text:code,width:200,height:200,correctLevel:QRCode.CorrectLevel.L});
-    document.getElementById('linkInput').value='QR scan karo mobile me!';
-  } catch(err){
-    box.innerHTML='<p style="color:#f87171;font-size:11px;padding:10px">Code bahut bada. Download karke share karo!</p>';
-    document.getElementById('linkInput').value='Download button use karo!';
-  }
+  newQR();
 }
-function closeQR(){document.getElementById('qrBox').style.display='none';}
+
+function newQR(){
+  run();
+  const box=document.getElementById('qrCanvas');
+  const linkInput=document.getElementById('linkInput');
+  box.innerHTML='<p style="padding:20px;color:#fff;font-size:12px">⏳ QR ban raha hai...</p>';
+  linkInput.value='Generating...';
+  
+  setTimeout(function(){
+    try {
+      const code=buildFullHTML();
+      const uniqueId=Date.now()+'-'+Math.random().toString(36).substring(2,8);
+      const htmlContent=code+'\n<!-- id:'+uniqueId+' -->';
+      const b64=btoa(unescape(encodeURIComponent(htmlContent)));
+      const dataUrl='data:text/html;base64,'+b64;
+      
+      box.innerHTML='';
+      
+      if(dataUrl.length<2900){
+        new QRCode(box,{text:dataUrl,width:200,height:200,correctLevel:QRCode.CorrectLevel.L});
+        linkInput.value=dataUrl.substring(0,80)+'...';
+        linkInput.setAttribute('data-full',dataUrl);
+      } else {
+        box.innerHTML='<div style="padding:15px;color:#fbbf24;font-size:12px;line-height:1.6"><b>📱 Code bahut bada</b><br>QR me nahi aayega.<br><br><b>Options:</b><br>1️⃣ Download button<br>2️⃣ Copy button</div>';
+        linkInput.value='Download ya Copy button use karo';
+        linkInput.setAttribute('data-full','');
+      }
+    } catch(err){
+      box.innerHTML='<p style="padding:15px;color:#f87171;font-size:12px">⚠️ Error: '+err.message+'<br>Download button try karo.</p>';
+      linkInput.value='';
+    }
+  },100);
+}
+
 function copyLink(){
-  const v=document.getElementById('linkInput').value;
-  navigator.clipboard.writeText(v).then(()=>alert('✅ Copy ho gaya!'));
+  const linkInput=document.getElementById('linkInput');
+  const fullLink=linkInput.getAttribute('data-full')||linkInput.value;
+  if(!fullLink||fullLink.includes('Generating')||fullLink.includes('Download')){
+    alert('Pehle New QR generate hone do!');
+    return;
+  }
+  navigator.clipboard.writeText(fullLink).then(()=>alert('✅ Link Copy ho gaya!'));
+}
+
+function closeQR(){
+  document.getElementById('qrBox').style.display='none';
+}
+
+// ============ LEARN SECTION ============
+function openLearn(){
+  const grid=document.getElementById('learnGrid');
+  grid.innerHTML=LEARN_CARDS.map((c,i)=>`
+    <div class="learnCard">
+      <h3>${c.title}</h3>
+      <div class="learnPreview">${c.preview}</div>
+      <div class="learnCode">
+        <button class="copyBtn" onclick="copyLearnCode(${i},event)">📋 Copy</button>
+        ${escapeHtml(c.code)}
+      </div>
+      <div class="learnTip">💡 ${c.tip}</div>
+    </div>
+  `).join('');
+  document.getElementById('learnPanel').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+
+function closeLearn(){
+  document.getElementById('learnPanel').classList.remove('open');
+  document.body.style.overflow='hidden';
+}
+
+function copyLearnCode(idx,ev){
+  ev.stopPropagation();
+  navigator.clipboard.writeText(LEARN_CARDS[idx].code).then(()=>{
+    ev.target.innerText='✅ Copied!';
+    setTimeout(()=>ev.target.innerText='📋 Copy',1500);
+  });
+}
+
+function escapeHtml(s){
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
 function toggleTheme(){
