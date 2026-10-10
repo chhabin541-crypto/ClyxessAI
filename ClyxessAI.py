@@ -7505,32 +7505,37 @@ setTimeout(function(){resizeCanvas();saveHistory();},300);
         
 def render_art_machinedesign():
     import streamlit.components.v1 as components
-    HTML = """
+    HTML = r"""
 <!DOCTYPE html><html><head>
 <meta charset="UTF-8"><script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 <style>
-*{box-sizing:border-box;} body{margin:0; background:#080a14; font-family:Inter,sans-serif; overflow:hidden;}
-.topbar{height:42px; background:#111326; border-bottom:1px solid #ffffff12; display:flex; align-items:center; justify-content:space-between; padding:0 10px;}
-.mini-btn{font-size:11px; font-weight:800; padding:6px 12px; border-radius:18px; border:1px solid #ffffff15; cursor:pointer;}
-.active-k{background:#ffcc00!important; color:black!important;}.active-p{background:#00ffff!important; color:black!important;}.active-i{background:#ff5c00!important; color:white!important;}
+*{box-sizing:border-box;} body{margin:0; background:#080a14; font-family:Inter,sans-serif; overflow:hidden; color:#fff;}
+.topbar{height:46px; background:#111326; border-bottom:1px solid #ffffff12; display:flex; align-items:center; justify-content:space-between; padding:0 10px;}
+.mini-btn{font-size:11px; font-weight:800; padding:6px 12px; border-radius:18px; border:1px solid #ffffff15; cursor:pointer; background:#1e2238; color:#fff;}
+.active-k{background:#ffcc00!important; color:black!important;}
+.active-p{background:#00ffff!important; color:black!important;}
 .ribbon{height:46px; background:#1a1e36; border-bottom:1px solid #ffffff12; display:flex; align-items:center; gap:6px; padding:0 10px; overflow-x:auto;}
 .rib-btn{background:#242a4d; border:1px solid #ffffff10; padding:6px 10px; border-radius:10px; font-size:10px; cursor:pointer; white-space:nowrap;}
 .rib-on{background:#ff5c00!important; color:white!important;}
 .tool-icon{width:38px; height:38px; background:#1a1e36; border:1px solid #ffffff0f; border-radius:10px; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:16px;}
 .tool-on{outline:2px solid #00ffff; background:#253055!important;}
 .kid-part{background:#1e2648; border:1px solid #ffffff12; padding:6px 4px; border-radius:10px; text-align:center; cursor:pointer; font-size:10px;}
-.alpha-btn{background:#242a4d; border:1px solid #ffffff15; padding:6px 2px; border-radius:8px; font-size:12px; font-weight:800; cursor:pointer; text-align:center;}
+.kid-part:hover{background:#2e3a6b;}
+.alpha-btn{background:#242a4d; border:1px solid #ffffff15; padding:5px 2px; border-radius:8px; font-size:12px; font-weight:800; cursor:pointer; text-align:center; user-select:none;}
 .alpha-btn:hover{background:#ffcc00; color:black;}
-#blockModal,#proBlockModal{position:fixed; inset:0; background:#000000d9; backdrop-filter:blur(8px); z-index:99999; display:none; align-items:center; justify-content:center;}
-.modal-box{background:#13162c; border:1px solid #ffffff25; border-radius:18px; width:840px; max-height:92vh; display:flex; flex-direction:column; overflow:hidden;}
 .block-item{background:#1e2648; border:1px solid #ffffff12; border-radius:12px; padding:10px 4px; text-align:center; cursor:pointer; font-size:9px; line-height:11px;}
 .block-item:hover{background:#2e3a6b; border-color:#ff5c00; transform:translateY(-1px);}
 .block-item b{font-size:10px; display:block;}
+.modal-box{background:#13162c; border:1px solid #ffffff25; border-radius:18px; width:900px; max-height:92vh; display:flex; flex-direction:column; overflow:hidden;}
 .pro-panel{background:#1a1e36; border-radius:12px; padding:8px; border:1px solid #ffffff10; margin-bottom:6px;}
 .label{font-size:9px; color:#aaa; display:flex; justify-content:space-between; margin-top:5px;}
 .slider{width:100%; height:6px;}
+.sec-title{font-size:10px; font-weight:800; color:#00ffff; margin:8px 0 6px 0;}
+.tab-btn{background:#1e2238; color:#aaa; border:none; padding:5px 12px; border-radius:20px; font-size:10px; font-weight:700; cursor:pointer; margin-right:4px;}
+.tab-btn.on{background:#ffcc00; color:black;}
+.text-input{background:#0b0e1e; color:#00ffff; border:1px solid #00ffff55; border-radius:8px; padding:6px; font-size:11px; width:100%; font-family:inherit;}
 </style>
 </head>
 <body class="h-screen flex flex-col text-white">
@@ -7538,221 +7543,785 @@ def render_art_machinedesign():
 <div class="topbar">
   <div class="flex items-center gap-3">
     <div style="width:26px; height:26px; background:#ffcc00; color:black; border-radius:8px; display:flex; align-items:center; justify-content:center; font-weight:900;">C</div>
-    <div><div id="headerTitle" style="font-size:12px; font-weight:900;">🚁 Create Your Future - 50+ Blocks + 50+ Functions - Final</div><div id="headerSub" style="font-size:8.5px; color:#8e94ab;">KIDS ABCD 123 + PRO 50 Blocks + INDUSTRIAL 50 Options - Kuch delete nahi</div></div>
+    <div><div id="headerTitle" style="font-size:12px; font-weight:900;">🚁 Create Your Future - Kids + Pro Blocks</div><div id="headerSub" style="font-size:8.5px; color:#8e94ab;">A-Z a-z 0-9 Special + Numbers 1 Lakh + Blocks + 60 Languages</div></div>
   </div>
   <div class="flex items-center gap-2">
-    <select id="langSel" onchange="changeLang()" style="background:#0b0e1e; color:#00ffff; border:1px solid #00ffff55; border-radius:20px; padding:5px 10px; font-size:11px; font-weight:700;">
-      <option value="hinglish">Hinglish</option><option value="en">English</option><option value="hi">हिंदी</option>
-    </select>
+    <select id="langSel" onchange="changeLang()" style="background:#0b0e1e; color:#00ffff; border:1px solid #00ffff55; border-radius:20px; padding:5px 10px; font-size:11px; font-weight:700; max-width:170px;"></select>
     <button id="btnKids" onclick="setMain('kids')" class="mini-btn active-k">👶 KIDS</button>
-    <button id="btnPro" onclick="setMain('pro')" class="mini-btn bg-[#1e2238] text-white">🚀 PRO 50+ BLOCKS</button>
-    <button id="btnInd" onclick="setMain('industrial')" class="mini-btn bg-[#1e2238] text-white">🏭 INDUSTRIAL 50 OPTIONS</button>
-    <button onclick="clearAll()" class="mini-btn bg-[#2a2a2a] text-white">Clear</button>
+    <button id="btnPro" onclick="setMain('pro')" class="mini-btn">🚀 PRO BLOCKS</button>
+    <button onclick="clearAll()" class="mini-btn">Clear</button>
   </div>
 </div>
 
 <div class="flex-1 flex overflow-hidden">
 
-  <!-- KIDS - FULL -->
+  <!-- KIDS MODE -->
   <div id="kidsUI" style="display:flex; width:100%; height:100%;">
     <div style="width:54px; background:#15182e; border-right:1px solid #ffffff0f; display:flex; flex-direction:column; align-items:center; gap:8px; padding:10px 0;">
-      <div id="kSelect" onclick="setKidTool('select')" class="tool-icon tool-on">🖱️</div><div id="kPen" onclick="setKidTool('pen')" class="tool-icon">✏️</div><div id="kRect" onclick="setKidTool('rect')" class="tool-icon">⬜</div><div id="kCircle" onclick="setKidTool('circle')" class="tool-icon">⭕</div><div onclick="deleteKid()" class="tool-icon" style="background:#3a1a1a;">🗑️</div>
+      <div id="kSelect" onclick="setKidTool('select')" class="tool-icon tool-on">🖱️</div>
+      <div id="kPen" onclick="setKidTool('pen')" class="tool-icon">✏️</div>
+      <div id="kRect" onclick="setKidTool('rect')" class="tool-icon">⬜</div>
+      <div id="kCircle" onclick="setKidTool('circle')" class="tool-icon">⭕</div>
+      <div onclick="deleteKid()" class="tool-icon" style="background:#3a1a1a;">🗑️</div>
     </div>
-    <div style="width:260px; background:#12162a; border-right:1px solid #ffffff0f; padding:8px; overflow-y:auto; display:flex; flex-direction:column; gap:8px;">
-      <div style="background:#1a1e36; border-radius:12px; padding:7px; border:1px solid #ffcc0030;">
-        <div style="font-size:11px; font-weight:800; color:#ffcc00;">🔤 ABCD + 123 + Special - FIXED</div>
-        <div style="display:grid; grid-template-columns:repeat(6,1fr); gap:4px; margin-top:6px;">
-          <div onclick="addAlpha('A')" class="alpha-btn">A</div><div onclick="addAlpha('B')" class="alpha-btn">B</div><div onclick="addAlpha('C')" class="alpha-btn">C</div><div onclick="addAlpha('D')" class="alpha-btn">D</div><div onclick="addAlpha('E')" class="alpha-btn">E</div><div onclick="addAlpha('F')" class="alpha-btn">F</div>
-          <div onclick="addAlpha('G')" class="alpha-btn">G</div><div onclick="addAlpha('H')" class="alpha-btn">H</div><div onclick="addAlpha('I')" class="alpha-btn">I</div><div onclick="addAlpha('J')" class="alpha-btn">J</div><div onclick="addAlpha('K')" class="alpha-btn">K</div><div onclick="addAlpha('L')" class="alpha-btn">L</div>
-          <div onclick="addAlpha('M')" class="alpha-btn">M</div><div onclick="addAlpha('N')" class="alpha-btn">N</div><div onclick="addAlpha('O')" class="alpha-btn">O</div><div onclick="addAlpha('P')" class="alpha-btn">P</div><div onclick="addAlpha('Q')" class="alpha-btn">Q</div><div onclick="addAlpha('R')" class="alpha-btn">R</div>
-          <div onclick="addAlpha('S')" class="alpha-btn">S</div><div onclick="addAlpha('T')" class="alpha-btn">T</div><div onclick="addAlpha('U')" class="alpha-btn">U</div><div onclick="addAlpha('V')" class="alpha-btn">V</div><div onclick="addAlpha('W')" class="alpha-btn">W</div><div onclick="addAlpha('X')" class="alpha-btn">X</div>
-          <div onclick="addAlpha('Y')" class="alpha-btn">Y</div><div onclick="addAlpha('Z')" class="alpha-btn">Z</div><div onclick="addAlpha('0')" class="alpha-btn" style="color:#00ffff;">0</div><div onclick="addAlpha('1')" class="alpha-btn" style="color:#00ffff;">1</div><div onclick="addAlpha('2')" class="alpha-btn" style="color:#00ffff;">2</div><div onclick="addAlpha('3')" class="alpha-btn" style="color:#00ffff;">3</div>
-          <div onclick="addAlpha('4')" class="alpha-btn" style="color:#00ffff;">4</div><div onclick="addAlpha('5')" class="alpha-btn" style="color:#00ffff;">5</div><div onclick="addAlpha('!')" class="alpha-btn" style="color:#ff5c9e;">!</div><div onclick="addAlpha('@')" class="alpha-btn" style="color:#ff5c9e;">@</div><div onclick="addAlpha('#')" class="alpha-btn" style="color:#ff5c9e;">#</div><div onclick="addAlpha('$')" class="alpha-btn" style="color:#ff5c9e;">$</div>
+    <div style="width:290px; background:#12162a; border-right:1px solid #ffffff0f; padding:8px; overflow-y:auto; display:flex; flex-direction:column; gap:8px;">
+
+      <!-- TABS -->
+      <div>
+        <button class="tab-btn on" id="tabABC" onclick="switchKidTab('abc',this)">🔤 ABC</button>
+        <button class="tab-btn" id="tabNUM" onclick="switchKidTab('num',this)">🔢 123</button>
+        <button class="tab-btn" id="tabTXT" onclick="switchKidTab('txt',this)">📝 Text</button>
+      </div>
+
+      <!-- ABC TAB -->
+      <div id="kidABC" style="background:#1a1e36; border-radius:12px; padding:8px; border:1px solid #ffcc0030;">
+        <div style="font-size:10px; font-weight:800; color:#ffcc00;">🔤 A-Z + a-z + 0-9 + Special</div>
+        <div style="font-size:8px; color:#888; margin-top:2px;">Click karo — canvas me aayega</div>
+        <div id="abcGrid" style="display:grid; grid-template-columns:repeat(7,1fr); gap:3px; margin-top:6px;"></div>
+      </div>
+
+      <!-- NUMBER TAB -->
+      <div id="kidNUM" style="display:none; background:#1a1e36; border-radius:12px; padding:8px; border:1px solid #00ffff30;">
+        <div style="font-size:10px; font-weight:800; color:#00ffff;">🔢 Numbers 1 to 1,00,000</div>
+        <div style="font-size:9px; color:#aaa; margin-top:3px;">Kitne numbers chahiye? (max 100000)</div>
+        <input id="numCount" type="number" min="1" max="100000" value="10" class="text-input" style="margin-top:5px;">
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:4px; margin-top:6px;">
+          <button onclick="generateNumbers()" class="mini-btn" style="background:#00ffff; color:black; font-weight:900;">▶️ Generate</button>
+          <button onclick="clearNumbers()" class="mini-btn" style="background:#3a1a1a;">🗑️ Clear Nums</button>
+        </div>
+        <div style="display:grid; grid-template-columns:repeat(5,1fr); gap:3px; margin-top:6px;">
+          <button onclick="quickNum(10)" class="alpha-btn">1-10</button>
+          <button onclick="quickNum(50)" class="alpha-btn">1-50</button>
+          <button onclick="quickNum(100)" class="alpha-btn">1-100</button>
+          <button onclick="quickNum(1000)" class="alpha-btn">1K</button>
+          <button onclick="quickNum(10000)" class="alpha-btn">10K</button>
         </div>
       </div>
+
+      <!-- TEXT TAB (Multilingual) -->
+      <div id="kidTXT" style="display:none; background:#1a1e36; border-radius:12px; padding:8px; border:1px solid #ff5c9e30;">
+        <div style="font-size:10px; font-weight:800; color:#ff5c9e;">📝 Apni Bhasha Me Likho</div>
+        <div style="font-size:9px; color:#aaa; margin-top:3px;">Koi bhi language type karo — Hindi, English, Tamil, Arabic, Chinese...</div>
+        <input id="kidText" type="text" placeholder="Yahan likho..." class="text-input" style="margin-top:6px;">
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:4px; margin-top:6px;">
+          <button onclick="addKidText()" class="mini-btn" style="background:#ff5c9e; color:white; font-weight:900;">➕ Add to Canvas</button>
+          <button onclick="document.getElementById('kidText').value=''" class="mini-btn">Clear Input</button>
+        </div>
+      </div>
+
+      <!-- BLOCK LIBRARY -->
+      <div style="background:#1a1e36; border-radius:12px; padding:7px; border:1px solid #00ffff25;">
+        <div style="font-size:10px; font-weight:800; color:#00ffff;">🧱 Blocks Library (Click to Open)</div>
+        <button onclick="openKidBlocks()" class="mini-btn" style="width:100%; background:#00ffff; color:black; margin-top:6px; font-weight:900; padding:10px; border-radius:12px;">
+          📚 200+ Blocks Kholein<br><span style="font-size:8px;">Medical • Bio • Engineering • Nature • Space</span>
+        </button>
+      </div>
+
+      <!-- SPACE TECH -->
       <div style="background:#1a1e36; border-radius:12px; padding:7px; border:1px solid #00ffff25;">
         <div style="font-size:10px; font-weight:800; color:#00ffff;">🇨🇳 CHINA SPACE TECH</div>
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-top:6px;">
-          <div onclick="addKidPart('wing')" class="kid-part">🪽 Wing</div><div onclick="addKidPart('propeller')" class="kid-part">🌀 Prop</div><div onclick="addKidPart('rocket')" class="kid-part">🚀 Rocket</div><div onclick="addKidPart('satellite')" class="kid-part">🛰️ Satellite</div><div onclick="addKidPart('naca')" class="kid-part">📈 NACA</div><div onclick="addKidPart('solar')" class="kid-part">🔋 Solar</div>
+          <div onclick="addKidPart('wing')" class="kid-part">🪽 Wing</div>
+          <div onclick="addKidPart('propeller')" class="kid-part">🌀 Prop</div>
+          <div onclick="addKidPart('rocket')" class="kid-part">🚀 Rocket</div>
+          <div onclick="addKidPart('satellite')" class="kid-part">🛰️ Satellite</div>
+          <div onclick="addKidPart('naca')" class="kid-part">📈 NACA</div>
+          <div onclick="addKidPart('solar')" class="kid-part">🔋 Solar</div>
         </div>
         <button onclick="startSim()" class="mini-btn" style="width:100%; background:#00ffff; color:black; margin-top:6px; font-weight:900;">▶️ Fly Simulation</button>
       </div>
-      <div style="display:grid; grid-template-columns:1fr 1fr; gap:4px; margin-top:auto;"><button onclick="rotateKid()" class="mini-btn bg-[#242a4d] text-white">Rotate</button><button onclick="duplicateKid()" class="mini-btn bg-[#242a4d] text-white">Duplicate</button><button onclick="deleteKid()" class="mini-btn bg-[#3a1a1a] text-white">Delete</button><button onclick="clearK()" class="mini-btn bg-[#3a1a1a] text-white">Clear</button></div>
+
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:4px; margin-top:auto;">
+        <button onclick="rotateKid()" class="mini-btn">Rotate</button>
+        <button onclick="duplicateKid()" class="mini-btn">Duplicate</button>
+        <button onclick="deleteKid()" class="mini-btn" style="background:#3a1a1a;">Delete</button>
+        <button onclick="clearK()" class="mini-btn" style="background:#3a1a1a;">Clear</button>
+      </div>
     </div>
-    <div style="flex:1; background:#e9e9ef; padding:6px; display:flex; flex-direction:column;"><div id="kHint" style="font-size:10px; color:#333; font-weight:800;">KIDS - Mouse Drag Fixed + ABCD 123 Special + Space Tech</div><canvas id="kCanvas" width="1300" height="750" style="flex:1; width:100%; background:white; border-radius:8px; margin-top:4px; cursor:move;"></canvas></div>
+    <div style="flex:1; background:#e9e9ef; padding:6px; display:flex; flex-direction:column;">
+      <div id="kHint" style="font-size:10px; color:#333; font-weight:800;">KIDS — Click buttons to add • Drag to move • Wheel to resize</div>
+      <canvas id="kCanvas" width="1300" height="750" style="flex:1; width:100%; background:white; border-radius:8px; margin-top:4px; cursor:move;"></canvas>
+    </div>
   </div>
 
-  <!-- PRO - 50+ BLOCKS + 50+ FUNCTIONS -->
+  <!-- PRO MODE -->
   <div id="proUI" style="display:none; width:100%; height:100%;">
     <div style="width:56px; background:#111326; border-right:1px solid #ffffff0f; display:flex; flex-direction:column; align-items:center; gap:8px; padding:10px 0;">
-      <div onclick="addProBlock('box')" class="tool-icon">🧱</div><div onclick="addProBlock('cyl')" class="tool-icon">🛢️</div><div onclick="addProBlock('plane')" class="tool-icon">🪽</div><div onclick="addProBlock('sphere')" class="tool-icon">⚪</div><div onclick="openProLibrary()" class="tool-icon" style="background:#ff5c00; color:white; font-weight:900;">+50</div><div onclick="deletePro()" class="tool-icon" style="background:#3a1a1a; margin-top:10px;">🗑️</div>
+      <div onclick="addProBlock('box')" class="tool-icon">🧱</div>
+      <div onclick="addProBlock('cyl')" class="tool-icon">🛢️</div>
+      <div onclick="addProBlock('plane')" class="tool-icon">🪽</div>
+      <div onclick="addProBlock('sphere')" class="tool-icon">⚪</div>
+      <div onclick="openProLibrary()" class="tool-icon" style="background:#ff5c00; color:white; font-weight:900;">+60</div>
+      <div onclick="deletePro()" class="tool-icon" style="background:#3a1a1a; margin-top:10px;">🗑️</div>
     </div>
     <div style="flex:1; background:#05070a; position:relative; display:flex; flex-direction:column; padding:6px;">
-      <div style="font-size:10px; color:#00ffff; font-weight:700;">🚀 PRO - 50+ Blocks + 50+ Functions - Mouse Drag + Snap Connect</div>
+      <div style="font-size:10px; color:#00ffff; font-weight:700;">🚀 PRO — 60+ Blocks + Full Editor + Mouse Drag + Snap</div>
       <div id="threePro" style="flex:1; width:100%; border-radius:10px; border:1px solid #00ffff15;"></div>
-      <div style="position:absolute; bottom:10px; left:12px; background:#000000cc; padding:6px 12px; border-radius:20px; font-size:9px; color:#aaa;">LEFT DRAG=Uthao-Jodo | SCROLL=Size | RIGHT DRAG=View</div>
+      <div style="position:absolute; bottom:10px; left:12px; background:#000000cc; padding:6px 12px; border-radius:20px; font-size:9px; color:#aaa;">LEFT DRAG=Move | SCROLL=Size | RIGHT DRAG=Camera</div>
     </div>
     <div style="width:300px; background:#15182e; border-left:1px solid #ffffff0f; padding:8px; overflow-y:auto; display:flex; flex-direction:column; gap:6px;">
-      <b style="font-size:12px; color:#00ffff;">PRO EDITOR - 50+ FUNCTIONS + 50+ BLOCKS</b>
-      <button onclick="openProLibrary()" class="mini-btn" style="width:100%; background:#00ffff; color:black; font-weight:900; padding:10px; border-radius:12px;">+60 Extra Blocks Library<br><span style="font-size:8px;">Click to open 50+ Blocks</span></button>
-
-      <div class="pro-panel"><div style="font-size:10px; font-weight:800; color:#00ffff;">1. COLOR & MATERIAL (4)</div><div class="label">Color</div><input id="pCol" type="color" value="#ffcc00" style="width:100%; height:26px;" oninput="updateProColor()"><div class="label">Metalness <span id="metVal">0.2</span></div><input id="metalness" type="range" min="0" max="1" step="0.05" value="0.2" class="slider" oninput="updateProMat()"><div class="label">Roughness <span id="roughVal">0.5</span></div><input id="roughness" type="range" min="0" max="1" step="0.05" value="0.5" class="slider" oninput="updateProMat()"><div class="label">Opacity <span id="opacVal">1.0</span></div><input id="opacity" type="range" min="0.1" max="1" step="0.05" value="1" class="slider" oninput="updateProMat()"></div>
-
-      <div class="pro-panel" style="border-color:#00ffff40;"><div style="font-size:10px; font-weight:800; color:#00ffff;">2. SIZE - BLUE SLIDER (6)</div><div class="label">Size Uniform <span id="pSizeVal">1.0</span></div><input id="pSize" type="range" min="0.2" max="4" step="0.1" value="1" class="slider" oninput="updateProScale()"><div class="label">Scale X <span id="psxVal">1.0</span></div><input id="pScaleX" type="range" min="0.1" max="5" step="0.1" value="1" class="slider" oninput="updateProScaleXYZ()"><div class="label">Scale Y <span id="psyVal">1.0</span></div><input id="pScaleY" type="range" min="0.1" max="5" step="0.1" value="1" class="slider" oninput="updateProScaleXYZ()"><div class="label">Scale Z <span id="pszVal">1.0</span></div><input id="pScaleZ" type="range" min="0.1" max="5" step="0.1" value="1" class="slider" oninput="updateProScaleXYZ()"><div style="display:grid; grid-template-columns:1fr 1fr; gap:4px; margin-top:4px;"><button onclick="scaleBtn(0.8)" class="mini-btn bg-[#242a4d] text-white">- Chhota</button><button onclick="scaleBtn(1.25)" class="mini-btn bg-[#242a4d] text-white">+ Bada</button></div></div>
-
-      <div class="pro-panel"><div style="font-size:10px; font-weight:800;">3. MOVE - Kahin Bhi (8)</div><div class="label">Move X <span id="pmxVal">0</span></div><input id="pMoveX" type="range" min="-10" max="10" step="0.1" value="0" class="slider" oninput="updateProMove()"><div class="label">Move Y <span id="pmyVal">0.8</span></div><input id="pMoveY" type="range" min="-5" max="10" step="0.1" value="0.8" class="slider" oninput="updateProMove()"><div class="label">Move Z <span id="pmzVal">0</span></div><input id="pMoveZ" type="range" min="-10" max="10" step="0.1" value="0" class="slider" oninput="updateProMove()"><div style="display:grid; grid-template-columns:repeat(4,1fr); gap:3px; margin-top:4px;"><button onclick="moveBtn('x',-0.5)" class="mini-btn bg-[#242a4d] text-white">←X</button><button onclick="moveBtn('x',0.5)" class="mini-btn bg-[#242a4d] text-white">X→</button><button onclick="moveBtn('y',0.5)" class="mini-btn bg-[#242a4d] text-white">Y↑</button><button onclick="moveBtn('y',-0.5)" class="mini-btn bg-[#242a4d] text-white">Y↓</button></div></div>
-
-      <div class="pro-panel"><div style="font-size:10px; font-weight:800;">4. ROTATE - Koi Bhi Angle (12)</div><div class="label">Rotate X <span id="prxVal">0°</span></div><input id="pRotX" type="range" min="0" max="360" step="5" value="0" class="slider" oninput="updateProRot()"><div class="label">Rotate Y <span id="pryVal">0°</span></div><input id="pRotY" type="range" min="0" max="360" step="5" value="0" class="slider" oninput="updateProRot()"><div class="label">Rotate Z <span id="przVal">0°</span></div><input id="pRotZ" type="range" min="0" max="360" step="5" value="0" class="slider" oninput="updateProRot()"><div style="display:grid; grid-template-columns:repeat(3,1fr); gap:3px; margin-top:4px;"><button onclick="rotBtn('x',15)" class="mini-btn bg-[#242a4d] text-white">X15°</button><button onclick="rotBtn('y',15)" class="mini-btn bg-[#242a4d] text-white">Y15°</button><button onclick="rotBtn('z',15)" class="mini-btn bg-[#242a4d] text-white">Z15°</button><button onclick="rotBtn('x',90)" class="mini-btn bg-[#242a4d] text-white">X90°</button><button onclick="rotBtn('y',90)" class="mini-btn bg-[#242a4d] text-white">Y90°</button><button onclick="rotBtn('z',90)" class="mini-btn bg-[#242a4d] text-white">Z90°</button></div></div>
-
-      <div class="pro-panel"><div style="font-size:10px; font-weight:800;">5. ADVANCE 20 Functions</div><div style="display:grid; grid-template-columns:1fr 1fr; gap:4px; font-size:9px;"><button onclick="proAction('mirrorX')" class="mini-btn bg-[#242a4d] text-white">Mirror X</button><button onclick="proAction('mirrorZ')" class="mini-btn bg-[#242a4d] text-white">Mirror Z</button><button onclick="proAction('duplicate')" class="mini-btn bg-[#242a4d] text-white">Duplicate</button><button onclick="proAction('pattern3')" class="mini-btn bg-[#242a4d] text-white">Pattern x3</button><button onclick="proAction('resetRot')" class="mini-btn bg-[#242a4d] text-white">Reset Rot</button><button onclick="proAction('resetScale')" class="mini-btn bg-[#242a4d] text-white">Reset Size</button><button onclick="proAction('topView')" class="mini-btn bg-[#242a4d] text-white">Top View</button><button onclick="proAction('frontView')" class="mini-btn bg-[#242a4d] text-white">Front View</button><label style="display:flex; align-items:center; gap:4px;"><input type="checkbox" id="proSnap" checked> Snap</label><label style="display:flex; align-items:center; gap:4px;"><input type="checkbox" id="proGrid" checked> Grid Snap</label></div><div class="label">Snap Dist <span id="proSnapVal">0.8</span></div><input id="proSnapDist" type="range" min="0.1" max="3" step="0.1" value="0.8" class="slider" oninput="document.getElementById('proSnapVal').innerText=this.value"></div>
-
-      <button onclick="clearPro()" class="mini-btn bg-[#3a1a1a] text-white">Clear All</button>
-    </div>
-  </div>
-
-  <!-- INDUSTRIAL - 50+ OPTIONS -->
-  <div id="industrialUI" style="display:none; width:100%; height:100%; flex-direction:column;">
-    <div class="ribbon">
-      <span style="font-size:9px; color:#888; font-weight:800;">SOLID:</span>
-      <button id="rExtrude" onclick="indTool('extrude')" class="rib-btn rib-on">Extrude</button><button id="rRevolve" onclick="indTool('revolve')" class="rib-btn">Revolve</button><button id="rLoft" onclick="indTool('loft')" class="rib-btn">Loft</button><button id="rSweep" onclick="indTool('sweep')" class="rib-btn">Sweep</button>
-      <div style="width:1px; height:20px; background:#ffffff20;"></div>
-      <button id="rFillet" onclick="indTool('fillet')" class="rib-btn">Fillet</button><button id="rChamfer" onclick="indTool('chamfer')" class="rib-btn">Chamfer</button><button id="rShell" onclick="indTool('shell')" class="rib-btn">Shell</button><button id="rHole" onclick="indTool('hole')" class="rib-btn">Hole</button>
-      <div style="width:1px; height:20px; background:#ffffff20;"></div>
-      <button id="rMirror" onclick="indTool('mirror')" class="rib-btn">Mirror</button><button id="rPattern" onclick="indTool('pattern')" class="rib-btn">Pattern</button><button id="rJoint" onclick="indTool('joint')" class="rib-btn">Joint</button>
-      <button onclick="simulate()" class="rib-btn" style="background:#00ffff; color:black; margin-left:auto; font-weight:900;">▶ Simulate</button><button onclick="analyze()" class="rib-btn" style="background:#ffcc00; color:black; font-weight:900;">Analyze</button>
-    </div>
-    <div style="flex:1; display:flex; overflow:hidden;">
-      <div style="width:200px; background:#0f1220; border-right:1px solid #ffffff10; padding:8px; font-size:10px; overflow-y:auto;"><b style="color:#ff5c00;">BROWSER - Industrial Tree</b><div style="background:#1a1e36; border-radius:10px; padding:8px; margin-top:6px;"><div>📦 Bodies (<span id="bodyCount">0</span>)</div><div id="bodyList" style="color:#aaa; margin-top:4px;"></div></div><div style="background:#1a1e36; border-radius:10px; padding:8px; margin-top:6px;"><div>🕒 Timeline</div><div id="timeline" style="display:flex; flex-wrap:wrap; gap:4px; margin-top:6px;"></div></div><div style="font-size:9px; color:#666; margin-top:8px;">Selected: <span id="selInfo" style="color:#00ffff;">None</span><br>Tool: <span id="toolInfo">Extrude</span></div></div>
-      <div style="flex:1; background:#06080f; position:relative;"><div id="threeInd" style="width:100%; height:100%;"></div><div style="position:absolute; bottom:10px; left:12px; background:#000000aa; padding:6px 12px; border-radius:20px; font-size:9px; color:#aaa;">🏭 INDUSTRIAL - Drag + Snap + 50 Functions</div></div>
-      <div style="width:310px; background:#15182e; border-left:1px solid #ffffff0f; padding:8px; overflow-y:auto; display:flex; flex-direction:column; gap:6px;">
-        <b style="font-size:12px; color:#ff5c00;">INDUSTRIAL - 50+ OPTIONS - FINAL</b>
-
-        <div class="pro-panel"><div style="font-size:10px; font-weight:700;">Operation Type + Material (2)</div><select id="opType" style="width:100%; background:#0f1220; color:white; border:1px solid #ffffff20; border-radius:8px; padding:5px; font-size:10px; margin-top:5px;"><option>Join</option><option>Cut</option><option>Intersect</option><option>New Body</option></select><select id="matType" style="width:100%; background:#0f1220; color:white; border:1px solid #ffffff20; border-radius:8px; padding:5px; font-size:10px; margin-top:4px;"><option>Steel</option><option>Aluminium 6061</option><option>Titanium - Aero Grade</option><option>Plastic ABS</option><option>Carbon Fiber</option></select></div>
-
-        <div class="pro-panel" style="border-color:#ff5c0040;">
-          <button onclick="openBlockLibrary()" class="mini-btn" style="width:100%; background:#ff5c00; color:white; font-weight:900; padding:12px; border-radius:12px;">+ Add Base Block - 60+ World Blocks<br><span style="font-size:8px;">Click → Full Library</span></button>
-          <div style="margin-top:8px;">
-            <div class="label" style="color:#00ffff;">Fillet Radius (Blue) <span id="filletVal">0.2</span></div><input id="fillet" type="range" min="0" max="1.5" step="0.05" value="0.2" class="slider" style="accent-color:#00ffff;" oninput="applyIndFillet()">
-            <div class="label" style="color:#00ffff;">Extrude Depth (Blue) <span id="extrudeVal">1.5</span></div><input id="extrude" type="range" min="0.1" max="6" step="0.1" value="1.5" class="slider" style="accent-color:#00ffff;" oninput="applyIndExtrude()">
-            <div class="label">Chamfer <span id="chamVal">0.2</span></div><input id="chamfer" type="range" min="0" max="1.5" step="0.05" value="0.2" class="slider" style="accent-color:#ff5c00;" oninput="applyIndChamfer()">
-            <div class="label">Revolve Angle <span id="revVal">360°</span></div><input id="revAngle" type="range" min="10" max="360" step="10" value="360" class="slider" oninput="applyIndRevolve()">
-            <div class="label">Shell Thickness <span id="shellVal">0.3</span></div><input id="shellThick" type="range" min="0.05" max="1" step="0.05" value="0.3" class="slider" oninput="applyIndShell()">
-            <div class="label">Hole Dia <span id="holeVal">0.3</span></div><input id="holeDia" type="range" min="0.05" max="1" step="0.05" value="0.3" class="slider" oninput="applyIndHole()">
-          </div>
-        </div>
-
-        <div class="pro-panel"><div style="font-size:10px; font-weight:800; color:#ff5c00;">SIZE - 50 OPTIONS (6)</div><div class="label">Scale X <span id="isxVal">1.0</span></div><input id="iScaleX" type="range" min="0.1" max="5" step="0.1" value="1" class="slider" oninput="applyIndScale()"><div class="label">Scale Y <span id="isyVal">1.0</span></div><input id="iScaleY" type="range" min="0.1" max="5" step="0.1" value="1" class="slider" oninput="applyIndScale()"><div class="label">Scale Z <span id="iszVal">1.0</span></div><input id="iScaleZ" type="range" min="0.1" max="5" step="0.1" value="1" class="slider" oninput="applyIndScale()"><div style="display:grid; grid-template-columns:1fr 1fr; gap:4px; margin-top:4px;"><button onclick="indScaleBtn(0.8)" class="mini-btn bg-[#242a4d] text-white">- Chhota</button><button onclick="indScaleBtn(1.25)" class="mini-btn bg-[#242a4d] text-white">+ Bada</button></div></div>
-
-        <div class="pro-panel"><div style="font-size:10px; font-weight:800; color:#ff5c00;">MOVE - Kahin Bhi (8)</div><div class="label">Move X <span id="imxVal">0</span></div><input id="iMoveX" type="range" min="-10" max="10" step="0.1" value="0" class="slider" oninput="applyIndMove()"><div class="label">Move Y <span id="imyVal">0.8</span></div><input id="iMoveY" type="range" min="-5" max="10" step="0.1" value="0.8" class="slider" oninput="applyIndMove()"><div class="label">Move Z <span id="imzVal">0</span></div><input id="iMoveZ" type="range" min="-10" max="10" step="0.1" value="0" class="slider" oninput="applyIndMove()"><div style="display:grid; grid-template-columns:repeat(4,1fr); gap:3px; margin-top:4px;"><button onclick="indMoveBtn('x',-0.5)" class="mini-btn bg-[#242a4d] text-white">←X</button><button onclick="indMoveBtn('x',0.5)" class="mini-btn bg-[#242a4d] text-white">X→</button><button onclick="indMoveBtn('y',0.5)" class="mini-btn bg-[#242a4d] text-white">Y↑</button><button onclick="indMoveBtn('y',-0.5)" class="mini-btn bg-[#242a4d] text-white">Y↓</button></div></div>
-
-        <div class="pro-panel"><div style="font-size:10px; font-weight:800; color:#ff5c00;">ROTATE - Koi Bhi Angle (12)</div><div class="label">Rotate X <span id="irxVal">0°</span></div><input id="iRotX" type="range" min="0" max="360" step="5" value="0" class="slider" oninput="applyIndRot()"><div class="label">Rotate Y <span id="iryVal">0°</span></div><input id="iRotY" type="range" min="0" max="360" step="5" value="0" class="slider" oninput="applyIndRot()"><div class="label">Rotate Z <span id="irzVal">0°</span></div><input id="iRotZ" type="range" min="0" max="360" step="5" value="0" class="slider" oninput="applyIndRot()"><div style="display:grid; grid-template-columns:repeat(3,1fr); gap:3px; margin-top:4px;"><button onclick="indRotBtn('x',15)" class="mini-btn bg-[#242a4d] text-white">X15°</button><button onclick="indRotBtn('y',15)" class="mini-btn bg-[#242a4d] text-white">Y15°</button><button onclick="indRotBtn('z',15)" class="mini-btn bg-[#242a4d] text-white">Z15°</button><button onclick="indRotBtn('x',90)" class="mini-btn bg-[#242a4d] text-white">X90°</button><button onclick="indRotBtn('y',90)" class="mini-btn bg-[#242a4d] text-white">Y90°</button><button onclick="indRotBtn('z',90)" class="mini-btn bg-[#242a4d] text-white">Z90°</button></div></div>
-
-        <div class="pro-panel"><div style="font-size:10px; font-weight:800;">ADVANCE 20 Functions</div><div style="display:grid; grid-template-columns:1fr 1fr; gap:4px; font-size:9px;"><button onclick="indAction('mirror')" class="mini-btn bg-[#242a4d] text-white">Mirror X</button><button onclick="indAction('pattern')" class="mini-btn bg-[#242a4d] text-white">Pattern x3</button><button onclick="indAction('shell')" class="mini-btn bg-[#242a4d] text-white">Shell</button><button onclick="indAction('hole')" class="mini-btn bg-[#242a4d] text-white">Hole</button><button onclick="indAction('resetRot')" class="mini-btn bg-[#242a4d] text-white">Reset Rot</button><button onclick="indAction('resetScale')" class="mini-btn bg-[#242a4d] text-white">Reset Size</button><label style="display:flex; align-items:center; gap:4px;"><input type="checkbox" id="snapOn" checked> Snap Connect</label><label style="display:flex; align-items:center; gap:4px;"><input type="checkbox" id="gridSnap" checked> Grid Snap</label></div><div class="label">Mass: <span id="massVal">0 kg</span> | Vol: <span id="volVal">0</span> | Surf: <span id="surfVal">0</span></div></div>
-
-        <button onclick="clearInd()" class="mini-btn bg-[#3a1a1a] text-white">Clear All Bodies</button>
+      <b style="font-size:12px; color:#00ffff;">PRO EDITOR</b>
+      <button onclick="openProLibrary()" class="mini-btn" style="width:100%; background:#00ffff; color:black; font-weight:900; padding:10px; border-radius:12px;">+60 Blocks Library</button>
+      <div class="pro-panel"><div class="sec-title">🎨 COLOR & MATERIAL</div>
+        <div class="label">Color</div><input id="pCol" type="color" value="#ffcc00" style="width:100%; height:26px;" oninput="updateProColor()">
+        <div class="label">Metalness <span id="metVal">0.2</span></div><input id="metalness" type="range" min="0" max="1" step="0.05" value="0.2" class="slider" oninput="updateProMat()">
+        <div class="label">Roughness <span id="roughVal">0.5</span></div><input id="roughness" type="range" min="0" max="1" step="0.05" value="0.5" class="slider" oninput="updateProMat()">
+        <div class="label">Opacity <span id="opacVal">1.0</span></div><input id="opacity" type="range" min="0.1" max="1" step="0.05" value="1" class="slider" oninput="updateProMat()">
       </div>
+      <div class="pro-panel"><div class="sec-title">📏 SIZE</div>
+        <div class="label">Uniform <span id="pSizeVal">1.0</span></div><input id="pSize" type="range" min="0.2" max="4" step="0.1" value="1" class="slider" oninput="updateProScale()">
+        <div class="label">X <span id="psxVal">1.0</span></div><input id="pScaleX" type="range" min="0.1" max="5" step="0.1" value="1" class="slider" oninput="updateProScaleXYZ()">
+        <div class="label">Y <span id="psyVal">1.0</span></div><input id="pScaleY" type="range" min="0.1" max="5" step="0.1" value="1" class="slider" oninput="updateProScaleXYZ()">
+        <div class="label">Z <span id="pszVal">1.0</span></div><input id="pScaleZ" type="range" min="0.1" max="5" step="0.1" value="1" class="slider" oninput="updateProScaleXYZ()">
+      </div>
+      <div class="pro-panel"><div class="sec-title">↔️ MOVE</div>
+        <div class="label">X <span id="pmxVal">0</span></div><input id="pMoveX" type="range" min="-10" max="10" step="0.1" value="0" class="slider" oninput="updateProMove()">
+        <div class="label">Y <span id="pmyVal">0.8</span></div><input id="pMoveY" type="range" min="-5" max="10" step="0.1" value="0.8" class="slider" oninput="updateProMove()">
+        <div class="label">Z <span id="pmzVal">0</span></div><input id="pMoveZ" type="range" min="-10" max="10" step="0.1" value="0" class="slider" oninput="updateProMove()">
+      </div>
+      <div class="pro-panel"><div class="sec-title">🔄 ROTATE</div>
+        <div class="label">X <span id="prxVal">0°</span></div><input id="pRotX" type="range" min="0" max="360" step="5" value="0" class="slider" oninput="updateProRot()">
+        <div class="label">Y <span id="pryVal">0°</span></div><input id="pRotY" type="range" min="0" max="360" step="5" value="0" class="slider" oninput="updateProRot()">
+        <div class="label">Z <span id="przVal">0°</span></div><input id="pRotZ" type="range" min="0" max="360" step="5" value="0" class="slider" oninput="updateProRot()">
+      </div>
+      <div class="pro-panel"><div class="sec-title">⚡ ACTIONS</div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:4px; font-size:9px;">
+          <button onclick="proAction('duplicate')" class="mini-btn">Copy</button>
+          <button onclick="proAction('pattern3')" class="mini-btn">Pattern x3</button>
+          <button onclick="proAction('resetRot')" class="mini-btn">Reset Rot</button>
+          <button onclick="proAction('resetScale')" class="mini-btn">Reset Size</button>
+          <button onclick="proAction('topView')" class="mini-btn">Top View</button>
+          <button onclick="proAction('frontView')" class="mini-btn">Front View</button>
+        </div>
+      </div>
+      <button onclick="clearPro()" class="mini-btn" style="background:#3a1a1a;">Clear All</button>
     </div>
   </div>
 
 </div>
 
-<!-- MODALS -->
-<div id="proBlockModal" onclick="if(event.target.id==='proBlockModal') closeProLibrary()"><div class="modal-box"><div style="padding:14px; border-bottom:1px solid #ffffff12; display:flex; justify-content:space-between;"><b>🚀 PRO - 60+ World Blocks - Full</b><button onclick="closeProLibrary()" style="background:#2a2a3a; border:none; color:white; width:28px; height:28px; border-radius:50%;">✕</button></div><div style="padding:12px; overflow-y:auto; flex:1;"><div style="font-size:10px; color:#00ffff; font-weight:800; margin-bottom:8px;">BASIC</div><div style="display:grid; grid-template-columns:repeat(5,1fr); gap:7px;"><div onclick="addProBlock('box')" class="block-item">🧱<b>Box</b></div><div onclick="addProBlock('cyl')" class="block-item">🛢️<b>Cylinder</b></div><div onclick="addProBlock('sphere')" class="block-item">⚪<b>Sphere</b></div><div onclick="addProBlock('cone')" class="block-item">🔺<b>Cone</b></div><div onclick="addProBlock('torus')" class="block-item">⭕<b>Torus</b></div><div onclick="addProBlock('plane')" class="block-item">▭<b>Plane</b></div><div onclick="addProBlock('wedge')" class="block-item">📐<b>Wedge</b></div><div onclick="addProBlock('capsule')" class="block-item">💊<b>Capsule</b></div></div><div style="font-size:10px; color:#00ffff; font-weight:800; margin:12px 0 8px 0;">AEROSPACE 20+</div><div style="display:grid; grid-template-columns:repeat(5,1fr); gap:7px;"><div onclick="addProBlock('fuselage')" class="block-item">🟧<b>Fuselage</b></div><div onclick="addProBlock('cockpit')" class="block-item">🪟<b>Cockpit</b></div><div onclick="addProBlock('wing')" class="block-item">🪽<b>Wing</b></div><div onclick="addProBlock('fin')" class="block-item">🚀<b>Fin</b></div><div onclick="addProBlock('rotor')" class="block-item">🌀<b>Rotor</b></div><div onclick="addProBlock('propeller')" class="block-item">✈️<b>Propeller</b></div><div onclick="addProBlock('landing_skid')" class="block-item">🛞<b>Skid</b></div><div onclick="addProBlock('engine_jet')" class="block-item">🔥<b>Jet</b></div><div onclick="addProBlock('rocket_body')" class="block-item">🚀<b>Rocket</b></div><div onclick="addProBlock('satellite')" class="block-item">🛰️<b>Satellite</b></div></div><div style="font-size:10px; color:#ffcc00; font-weight:800; margin:12px 0 8px 0;">MECHANICAL 20+</div><div style="display:grid; grid-template-columns:repeat(5,1fr); gap:7px;"><div onclick="addProBlock('gear_spur')" class="block-item">⚙️<b>Spur Gear</b></div><div onclick="addProBlock('shaft')" class="block-item">📏<b>Shaft</b></div><div onclick="addProBlock('bolt')" class="block-item">🔩<b>Bolt</b></div><div onclick="addProBlock('beam_i')" class="block-item">🏗️<b>Beam</b></div><div onclick="addProBlock('plate')" class="block-item">⬜<b>Plate</b></div><div onclick="addProBlock('motor_box')" class="block-item">⚡<b>Motor</b></div><div onclick="addProBlock('battery')" class="block-item">🔋<b>Battery</b></div><div onclick="addProBlock('airfoil_0012')" class="block-item">📈<b>NACA</b></div><div onclick="addProBlock('ducted_fan')" class="block-item">🌀<b>Ducted</b></div><div onclick="addProBlock('v_tail')" class="block-item">✈️<b>V-Tail</b></div></div></div></div></div>
+<!-- KIDS BLOCKS MODAL -->
+<div id="kidBlocksModal" onclick="if(event.target.id==='kidBlocksModal') closeKidBlocks()" style="position:fixed; inset:0; background:#000000d9; backdrop-filter:blur(8px); z-index:99999; display:none; align-items:center; justify-content:center;">
+  <div class="modal-box" style="width:920px;">
+    <div style="padding:14px; border-bottom:1px solid #ffffff12; display:flex; justify-content:space-between;">
+      <b>🧱 Kids Blocks Library — 200+ Blocks</b>
+      <button onclick="closeKidBlocks()" style="background:#2a2a3a; border:none; color:white; width:28px; height:28px; border-radius:50%; cursor:pointer;">✕</button>
+    </div>
+    <div style="padding:12px; overflow-y:auto; flex:1;">
+      <div class="sec-title">🎓 SCHOOL</div>
+      <div id="blockSchool" style="display:grid; grid-template-columns:repeat(6,1fr); gap:6px;"></div>
 
-<div id="blockModal" onclick="if(event.target.id==='blockModal') closeBlockLibrary()"><div class="modal-box"><div style="padding:14px; border-bottom:1px solid #ffffff12; display:flex; justify-content:space-between;"><b>🌍 INDUSTRIAL - 60+ World Blocks - Full</b><button onclick="closeBlockLibrary()" style="background:#2a2a3a; border:none; color:white; width:28px; height:28px; border-radius:50%;">✕</button></div><div style="padding:12px; overflow-y:auto; flex:1;"><div style="font-size:10px; color:#ff5c00; font-weight:800; margin-bottom:8px;">BASIC 10</div><div style="display:grid; grid-template-columns:repeat(5,1fr); gap:7px;"><div onclick="addBlockType('box')" class="block-item">🧱<b>Box</b></div><div onclick="addBlockType('cylinder')" class="block-item">🛢️<b>Cylinder</b></div><div onclick="addBlockType('sphere')" class="block-item">⚪<b>Sphere</b></div><div onclick="addBlockType('cone')" class="block-item">🔺<b>Cone</b></div><div onclick="addBlockType('torus')" class="block-item">⭕<b>Torus</b></div><div onclick="addBlockType('plane')" class="block-item">▭<b>Plane</b></div><div onclick="addBlockType('wedge')" class="block-item">📐<b>Wedge</b></div><div onclick="addBlockType('capsule')" class="block-item">💊<b>Capsule</b></div><div onclick="addBlockType('tube')" class="block-item">◯<b>Tube</b></div><div onclick="addBlockType('pyramid')" class="block-item">🔺<b>Pyramid</b></div></div><div style="font-size:10px; color:#00ffff; font-weight:800; margin:12px 0 8px 0;">AEROSPACE + SPACE 20+</div><div style="display:grid; grid-template-columns:repeat(5,1fr); gap:7px;"><div onclick="addBlockType('fuselage')" class="block-item">🟧<b>Fuselage</b></div><div onclick="addBlockType('cockpit')" class="block-item">🪟<b>Cockpit</b></div><div onclick="addBlockType('wing')" class="block-item">🪽<b>Wing</b></div><div onclick="addBlockType('fin')" class="block-item">🚀<b>Fin</b></div><div onclick="addBlockType('rotor')" class="block-item">🌀<b>Rotor</b></div><div onclick="addBlockType('propeller')" class="block-item">✈️<b>Propeller</b></div><div onclick="addBlockType('landing_skid')" class="block-item">🛞<b>Skid</b></div><div onclick="addBlockType('engine_jet')" class="block-item">🔥<b>Jet</b></div><div onclick="addBlockType('nozzle')" class="block-item">🚀<b>Nozzle</b></div><div onclick="addBlockType('rocket_body')" class="block-item">🚀<b>Rocket</b></div><div onclick="addBlockType('satellite')" class="block-item">🛰️<b>Satellite</b></div><div onclick="addBlockType('solar_panel')" class="block-item">🔋<b>Solar</b></div><div onclick="addBlockType('airfoil_0012')" class="block-item">📈<b>NACA 0012</b></div><div onclick="addBlockType('ducted_fan')" class="block-item">🌀<b>Ducted Fan</b></div><div onclick="addBlockType('v_tail')" class="block-item">✈️<b>V-Tail</b></div></div><div style="font-size:10px; color:#ffcc00; font-weight:800; margin:12px 0 8px 0;">MECHANICAL 20+</div><div style="display:grid; grid-template-columns:repeat(5,1fr); gap:7px;"><div onclick="addBlockType('gear_spur')" class="block-item">⚙️<b>Gear</b></div><div onclick="addBlockType('bolt')" class="block-item">🔩<b>Bolt</b></div><div onclick="addBlockType('beam_i')" class="block-item">🏗️<b>Beam</b></div><div onclick="addBlockType('plate')" class="block-item">⬜<b>Plate</b></div><div onclick="addBlockType('motor_box')" class="block-item">⚡<b>Motor</b></div><div onclick="addBlockType('battery')" class="block-item">🔋<b>Battery</b></div><div onclick="addBlockType('bearing')" class="block-item">⭕<b>Bearing</b></div><div onclick="addBlockType('spring')" class="block-item">〰️<b>Spring</b></div></div></div></div></div>
+      <div class="sec-title">🏥 MEDICAL (Body Parts)</div>
+      <div id="blockMedical" style="display:grid; grid-template-columns:repeat(6,1fr); gap:6px;"></div>
+
+      <div class="sec-title">🧬 BIOLOGICAL</div>
+      <div id="blockBio" style="display:grid; grid-template-columns:repeat(6,1fr); gap:6px;"></div>
+
+      <div class="sec-title">🔬 SCIENCE</div>
+      <div id="blockScience" style="display:grid; grid-template-columns:repeat(6,1fr); gap:6px;"></div>
+
+      <div class="sec-title">🔧 ENGINEERING</div>
+      <div id="blockEng" style="display:grid; grid-template-columns:repeat(6,1fr); gap:6px;"></div>
+
+      <div class="sec-title">🌳 NATURE</div>
+      <div id="blockNature" style="display:grid; grid-template-columns:repeat(6,1fr); gap:6px;"></div>
+
+      <div class="sec-title">🚀 SPACE & TECH</div>
+      <div id="blockSpace" style="display:grid; grid-template-columns:repeat(6,1fr); gap:6px;"></div>
+
+      <div class="sec-title">🎨 SHAPES</div>
+      <div id="blockShapes" style="display:grid; grid-template-columns:repeat(6,1fr); gap:6px;"></div>
+    </div>
+  </div>
+</div>
+
+<!-- PRO BLOCKS MODAL -->
+<div id="proBlockModal" onclick="if(event.target.id==='proBlockModal') closeProLibrary()" style="position:fixed; inset:0; background:#000000d9; backdrop-filter:blur(8px); z-index:99999; display:none; align-items:center; justify-content:center;">
+  <div class="modal-box">
+    <div style="padding:14px; border-bottom:1px solid #ffffff12; display:flex; justify-content:space-between;">
+      <b>🚀 PRO — 60+ Blocks</b>
+      <button onclick="closeProLibrary()" style="background:#2a2a3a; border:none; color:white; width:28px; height:28px; border-radius:50%; cursor:pointer;">✕</button>
+    </div>
+    <div style="padding:12px; overflow-y:auto; flex:1;">
+      <div class="sec-title">BASIC</div>
+      <div style="display:grid; grid-template-columns:repeat(5,1fr); gap:7px;">
+        <div onclick="addProBlock('box')" class="block-item">🧱<b>Box</b></div>
+        <div onclick="addProBlock('cyl')" class="block-item">🛢️<b>Cylinder</b></div>
+        <div onclick="addProBlock('sphere')" class="block-item">⚪<b>Sphere</b></div>
+        <div onclick="addProBlock('cone')" class="block-item">🔺<b>Cone</b></div>
+        <div onclick="addProBlock('torus')" class="block-item">⭕<b>Torus</b></div>
+        <div onclick="addProBlock('plane')" class="block-item">▭<b>Plane</b></div>
+        <div onclick="addProBlock('wedge')" class="block-item">📐<b>Wedge</b></div>
+        <div onclick="addProBlock('capsule')" class="block-item">💊<b>Capsule</b></div>
+      </div>
+      <div class="sec-title">AEROSPACE</div>
+      <div style="display:grid; grid-template-columns:repeat(5,1fr); gap:7px;">
+        <div onclick="addProBlock('fuselage')" class="block-item">🟧<b>Fuselage</b></div>
+        <div onclick="addProBlock('cockpit')" class="block-item">🪟<b>Cockpit</b></div>
+        <div onclick="addProBlock('wing')" class="block-item">🪽<b>Wing</b></div>
+        <div onclick="addProBlock('fin')" class="block-item">🚀<b>Fin</b></div>
+        <div onclick="addProBlock('rotor')" class="block-item">🌀<b>Rotor</b></div>
+        <div onclick="addProBlock('propeller')" class="block-item">✈️<b>Propeller</b></div>
+        <div onclick="addProBlock('rocket_body')" class="block-item">🚀<b>Rocket</b></div>
+        <div onclick="addProBlock('satellite')" class="block-item">🛰️<b>Satellite</b></div>
+        <div onclick="addProBlock('airfoil_0012')" class="block-item">📈<b>NACA</b></div>
+        <div onclick="addProBlock('v_tail')" class="block-item">✈️<b>V-Tail</b></div>
+      </div>
+      <div class="sec-title">MECHANICAL</div>
+      <div style="display:grid; grid-template-columns:repeat(5,1fr); gap:7px;">
+        <div onclick="addProBlock('gear_spur')" class="block-item">⚙️<b>Gear</b></div>
+        <div onclick="addProBlock('shaft')" class="block-item">📏<b>Shaft</b></div>
+        <div onclick="addProBlock('bolt')" class="block-item">🔩<b>Bolt</b></div>
+        <div onclick="addProBlock('beam_i')" class="block-item">🏗️<b>Beam</b></div>
+        <div onclick="addProBlock('plate')" class="block-item">⬜<b>Plate</b></div>
+        <div onclick="addProBlock('motor_box')" class="block-item">⚡<b>Motor</b></div>
+        <div onclick="addProBlock('battery')" class="block-item">🔋<b>Battery</b></div>
+        <div onclick="addProBlock('ducted_fan')" class="block-item">🌀<b>Ducted</b></div>
+      </div>
+    </div>
+  </div>
+</div>
 
 <script>
-let mainMode='kids', kObjects=[], selectedIdx=-1, isDown=false, dragOff={x:0,y:0}, kTool='select', kColor='#ff0000', kSize=70;
-function setMain(m){
-  mainMode=m;
-  document.getElementById('kidsUI').style.display=m==='kids'?'flex':'none';
-  document.getElementById('proUI').style.display=m==='pro'?'flex':'none';
-  document.getElementById('industrialUI').style.display=m==='industrial'?'flex':'none';
-  document.getElementById('btnKids').className=m==='kids'?'mini-btn active-k':'mini-btn bg-[#1e2238] text-white';
-  document.getElementById('btnPro').className=m==='pro'?'mini-btn active-p':'mini-btn bg-[#1e2238] text-white';
-  document.getElementById('btnInd').className=m==='industrial'?'mini-btn active-i':'mini-btn bg-[#1e2238] text-white';
-  if(m==='pro') initPro(); if(m==='industrial') initInd();
+// ============================================================
+// LANGUAGES (60+)
+// ============================================================
+const LANGS = [
+  {c:'hinglish', n:'Hinglish'},
+  {c:'en', n:'English'},
+  {c:'hi', n:'हिंदी'},
+  {c:'bn', n:'বাংলা'},
+  {c:'te', n:'తెలుగు'},
+  {c:'mr', n:'मराठी'},
+  {c:'ta', n:'தமிழ்'},
+  {c:'gu', n:'ગુજરાતી'},
+  {c:'kn', n:'ಕನ್ನಡ'},
+  {c:'ml', n:'മലയാളം'},
+  {c:'pa', n:'ਪੰਜਾਬੀ'},
+  {c:'or', n:'ଓଡ଼ିଆ'},
+  {c:'ur', n:'اردو'},
+  {c:'ne', n:'नेपाली'},
+  {c:'si', n:'සිංහල'},
+  {c:'zh', n:'中文'},
+  {c:'ja', n:'日本語'},
+  {c:'ko', n:'한국어'},
+  {c:'th', n:'ไทย'},
+  {c:'vi', n:'Tiếng Việt'},
+  {c:'id', n:'Bahasa Indonesia'},
+  {c:'ms', n:'Bahasa Melayu'},
+  {c:'tl', n:'Filipino'},
+  {c:'ar', n:'العربية'},
+  {c:'fa', n:'فارسی'},
+  {c:'he', n:'עברית'},
+  {c:'tr', n:'Türkçe'},
+  {c:'ru', n:'Русский'},
+  {c:'uk', n:'Українська'},
+  {c:'bg', n:'Български'},
+  {c:'sr', n:'Српски'},
+  {c:'hr', n:'Hrvatski'},
+  {c:'sl', n:'Slovenščina'},
+  {c:'sk', n:'Slovenčina'},
+  {c:'cs', n:'Čeština'},
+  {c:'pl', n:'Polski'},
+  {c:'hu', n:'Magyar'},
+  {c:'ro', n:'Română'},
+  {c:'el', n:'Ελληνικά'},
+  {c:'de', n:'Deutsch'},
+  {c:'nl', n:'Nederlands'},
+  {c:'sv', n:'Svenska'},
+  {c:'no', n:'Norsk'},
+  {c:'da', n:'Dansk'},
+  {c:'fi', n:'Suomi'},
+  {c:'is', n:'Íslenska'},
+  {c:'et', n:'Eesti'},
+  {c:'lv', n:'Latviešu'},
+  {c:'lt', n:'Lietuvių'},
+  {c:'es', n:'Español'},
+  {c:'pt', n:'Português'},
+  {c:'fr', n:'Français'},
+  {c:'it', n:'Italiano'},
+  {c:'ca', n:'Català'},
+  {c:'eu', n:'Euskara'},
+  {c:'gl', n:'Galego'},
+  {c:'sw', n:'Kiswahili'},
+  {c:'af', n:'Afrikaans'},
+  {c:'zu', n:'Zulu'},
+  {c:'yo', n:'Yorùbá'},
+  {c:'am', n:'አማርኛ'},
+  {c:'hy', n:'Հայերեն'},
+  {c:'ka', n:'ქართული'},
+  {c:'az', n:'Azərbaycan'},
+  {c:'kk', n:'Қазақ'},
+  {c:'uz', n:'Oʻzbek'},
+  {c:'mn', n:'Монгол'},
+  {c:'my', n:'မြန်မာ'},
+  {c:'km', n:'ខ្មែរ'},
+  {c:'lo', n:'ລາວ'},
+  {c:'eo', n:'Esperanto'}
+];
+
+// Fill language dropdown
+(function(){
+  const sel = document.getElementById('langSel');
+  sel.innerHTML = LANGS.map(l=>`<option value="${l.c}">${l.n}</option>`).join('');
+})();
+
+function changeLang(){
+  const c = document.getElementById('langSel').value;
+  const lang = LANGS.find(l=>l.c===c);
+  document.getElementById('headerTitle').innerText = '🚁 ' + lang.n + ' — Kids + Pro Blocks';
+  // RTL for Arabic/Hebrew/Urdu/Persian
+  if(['ar','he','ur','fa'].includes(c)) document.body.style.direction='rtl';
+  else document.body.style.direction='ltr';
 }
-function changeLang(){const l=document.getElementById('langSel').value; if(l==='hi'){document.getElementById('headerTitle').innerText='🚁 अपना भविष्य बनाओ - 50 Blocks + 50 Functions';} else if(l==='en'){document.getElementById('headerTitle').innerText='🚁 Create Your Future - 50 Blocks + 50 Functions';} else{document.getElementById('headerTitle').innerText='🚁 Create Your Future - 50+ Blocks + 50+ Functions - Final';}}
-function setKidTool(t){kTool=t; document.querySelectorAll('#kidsUI.tool-icon').forEach(e=>e.classList.remove('tool-on')); const map={select:'kSelect', pen:'kPen', rect:'kRect', circle:'kCircle'}; if(map[t]) document.getElementById(map[t]).classList.add('tool-on');}
-const kcv=document.getElementById('kCanvas'), kctx=kcv.getContext('2d');
-function drawKBG(){kctx.fillStyle='white'; kctx.fillRect(0,0,kcv.width,kcv.height);}
+
+// ============================================================
+// MAIN MODE SWITCH
+// ============================================================
+let mainMode='kids';
+function setMain(m){
+  mainMode = m;
+  document.getElementById('kidsUI').style.display = m==='kids'?'flex':'none';
+  document.getElementById('proUI').style.display = m==='pro'?'flex':'none';
+  document.getElementById('btnKids').className = m==='kids'?'mini-btn active-k':'mini-btn';
+  document.getElementById('btnPro').className = m==='pro'?'mini-btn active-p':'mini-btn';
+  if(m==='pro') initPro();
+}
+
+// ============================================================
+// KIDS CANVAS
+// ============================================================
+let kObjects = [], selectedIdx = -1, isDown=false, dragOff={x:0,y:0}, kTool='select';
+const kcv = document.getElementById('kCanvas');
+const kctx = kcv.getContext('2d');
+
+function drawKBG(){ kctx.fillStyle='white'; kctx.fillRect(0,0,kcv.width,kcv.height); }
+
 function drawK(){
   drawKBG();
   kObjects.forEach((o,i)=>{
-    kctx.save(); kctx.translate(o.x,o.y); kctx.rotate((o.rot||0)*Math.PI/180); kctx.fillStyle=o.color; kctx.strokeStyle=i===selectedIdx?'#00aaff':'#222'; kctx.lineWidth=i===selectedIdx?3:1.2;
-    if(o.type==='alpha'){kctx.font='bold '+(o.w*0.7)+'px sans-serif'; kctx.textAlign='center'; kctx.textBaseline='middle'; kctx.fillText(o.char,0,0); if(i===selectedIdx) kctx.strokeRect(-o.w/2-6,-o.h/2-6,o.w+12,o.h+12);}
-    else if(o.type==='rect') kctx.fillRect(-o.w/2,-o.h/2,o.w,o.h);
-    else if(o.type==='circle'){kctx.beginPath(); kctx.arc(0,0,o.w/2,0,Math.PI*2); kctx.fill();}
-    else if(o.type==='wing'){kctx.beginPath(); kctx.ellipse(0,0,o.w/2,o.h/3,0,0,Math.PI*2); kctx.fill();}
-    else if(o.type==='rocket'){kctx.fillRect(-o.w/3,-o.h/2,o.w*0.66,o.h); kctx.beginPath(); kctx.moveTo(0,-o.h/2-10); kctx.lineTo(-o.w/3,-o.h/2); kctx.lineTo(o.w/3,-o.h/2); kctx.closePath(); kctx.fillStyle='red'; kctx.fill();}
-    else kctx.fillRect(-o.w/2,-o.h/2,o.w,o.h);
+    kctx.save();
+    kctx.translate(o.x, o.y);
+    kctx.rotate((o.rot||0)*Math.PI/180);
+    kctx.fillStyle = o.color;
+    kctx.strokeStyle = i===selectedIdx?'#00aaff':'#222';
+    kctx.lineWidth = i===selectedIdx?3:1.2;
+
+    if(o.type==='text'){
+      kctx.font = 'bold '+(o.size||40)+'px sans-serif';
+      kctx.textAlign='center'; kctx.textBaseline='middle';
+      kctx.fillText(o.char, 0, 0);
+      if(i===selectedIdx){
+        const m = kctx.measureText(o.char);
+        kctx.strokeRect(-m.width/2-8, -(o.size||40)/2-4, m.width+16, (o.size||40)+8);
+      }
+    } else if(o.type==='rect'){
+      kctx.fillRect(-o.w/2, -o.h/2, o.w, o.h);
+    } else if(o.type==='circle'){
+      kctx.beginPath(); kctx.arc(0,0,o.w/2,0,Math.PI*2); kctx.fill();
+    } else if(o.type==='wing'){
+      kctx.beginPath(); kctx.ellipse(0,0,o.w/2,o.h/3,0,0,Math.PI*2); kctx.fill();
+    } else if(o.type==='rocket'){
+      kctx.fillRect(-o.w/3, -o.h/2, o.w*0.66, o.h);
+      kctx.beginPath();
+      kctx.moveTo(0, -o.h/2-12);
+      kctx.lineTo(-o.w/3, -o.h/2);
+      kctx.lineTo(o.w/3, -o.h/2);
+      kctx.closePath();
+      kctx.fillStyle='red'; kctx.fill();
+    } else {
+      kctx.fillRect(-o.w/2, -o.h/2, o.w, o.h);
+    }
     kctx.restore();
   });
 }
-function addAlpha(ch){kObjects.push({type:'alpha', char:ch, x:350+Math.random()*200, y:250+Math.random()*150, w:42, h:42, color:ch.match(/[0-9]/)?'#0066ff':ch.match(/[!@#$%]/)?'#cc0066':'#111', rot:0}); selectedIdx=kObjects.length-1; drawK();}
-function addKidPart(t){const c={'rect':'#ff5a5a','circle':'#00aaff','wing':'#22ff66','rocket':'#ffaa00','satellite':'#7ec8ff','naca':'#22ff66','solar':'#001a66','propeller':'#ff8c00'}; kObjects.push({type:t, x:350+Math.random()*150, y:300+Math.random()*80, w:80, h:50, color:c[t]||'#ff8c00', rot:0}); selectedIdx=kObjects.length-1; drawK();}
-function getPos(e){const r=kcv.getBoundingClientRect(); return {x:(e.clientX-r.left)*(kcv.width/r.width), y:(e.clientY-r.top)*(kcv.height/r.height)};}
-kcv.addEventListener('mousedown', e=>{const p=getPos(e); isDown=true; selectedIdx=-1; for(let i=kObjects.length-1;i>=0;i--){const o=kObjects[i]; if(Math.abs(p.x-o.x)<o.w*0.8 && Math.abs(p.y-o.y)<o.h*0.8){selectedIdx=i; dragOff={x:p.x-o.x, y:p.y-o.y}; break;}} drawK();});
-kcv.addEventListener('mousemove', e=>{if(!isDown||selectedIdx<0) return; const p=getPos(e); kObjects[selectedIdx].x=p.x-dragOff.x; kObjects[selectedIdx].y=p.y-dragOff.y; for(let i=0;i<kObjects.length;i++){if(i===selectedIdx) continue; const d=Math.hypot(kObjects[selectedIdx].x-kObjects[i].x, kObjects[selectedIdx].y-kObjects[i].y); if(d<30){kObjects[selectedIdx].x=kObjects[i].x; kObjects[selectedIdx].y=kObjects[i].y+kObjects[i].h/2+kObjects[selectedIdx].h/2+4;}} drawK();});
-kcv.addEventListener('mouseup', ()=>{isDown=false;}); kcv.addEventListener('wheel', e=>{if(selectedIdx>=0){e.preventDefault(); const d=e.deltaY>0?-5:5; kObjects[selectedIdx].w=Math.max(20,Math.min(200,kObjects[selectedIdx].w+d)); kObjects[selectedIdx].h=kObjects[selectedIdx].w*0.8; drawK();}}, {passive:false});
-function deleteKid(){if(selectedIdx>=0){kObjects.splice(selectedIdx,1); selectedIdx=-1; drawK();}} function rotateKid(){if(selectedIdx>=0){kObjects[selectedIdx].rot=(kObjects[selectedIdx].rot||0)+15; drawK();}} function duplicateKid(){if(selectedIdx>=0){const o={...kObjects[selectedIdx]}; o.x+=30; o.y+=30; kObjects.push(o); selectedIdx=kObjects.length-1; drawK();}} function clearK(){kObjects=[]; drawKBG();} function startSim(){let t=0; const id=setInterval(()=>{t+=0.05; kObjects.forEach(o=>{if(o.type==='propeller') o.rot+=20; if(o.type==='wing') o.y+=Math.sin(t)*0.4; if(o.type==='rocket') o.y-=0.8;}); drawK(); if(t>6) clearInterval(id);},30);} drawKBG();
 
-// PRO - 50 FUNCTIONS + 50+ BLOCKS - DRAG FIX
-let sceneP,cameraP,rendererP,controlsP,groupP, proInit=false, selP=null, bodiesP=[], isDraggingP=false, dragPlaneP=new THREE.Plane(), dragOffsetP=new THREE.Vector3();
-function initPro(){
-  if(proInit) return; proInit=true;
-  const c=document.getElementById('threePro'); sceneP=new THREE.Scene(); sceneP.background=new THREE.Color(0x05070a); cameraP=new THREE.PerspectiveCamera(50,c.clientWidth/c.clientHeight,0.1,1000); cameraP.position.set(6,5,7); rendererP=new THREE.WebGLRenderer({antialias:true}); rendererP.setSize(c.clientWidth,c.clientHeight); c.appendChild(rendererP.domElement); controlsP=new THREE.OrbitControls(cameraP, rendererP.domElement); controlsP.enableDamping=true; sceneP.add(new THREE.DirectionalLight(0xffffff,1.2)); sceneP.add(new THREE.AmbientLight(0xffffff,0.7)); groupP=new THREE.Group(); sceneP.add(groupP); sceneP.add(new THREE.GridHelper(24,48,0x223344,0x101a2a));
-  const ray=new THREE.Raycaster(), mouse=new THREE.Vector2();
-  rendererP.domElement.addEventListener('mousedown', e=>{
-    const r=rendererP.domElement.getBoundingClientRect(); mouse.x=((e.clientX-r.left)/r.width)*2-1; mouse.y=-((e.clientY-r.top)/r.height)*2+1; ray.setFromCamera(mouse,cameraP);
-    const inter=ray.intersectObjects(groupP.children,true);
-    if(inter.length>0){selP=inter[0].object; while(selP.parent&&selP.parent!==groupP) selP=selP.parent; isDraggingP=true; controlsP.enabled=false; dragPlaneP.setFromNormalAndCoplanarPoint(new THREE.Vector3(0,1,0), new THREE.Vector3(0,selP.position.y,0)); const ip=ray.intersectPlane(dragPlaneP, new THREE.Vector3()); if(ip) dragOffsetP.copy(ip).sub(selP.position); syncPro();}
-  });
-  rendererP.domElement.addEventListener('mousemove', e=>{
-    if(!isDraggingP||!selP) return;
-    const r=rendererP.domElement.getBoundingClientRect(); mouse.x=((e.clientX-r.left)/r.width)*2-1; mouse.y=-((e.clientY-r.top)/r.height)*2+1; ray.setFromCamera(mouse,cameraP);
-    const ip=ray.intersectPlane(dragPlaneP, new THREE.Vector3()); if(ip){selP.position.copy(ip).sub(dragOffsetP); if(document.getElementById('proSnap').checked){for(let o of bodiesP){if(o===selP) continue; if(selP.position.distanceTo(o.position)<parseFloat(document.getElementById('proSnapDist').value)){selP.position.x=o.position.x; selP.position.z=o.position.z; selP.position.y=o.position.y+1; break;}}} syncPro();}
-  });
-  window.addEventListener('mouseup', ()=>{isDraggingP=false; controlsP.enabled=true;});
-  rendererP.domElement.addEventListener('wheel', e=>{if(selP){e.preventDefault(); const d=e.deltaY>0?-0.1:0.1; selP.scale.x+=d; selP.scale.y+=d; selP.scale.z+=d; selP.scale.x=Math.max(0.1,Math.min(5,selP.scale.x)); selP.scale.y=selP.scale.x; selP.scale.z=selP.scale.x; syncPro();}}, {passive:false});
-  (function anim(){requestAnimationFrame(anim); controlsP.update(); rendererP.render(sceneP,cameraP);})();
+function addToCanvas(obj){
+  kObjects.push(obj);
+  selectedIdx = kObjects.length-1;
+  drawK();
 }
+
+function addAlpha(ch){
+  const isNum = /[0-9]/.test(ch);
+  const isSpec = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(ch);
+  const color = isNum ? '#0066ff' : isSpec ? '#cc0066' : '#111';
+  addToCanvas({
+    type:'text', char:ch,
+    x: 350 + Math.random()*200,
+    y: 250 + Math.random()*150,
+    size: 42, color: color, rot:0
+  });
+}
+
+function addKidText(){
+  const v = document.getElementById('kidText').value.trim();
+  if(!v) return;
+  addToCanvas({
+    type:'text', char:v,
+    x: 400 + Math.random()*100,
+    y: 300 + Math.random()*100,
+    size: 36, color: '#333', rot:0
+  });
+  document.getElementById('kidText').value='';
+}
+
+function addKidPart(t){
+  const colors = {'rect':'#ff5a5a','circle':'#00aaff','wing':'#22ff66','rocket':'#ffaa00','satellite':'#7ec8ff','naca':'#22ff66','solar':'#001a66','propeller':'#ff8c00'};
+  addToCanvas({
+    type:t, x: 350 + Math.random()*150, y: 300 + Math.random()*80,
+    w: 80, h: 50, color: colors[t]||'#ff8c00', rot:0
+  });
+}
+
+// Number generator
+let numObjects = [];
+function generateNumbers(){
+  const n = Math.min(100000, parseInt(document.getElementById('numCount').value)||10);
+  // Remove old numbers
+  kObjects = kObjects.filter(o => o.type !== 'text' || !/^[0-9]+$/.test(o.char));
+  
+  // Layout in grid
+  const cols = 20;
+  const startX = 60, startY = 60;
+  const cellW = 60, cellH = 32;
+  
+  for(let i=0; i<n; i++){
+    const num = i+1;
+    const col = i % cols;
+    const row = Math.floor(i / cols);
+    kObjects.push({
+      type:'text', char: String(num),
+      x: startX + col*cellW,
+      y: startY + row*cellH,
+      size: 20, color: '#0066ff', rot:0
+    });
+  }
+  drawK();
+  document.getElementById('kHint').innerText = '✅ ' + n + ' numbers canvas me add ho gaye!';
+}
+
+function quickNum(n){
+  document.getElementById('numCount').value = n;
+  generateNumbers();
+}
+
+function clearNumbers(){
+  kObjects = kObjects.filter(o => o.type !== 'text' || !/^[0-9]+$/.test(o.char));
+  drawK();
+}
+
+// Mouse events
+function getPos(e){
+  const r = kcv.getBoundingClientRect();
+  return {x:(e.clientX-r.left)*(kcv.width/r.width), y:(e.clientY-r.top)*(kcv.height/r.height)};
+}
+
+kcv.addEventListener('mousedown', e=>{
+  const p = getPos(e);
+  isDown = true;
+  selectedIdx = -1;
+  for(let i=kObjects.length-1; i>=0; i--){
+    const o = kObjects[i];
+    const w = (o.w || o.size || 40) * 1.2;
+    const h = (o.h || o.size || 40) * 1.2;
+    if(Math.abs(p.x-o.x) < w && Math.abs(p.y-o.y) < h){
+      selectedIdx = i;
+      dragOff = {x:p.x-o.x, y:p.y-o.y};
+      break;
+    }
+  }
+  drawK();
+});
+
+kcv.addEventListener('mousemove', e=>{
+  if(!isDown || selectedIdx < 0) return;
+  const p = getPos(e);
+  kObjects[selectedIdx].x = p.x - dragOff.x;
+  kObjects[selectedIdx].y = p.y - dragOff.y;
+  drawK();
+});
+
+kcv.addEventListener('mouseup', ()=>{ isDown = false; });
+
+kcv.addEventListener('wheel', e=>{
+  if(selectedIdx >= 0){
+    e.preventDefault();
+    const d = e.deltaY > 0 ? -3 : 3;
+    const o = kObjects[selectedIdx];
+    if(o.size) o.size = Math.max(10, Math.min(200, o.size + d));
+    else { o.w = Math.max(20, o.w + d); o.h = Math.max(20, o.h + d*0.7); }
+    drawK();
+  }
+}, {passive:false});
+
+function deleteKid(){ if(selectedIdx >= 0){ kObjects.splice(selectedIdx, 1); selectedIdx = -1; drawK(); } }
+function rotateKid(){ if(selectedIdx >= 0){ kObjects[selectedIdx].rot = (kObjects[selectedIdx].rot||0) + 15; drawK(); } }
+function duplicateKid(){ if(selectedIdx >= 0){ const o = {...kObjects[selectedIdx]}; o.x += 30; o.y += 30; kObjects.push(o); selectedIdx = kObjects.length-1; drawK(); } }
+function clearK(){ kObjects = []; drawKBG(); }
+function setKidTool(t){ kTool = t; document.querySelectorAll('#kidsUI .tool-icon').forEach(e=>e.classList.remove('tool-on')); const m={select:'kSelect', pen:'kPen', rect:'kRect', circle:'kCircle'}; if(m[t]) document.getElementById(m[t]).classList.add('tool-on'); }
+
+function startSim(){
+  let t = 0;
+  const id = setInterval(()=>{
+    t += 0.05;
+    kObjects.forEach(o=>{
+      if(o.type === 'propeller') o.rot = (o.rot||0) + 20;
+      if(o.type === 'wing') o.y += Math.sin(t)*0.4;
+      if(o.type === 'rocket') o.y -= 0.8;
+    });
+    drawK();
+    if(t > 6) clearInterval(id);
+  }, 30);
+}
+
+// ============================================================
+// KIDS BLOCK LIBRARY
+// ============================================================
+const KID_BLOCKS = {
+  school: [
+    {e:'📚', n:'Book'}, {e:'✏️', n:'Pencil'}, {e:'📐', n:'Ruler'}, {e:'🖍️', n:'Crayon'},
+    {e:'🎒', n:'Bag'}, {e:'📓', n:'Notebook'}, {e:'📏', n:'Scale'}, {e:'🖊️', n:'Pen'},
+    {e:'🖇️', n:'Clip'}, {e:'📎', n:'Pin'}, {e:'🏫', n:'School'}, {e:'🖥️', n:'Computer'}
+  ],
+  medical: [
+    {e:'❤️', n:'Heart'}, {e:'🧠', n:'Brain'}, {e:'🫁', n:'Lungs'}, {e:'🦴', n:'Bone'},
+    {e:'👁️', n:'Eye'}, {e:'👂', n:'Ear'}, {e:'👄', n:'Mouth'}, {e:'🦷', n:'Tooth'},
+    {e:'🫀', n:'Heart 2'}, {e:'🩺', n:'Stetho'}, {e:'💊', n:'Medicine'}, {e:'💉', n:'Injection'},
+    {e:'🧬', n:'DNA'}, {e:'🩸', n:'Blood'}, {e:'🦵', n:'Leg'}, {e:'🦶', n:'Foot'},
+    {e:'👋', n:'Hand'}, {e:'🖐️', n:'Palm'}, {e:'💪', n:'Arm'}, {e:'👃', n:'Nose'}
+  ],
+  bio: [
+    {e:'🌱', n:'Seedling'}, {e:'🌿', n:'Leaf'}, {e:'🌳', n:'Tree'}, {e:'🌸', n:'Flower'},
+    {e:'🍎', n:'Apple'}, {e:'🍌', n:'Banana'}, {e:'🥕', n:'Carrot'}, {e:'🌽', n:'Corn'},
+    {e:'🐛', n:'Caterpillar'}, {e:'🦋', n:'Butterfly'}, {e:'🐝', n:'Bee'}, {e:'🐌', n:'Snail'},
+    {e:'🌾', n:'Wheat'}, {e:'🍇', n:'Grapes'}, {e:'🥭', n:'Mango'}, {e:'🌻', n:'Sunflower'},
+    {e:'🍄', n:'Mushroom'}, {e:'🌵', n:'Cactus'}, {e:'🌴', n:'Palm'}, {e:'🍀', n:'Clover'}
+  ],
+  science: [
+    {e:'🔬', n:'Microscope'}, {e:'🔭', n:'Telescope'}, {e:'⚗️', n:'Flask'}, {e:'🧪', n:'Test Tube'},
+    {e:'⚛️', n:'Atom'}, {e:'🧲', n:'Magnet'}, {e:'💡', n:'Bulb'}, {e:'🔋', n:'Battery'},
+    {e:'🔌', n:'Plug'}, {e:'⚡', n:'Electric'}, {e:'🌡️', n:'Thermometer'}, {e:'🧫', n:'Petri'},
+    {e:'🧬', n:'Genes'}, {e:'🩻', n:'X-Ray'}, {e:'💧', n:'Water'}, {e:'💨', n:'Air'},
+    {e:'🔥', n:'Fire'}, {e:'❄️', n:'Ice'}, {e:'🌪️', n:'Tornado'}, {e:'⛈️', n:'Storm'}
+  ],
+  eng: [
+    {e:'⚙️', n:'Gear'}, {e:'🔧', n:'Wrench'}, {e:'🔨', n:'Hammer'}, {e:'🪛', n:'Screwdrv'},
+    {e:'📏', n:'Ruler'}, {e:'🪚', n:'Saw'}, {e:'🔩', n:'Bolt'}, {e:'⚡', n:'Power'},
+    {e:'🏗️', n:'Crane'}, {e:'🚧', n:'Barrier'}, {e:'🛠️', n:'Tools'}, {e:'⚓', n:'Anchor'},
+    {e:'🧰', n:'Toolbox'}, {e:'🔗', n:'Chain'}, {e:'📡', n:'Antenna'}, {e:'🛞', n:'Wheel'}
+  ],
+  nature: [
+    {e:'☀️', n:'Sun'}, {e:'🌙', n:'Moon'}, {e:'⭐', n:'Star'}, {e:'☁️', n:'Cloud'},
+    {e:'🌈', n:'Rainbow'}, {e:'🌊', n:'Wave'}, {e:'🏔️', n:'Mountain'}, {e:'🏝️', n:'Island'},
+    {e:'🌷', n:'Tulip'}, {e:'🍁', n:'Maple'}, {e:'🦅', n:'Eagle'}, {e:'🦁', n:'Lion'},
+    {e:'🐘', n:'Elephant'}, {e:'🐋', n:'Whale'}, {e:'🦜', n:'Parrot'}, {e:'🐢', n:'Turtle'},
+    {e:'🦒', n:'Giraffe'}, {e:'🐼', n:'Panda'}, {e:'🦉', n:'Owl'}, {e:'🦚', n:'Peacock'}
+  ],
+  space: [
+    {e:'🚀', n:'Rocket'}, {e:'🛰️', n:'Satellite'}, {e:'🪐', n:'Saturn'}, {e:'🌍', n:'Earth'},
+    {e:'🌎', n:'Earth 2'}, {e:'🌏', n:'Earth 3'}, {e:'☄️', n:'Comet'}, {e:'🌠', n:'Shooting'},
+    {e:'👨‍🚀', n:'Astronaut'}, {e:'👩‍🚀', n:'Astronaut W'}, {e:'🔭', n:'Telescope'}, {e:'🌌', n:'Galaxy'},
+    {e:'✨', n:'Sparkle'}, {e:'🌟', n:'Star 2'}, {e:'💫', n:'Comet 2'}, {e:'🌞', n:'Sun 2'}
+  ],
+  shapes: [
+    {e:'⬜', n:'Square'}, {e:'⬛', n:'Black Sq'}, {e:'🟥', n:'Red Sq'}, {e:'🟧', n:'Orange Sq'},
+    {e:'🟨', n:'Yellow Sq'}, {e:'🟩', n:'Green Sq'}, {e:'🟦', n:'Blue Sq'}, {e:'🟪', n:'Purple Sq'},
+    {e:'⚪', n:'Circle'}, {e:'⚫', n:'Black C'}, {e:'🔴', n:'Red C'}, {e:'🟠', n:'Orange C'},
+    {e:'🟡', n:'Yellow C'}, {e:'🟢', n:'Green C'}, {e:'🔵', n:'Blue C'}, {e:'🟣', n:'Purple C'},
+    {e:'🔺', n:'Triangle'}, {e:'🔻', n:'Triangle D'}, {e:'⭐', n:'Star'}, {e:'❤️', n:'Heart'},
+    {e:'💛', n:'Yellow H'}, {e:'💚', n:'Green H'}, {e:'💙', n:'Blue H'}, {e:'💜', n:'Purple H'}
+  ]
+};
+
+function buildBlocksGrid(){
+  for(const [key, arr] of Object.entries(KID_BLOCKS)){
+    const container = document.getElementById('block' + key.charAt(0).toUpperCase() + key.slice(1));
+    if(!container) continue;
+    container.innerHTML = arr.map(b => 
+      `<div class="block-item" onclick="addKidBlock('${b.e}')"><span style="font-size:22px">${b.e}</span><b>${b.n}</b></div>`
+    ).join('');
+  }
+}
+buildBlocksGrid();
+
+function addKidBlock(emoji){
+  addToCanvas({
+    type:'text', char:emoji,
+    x: 400 + Math.random()*150,
+    y: 300 + Math.random()*100,
+    size: 60, color:'#000', rot:0
+  });
+  closeKidBlocks();
+}
+
+function openKidBlocks(){ document.getElementById('kidBlocksModal').style.display='flex'; }
+function closeKidBlocks(){ document.getElementById('kidBlocksModal').style.display='none'; }
+
+// Tab switching in Kids
+function switchKidTab(tab, el){
+  document.querySelectorAll('.tab-btn').forEach(t=>t.classList.remove('on'));
+  el.classList.add('on');
+  document.getElementById('kidABC').style.display = tab==='abc'?'block':'none';
+  document.getElementById('kidNUM').style.display = tab==='num'?'block':'none';
+  document.getElementById('kidTXT').style.display = tab==='txt'?'block':'none';
+}
+
+// Build ABC grid
+(function buildABCGrid(){
+  const upper = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+  const lower = 'abcdefghijklmnopqrstuvwxyz'.split('');
+  const digits = '0123456789'.split('');
+  const special = ['!','@','#','$','%','^','&','*','(',')','-','_','+','=','[',']','{','}',';',':','\'','"',',','.','<','>','/','?','\\','|','~','`','₹','€','$','£','¥'];
+  
+  const all = [...upper, ...lower, ...digits, ...special];
+  document.getElementById('abcGrid').innerHTML = all.map(c => 
+    `<div class="alpha-btn" onclick="addAlpha('${c.replace(/\\/g, '\\\\').replace(/'/g, "\\'")}')">${c}</div>`
+  ).join('');
+})();
+
+drawKBG();
+
+// ============================================================
+// PRO MODE — 3D
+// ============================================================
+let sceneP, cameraP, rendererP, controlsP, groupP, proInit=false, selP=null, bodiesP=[], isDraggingP=false, dragPlaneP=new THREE.Plane(), dragOffsetP=new THREE.Vector3();
+
+function initPro(){
+  if(proInit) return;
+  proInit = true;
+  const c = document.getElementById('threePro');
+  sceneP = new THREE.Scene();
+  sceneP.background = new THREE.Color(0x05070a);
+  cameraP = new THREE.PerspectiveCamera(50, c.clientWidth/c.clientHeight, 0.1, 1000);
+  cameraP.position.set(6,5,7);
+  rendererP = new THREE.WebGLRenderer({antialias:true});
+  rendererP.setSize(c.clientWidth, c.clientHeight);
+  c.appendChild(rendererP.domElement);
+  controlsP = new THREE.OrbitControls(cameraP, rendererP.domElement);
+  controlsP.enableDamping = true;
+  sceneP.add(new THREE.DirectionalLight(0xffffff,1.2));
+  sceneP.add(new THREE.AmbientLight(0xffffff,0.7));
+  groupP = new THREE.Group();
+  sceneP.add(groupP);
+  sceneP.add(new THREE.GridHelper(24, 48, 0x223344, 0x101a2a));
+
+  const ray = new THREE.Raycaster();
+  const mouse = new THREE.Vector2();
+
+  rendererP.domElement.addEventListener('mousedown', e=>{
+    const r = rendererP.domElement.getBoundingClientRect();
+    mouse.x = ((e.clientX-r.left)/r.width)*2-1;
+    mouse.y = -((e.clientY-r.top)/r.height)*2+1;
+    ray.setFromCamera(mouse, cameraP);
+    const inter = ray.intersectObjects(groupP.children, true);
+    if(inter.length > 0){
+      selP = inter[0].object;
+      while(selP.parent && selP.parent !== groupP) selP = selP.parent;
+      isDraggingP = true;
+      controlsP.enabled = false;
+      dragPlaneP.setFromNormalAndCoplanarPoint(new THREE.Vector3(0,1,0), new THREE.Vector3(0, selP.position.y, 0));
+      const ip = ray.intersectPlane(dragPlaneP, new THREE.Vector3());
+      if(ip) dragOffsetP.copy(ip).sub(selP.position);
+      syncPro();
+    }
+  });
+
+  rendererP.domElement.addEventListener('mousemove', e=>{
+    if(!isDraggingP || !selP) return;
+    const r = rendererP.domElement.getBoundingClientRect();
+    mouse.x = ((e.clientX-r.left)/r.width)*2-1;
+    mouse.y = -((e.clientY-r.top)/r.height)*2+1;
+    ray.setFromCamera(mouse, cameraP);
+    const ip = ray.intersectPlane(dragPlaneP, new THREE.Vector3());
+    if(ip) { selP.position.copy(ip).sub(dragOffsetP); syncPro(); }
+  });
+
+  window.addEventListener('mouseup', ()=>{ isDraggingP = false; controlsP.enabled = true; });
+
+  rendererP.domElement.addEventListener('wheel', e=>{
+    if(selP){
+      e.preventDefault();
+      const d = e.deltaY > 0 ? -0.1 : 0.1;
+      selP.scale.x = Math.max(0.1, Math.min(5, selP.scale.x + d));
+      selP.scale.y = selP.scale.x;
+      selP.scale.z = selP.scale.x;
+      syncPro();
+    }
+  }, {passive:false});
+
+  (function anim(){ requestAnimationFrame(anim); controlsP.update(); rendererP.render(sceneP, cameraP); })();
+}
+
 function syncPro(){
   if(!selP) return;
-  document.getElementById('pMoveX').value=selP.position.x; document.getElementById('pmxVal').innerText=selP.position.x.toFixed(1);
-  document.getElementById('pMoveY').value=selP.position.y; document.getElementById('pmyVal').innerText=selP.position.y.toFixed(1);
-  document.getElementById('pMoveZ').value=selP.position.z; document.getElementById('pmzVal').innerText=selP.position.z.toFixed(1);
-  document.getElementById('pScaleX').value=selP.scale.x; document.getElementById('psxVal').innerText=selP.scale.x.toFixed(1);
-  document.getElementById('pScaleY').value=selP.scale.y; document.getElementById('psyVal').innerText=selP.scale.y.toFixed(1);
-  document.getElementById('pScaleZ').value=selP.scale.z; document.getElementById('pszVal').innerText=selP.scale.z.toFixed(1);
-  document.getElementById('pSize').value=selP.scale.x; document.getElementById('pSizeVal').innerText=selP.scale.x.toFixed(1);
-  document.getElementById('pRotX').value=(selP.rotation.x*180/Math.PI)%360; document.getElementById('prxVal').innerText=Math.round(document.getElementById('pRotX').value)+'°';
-  document.getElementById('pRotY').value=(selP.rotation.y*180/Math.PI)%360; document.getElementById('pryVal').innerText=Math.round(document.getElementById('pRotY').value)+'°';
-  document.getElementById('pRotZ').value=(selP.rotation.z*180/Math.PI)%360; document.getElementById('przVal').innerText=Math.round(document.getElementById('pRotZ').value)+'°';
+  document.getElementById('pMoveX').value = selP.position.x; document.getElementById('pmxVal').innerText = selP.position.x.toFixed(1);
+  document.getElementById('pMoveY').value = selP.position.y; document.getElementById('pmyVal').innerText = selP.position.y.toFixed(1);
+  document.getElementById('pMoveZ').value = selP.position.z; document.getElementById('pmzVal').innerText = selP.position.z.toFixed(1);
+  document.getElementById('pScaleX').value = selP.scale.x; document.getElementById('psxVal').innerText = selP.scale.x.toFixed(1);
+  document.getElementById('pScaleY').value = selP.scale.y; document.getElementById('psyVal').innerText = selP.scale.y.toFixed(1);
+  document.getElementById('pScaleZ').value = selP.scale.z; document.getElementById('pszVal').innerText = selP.scale.z.toFixed(1);
+  document.getElementById('pSize').value = selP.scale.x; document.getElementById('pSizeVal').innerText = selP.scale.x.toFixed(1);
 }
-function addProBlock(t){initPro(); closeProLibrary(); let m; const mat=new THREE.MeshStandardMaterial({color:document.getElementById('pCol').value}); if(t==='box') m=new THREE.Mesh(new THREE.BoxGeometry(2,0.8,0.9), mat); if(t==='cyl') m=new THREE.Mesh(new THREE.CylinderGeometry(0.4,0.4,1.5,16), mat); if(t==='sphere') m=new THREE.Mesh(new THREE.SphereGeometry(0.6,16,16), mat); if(t==='cone') m=new THREE.Mesh(new THREE.ConeGeometry(0.5,1,16), mat); if(t==='torus') m=new THREE.Mesh(new THREE.TorusGeometry(0.5,0.15,10,20), mat); if(t==='plane') m=new THREE.Mesh(new THREE.BoxGeometry(2.4,0.05,1), mat); if(t==='wedge'){m=new THREE.Mesh(new THREE.BoxGeometry(1.5,0.8,1), mat); m.scale.x=0.5;} if(t==='capsule'){m=new THREE.Group(); const c1=new THREE.Mesh(new THREE.CylinderGeometry(0.4,0.4,1.2,16), mat); const s1=new THREE.Mesh(new THREE.SphereGeometry(0.4,12,12), mat); s1.position.y=0.6; const s2=s1.clone(); s2.position.y=-0.6; m.add(c1,s1,s2);} if(t==='fuselage') m=new THREE.Mesh(new THREE.BoxGeometry(2.8,0.6,0.6), mat); if(t==='cockpit') m=new THREE.Mesh(new THREE.BoxGeometry(0.6,0.4,0.5), new THREE.MeshStandardMaterial({color:'#7ec8ff', transparent:true, opacity:0.6})); if(t==='wing'){const sh=new THREE.Shape(); sh.moveTo(0,0); sh.lineTo(2,0); sh.lineTo(2,0.15); sh.lineTo(0,0.25); sh.lineTo(0,0); m=new THREE.Mesh(new THREE.ExtrudeGeometry(sh,{depth:0.06, bevelEnabled:false}), new THREE.MeshStandardMaterial({color:'#22ff66'}));} if(t==='rotor'){m=new THREE.Group(); const b1=new THREE.Mesh(new THREE.BoxGeometry(3.2,0.06,0.12), new THREE.MeshStandardMaterial({color:'#00ffff'})); const b2=b1.clone(); b2.rotation.y=Math.PI/2; m.add(b1,b2);} if(t==='propeller'){m=new THREE.Group(); const b=new THREE.Mesh(new THREE.BoxGeometry(2,0.07,0.12), mat); const b2=b.clone(); b2.rotation.y=Math.PI/2; m.add(b,b2);} if(t==='fin') m=new THREE.Mesh(new THREE.BoxGeometry(0.08,0.9,0.7), mat); if(t==='landing_skid'){m=new THREE.Group(); const bar=new THREE.Mesh(new THREE.BoxGeometry(2,0.1,0.1), mat); const l1=new THREE.Mesh(new THREE.CylinderGeometry(0.05,0.05,0.7,8), mat); l1.position.set(-0.7,-0.35,0); const l2=l1.clone(); l2.position.x=0.7; m.add(bar,l1,l2);} if(t==='engine_jet') m=new THREE.Mesh(new THREE.CylinderGeometry(0.35,0.45,1,16), new THREE.MeshStandardMaterial({color:'#ff5c00'})); if(t==='rocket_body') m=new THREE.Mesh(new THREE.CylinderGeometry(0.3,0.3,1.8,16), new THREE.MeshStandardMaterial({color:'#ffaa00'})); if(t==='satellite') m=new THREE.Mesh(new THREE.BoxGeometry(0.7,0.5,0.5), new THREE.MeshStandardMaterial({color:'#c0c0ff'})); if(t==='gear_spur') m=new THREE.Mesh(new THREE.CylinderGeometry(0.45,0.45,0.18,16), mat); if(t==='shaft') m=new THREE.Mesh(new THREE.CylinderGeometry(0.08,0.08,2,12), mat); if(t==='bolt'){m=new THREE.Group(); const hd=new THREE.Mesh(new THREE.CylinderGeometry(0.18,0.18,0.1,6), mat); const sh=new THREE.Mesh(new THREE.CylinderGeometry(0.08,0.08,0.6,8), mat); sh.position.y=-0.35; m.add(hd,sh);} if(t==='beam_i') m=new THREE.Mesh(new THREE.BoxGeometry(2.2,0.3,0.12), mat); if(t==='plate') m=new THREE.Mesh(new THREE.BoxGeometry(1.6,0.06,1), mat); if(t==='motor_box') m=new THREE.Mesh(new THREE.BoxGeometry(0.5,0.4,0.5), new THREE.MeshStandardMaterial({color:'#00ffff'})); if(t==='battery') m=new THREE.Mesh(new THREE.BoxGeometry(0.5,0.25,0.35), new THREE.MeshStandardMaterial({color:'#ff0000'})); if(t==='airfoil_0012'){const sh=new THREE.Shape(); sh.moveTo(0,0); sh.bezierCurveTo(0.6,0.18,1.4,0.18,2,0); sh.bezierCurveTo(1.4,-0.08,0.6,-0.05,0,0); m=new THREE.Mesh(new THREE.ExtrudeGeometry(sh,{depth:0.05, bevelEnabled:false}), new THREE.MeshStandardMaterial({color:'#22ff66'}));} if(t==='ducted_fan'){m=new THREE.Group(); const duct=new THREE.Mesh(new THREE.TorusGeometry(0.4,0.08,8,20), mat); const fan=new THREE.Mesh(new THREE.BoxGeometry(0.7,0.04,0.1), mat); m.add(duct,fan);} if(t==='v_tail'){m=new THREE.Group(); const f1=new THREE.Mesh(new THREE.BoxGeometry(0.06,0.8,0.5), mat); f1.rotation.z=Math.PI/6; const f2=f1.clone(); f2.rotation.z=-Math.PI/6; m.add(f1,f2);} if(!m) return; m.position.set((Math.random()-0.5)*2,0.8,(Math.random()-0.5)*2); m.name=t+'_'+(bodiesP.length+1); groupP.add(m); bodiesP.push(m); selP=m; syncPro();}
-function updateProColor(){if(selP){const c=document.getElementById('pCol').value; selP.traverse?selP.traverse(o=>{if(o.material) o.material.color.set(c);}):selP.material.color.set(c);}} function updateProMat(){if(!selP) return; const met=parseFloat(document.getElementById('metalness').value); const rough=parseFloat(document.getElementById('roughness').value); const op=parseFloat(document.getElementById('opacity').value); selP.traverse?selP.traverse(o=>{if(o.material){o.material.metalness=met; o.material.roughness=rough; o.material.transparent=op<1; o.material.opacity=op;}}):(selP.material.metalness=met, selP.material.roughness=rough, selP.material.transparent=op<1, selP.material.opacity=op);} function updateProScale(){if(!selP) return; const s=parseFloat(document.getElementById('pSize').value); selP.scale.set(s,s,s); syncPro();} function updateProScaleXYZ(){if(!selP) return; selP.scale.x=parseFloat(document.getElementById('pScaleX').value); selP.scale.y=parseFloat(document.getElementById('pScaleY').value); selP.scale.z=parseFloat(document.getElementById('pScaleZ').value); syncPro();} function updateProMove(){if(!selP) return; selP.position.x=parseFloat(document.getElementById('pMoveX').value); selP.position.y=parseFloat(document.getElementById('pMoveY').value); selP.position.z=parseFloat(document.getElementById('pMoveZ').value); syncPro();} function updateProRot(){if(!selP) return; selP.rotation.x=parseFloat(document.getElementById('pRotX').value)*Math.PI/180; selP.rotation.y=parseFloat(document.getElementById('pRotY').value)*Math.PI/180; selP.rotation.z=parseFloat(document.getElementById('pRotZ').value)*Math.PI/180; syncPro();} function scaleBtn(f){if(!selP) return; selP.scale.x*=f; selP.scale.y*=f; selP.scale.z*=f; syncPro();} function moveBtn(ax,v){if(!selP) return; selP.position[ax]+=v; syncPro();} function rotBtn(ax,v){if(!selP) return; selP.rotation[ax]+=v*Math.PI/180; syncPro();} function proAction(a){if(!selP) return; if(a==='mirrorX') selP.position.x*=-1; if(a==='mirrorZ') selP.position.z*=-1; if(a==='duplicate'){const c=selP.clone(); c.position.x+=0.7; groupP.add(c); bodiesP.push(c);} if(a==='pattern3'){for(let i=1;i<=2;i++){const c=selP.clone(); c.position.x+=i*1.2; groupP.add(c); bodiesP.push(c);}} if(a==='resetRot') selP.rotation.set(0,0,0); if(a==='resetScale') selP.scale.set(1,1,1); if(a==='topView'){cameraP.position.set(0,12,0); controlsP.target.set(0,0,0);} if(a==='frontView'){cameraP.position.set(0,2,8); controlsP.target.set(0,0,0);} syncPro();} function deletePro(){if(selP){groupP.remove(selP); selP=null;}} function clearPro(){if(groupP){while(groupP.children.length>0) groupP.remove(groupP.children[0]);} bodiesP=[];} function openProLibrary(){document.getElementById('proBlockModal').style.display='flex';} function closeProLibrary(){document.getElementById('proBlockModal').style.display='none';}
 
-// INDUSTRIAL - 50+ OPTIONS + 60+ BLOCKS
-let sceneI,cameraI,rendererI,controlsI,groupI, indInit=false, selI=null, bodiesI=[], isDraggingI=false, dragPlaneI=new THREE.Plane(), dragOffsetI=new THREE.Vector3();
-function initInd(){
-  if(indInit) return; indInit=true;
-  const c=document.getElementById('threeInd'); sceneI=new THREE.Scene(); sceneI.background=new THREE.Color(0x080a14); cameraI=new THREE.PerspectiveCamera(50,c.clientWidth/c.clientHeight,0.1,1000); cameraI.position.set(7,6,8); rendererI=new THREE.WebGLRenderer({antialias:true}); rendererI.setSize(c.clientWidth,c.clientHeight); c.appendChild(rendererI.domElement); controlsI=new THREE.OrbitControls(cameraI, rendererI.domElement); controlsI.enableDamping=true; sceneI.add(new THREE.DirectionalLight(0xffffff,1.3)); sceneI.add(new THREE.AmbientLight(0xffffff,0.6)); groupI=new THREE.Group(); sceneI.add(groupI); sceneI.add(new THREE.GridHelper(30,60,0x1e2a3a,0x0f1720));
-  const ray=new THREE.Raycaster(), mouse=new THREE.Vector2();
-  rendererI.domElement.addEventListener('mousedown', e=>{const r=rendererI.domElement.getBoundingClientRect(); mouse.x=((e.clientX-r.left)/r.width)*2-1; mouse.y=-((e.clientY-r.top)/r.height)*2+1; ray.setFromCamera(mouse,cameraI); const inter=ray.intersectObjects(groupI.children,true); if(inter.length>0){selI=inter[0].object; while(selI.parent&&selI.parent!==groupI) selI=selI.parent; document.getElementById('selInfo').innerText=selI.name; isDraggingI=true; controlsI.enabled=false; dragPlaneI.setFromNormalAndCoplanarPoint(new THREE.Vector3(0,1,0), new THREE.Vector3(0,selI.position.y,0)); const ip=ray.intersectPlane(dragPlaneI, new THREE.Vector3()); if(ip) dragOffsetI.copy(ip).sub(selI.position); syncInd();}});
-  rendererI.domElement.addEventListener('mousemove', e=>{if(!isDraggingI||!selI) return; const r=rendererI.domElement.getBoundingClientRect(); mouse.x=((e.clientX-r.left)/r.width)*2-1; mouse.y=-((e.clientY-r.top)/r.height)*2+1; ray.setFromCamera(mouse,cameraI); const ip=ray.intersectPlane(dragPlaneI, new THREE.Vector3()); if(ip){selI.position.copy(ip).sub(dragOffsetI); if(document.getElementById('snapOn').checked){for(let o of bodiesI){if(o===selI) continue; if(selI.position.distanceTo(o.position)<0.9){selI.position.x=o.position.x; selI.position.z=o.position.z; selI.position.y=o.position.y+1; break;}}} syncInd();}});
-  window.addEventListener('mouseup', ()=>{isDraggingI=false; controlsI.enabled=true;});
-  rendererI.domElement.addEventListener('wheel', e=>{if(selI){e.preventDefault(); const d=e.deltaY>0?-0.1:0.1; selI.scale.x+=d; selI.scale.y+=d; selI.scale.z+=d; selI.scale.x=Math.max(0.1,Math.min(5,selI.scale.x)); selI.scale.y=selI.scale.x; selI.scale.z=selI.scale.x; syncInd();}}, {passive:false});
-  (function anim(){requestAnimationFrame(anim); controlsI.update(); rendererI.render(sceneI,cameraI);})();
+function addProBlock(t){
+  initPro();
+  closeProLibrary();
+  let m;
+  const mat = new THREE.MeshStandardMaterial({color: document.getElementById('pCol').value});
+  if(t==='box') m = new THREE.Mesh(new THREE.BoxGeometry(2, 0.8, 0.9), mat);
+  else if(t==='cyl') m = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.4, 1.5, 16), mat);
+  else if(t==='sphere') m = new THREE.Mesh(new THREE.SphereGeometry(0.6, 16, 16), mat);
+  else if(t==='cone') m = new THREE.Mesh(new THREE.ConeGeometry(0.5, 1, 16), mat);
+  else if(t==='torus') m = new THREE.Mesh(new THREE.TorusGeometry(0.5, 0.15, 10, 20), mat);
+  else if(t==='plane') m = new THREE.Mesh(new THREE.BoxGeometry(2.4, 0.05, 1), mat);
+  else if(t==='wedge'){ m = new THREE.Mesh(new THREE.BoxGeometry(1.5, 0.8, 1), mat); m.scale.x = 0.5; }
+  else if(t==='capsule'){ m = new THREE.Group(); const c1 = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.4, 1.2, 16), mat); const s1 = new THREE.Mesh(new THREE.SphereGeometry(0.4, 12, 12), mat); s1.position.y = 0.6; const s2 = s1.clone(); s2.position.y = -0.6; m.add(c1, s1, s2); }
+  else if(t==='fuselage') m = new THREE.Mesh(new THREE.BoxGeometry(2.8, 0.6, 0.6), mat);
+  else if(t==='cockpit') m = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.4, 0.5), new THREE.MeshStandardMaterial({color:'#7ec8ff', transparent:true, opacity:0.6}));
+  else if(t==='wing'){ const sh = new THREE.Shape(); sh.moveTo(0,0); sh.lineTo(2,0); sh.lineTo(2,0.15); sh.lineTo(0,0.25); sh.lineTo(0,0); m = new THREE.Mesh(new THREE.ExtrudeGeometry(sh, {depth:0.06, bevelEnabled:false}), new THREE.MeshStandardMaterial({color:'#22ff66'})); }
+  else if(t==='fin') m = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.9, 0.7), mat);
+  else if(t==='rotor'){ m = new THREE.Group(); const b1 = new THREE.Mesh(new THREE.BoxGeometry(3.2, 0.06, 0.12), new THREE.MeshStandardMaterial({color:'#00ffff'})); const b2 = b1.clone(); b2.rotation.y = Math.PI/2; m.add(b1, b2); }
+  else if(t==='propeller'){ m = new THREE.Group(); const b = new THREE.Mesh(new THREE.BoxGeometry(2, 0.07, 0.12), mat); const b2 = b.clone(); b2.rotation.y = Math.PI/2; m.add(b, b2); }
+  else if(t==='rocket_body') m = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.3, 1.8, 16), new THREE.MeshStandardMaterial({color:'#ffaa00'}));
+  else if(t==='satellite') m = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.5, 0.5), new THREE.MeshStandardMaterial({color:'#c0c0ff'}));
+  else if(t==='gear_spur') m = new THREE.Mesh(new THREE.CylinderGeometry(0.45, 0.45, 0.18, 16), mat);
+  else if(t==='shaft') m = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 2, 12), mat);
+  else if(t==='bolt'){ m = new THREE.Group(); const hd = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.18, 0.1, 6), mat); const sh = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 0.6, 8), mat); sh.position.y = -0.35; m.add(hd, sh); }
+  else if(t==='beam_i') m = new THREE.Mesh(new THREE.BoxGeometry(2.2, 0.3, 0.12), mat);
+  else if(t==='plate') m = new THREE.Mesh(new THREE.BoxGeometry(1.6, 0.06, 1), mat);
+  else if(t==='motor_box') m = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.4, 0.5), new THREE.MeshStandardMaterial({color:'#00ffff'}));
+  else if(t==='battery') m = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.25, 0.35), new THREE.MeshStandardMaterial({color:'#ff0000'}));
+  else if(t==='airfoil_0012'){ const sh = new THREE.Shape(); sh.moveTo(0,0); sh.bezierCurveTo(0.6,0.18,1.4,0.18,2,0); sh.bezierCurveTo(1.4,-0.08,0.6,-0.05,0,0); m = new THREE.Mesh(new THREE.ExtrudeGeometry(sh,{depth:0.05, bevelEnabled:false}), new THREE.MeshStandardMaterial({color:'#22ff66'})); }
+  else if(t==='ducted_fan'){ m = new THREE.Group(); const duct = new THREE.Mesh(new THREE.TorusGeometry(0.4, 0.08, 8, 20), mat); const fan = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.04, 0.1), mat); m.add(duct, fan); }
+  else if(t==='v_tail'){ m = new THREE.Group(); const f1 = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.8, 0.5), mat); f1.rotation.z = Math.PI/6; const f2 = f1.clone(); f2.rotation.z = -Math.PI/6; m.add(f1, f2); }
+  if(!m) return;
+  m.position.set((Math.random()-0.5)*2, 0.8, (Math.random()-0.5)*2);
+  m.name = t + '_' + (bodiesP.length+1);
+  groupP.add(m);
+  bodiesP.push(m);
+  selP = m;
+  syncPro();
 }
-function syncInd(){if(!selI) return; document.getElementById('iMoveX').value=selI.position.x; document.getElementById('imxVal').innerText=selI.position.x.toFixed(1); document.getElementById('iMoveY').value=selI.position.y; document.getElementById('imyVal').innerText=selI.position.y.toFixed(1); document.getElementById('iMoveZ').value=selI.position.z; document.getElementById('imzVal').innerText=selI.position.z.toFixed(1); document.getElementById('iScaleX').value=selI.scale.x; document.getElementById('isxVal').innerText=selI.scale.x.toFixed(1); document.getElementById('iScaleY').value=selI.scale.y; document.getElementById('isyVal').innerText=selI.scale.y.toFixed(1); document.getElementById('iScaleZ').value=selI.scale.z; document.getElementById('iszVal').innerText=selI.scale.z.toFixed(1); document.getElementById('iRotX').value=(selI.rotation.x*180/Math.PI)%360; document.getElementById('irxVal').innerText=Math.round(document.getElementById('iRotX').value)+'°'; document.getElementById('iRotY').value=(selI.rotation.y*180/Math.PI)%360; document.getElementById('iryVal').innerText=Math.round(document.getElementById('iRotY').value)+'°'; document.getElementById('iRotZ').value=(selI.rotation.z*180/Math.PI)%360; document.getElementById('irzVal').innerText=Math.round(document.getElementById('iRotZ').value)+'°';}
-function addBlockType(t){initInd(); closeBlockLibrary(); let m; const matS=new THREE.MeshStandardMaterial({color:'#c0c0c0'}); const matG=new THREE.MeshStandardMaterial({color:'#22ff66'}); const matO=new THREE.MeshStandardMaterial({color:'#ff5c00'}); if(t==='box') m=new THREE.Mesh(new THREE.BoxGeometry(2.2,0.9,1.3), matS); if(t==='cylinder') m=new THREE.Mesh(new THREE.CylinderGeometry(0.5,0.5,1.6,20), matS); if(t==='sphere') m=new THREE.Mesh(new THREE.SphereGeometry(0.65,20,20), matS); if(t==='cone') m=new THREE.Mesh(new THREE.ConeGeometry(0.6,1.2,20), matS); if(t==='torus') m=new THREE.Mesh(new THREE.TorusGeometry(0.5,0.18,12,24), matS); if(t==='plane') m=new THREE.Mesh(new THREE.BoxGeometry(2.5,0.06,1.2), matS); if(t==='wedge'){m=new THREE.Mesh(new THREE.BoxGeometry(1.5,0.8,1), matS); m.scale.x=0.5;} if(t==='capsule'){m=new THREE.Group(); const c1=new THREE.Mesh(new THREE.CylinderGeometry(0.4,0.4,1.2,16), matS); const s1=new THREE.Mesh(new THREE.SphereGeometry(0.4,12,12), matS); s1.position.y=0.6; const s2=s1.clone(); s2.position.y=-0.6; m.add(c1,s1,s2);} if(t==='tube') m=new THREE.Mesh(new THREE.TorusGeometry(0.5,0.12,12,24), matS); if(t==='pyramid') m=new THREE.Mesh(new THREE.ConeGeometry(0.7,1,4), matS); if(t==='fuselage') m=new THREE.Mesh(new THREE.BoxGeometry(3.2,0.7,0.7), matS); if(t==='cockpit') m=new THREE.Mesh(new THREE.BoxGeometry(0.6,0.4,0.5), new THREE.MeshStandardMaterial({color:'#7ec8ff', transparent:true, opacity:0.6})); if(t==='wing'){const sh=new THREE.Shape(); sh.moveTo(0,0); sh.lineTo(2,0); sh.lineTo(2,0.15); sh.lineTo(0,0.25); sh.lineTo(0,0); m=new THREE.Mesh(new THREE.ExtrudeGeometry(sh,{depth:0.06, bevelEnabled:false}), matG);} if(t==='fin') m=new THREE.Mesh(new THREE.BoxGeometry(0.08,1.1,0.8), matS); if(t==='rotor'){m=new THREE.Group(); const b1=new THREE.Mesh(new THREE.BoxGeometry(3.5,0.07,0.15), new THREE.MeshStandardMaterial({color:'#00ffff'})); const b2=b1.clone(); b2.rotation.y=Math.PI/2; m.add(b1,b2);} if(t==='propeller'){m=new THREE.Group(); const b=new THREE.Mesh(new THREE.BoxGeometry(2.2,0.08,0.18), matS); const b2=b.clone(); b2.rotation.y=Math.PI/2; m.add(b,b2);} if(t==='landing_skid'){m=new THREE.Group(); const bar=new THREE.Mesh(new THREE.BoxGeometry(2.2,0.08,0.08), matS); const l1=new THREE.Mesh(new THREE.CylinderGeometry(0.05,0.05,0.7,8), matS); l1.position.set(-0.7,-0.35,0); const l2=l1.clone(); l2.position.x=0.7; m.add(bar,l1,l2);} if(t==='engine_jet') m=new THREE.Mesh(new THREE.CylinderGeometry(0.4,0.5,1.2,16), matO); if(t==='nozzle') m=new THREE.Mesh(new THREE.CylinderGeometry(0.5,0.3,0.6,16), matO); if(t==='rocket_body') m=new THREE.Mesh(new THREE.CylinderGeometry(0.35,0.35,2.2,16), new THREE.MeshStandardMaterial({color:'#ffaa00'})); if(t==='satellite') m=new THREE.Mesh(new THREE.BoxGeometry(0.8,0.6,0.6), new THREE.MeshStandardMaterial({color:'#c0c0ff'})); if(t==='solar_panel') m=new THREE.Mesh(new THREE.BoxGeometry(1.5,0.02,0.6), new THREE.MeshStandardMaterial({color:'#001a66'})); if(t==='parachute') m=new THREE.Mesh(new THREE.SphereGeometry(0.6,12,8,0,Math.PI*2,0,Math.PI/2), new THREE.MeshStandardMaterial({color:'white', side:THREE.DoubleSide})); if(t==='gear_spur') m=new THREE.Mesh(new THREE.CylinderGeometry(0.5,0.5,0.2,16), matS); if(t==='bolt'){m=new THREE.Group(); const hd=new THREE.Mesh(new THREE.CylinderGeometry(0.18,0.18,0.1,6), matS); const sh=new THREE.Mesh(new THREE.CylinderGeometry(0.08,0.08,0.6,8), matS); sh.position.y=-0.35; m.add(hd,sh);} if(t==='beam_i') m=new THREE.Mesh(new THREE.BoxGeometry(2.5,0.4,0.15), matS); if(t==='plate') m=new THREE.Mesh(new THREE.BoxGeometry(1.8,0.08,1.2), matS); if(t==='motor_box') m=new THREE.Mesh(new THREE.BoxGeometry(0.5,0.4,0.6), new THREE.MeshStandardMaterial({color:'#00ffff'})); if(t==='battery') m=new THREE.Mesh(new THREE.BoxGeometry(0.6,0.3,0.4), new THREE.MeshStandardMaterial({color:'#ff0000'})); if(t==='bearing') m=new THREE.Mesh(new THREE.TorusGeometry(0.2,0.05,8,16), matS); if(t==='spring'){const pts=[]; for(let i=0;i<20;i++) pts.push(new THREE.Vector3(Math.sin(i*0.8)*0.15, i*0.08-0.8, Math.cos(i*0.8)*0.15)); const g=new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 64, 0.03, 8, false); m=new THREE.Mesh(g, matS);} if(t==='airfoil_0012'){const sh=new THREE.Shape(); sh.moveTo(0,0); sh.bezierCurveTo(0.6,0.18,1.4,0.18,2,0); sh.bezierCurveTo(1.4,-0.08,0.6,-0.05,0,0); m=new THREE.Mesh(new THREE.ExtrudeGeometry(sh,{depth:0.05, bevelEnabled:false}), matG);} if(t==='ducted_fan'){m=new THREE.Group(); const duct=new THREE.Mesh(new THREE.TorusGeometry(0.4,0.08,8,20), matS); const fan=new THREE.Mesh(new THREE.BoxGeometry(0.7,0.04,0.1), matS); m.add(duct,fan);} if(t==='v_tail'){m=new THREE.Group(); const f1=new THREE.Mesh(new THREE.BoxGeometry(0.06,0.8,0.5), matS); f1.rotation.z=Math.PI/6; const f2=f1.clone(); f2.rotation.z=-Math.PI/6; m.add(f1,f2);} if(!m) return; m.name=t+'_'+(bodiesI.length+1); m.position.set((Math.random()-0.5)*2,0.9,(Math.random()-0.5)*2); groupI.add(m); bodiesI.push(m); selI=m; updateLists(); syncInd();}
-function updateLists(){document.getElementById('bodyCount').innerText=bodiesI.length; document.getElementById('bodyList').innerHTML=bodiesI.map(b=>`<div>🔩 ${b.name}</div>`).join(''); document.getElementById('timeline').innerHTML=bodiesI.map((_,i)=>`<div style="width:32px; height:20px; background:#242a4d; border-radius:6px; font-size:8px; display:flex; align-items:center; justify-content:center;">F${i+1}</div>`).join(''); document.getElementById('massVal').innerText=(bodiesI.length*1.25).toFixed(2)+' kg'; document.getElementById('volVal').innerText=(bodiesI.length*0.0034).toFixed(5)+' m³'; document.getElementById('surfVal').innerText=(bodiesI.length*0.82).toFixed(3)+' m²';}
-function indTool(t){document.querySelectorAll('.rib-btn').forEach(b=>b.classList.remove('rib-on')); const el=document.getElementById('r'+t.charAt(0).toUpperCase()+t.slice(1)); if(el) el.classList.add('rib-on'); document.getElementById('toolInfo').innerText=t;}
-function applyIndScale(){if(!selI) return; selI.scale.x=parseFloat(document.getElementById('iScaleX').value); selI.scale.y=parseFloat(document.getElementById('iScaleY').value); selI.scale.z=parseFloat(document.getElementById('iScaleZ').value); syncInd();} function applyIndMove(){if(!selI) return; selI.position.x=parseFloat(document.getElementById('iMoveX').value); selI.position.y=parseFloat(document.getElementById('iMoveY').value); selI.position.z=parseFloat(document.getElementById('iMoveZ').value); syncInd();} function applyIndRot(){if(!selI) return; selI.rotation.x=parseFloat(document.getElementById('iRotX').value)*Math.PI/180; selI.rotation.y=parseFloat(document.getElementById('iRotY').value)*Math.PI/180; selI.rotation.z=parseFloat(document.getElementById('iRotZ').value)*Math.PI/180; syncInd();} function indScaleBtn(f){if(!selI) return; selI.scale.x*=f; selI.scale.y*=f; selI.scale.z*=f; syncInd();} function indMoveBtn(ax,v){if(!selI) return; selI.position[ax]+=v; syncInd();} function indRotBtn(ax,v){if(!selI) return; selI.rotation[ax]+=v*Math.PI/180; syncInd();} function applyIndFillet(){if(!selI) return; document.getElementById('filletVal').innerText=document.getElementById('fillet').value; selI.scale.x=1+parseFloat(document.getElementById('fillet').value)*0.2;} function applyIndExtrude(){if(!selI) return; document.getElementById('extrudeVal').innerText=document.getElementById('extrude').value; selI.scale.y=parseFloat(document.getElementById('extrude').value);} function applyIndChamfer(){if(!selI) return; document.getElementById('chamVal').innerText=document.getElementById('chamfer').value; selI.rotation.x=parseFloat(document.getElementById('chamfer').value)*0.3;} function applyIndRevolve(){if(!selI) return; document.getElementById('revVal').innerText=document.getElementById('revAngle').value+'°'; selI.rotation.y=parseFloat(document.getElementById('revAngle').value)*Math.PI/180;} function applyIndShell(){if(!selI) return; document.getElementById('shellVal').innerText=document.getElementById('shellThick').value; selI.material.wireframe=!selI.material.wireframe; selI.material.transparent=true; selI.material.opacity=0.6;} function applyIndHole(){if(!selI) return; document.getElementById('holeVal').innerText=document.getElementById('holeDia').value; selI.scale.x*=0.9;} function indAction(a){if(!selI) return; if(a==='mirror'){const c=selI.clone(); c.position.x=-c.position.x; c.name=selI.name+'_Mirror'; groupI.add(c); bodiesI.push(c);} if(a==='pattern'){for(let i=1;i<=2;i++){const c=selI.clone(); c.position.x+=i*1.2; c.name=selI.name+'_Pat'+i; groupI.add(c); bodiesI.push(c);}} if(a==='resetRot') selI.rotation.set(0,0,0); if(a==='resetScale') selI.scale.set(1,1,1); updateLists(); syncInd();} function openBlockLibrary(){document.getElementById('blockModal').style.display='flex';} function closeBlockLibrary(){document.getElementById('blockModal').style.display='none';} function clearInd(){if(groupI){while(groupI.children.length>0) groupI.remove(groupI.children[0]);} bodiesI=[]; updateLists();} function clearAll(){if(mainMode==='kids') clearK(); if(mainMode==='pro') clearPro(); if(mainMode==='industrial') clearInd();} function simulate(){if(!selI) return; let t=0; const id=setInterval(()=>{t+=0.05; selI.rotation.y+=0.12; if(t>4) clearInterval(id);},16);} function analyze(){alert('Mass: '+document.getElementById('massVal').innerText);} setMain('kids');
-</script></body></html>
-    """
+
+function updateProColor(){ if(!selP) return; const c = document.getElementById('pCol').value; if(selP.traverse) selP.traverse(o=>{ if(o.material) o.material.color.set(c); }); else selP.material.color.set(c); }
+function updateProMat(){ if(!selP) return; const met = parseFloat(document.getElementById('metalness').value); const rough = parseFloat(document.getElementById('roughness').value); const op = parseFloat(document.getElementById('opacity').value); document.getElementById('metVal').innerText = met; document.getElementById('roughVal').innerText = rough; document.getElementById('opacVal').innerText = op; if(selP.traverse) selP.traverse(o=>{ if(o.material){ o.material.metalness = met; o.material.roughness = rough; o.material.transparent = op<1; o.material.opacity = op; } }); }
+function updateProScale(){ if(!selP) return; const s = parseFloat(document.getElementById('pSize').value); selP.scale.set(s,s,s); syncPro(); }
+function updateProScaleXYZ(){ if(!selP) return; selP.scale.x = parseFloat(document.getElementById('pScaleX').value); selP.scale.y = parseFloat(document.getElementById('pScaleY').value); selP.scale.z = parseFloat(document.getElementById('pScaleZ').value); syncPro(); }
+function updateProMove(){ if(!selP) return; selP.position.x = parseFloat(document.getElementById('pMoveX').value); selP.position.y = parseFloat(document.getElementById('pMoveY').value); selP.position.z = parseFloat(document.getElementById('pMoveZ').value); syncPro(); }
+function updateProRot(){ if(!selP) return; selP.rotation.x = parseFloat(document.getElementById('pRotX').value) * Math.PI/180; selP.rotation.y = parseFloat(document.getElementById('pRotY').value) * Math.PI/180; selP.rotation.z = parseFloat(document.getElementById('pRotZ').value) * Math.PI/180; syncPro(); }
+function proAction(a){ if(!selP) return; if(a==='duplicate'){ const c = selP.clone(); c.position.x += 0.7; groupP.add(c); bodiesP.push(c); } if(a==='pattern3'){ for(let i=1;i<=2;i++){ const c = selP.clone(); c.position.x += i*1.2; groupP.add(c); bodiesP.push(c); } } if(a==='resetRot') selP.rotation.set(0,0,0); if(a==='resetScale') selP.scale.set(1,1,1); if(a==='topView'){ cameraP.position.set(0,12,0); controlsP.target.set(0,0,0); } if(a==='frontView'){ cameraP.position.set(0,2,8); controlsP.target.set(0,0,0); } syncPro(); }
+function deletePro(){ if(selP){ groupP.remove(selP); selP = null; } }
+function clearPro(){ if(groupP){ while(groupP.children.length>0) groupP.remove(groupP.children[0]); } bodiesP = []; }
+function openProLibrary(){ document.getElementById('proBlockModal').style.display = 'flex'; }
+function closeProLibrary(){ document.getElementById('proBlockModal').style.display = 'none'; }
+function clearAll(){ if(mainMode==='kids') clearK(); if(mainMode==='pro') clearPro(); }
+
+// Init
+setMain('kids');
+</script>
+</body></html>
+"""
     components.html(HTML, height=950, scrolling=False)
     
 def render_kids_logic_lab():
