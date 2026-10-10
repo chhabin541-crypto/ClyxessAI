@@ -4568,6 +4568,7 @@ def render_coding_lab_mod():
 <title>Clyxess Kids Coding Lab</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lz-string@1.5.0/libs/lz-string.min.js"></script>
 <style>
 :root{--bg:#08080a;--panel:#121215;--panel2:#18181b;--border:#27272a;--text:#fff;--muted:#71717a;--muted2:#a1a1aa;--accent:#6366f1;--success:#22c55e;--warn:#f59e0b}
 body.light{--bg:#f4f4f7;--panel:#ffffff;--panel2:#f9f9fb;--border:#e4e4e7;--text:#111113;--muted:#71717a;--muted2:#52525b;--accent:#4f46e5}
@@ -4627,8 +4628,6 @@ body.light .rwrap{background:linear-gradient(135deg,#e5e7eb,#d1d5db)}
 #emojiPanel{display:none;position:fixed;background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:8px;z-index:10000;max-width:280px;box-shadow:0 10px 30px rgba(0,0,0,0.5)}
 #emojiPanel span{font-size:20px;cursor:pointer;padding:3px;display:inline-block;border-radius:4px}
 #emojiPanel span:hover{background:var(--accent)}
-
-/* LEARN SECTION */
 #learnPanel{display:none;position:fixed;inset:0;background:var(--bg);z-index:9500;overflow-y:auto;padding:20px}
 #learnPanel.open{display:block}
 .learnHead{display:flex;justify-content:space-between;align-items:center;max-width:1100px;margin:0 auto 20px;padding:12px 16px;background:var(--panel);border-radius:12px;border:1px solid var(--border)}
@@ -4707,7 +4706,6 @@ body.light .learnCode{background:#1e293b;color:#67e8f9}
 </div>
 </div>
 
-<!-- LEARN PANEL -->
 <div id="learnPanel">
 <div class="learnHead">
 <h2>📚 Learn Coding — Ek Ek Cheez Seekho!</h2>
@@ -4737,31 +4735,29 @@ body.light .learnCode{background:#1e293b;color:#67e8f9}
 <script>
 const CLS_MAP={"5 Years":"Class 1","6 Years":"Class 1","7 Years":"Class 2","8 Years":"Class 3","9 Years":"Class 4","10 Years":"Class 5","11-12 Years":"Class 6-7","13-14 Years":"Class 8-9","15-16 Years":"Class 10","17-18 Years":"Class 11-12","18+ Years":"College"};
 
-// ============ LEARN CARDS ============
 const LEARN_CARDS = [
-  {title:"📝 Heading (H1)", preview:`<h1 style="font-size:28px;color:#dc2626;margin:0">Hello Duniya!</h1>`, code:`<h1>Hello Duniya!</h1>`, tip:"Bada title likhne ke liye <h1> use karo. h2 chhota, h3 aur chhota."},
-  {title:"📄 Paragraph", preview:`<p style="margin:0;color:#333">Main 5 saal ka hu aur mujhe coding pasand hai!</p>`, code:`<p>Yahan apni baat likho...</p>`, tip:"Kisi bhi text ke liye <p> use karo."},
-  {title:"🎨 Color (Colored Text)", preview:`<span style="color:#2563eb;font-weight:bold">Mera favourite color BLUE hai</span>`, code:`<p style="color:blue">Mera favourite color BLUE hai</p>`, tip:"color: blue ki jagah red, green, orange likho!"},
-  {title:"🔘 Button", preview:`<button style="padding:10px 20px;background:#f59e0b;color:#fff;border:none;border-radius:10px;font-weight:bold">Mujhe Dabao!</button>`, code:`<button>Mujhe Dabao!</button>`, tip:"Button banane ke liye <button> use karo."},
-  {title:"🖼️ Image", preview:`<img src="https://cdn-icons-png.flaticon.com/512/616/616408.png" width="70">`, code:`<img src="IMAGE-LINK" width="100">`, tip:"Image dikhane ke liye <img> use karo. src me link daalo."},
-  {title:"🔗 Link", preview:`<a href="#" style="color:#6366f1;text-decoration:underline">Mere Baare Me Jaano</a>`, code:`<a href="https://google.com">Google</a>`, tip:"Link banane ke liye <a href='...'> use karo."},
-  {title:"📋 List", preview:`<ul style="margin:0;padding-left:20px;color:#333"><li>Class 1 - Drawing</li><li>Class 2 - Coding</li></ul>`, code:`<ul>\n  <li>Class 1 - Drawing</li>\n  <li>Class 2 - Coding</li>\n</ul>`, tip:"List banane ke liye <ul> aur <li> use karo."},
-  {title:"📊 Slider", preview:`<input type="range" min="0" max="100" value="50" style="width:150px">`, code:`<input type="range" min="0" max="100">`, tip:"Slider banane ke liye input type='range' likho."},
-  {title:"✍️ Input Box", preview:`<input type="text" placeholder="Naam likho..." style="padding:8px;border-radius:6px;border:1px solid #ccc">`, code:`<input type="text" placeholder="Naam likho...">`, tip:"User se kuch likhwane ke liye input type='text' use karo."},
-  {title:"🎯 Alert (Click pe popup)", preview:`<button onclick="alert('Wah! 🌟')" style="padding:8px 16px;background:#22c55e;color:#fff;border:none;border-radius:8px">Click Karo</button>`, code:`<button onclick="alert('Wah!')">Click Karo</button>`, tip:"onclick='alert(...)' se click pe popup aata hai."},
-  {title:"🖍️ Background Color", preview:`<div style="background:#fef9c3;padding:15px;border-radius:10px;color:#333;width:100%;text-align:center">Rangila Box!</div>`, code:`<div style="background:#fef9c3;padding:15px">Rangila Box!</div>`, tip:"background: color se box ka rang badal jata hai."},
-  {title:"⬛ Box with Border", preview:`<div style="border:3px solid #dc2626;padding:12px;border-radius:10px;color:#333;width:100%;text-align:center">Mera Box</div>`, code:`<div style="border:3px solid red;padding:12px">Mera Box</div>`, tip:"border: 3px solid red se border lagta hai."},
-  {title:"🎬 Emoji", preview:`<div style="font-size:30px">😀 🚀 ❤️ 🌟 🎉</div>`, code:`😀 🚀 ❤️ 🌟 🎉`, tip:"Emoji seedha code me likh sakte ho!"},
-  {title:"🖼️ Circle Image", preview:`<img src="https://cdn-icons-png.flaticon.com/512/616/616408.png" width="70" style="border-radius:50%">`, code:`<img src="LINK" style="border-radius:50%">`, tip:"border-radius:50% se image gol ho jati hai."},
-  {title:"📐 Center Text", preview:`<div style="text-align:center;color:#333">Yeh Text Center Me Hai</div>`, code:`<div style="text-align:center">Yeh Text Center Me Hai</div>`, tip:"text-align:center se text center me aata hai."},
-  {title:"🎮 Score Game", preview:`<div style="text-align:center"><p style="margin:0;color:#333">Score: <b id="demoScore">0</b></p><button onclick="document.getElementById('demoScore').innerText++" style="padding:6px 12px;background:#f59e0b;color:#fff;border:none;border-radius:6px">+1</button></div>`, code:`<p>Score: <span id="s">0</span></p>\n<button onclick="document.getElementById('s').innerText++">+1</button>`, tip:"Click pe score badhane ka game banao!"},
-  {title:"🌈 Gradient Background", preview:`<div style="background:linear-gradient(135deg,#667eea,#764ba2);padding:15px;color:#fff;border-radius:10px;width:100%;text-align:center">Gradient!</div>`, code:`<div style="background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;padding:15px">Gradient!</div>`, tip:"linear-gradient se 2 rang ka mix background banta hai."},
-  {title:"💬 Sidebar (Div)", preview:`<div style="display:flex;gap:8px"><div style="background:#333;color:#fff;padding:8px;border-radius:8px">Side</div><div style="background:#eee;color:#333;padding:8px;border-radius:8px;flex:1">Main</div></div>`, code:`<div style="display:flex">\n  <div>Side</div>\n  <div>Main</div>\n</div>`, tip:"display:flex se side-by-side boxes bante hain."}
+  {title:"📝 Heading (H1)", preview:`<h1 style="font-size:28px;color:#dc2626;margin:0">Hello Duniya!</h1>`, code:`<h1>Hello Duniya!</h1>`, tip:"Bada title ke liye <h1> use karo."},
+  {title:"📄 Paragraph", preview:`<p style="margin:0;color:#333">Main 5 saal ka hu aur mujhe coding pasand hai!</p>`, code:`<p>Yahan apni baat likho...</p>`, tip:"Text ke liye <p> use karo."},
+  {title:"🎨 Color", preview:`<span style="color:#2563eb;font-weight:bold">Mera favourite color BLUE hai</span>`, code:`<p style="color:blue">Mera favourite color BLUE hai</p>`, tip:"blue ki jagah red, green try karo!"},
+  {title:"🔘 Button", preview:`<button style="padding:10px 20px;background:#f59e0b;color:#fff;border:none;border-radius:10px;font-weight:bold">Mujhe Dabao!</button>`, code:`<button>Mujhe Dabao!</button>`, tip:"Button ke liye <button> use karo."},
+  {title:"🖼️ Image", preview:`<img src="https://cdn-icons-png.flaticon.com/512/616/616408.png" width="70">`, code:`<img src="IMAGE-LINK" width="100">`, tip:"Image ke liye <img> use karo."},
+  {title:"🔗 Link", preview:`<a href="#" style="color:#6366f1;text-decoration:underline">Click Karo</a>`, code:`<a href="https://google.com">Google</a>`, tip:"Link ke liye <a href='...'> use karo."},
+  {title:"📋 List", preview:`<ul style="margin:0;padding-left:20px;color:#333"><li>Class 1 - Drawing</li><li>Class 2 - Coding</li></ul>`, code:`<ul>\n  <li>Class 1 - Drawing</li>\n  <li>Class 2 - Coding</li>\n</ul>`, tip:"List ke liye <ul> aur <li> use karo."},
+  {title:"📊 Slider", preview:`<input type="range" min="0" max="100" value="50" style="width:150px">`, code:`<input type="range" min="0" max="100">`, tip:"Slider ke liye input type='range' likho."},
+  {title:"✍️ Input Box", preview:`<input type="text" placeholder="Naam..." style="padding:8px;border-radius:6px;border:1px solid #ccc">`, code:`<input type="text" placeholder="Naam likho...">`, tip:"Input ke liye input type='text' use karo."},
+  {title:"🎯 Alert", preview:`<button onclick="alert('Wah! 🌟')" style="padding:8px 16px;background:#22c55e;color:#fff;border:none;border-radius:8px">Click Karo</button>`, code:`<button onclick="alert('Wah!')">Click Karo</button>`, tip:"onclick='alert(...)' se click pe popup aata hai."},
+  {title:"🖍️ Background Color", preview:`<div style="background:#fef9c3;padding:15px;border-radius:10px;color:#333;width:100%;text-align:center">Rangila Box!</div>`, code:`<div style="background:#fef9c3;padding:15px">Rangila Box!</div>`, tip:"background: color se box rangila hota hai."},
+  {title:"⬛ Box Border", preview:`<div style="border:3px solid #dc2626;padding:12px;border-radius:10px;color:#333;width:100%;text-align:center">Mera Box</div>`, code:`<div style="border:3px solid red;padding:12px">Mera Box</div>`, tip:"border: 3px solid red se border aata hai."},
+  {title:"🎬 Emoji", preview:`<div style="font-size:30px">😀 🚀 ❤️ 🌟 🎉</div>`, code:`😀 🚀 ❤️ 🌟 🎉`, tip:"Emoji seedha code me likho!"},
+  {title:"🖼️ Circle Image", preview:`<img src="https://cdn-icons-png.flaticon.com/512/616/616408.png" width="70" style="border-radius:50%">`, code:`<img src="LINK" style="border-radius:50%">`, tip:"border-radius:50% se gol image banti hai."},
+  {title:"📐 Center Text", preview:`<div style="text-align:center;color:#333">Yeh Center Me Hai</div>`, code:`<div style="text-align:center">Yeh Center Me Hai</div>`, tip:"text-align:center se text center aata hai."},
+  {title:"🎮 Score Game", preview:`<div style="text-align:center"><p style="margin:0;color:#333">Score: <b id="demoScore">0</b></p><button onclick="document.getElementById('demoScore').innerText++" style="padding:6px 12px;background:#f59e0b;color:#fff;border:none;border-radius:6px">+1</button></div>`, code:`<p>Score: <span id="s">0</span></p>\n<button onclick="document.getElementById('s').innerText++">+1</button>`, tip:"Click pe score badhao!"},
+  {title:"🌈 Gradient", preview:`<div style="background:linear-gradient(135deg,#667eea,#764ba2);padding:15px;color:#fff;border-radius:10px;width:100%;text-align:center">Gradient!</div>`, code:`<div style="background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;padding:15px">Gradient!</div>`, tip:"2 rang mix karne ke liye gradient use karo."},
+  {title:"💬 Flex Box", preview:`<div style="display:flex;gap:8px"><div style="background:#333;color:#fff;padding:8px;border-radius:8px">Side</div><div style="background:#eee;color:#333;padding:8px;border-radius:8px;flex:1">Main</div></div>`, code:`<div style="display:flex">\n  <div>Side</div>\n  <div>Main</div>\n</div>`, tip:"display:flex se side-by-side boxes bante hain."}
 ];
 
-// ============ AGE TEMPLATES ============
 const ageTemplates={
-"5 Years":{html:`<h1>👋 Hello! Mera Naam Aman Hai</h1>\n<p>Main 5 saal ka hu!</p>\n<h2 style="color:blue">Mera favourite color BLUE hai</h2>\n<button onclick="alert('Wah! 🌟')">Mujhe Dabao!</button>`,css:`body{text-align:center;padding:30px;background:#fef9c3;font-family:Comic Sans MS;margin:0}\nh1{background:#fff;padding:15px;border-radius:15px}\nbutton{padding:15px 30px;background:orange;color:#fff;border:none;border-radius:20px;font-size:16px}`,js:`// Sirf click karo!`,tipTitle:"5 Years Tip:",tipText:"Aman ki jagah apna naam likho. Blue ko RED karo!"},
+"5 Years":{html:`<h1>👋 Hello! Mera Naam Aman Hai</h1>\n<p>Main 5 saal ka hu!</p>\n<h2 style="color:blue">Mera favourite color BLUE hai</h2>\n<button onclick="alert('Wah! 🌟')">Mujhe Dabao!</button>`,css:`body{text-align:center;padding:30px;background:#fef9c3;font-family:Comic Sans MS;margin:0}\nh1{background:#fff;padding:15px;border-radius:15px}\nbutton{padding:15px 30px;background:orange;color:#fff;border:none;border-radius:20px;font-size:16px}`,js:`// Sirf click karo!`,tipTitle:"5 Years Tip:",tipText:"Apna naam likho. Blue ko RED karo!"},
 "6 Years":{html:`<h1>🔤 ABCD</h1>\n<div class="box">A for Apple 🍎</div>\n<div class="box">B for Ball ⚽</div>\n<button onclick="this.innerText='Shabash! 🌟'">Click Karo</button>`,css:`body{text-align:center;padding:20px;background:#dcfce7;margin:0}\n.box{background:#fff;margin:10px;padding:15px;border-radius:15px;font-size:20px}\nbutton{padding:10px 20px;background:#6366f1;color:#fff;border:none;border-radius:10px}`,js:`// Kuch nahi`,tipTitle:"6 Years Tip:",tipText:"Apna fruit likho!"},
 "7 Years":{html:`<h1>🎨 Colour Game</h1>\n<p>Rang pe click karo!</p>\n<div class="row">\n<div onclick="document.body.style.background='lightcoral'" class="c" style="background:red"></div>\n<div onclick="document.body.style.background='lightblue'" class="c" style="background:blue"></div>\n<div onclick="document.body.style.background='lightgreen'" class="c" style="background:green"></div>\n</div>`,css:`body{text-align:center;padding:30px;transition:0.5s;margin:0}\n.row{display:flex;gap:10px;justify-content:center}\n.c{width:60px;height:60px;border-radius:15px;cursor:pointer}`,js:`// Rang click karo!`,tipTitle:"7 Years Tip:",tipText:"Apne colors add karo!"},
 "8 Years":{html:`<h1>🐶 My Pet Dog</h1>\n<img src="https://cdn-icons-png.flaticon.com/512/616/616408.png" width="100">\n<p>Naam Tommy hai!</p>\n<button onclick="alert('Bhow Bhow! 🐶')">Bulao</button>`,css:`body{text-align:center;padding:20px;background:#ffedd5;margin:0}\nbutton{padding:10px 20px;background:#f59e0b;color:#fff;border:none;border-radius:10px}`,js:`// Alert dabao!`,tipTitle:"8 Years Tip:",tipText:"Cat ka photo try karo!"},
@@ -4928,13 +4924,13 @@ function analyzeCode(){
   let issues=[];
   const openTags=(html.match(/<([a-z][a-z0-9]*)\b[^>]*>/gi)||[]).filter(t=>!/\/>|<br|<img|<input|<meta|<link|<hr/i.test(t));
   const closeTags=(html.match(/<\/([a-z][a-z0-9]*)>/gi)||[]);
-  if(openTags.length!==closeTags.length) issues.push('Kuch tag band nahi hue - closing tag </tag> check karo');
+  if(openTags.length!==closeTags.length) issues.push('Kuch tag band nahi hue - closing tag check karo');
   const openB=(js.match(/{/g)||[]).length;
   const closeB=(js.match(/}/g)||[]).length;
-  if(openB!==closeB) issues.push('JavaScript me { } ka balance galat hai');
+  if(openB!==closeB) issues.push('JavaScript me { } balance galat');
   const openP=(css.match(/{/g)||[]).length;
   const closeP=(css.match(/}/g)||[]).length;
-  if(openP!==closeP) issues.push('CSS me { } ka balance galat hai');
+  if(openP!==closeP) issues.push('CSS me { } balance galat');
   const msg=document.getElementById('robotMsg');
   if(issues.length===0){
     msg.innerHTML='<span class="tip">✅ Code sahi hai! Shabash!</span>Color, text, image change karke try karo! 🌟';
@@ -4956,7 +4952,7 @@ function copyAllCode(){
   navigator.clipboard.writeText(code).then(()=>alert('✅ Code copy ho gaya!'));
 }
 
-// ============ QR FUNCTIONS ============
+// ============ QR — HOSTED LINK (WORKING) ============
 function openQR(){
   document.getElementById('qrBox').style.display='flex';
   newQR();
@@ -4968,31 +4964,57 @@ function newQR(){
   const linkInput=document.getElementById('linkInput');
   box.innerHTML='<p style="padding:20px;color:#fff;font-size:12px">⏳ QR ban raha hai...</p>';
   linkInput.value='Generating...';
+
+  const code=buildFullHTML();
   
-  setTimeout(function(){
-    try {
-      const code=buildFullHTML();
-      const uniqueId=Date.now()+'-'+Math.random().toString(36).substring(2,8);
-      const htmlContent=code+'\n<!-- id:'+uniqueId+' -->';
-      const b64=btoa(unescape(encodeURIComponent(htmlContent)));
-      const dataUrl='data:text/html;base64,'+b64;
-      
-      box.innerHTML='';
-      
-      if(dataUrl.length<2900){
-        new QRCode(box,{text:dataUrl,width:200,height:200,correctLevel:QRCode.CorrectLevel.L});
-        linkInput.value=dataUrl.substring(0,80)+'...';
-        linkInput.setAttribute('data-full',dataUrl);
-      } else {
-        box.innerHTML='<div style="padding:15px;color:#fbbf24;font-size:12px;line-height:1.6"><b>📱 Code bahut bada</b><br>QR me nahi aayega.<br><br><b>Options:</b><br>1️⃣ Download button<br>2️⃣ Copy button</div>';
-        linkInput.value='Download ya Copy button use karo';
-        linkInput.setAttribute('data-full','');
-      }
-    } catch(err){
-      box.innerHTML='<p style="padding:15px;color:#f87171;font-size:12px">⚠️ Error: '+err.message+'<br>Download button try karo.</p>';
-      linkInput.value='';
+  // Compress code with LZString for smaller size
+  let compressed;
+  try {
+    compressed = LZString.compressToEncodedURIComponent(code);
+  } catch(e) {
+    compressed = encodeURIComponent(code);
+  }
+
+  // Build a data URL that contains the FULL code (compressed)
+  // The receiver browser opens this directly
+  const fullHTMLPage = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>My Website</title><script src="https://cdn.jsdelivr.net/npm/lz-string@1.5.0/libs/lz-string.min.js"><\/script><style>body{margin:0;padding:20px;font-family:Arial;background:#f0f0f0}.info{background:#fff;padding:20px;border-radius:12px;max-width:600px;margin:auto;box-shadow:0 4px 12px rgba(0,0,0,0.1);text-align:center}h2{color:#333;margin-top:0}pre{background:#1e293b;color:#67e8f9;padding:15px;border-radius:8px;overflow:auto;font-size:12px;white-space:pre-wrap;text-align:left;max-height:300px}button{background:#6366f1;color:#fff;padding:12px 24px;border:none;border-radius:8px;cursor:pointer;font-size:14px;margin:5px}.ok{background:#22c55e;color:#fff;padding:10px;border-radius:8px;margin-bottom:15px}</style></head><body><div class="info"><div class="ok">✅ Clyxess Kids Coding Lab</div><h2>👋 Tumhara Code Ready Hai!</h2><pre id="c">Loading...</pre><button onclick="cp()">📋 Copy Code</button><button onclick="dl()" style="background:#16a34a">⬇ Download Website</button><p style="color:#666;font-size:13px;margin-top:15px">Download karke browser me kholo — website dikhegi!</p></div><script src="https://cdn.jsdelivr.net/npm/lz-string@1.5.0/libs/lz-string.min.js"><\/script><script>var d=LZString.decompressFromEncodedURIComponent("'+compressed+'");document.getElementById("c").textContent=d;function cp(){navigator.clipboard.writeText(d);alert("✅ Copy ho gaya!")}function dl(){var b=new Blob([d],{type:"text/html"});var a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="Clyxess-Website.html";a.click()}<\/script></body></html>';
+
+  const b64 = btoa(unescape(encodeURIComponent(fullHTMLPage)));
+  const dataUrl = 'data:text/html;base64,' + b64;
+
+  box.innerHTML = '';
+
+  if(dataUrl.length < 2900){
+    new QRCode(box, {
+      text: dataUrl,
+      width: 220,
+      height: 220,
+      correctLevel: QRCode.CorrectLevel.L
+    });
+    linkInput.value = '✅ QR Ready! Phone se scan karo!';
+    linkInput.setAttribute('data-full', dataUrl);
+  } else {
+    // Fallback: compress the whole page too
+    const smallPage = '<!DOCTYPE html><html><head><meta charset="UTF-8"><script src="https://cdn.jsdelivr.net/npm/lz-string@1.5.0/libs/lz-string.min.js"><\/script></head><body style="font-family:Arial;padding:20px;background:#f0f0f0"><div style="background:#fff;padding:20px;border-radius:12px;max-width:600px;margin:auto"><h2>📱 Tumhara Code</h2><pre id="c" style="background:#1e293b;color:#67e8f9;padding:15px;border-radius:8px;overflow:auto;font-size:11px;white-space:pre-wrap;text-align:left">Loading...</pre><button onclick="navigator.clipboard.writeText(document.getElementById(\'c\').textContent);alert(\'✅ Copy!\')" style="background:#6366f1;color:#fff;padding:12px 24px;border:none;border-radius:8px;cursor:pointer;font-size:14px">📋 Copy</button></div><script>document.getElementById("c").textContent=LZString.decompressFromEncodedURIComponent("' + compressed + '");<\/script></body></html>';
+    
+    const b64Small = btoa(unescape(encodeURIComponent(smallPage)));
+    const smallUrl = 'data:text/html;base64,' + b64Small;
+
+    if(smallUrl.length < 2900){
+      new QRCode(box, {
+        text: smallUrl,
+        width: 220,
+        height: 220,
+        correctLevel: QRCode.CorrectLevel.L
+      });
+      linkInput.value = '✅ QR Ready! Scan karo — code milega!';
+      linkInput.setAttribute('data-full', smallUrl);
+    } else {
+      box.innerHTML = '<div style="padding:15px;color:#fbbf24;font-size:12px;line-height:1.6;text-align:left"><b>📱 Code bahut bada</b><br>QR me nahi aayega. 2 tarike:</div><div style="background:#0a0a0f;padding:10px;border-radius:8px;margin-top:8px;font-size:11px;color:#67e8f9;text-align:left;line-height:1.6">1️⃣ <b>Download</b> button<br>2️⃣ <b>Copy</b> button</div>';
+      linkInput.value = 'Download ya Copy button use karo!';
+      linkInput.setAttribute('data-full', '');
     }
-  },100);
+  }
 }
 
 function copyLink(){
