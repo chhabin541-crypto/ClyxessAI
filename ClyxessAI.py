@@ -8727,9 +8727,9 @@ def render_kids_logic_lab():
 
                 <!-- Class Filter -->
                 <select id="ageFilter" onchange="filterGamesByAge()" class="bg-slate-950 text-emerald-400 text-xs font-bold border border-emerald-500/40 rounded-xl px-3 py-2 focus:outline-none cursor-pointer">
-                    <option value="group1">Class 1-2 (5-7 Yrs) • Visual Puzzles</option>
-                    <option value="group2">Class 3-5 (8-10 Yrs) • Science & Machines</option>
-                    <option value="group3">Class 6-7 (11-13 Yrs) • Advanced Engineering</option>
+                    <option value="group1">Class 1-2 (5-7 Yrs) - Visual Puzzles</option>
+                    <option value="group2">Class 3-5 (8-10 Yrs) - Science & Machines</option>
+                    <option value="group3">Class 6-7 (11-13 Yrs) - Advanced Engineering</option>
                 </select>
             </div>
         </header>
