@@ -7503,7 +7503,7 @@ setTimeout(function(){resizeCanvas();saveHistory();},300);
                 st.error(f"Invalid: {e}")
         return
         
-def def render_art_machinedesign():
+def render_art_machinedesign():
     import streamlit.components.v1 as components
 
     HTML = r"""<!DOCTYPE html>
@@ -7586,7 +7586,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#1a1d24;color:#e0e0e
 .empty-state .ico{font-size:32px;display:block;margin-bottom:8px;opacity:.5}
 
 /* ============================================ */
-/* NEW ADVANCED KIDS MODE */
+/* ADVANCED KIDS MODE — Numbering + Blocks + Languages */
 /* ============================================ */
 .kids-root{width:100%;height:100%;display:flex;overflow:hidden;background:#080a14;color:#fff}
 
@@ -7596,6 +7596,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#1a1d24;color:#e0e0e
 .tool-on{outline:2px solid #00ffff;background:#253055!important}
 
 .kids-panel{width:290px;flex-shrink:0;background:#12162a;border-right:1px solid #ffffff0f;padding:8px;overflow-y:auto;display:flex;flex-direction:column;gap:8px}
+
 .tab-btn{background:#1e2238;color:#aaa;border:none;padding:5px 12px;border-radius:20px;font-size:10px;font-weight:700;cursor:pointer;margin-right:4px;font-family:inherit}
 .tab-btn.on{background:#ffcc00;color:black}
 .text-input{background:#0b0e1e;color:#00ffff;border:1px solid #00ffff55;border-radius:8px;padding:6px;font-size:11px;width:100%;font-family:inherit}
@@ -7647,51 +7648,54 @@ html,body{width:100%;height:100%;overflow:hidden;background:#1a1d24;color:#e0e0e
 <div class="app">
 
   <div class="ribbon">
-    <div class="logo">🧊 Clyxess Studio <span class="badge">CAD</span></div>
+    <div class="logo">&#129482; Clyxess Studio <span class="badge">CAD</span></div>
+
     <div class="mode-switch">
-      <button class="mode-switch-btn active" id="btnModeStudio" onclick="switchAppMode('studio')">🎨 Studio</button>
-      <button class="mode-switch-btn" id="btnModeKids" onclick="switchAppMode('kids')">🧒 Kids</button>
+      <button class="mode-switch-btn active" id="btnModeStudio" onclick="switchAppMode('studio')">&#127912; Studio</button>
+      <button class="mode-switch-btn" id="btnModeKids" onclick="switchAppMode('kids')">&#128102; Kids</button>
     </div>
+
     <div class="rib-sep"></div>
     <span class="toolbar-title">Templates:</span>
     <select class="prop-select" id="tplSelect" style="width:170px" onchange="loadTemplate(this.value)">
       <option value="">-- Choose Design --</option>
-      <option value="cycle">🚲 Simple Cycle</option>
-      <option value="bike">🏍️ Motor Bike</option>
-      <option value="car">🚗 Super Car</option>
-      <option value="airplane">✈️ Airplane</option>
-      <option value="helicopter">🚁 Helicopter</option>
-      <option value="rocket">🚀 Rocket</option>
-      <option value="robot">🤖 Robot</option>
-      <option value="drone">🛸 Drone</option>
-      <option value="pcb">🔌 PCB Board</option>
-      <option value="gear">⚙️ Gear Assembly</option>
+      <option value="cycle">&#128690; Simple Cycle</option>
+      <option value="bike">&#127949;&#65039; Motor Bike</option>
+      <option value="car">&#128663; Super Car</option>
+      <option value="airplane">&#9992;&#65039; Airplane</option>
+      <option value="helicopter">&#128641; Helicopter</option>
+      <option value="rocket">&#128640; Rocket</option>
+      <option value="robot">&#129302; Robot</option>
+      <option value="drone">&#128760; Drone</option>
+      <option value="pcb">&#128268; PCB Board</option>
+      <option value="gear">&#9881;&#65039; Gear Assembly</option>
     </select>
     <div class="rib-sep"></div>
     <span class="toolbar-title">Tools:</span>
-    <button class="rib-btn" onclick="setMode('move')" id="btnMove">↔️ Move</button>
-    <button class="rib-btn" onclick="setMode('rotate')" id="btnRotate">🔄 Rotate</button>
-    <button class="rib-btn" onclick="setMode('scale')" id="btnScale">📏 Scale</button>
+    <button class="rib-btn" onclick="setMode('move')" id="btnMove">&#8596;&#65039; Move</button>
+    <button class="rib-btn" onclick="setMode('rotate')" id="btnRotate">&#128260; Rotate</button>
+    <button class="rib-btn" onclick="setMode('scale')" id="btnScale">&#128207; Scale</button>
     <div class="rib-sep"></div>
-    <button class="rib-btn" onclick="duplicateSelected()">📋 Copy</button>
-    <button class="rib-btn danger" onclick="deleteSelected()">🗑️ Delete</button>
-    <button class="rib-btn danger" onclick="clearAll()">✖️ Clear</button>
+    <button class="rib-btn" onclick="duplicateSelected()">&#128203; Copy</button>
+    <button class="rib-btn danger" onclick="deleteSelected()">&#128465;&#65039; Delete</button>
+    <button class="rib-btn danger" onclick="clearAll()">&#10006;&#65039; Clear</button>
     <div class="rib-sep"></div>
-    <button class="rib-btn primary" onclick="openExport()">💾 Export / Download</button>
-    <button class="rib-btn" onclick="toggleSnap()" id="btnSnap">🧲 Snap: ON</button>
-    <button class="rib-btn" onclick="toggleGrid()">📐 Grid</button>
+    <button class="rib-btn primary" onclick="openExport()">&#128190; Export</button>
+    <button class="rib-btn" onclick="toggleSnap()" id="btnSnap">&#129530; Snap: ON</button>
+    <button class="rib-btn" onclick="toggleGrid()">&#128208; Grid</button>
   </div>
 
+  <!-- STUDIO MODE -->
   <div class="main" id="studioMain" style="display:flex;">
     <div class="left">
-      <div class="section-title">📚 Readymade Templates</div>
+      <div class="section-title">&#128218; Readymade Templates</div>
       <div class="tpl-grid" id="tplGrid"></div>
-      <div class="section-title" style="margin-top:14px">🧱 Component Library</div>
+      <div class="section-title" style="margin-top:14px">&#129521; Component Library</div>
       <div id="catContainer"></div>
     </div>
     <div class="center">
       <canvas id="viewport"></canvas>
-      <div class="viewport-overlay">🖱️ <b>Left Drag</b> = Rotate • <b>Right Drag</b> = Pan • <b>Scroll</b> = Zoom</div>
+      <div class="viewport-overlay">&#128433;&#65039; <b>Left Drag</b> = Rotate | <b>Right Drag</b> = Pan | <b>Scroll</b> = Zoom</div>
       <div class="view-btns">
         <button class="view-btn" onclick="setView('top')">TOP</button>
         <button class="view-btn" onclick="setView('front')">FRT</button>
@@ -7699,53 +7703,58 @@ html,body{width:100%;height:100%;overflow:hidden;background:#1a1d24;color:#e0e0e
         <button class="view-btn" onclick="setView('iso')">ISO</button>
       </div>
       <div class="bottom-bar">
-        <span>📦 <b id="statCount">0</b> parts in scene</span>
-        <span>🎯 <b id="statSel">Nothing selected</b></span>
-        <span>🔧 Mode: <b id="statMode">Move</b></span>
+        <span>&#128230; <b id="statCount">0</b> parts in scene</span>
+        <span>&#127919; <b id="statSel">Nothing selected</b></span>
+        <span>&#128295; Mode: <b id="statMode">Move</b></span>
       </div>
     </div>
     <div class="right">
-      <div class="section-title">⚙️ Properties</div>
+      <div class="section-title">&#9881;&#65039; Properties</div>
       <div id="propPanel">
         <div class="empty-state">
-          <span class="ico">🎯</span>
+          <span class="ico">&#127919;</span>
           Click any object in the 3D scene to edit it
         </div>
       </div>
     </div>
   </div>
 
+  <!-- ADVANCED KIDS MODE (Numbering wala) -->
   <div class="main" id="kidsMain" style="display:none;">
     <div class="kids-root">
       <div class="kids-tools">
-        <div id="kSelect" onclick="setKidTool('select')" class="tool-icon tool-on">🖱️</div>
-        <div id="kPen" onclick="setKidTool('pen')" class="tool-icon">✏️</div>
-        <div id="kRect" onclick="setKidTool('rect')" class="tool-icon">⬜</div>
-        <div id="kCircle" onclick="setKidTool('circle')" class="tool-icon">⭕</div>
-        <div onclick="deleteKid()" class="tool-icon" style="background:#3a1a1a;">🗑️</div>
+        <div id="kSelect" onclick="setKidTool('select')" class="tool-icon tool-on">&#128433;&#65039;</div>
+        <div id="kPen" onclick="setKidTool('pen')" class="tool-icon">&#9999;&#65039;</div>
+        <div id="kRect" onclick="setKidTool('rect')" class="tool-icon">&#11036;</div>
+        <div id="kCircle" onclick="setKidTool('circle')" class="tool-icon">&#11093;</div>
+        <div onclick="deleteKid()" class="tool-icon" style="background:#3a1a1a;">&#128465;&#65039;</div>
       </div>
+
       <div class="kids-panel">
         <div style="background:#1a1e36;border-radius:10px;padding:8px;border:1px solid #ffffff10;">
-          <div style="font-size:10px;font-weight:800;color:#00ffff;">🌍 60+ Languages</div>
+          <div style="font-size:10px;font-weight:800;color:#00ffff;">&#127757; 60+ Languages</div>
           <select id="langSel" onchange="changeLang()" style="background:#0b0e1e;color:#00ffff;border:1px solid #00ffff55;border-radius:8px;padding:5px;font-size:11px;font-weight:700;width:100%;margin-top:5px;"></select>
         </div>
+
         <div>
-          <button class="tab-btn on" id="tabABC" onclick="switchKidTab('abc',this)">🔤 ABC</button>
-          <button class="tab-btn" id="tabNUM" onclick="switchKidTab('num',this)">🔢 123</button>
-          <button class="tab-btn" id="tabTXT" onclick="switchKidTab('txt',this)">📝 Text</button>
+          <button class="tab-btn on" id="tabABC" onclick="switchKidTab('abc',this)">&#128289; ABC</button>
+          <button class="tab-btn" id="tabNUM" onclick="switchKidTab('num',this)">&#128290; 123</button>
+          <button class="tab-btn" id="tabTXT" onclick="switchKidTab('txt',this)">&#128221; Text</button>
         </div>
+
         <div id="kidABC" style="background:#1a1e36;border-radius:12px;padding:8px;border:1px solid #ffcc0030;">
-          <div style="font-size:10px;font-weight:800;color:#ffcc00;">🔤 A-Z + a-z + 0-9 + Special</div>
+          <div style="font-size:10px;font-weight:800;color:#ffcc00;">&#128289; A-Z + a-z + 0-9 + Special</div>
           <div style="font-size:8px;color:#888;margin-top:2px;">Click karo - canvas me aayega</div>
           <div id="abcGrid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-top:6px;"></div>
         </div>
+
         <div id="kidNUM" style="display:none;background:#1a1e36;border-radius:12px;padding:8px;border:1px solid #00ffff30;">
-          <div style="font-size:10px;font-weight:800;color:#00ffff;">🔢 Numbers 1 to 1,00,000</div>
+          <div style="font-size:10px;font-weight:800;color:#00ffff;">&#128290; Numbers 1 to 1,00,000</div>
           <div style="font-size:9px;color:#aaa;margin-top:3px;">Kitne numbers chahiye? (max 100000)</div>
           <input id="numCount" type="number" min="1" max="100000" value="10" class="text-input" style="margin-top:5px;">
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-top:6px;">
-            <button onclick="generateNumbers()" class="mini-btn" style="background:#00ffff;color:black;font-weight:900;">▶ Generate</button>
-            <button onclick="clearNumbers()" class="mini-btn" style="background:#3a1a1a;">🗑 Clear Nums</button>
+            <button onclick="generateNumbers()" class="mini-btn" style="background:#00ffff;color:black;font-weight:900;">&#9654; Generate</button>
+            <button onclick="clearNumbers()" class="mini-btn" style="background:#3a1a1a;">&#128465; Clear Nums</button>
           </div>
           <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:3px;margin-top:6px;">
             <button onclick="quickNum(10)" class="alpha-btn">1-10</button>
@@ -7755,33 +7764,37 @@ html,body{width:100%;height:100%;overflow:hidden;background:#1a1d24;color:#e0e0e
             <button onclick="quickNum(10000)" class="alpha-btn">10K</button>
           </div>
         </div>
+
         <div id="kidTXT" style="display:none;background:#1a1e36;border-radius:12px;padding:8px;border:1px solid #ff5c9e30;">
-          <div style="font-size:10px;font-weight:800;color:#ff5c9e;">📝 Apni Bhasha Me Likho</div>
+          <div style="font-size:10px;font-weight:800;color:#ff5c9e;">&#128221; Apni Bhasha Me Likho</div>
           <div style="font-size:9px;color:#aaa;margin-top:3px;">Koi bhi language type karo</div>
           <input id="kidText" type="text" placeholder="Yahan likho..." class="text-input" style="margin-top:6px;">
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-top:6px;">
-            <button onclick="addKidText()" class="mini-btn" style="background:#ff5c9e;color:white;font-weight:900;">➕ Add</button>
+            <button onclick="addKidText()" class="mini-btn" style="background:#ff5c9e;color:white;font-weight:900;">+ Add</button>
             <button onclick="document.getElementById('kidText').value=''" class="mini-btn">Clear</button>
           </div>
         </div>
+
         <div style="background:#1a1e36;border-radius:12px;padding:7px;border:1px solid #00ffff25;">
-          <div style="font-size:10px;font-weight:800;color:#00ffff;">🧱 Blocks Library</div>
+          <div style="font-size:10px;font-weight:800;color:#00ffff;">&#129521; Blocks Library</div>
           <button onclick="openKidBlocks()" class="mini-btn" style="width:100%;background:#00ffff;color:black;margin-top:6px;font-weight:900;padding:10px;border-radius:12px;">
-            📚 200+ Blocks Kholein
+            &#128218; 200+ Blocks Kholein
           </button>
         </div>
+
         <div style="background:#1a1e36;border-radius:12px;padding:7px;border:1px solid #00ffff25;">
-          <div style="font-size:10px;font-weight:800;color:#00ffff;">🇨🇳 CHINA SPACE TECH</div>
+          <div style="font-size:10px;font-weight:800;color:#00ffff;">&#127464;&#127475; CHINA SPACE TECH</div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px;">
-            <div onclick="addKidPart('wing')" class="kid-part">🪽 Wing</div>
-            <div onclick="addKidPart('propeller')" class="kid-part">🌀 Prop</div>
-            <div onclick="addKidPart('rocket')" class="kid-part">🚀 Rocket</div>
-            <div onclick="addKidPart('satellite')" class="kid-part">🛰 Satellite</div>
-            <div onclick="addKidPart('naca')" class="kid-part">📈 NACA</div>
-            <div onclick="addKidPart('solar')" class="kid-part">🔋 Solar</div>
+            <div onclick="addKidPart('wing')" class="kid-part">&#129413; Wing</div>
+            <div onclick="addKidPart('propeller')" class="kid-part">&#127744; Prop</div>
+            <div onclick="addKidPart('rocket')" class="kid-part">&#128640; Rocket</div>
+            <div onclick="addKidPart('satellite')" class="kid-part">&#128752; Satellite</div>
+            <div onclick="addKidPart('naca')" class="kid-part">&#128200; NACA</div>
+            <div onclick="addKidPart('solar')" class="kid-part">&#128267; Solar</div>
           </div>
-          <button onclick="startSim()" class="mini-btn" style="width:100%;background:#00ffff;color:black;margin-top:6px;font-weight:900;">▶ Fly Simulation</button>
+          <button onclick="startSim()" class="mini-btn" style="width:100%;background:#00ffff;color:black;margin-top:6px;font-weight:900;">&#9654; Fly Simulation</button>
         </div>
+
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-top:auto;">
           <button onclick="rotateKid()" class="mini-btn">Rotate</button>
           <button onclick="duplicateKid()" class="mini-btn">Duplicate</button>
@@ -7789,70 +7802,72 @@ html,body{width:100%;height:100%;overflow:hidden;background:#1a1d24;color:#e0e0e
           <button onclick="clearK()" class="mini-btn" style="background:#3a1a1a;">Clear</button>
         </div>
       </div>
+
       <div class="kids-canvas-area">
-        <div id="kHint" style="font-size:10px;color:#333;font-weight:800;">KIDS — Click buttons to add • Drag to move • Wheel to resize</div>
+        <div id="kHint" style="font-size:10px;color:#333;font-weight:800;">KIDS — Click buttons to add | Drag to move | Wheel to resize</div>
         <canvas id="kCanvas" width="1300" height="750"></canvas>
       </div>
     </div>
   </div>
 
   <div class="status">
-    <span>🧊 <b>Clyxess Studio CAD</b> — Autodesk-style 3D design for kids</span>
-    <span>Made with ❤ by Clyxess AI</span>
+    <span>&#129482; <b>Clyxess Studio CAD</b> — Autodesk-style 3D design for kids</span>
+    <span>Made with love by Clyxess AI</span>
   </div>
-
 </div>
 
+<!-- EXPORT MODAL -->
 <div class="modal" id="exportModal">
   <div class="modal-box">
     <div class="modal-head">
-      <h3>💾 Export / Download Your Design</h3>
+      <h3>&#128190; Export / Download Your Design</h3>
       <button class="modal-close" onclick="closeExport()">X</button>
     </div>
     <div class="modal-body">
       <p>Choose how you want to save your design.</p>
       <div class="export-opt" onclick="exportPNG()">
-        <div class="ico">🖼</div>
+        <div class="ico">&#128444;&#65039;</div>
         <div><b>Download as Image (PNG)</b><small>Share on WhatsApp, Instagram</small></div>
       </div>
       <div class="export-opt" onclick="exportOBJ()">
-        <div class="ico">📦</div>
+        <div class="ico">&#128230;</div>
         <div><b>Download as 3D Model (OBJ)</b><small>Open in Blender, Maya</small></div>
       </div>
       <div class="export-opt" onclick="saveProject()">
-        <div class="ico">💾</div>
+        <div class="ico">&#128190;</div>
         <div><b>Save Project (Load Later)</b><small>Save all parts, colors, positions</small></div>
       </div>
       <div class="export-opt" onclick="loadProject()">
-        <div class="ico">📂</div>
+        <div class="ico">&#128193;</div>
         <div><b>Load Saved Project</b><small>Continue where you left off</small></div>
       </div>
     </div>
   </div>
 </div>
 
+<!-- KIDS BLOCKS MODAL -->
 <div class="kids-modal" id="kidBlocksModal" onclick="if(event.target.id==='kidBlocksModal') closeKidBlocks()">
   <div class="kids-modal-box">
     <div class="kids-modal-head">
-      <b>🧱 Kids Blocks Library — 200+ Blocks</b>
+      <b>&#129521; Kids Blocks Library — 200+ Blocks</b>
       <button onclick="closeKidBlocks()" style="background:#2a2a3a;border:none;color:white;width:28px;height:28px;border-radius:50%;cursor:pointer;">X</button>
     </div>
     <div class="kids-modal-body">
-      <div class="sec-title">🎓 SCHOOL</div>
+      <div class="sec-title">&#127891; SCHOOL</div>
       <div id="blockSchool" style="display:grid;grid-template-columns:repeat(6,1fr);gap:6px;"></div>
-      <div class="sec-title">🏥 MEDICAL (Body Parts)</div>
+      <div class="sec-title">&#127973; MEDICAL (Body Parts)</div>
       <div id="blockMedical" style="display:grid;grid-template-columns:repeat(6,1fr);gap:6px;"></div>
-      <div class="sec-title">🧬 BIOLOGICAL</div>
+      <div class="sec-title">&#129516; BIOLOGICAL</div>
       <div id="blockBio" style="display:grid;grid-template-columns:repeat(6,1fr);gap:6px;"></div>
-      <div class="sec-title">🔬 SCIENCE</div>
+      <div class="sec-title">&#128300; SCIENCE</div>
       <div id="blockScience" style="display:grid;grid-template-columns:repeat(6,1fr);gap:6px;"></div>
-      <div class="sec-title">🔧 ENGINEERING</div>
+      <div class="sec-title">&#128295; ENGINEERING</div>
       <div id="blockEng" style="display:grid;grid-template-columns:repeat(6,1fr);gap:6px;"></div>
-      <div class="sec-title">🌳 NATURE</div>
+      <div class="sec-title">&#127795; NATURE</div>
       <div id="blockNature" style="display:grid;grid-template-columns:repeat(6,1fr);gap:6px;"></div>
-      <div class="sec-title">🚀 SPACE & TECH</div>
+      <div class="sec-title">&#128640; SPACE &amp; TECH</div>
       <div id="blockSpace" style="display:grid;grid-template-columns:repeat(6,1fr);gap:6px;"></div>
-      <div class="sec-title">🎨 SHAPES</div>
+      <div class="sec-title">&#127912; SHAPES</div>
       <div id="blockShapes" style="display:grid;grid-template-columns:repeat(6,1fr);gap:6px;"></div>
     </div>
   </div>
@@ -7949,16 +7964,16 @@ const MATERIALS = {
 function getMat(type) { return MATERIALS[type].clone(); }
 
 const COMPONENTS = {
-  '🔧 Basic Shapes': [
-    {n:'Box', i:'🧱', f:()=>new THREE.Mesh(new THREE.BoxGeometry(1.5,1.5,1.5), getMat('plastic'))},
-    {n:'Sphere', i:'⚪', f:()=>new THREE.Mesh(new THREE.SphereGeometry(0.9, 24, 24), getMat('plastic'))},
-    {n:'Cylinder', i:'🛢', f:()=>new THREE.Mesh(new THREE.CylinderGeometry(0.7,0.7,1.6,24), getMat('plastic'))},
-    {n:'Cone', i:'🔺', f:()=>new THREE.Mesh(new THREE.ConeGeometry(0.8,1.6,24), getMat('plastic'))},
-    {n:'Torus', i:'⭕', f:()=>new THREE.Mesh(new THREE.TorusGeometry(0.7,0.25,16,32), getMat('plastic'))},
-    {n:'Plane', i:'▭', f:()=>new THREE.Mesh(new THREE.BoxGeometry(2,0.1,2), getMat('plastic'))}
+  '\uD83D\uDD27 Basic Shapes': [
+    {n:'Box', i:'\uD83E\uDDF1', f:()=>new THREE.Mesh(new THREE.BoxGeometry(1.5,1.5,1.5), getMat('plastic'))},
+    {n:'Sphere', i:'\u26AA', f:()=>new THREE.Mesh(new THREE.SphereGeometry(0.9, 24, 24), getMat('plastic'))},
+    {n:'Cylinder', i:'\uD83D\uDEE2', f:()=>new THREE.Mesh(new THREE.CylinderGeometry(0.7,0.7,1.6,24), getMat('plastic'))},
+    {n:'Cone', i:'\uD83D\uDD3A', f:()=>new THREE.Mesh(new THREE.ConeGeometry(0.8,1.6,24), getMat('plastic'))},
+    {n:'Torus', i:'\u2B55', f:()=>new THREE.Mesh(new THREE.TorusGeometry(0.7,0.25,16,32), getMat('plastic'))},
+    {n:'Plane', i:'\u25AD', f:()=>new THREE.Mesh(new THREE.BoxGeometry(2,0.1,2), getMat('plastic'))}
   ],
-  '🚲 Cycle Parts': [
-    {n:'Wheel', i:'⚫', f:()=>{
+  '\uD83D\uDEB2 Cycle Parts': [
+    {n:'Wheel', i:'\u26AB', f:()=>{
       const g = new THREE.Group();
       const tire = new THREE.Mesh(new THREE.TorusGeometry(0.7, 0.12, 12, 32), getMat('rubber'));
       g.add(tire);
@@ -7972,7 +7987,7 @@ const COMPONENTS = {
       g.add(hub);
       return g;
     }},
-    {n:'Frame', i:'🚲', f:()=>{
+    {n:'Frame', i:'\uD83D\uDEB2', f:()=>{
       const g = new THREE.Group();
       const tubeMat = getMat('red');
       const t1 = new THREE.Mesh(new THREE.CylinderGeometry(0.06,0.06,2,8), tubeMat);
@@ -7983,7 +7998,7 @@ const COMPONENTS = {
       t3.rotation.z = Math.PI/4; t3.position.set(-0.5,0.5,0); g.add(t3);
       return g;
     }},
-    {n:'Handlebar', i:'🛞', f:()=>{
+    {n:'Handlebar', i:'\uD83D\uDEDE', f:()=>{
       const g = new THREE.Group();
       const bar = new THREE.Mesh(new THREE.CylinderGeometry(0.05,0.05,1.2,8), getMat('metal'));
       bar.rotation.z = Math.PI/2;
@@ -7993,81 +8008,81 @@ const COMPONENTS = {
       g.add(stem);
       return g;
     }},
-    {n:'Seat', i:'💺', f:()=>new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.15, 0.4), getMat('black'))},
-    {n:'Pedal', i:'🦶', f:()=>new THREE.Mesh(new THREE.BoxGeometry(0.3,0.1,0.4), getMat('black'))},
-    {n:'Chain', i:'🔗', f:()=>new THREE.Mesh(new THREE.TorusGeometry(0.4, 0.03, 8, 32), getMat('metal'))}
+    {n:'Seat', i:'\uD83D\uDCBA', f:()=>new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.15, 0.4), getMat('black'))},
+    {n:'Pedal', i:'\uD83E\uDDB6', f:()=>new THREE.Mesh(new THREE.BoxGeometry(0.3,0.1,0.4), getMat('black'))},
+    {n:'Chain', i:'\uD83D\uDD17', f:()=>new THREE.Mesh(new THREE.TorusGeometry(0.4, 0.03, 8, 32), getMat('metal'))}
   ],
-  '🏍 Motor Bike': [
-    {n:'Engine', i:'⚙', f:()=>new THREE.Mesh(new THREE.BoxGeometry(1,0.7,0.8), getMat('metal'))},
-    {n:'Fuel Tank', i:'⛽', f:()=>{
+  '\uD83C\uDFCD Motor Bike': [
+    {n:'Engine', i:'\u2699', f:()=>new THREE.Mesh(new THREE.BoxGeometry(1,0.7,0.8), getMat('metal'))},
+    {n:'Fuel Tank', i:'\u26FD', f:()=>{
       const t = new THREE.Mesh(new THREE.SphereGeometry(0.6, 16, 12), getMat('red'));
       t.scale.set(1.4, 0.8, 0.9);
       return t;
     }},
-    {n:'Seat Long', i:'💺', f:()=>new THREE.Mesh(new THREE.BoxGeometry(1.4,0.15,0.45), getMat('black'))},
-    {n:'Exhaust', i:'🔧', f:()=>{
+    {n:'Seat Long', i:'\uD83D\uDCBA', f:()=>new THREE.Mesh(new THREE.BoxGeometry(1.4,0.15,0.45), getMat('black'))},
+    {n:'Exhaust', i:'\uD83D\uDD27', f:()=>{
       const e = new THREE.Mesh(new THREE.CylinderGeometry(0.08,0.1,1.4,12), getMat('chrome'));
       e.rotation.z = Math.PI/2;
       return e;
     }}
   ],
-  '🚗 Car Parts': [
-    {n:'Body', i:'🚗', f:()=>new THREE.Mesh(new THREE.BoxGeometry(2.4,0.7,1.4), getMat('red'))},
-    {n:'Cabin', i:'🏠', f:()=>{
+  '\uD83D\uDE97 Car Parts': [
+    {n:'Body', i:'\uD83D\uDE97', f:()=>new THREE.Mesh(new THREE.BoxGeometry(2.4,0.7,1.4), getMat('red'))},
+    {n:'Cabin', i:'\uD83C\uDFE0', f:()=>{
       const c = new THREE.Mesh(new THREE.BoxGeometry(1.2,0.6,1.3), getMat('blue'));
       c.position.y = 0.6;
       return c;
     }},
-    {n:'Tire', i:'⚫', f:()=>{
+    {n:'Tire', i:'\u26AB', f:()=>{
       const t = new THREE.Mesh(new THREE.CylinderGeometry(0.35,0.35,0.25,20), getMat('rubber'));
       t.rotation.z = Math.PI/2;
       return t;
     }},
-    {n:'Headlight', i:'💡', f:()=>new THREE.Mesh(new THREE.SphereGeometry(0.15,12,12), new THREE.MeshStandardMaterial({color:0xffffaa, emissive:0xffff88, emissiveIntensity:0.5}))},
-    {n:'Bumper', i:'🛡', f:()=>new THREE.Mesh(new THREE.BoxGeometry(0.15,0.3,1.4), getMat('metal'))},
-    {n:'Spoiler', i:'🪽', f:()=>new THREE.Mesh(new THREE.BoxGeometry(0.2,0.08,1.4), getMat('black'))}
+    {n:'Headlight', i:'\uD83D\uDCA1', f:()=>new THREE.Mesh(new THREE.SphereGeometry(0.15,12,12), new THREE.MeshStandardMaterial({color:0xffffaa, emissive:0xffff88, emissiveIntensity:0.5}))},
+    {n:'Bumper', i:'\uD83D\uDEE1', f:()=>new THREE.Mesh(new THREE.BoxGeometry(0.15,0.3,1.4), getMat('metal'))},
+    {n:'Spoiler', i:'\uD83E\uDEBD', f:()=>new THREE.Mesh(new THREE.BoxGeometry(0.2,0.08,1.4), getMat('black'))}
   ],
-  '✈ Aerospace': [
-    {n:'Fuselage', i:'✈', f:()=>{
+  '\u2708 Aerospace': [
+    {n:'Fuselage', i:'\u2708', f:()=>{
       const f = new THREE.Mesh(new THREE.CylinderGeometry(0.4,0.4,2.8,16), getMat('metal'));
       f.rotation.z = Math.PI/2;
       return f;
     }},
-    {n:'Wing', i:'🪽', f:()=>new THREE.Mesh(new THREE.BoxGeometry(2.4,0.08,0.9), getMat('metal'))},
-    {n:'Tail Fin', i:'🚀', f:()=>new THREE.Mesh(new THREE.BoxGeometry(0.08,0.8,0.7), getMat('red'))},
-    {n:'Cockpit', i:'🪟', f:()=>new THREE.Mesh(new THREE.SphereGeometry(0.4,16,12,0,Math.PI*2,0,Math.PI/2), getMat('glass'))},
-    {n:'Propeller', i:'🌀', f:()=>{
+    {n:'Wing', i:'\uD83E\uDEBD', f:()=>new THREE.Mesh(new THREE.BoxGeometry(2.4,0.08,0.9), getMat('metal'))},
+    {n:'Tail Fin', i:'\uD83D\uDE80', f:()=>new THREE.Mesh(new THREE.BoxGeometry(0.08,0.8,0.7), getMat('red'))},
+    {n:'Cockpit', i:'\uD83E\uDE9F', f:()=>new THREE.Mesh(new THREE.SphereGeometry(0.4,16,12,0,Math.PI*2,0,Math.PI/2), getMat('glass'))},
+    {n:'Propeller', i:'\uD83C\uDF00', f:()=>{
       const g = new THREE.Group();
       const b1 = new THREE.Mesh(new THREE.BoxGeometry(1.6,0.06,0.15), getMat('metal'));
       const b2 = b1.clone(); b2.rotation.y = Math.PI/2;
       g.add(b1, b2);
       return g;
     }},
-    {n:'Jet Engine', i:'🔥', f:()=>new THREE.Mesh(new THREE.CylinderGeometry(0.35,0.45,1,16), getMat('chrome'))}
+    {n:'Jet Engine', i:'\uD83D\uDD25', f:()=>new THREE.Mesh(new THREE.CylinderGeometry(0.35,0.45,1,16), getMat('chrome'))}
   ],
-  '🚀 Rocket': [
-    {n:'Rocket Body', i:'🚀', f:()=>new THREE.Mesh(new THREE.CylinderGeometry(0.4,0.4,2.2,16), getMat('metal'))},
-    {n:'Nose Cone', i:'🔺', f:()=>new THREE.Mesh(new THREE.ConeGeometry(0.4,0.9,16), getMat('red'))},
-    {n:'Fin', i:'📐', f:()=>{
+  '\uD83D\uDE80 Rocket': [
+    {n:'Rocket Body', i:'\uD83D\uDE80', f:()=>new THREE.Mesh(new THREE.CylinderGeometry(0.4,0.4,2.2,16), getMat('metal'))},
+    {n:'Nose Cone', i:'\uD83D\uDD3A', f:()=>new THREE.Mesh(new THREE.ConeGeometry(0.4,0.9,16), getMat('red'))},
+    {n:'Fin', i:'\uD83D\uDCD0', f:()=>{
       const sh = new THREE.Shape();
       sh.moveTo(0,0); sh.lineTo(0.5,0.8); sh.lineTo(0.5,0); sh.lineTo(0,0);
       const g = new THREE.ExtrudeGeometry(sh, {depth:0.06, bevelEnabled:false});
       return new THREE.Mesh(g, getMat('red'));
     }},
-    {n:'Nozzle', i:'🔥', f:()=>new THREE.Mesh(new THREE.CylinderGeometry(0.5,0.3,0.5,16), getMat('chrome'))},
-    {n:'Booster', i:'💥', f:()=>new THREE.Mesh(new THREE.CylinderGeometry(0.2,0.2,1.5,12), getMat('gold'))},
-    {n:'Satellite', i:'🛰', f:()=>new THREE.Mesh(new THREE.BoxGeometry(0.6,0.4,0.4), getMat('metal'))}
+    {n:'Nozzle', i:'\uD83D\uDD25', f:()=>new THREE.Mesh(new THREE.CylinderGeometry(0.5,0.3,0.5,16), getMat('chrome'))},
+    {n:'Booster', i:'\uD83D\uDCA5', f:()=>new THREE.Mesh(new THREE.CylinderGeometry(0.2,0.2,1.5,12), getMat('gold'))},
+    {n:'Satellite', i:'\uD83D\uDEF0', f:()=>new THREE.Mesh(new THREE.BoxGeometry(0.6,0.4,0.4), getMat('metal'))}
   ],
-  '🤖 Robot': [
-    {n:'Head', i:'🤖', f:()=>new THREE.Mesh(new THREE.BoxGeometry(0.8,0.7,0.7), getMat('chrome'))},
-    {n:'Body', i:'🧊', f:()=>new THREE.Mesh(new THREE.BoxGeometry(1,1.2,0.7), getMat('blue'))},
-    {n:'Arm', i:'💪', f:()=>new THREE.Mesh(new THREE.CylinderGeometry(0.12,0.12,1,12), getMat('metal'))},
-    {n:'Leg', i:'🦵', f:()=>new THREE.Mesh(new THREE.BoxGeometry(0.25,1,0.25), getMat('metal'))},
-    {n:'Eye', i:'👁', f:()=>new THREE.Mesh(new THREE.SphereGeometry(0.1,12,12), new THREE.MeshStandardMaterial({color:0x00ffff, emissive:0x00ffff, emissiveIntensity:0.8}))},
-    {n:'Antenna', i:'📡', f:()=>new THREE.Mesh(new THREE.CylinderGeometry(0.03,0.03,0.5,8), getMat('metal'))}
+  '\uD83E\uDD16 Robot': [
+    {n:'Head', i:'\uD83E\uDD16', f:()=>new THREE.Mesh(new THREE.BoxGeometry(0.8,0.7,0.7), getMat('chrome'))},
+    {n:'Body', i:'\uD83E\uDDCA', f:()=>new THREE.Mesh(new THREE.BoxGeometry(1,1.2,0.7), getMat('blue'))},
+    {n:'Arm', i:'\uD83D\uDCAA', f:()=>new THREE.Mesh(new THREE.CylinderGeometry(0.12,0.12,1,12), getMat('metal'))},
+    {n:'Leg', i:'\uD83E\uDDB5', f:()=>new THREE.Mesh(new THREE.BoxGeometry(0.25,1,0.25), getMat('metal'))},
+    {n:'Eye', i:'\uD83D\uDC41', f:()=>new THREE.Mesh(new THREE.SphereGeometry(0.1,12,12), new THREE.MeshStandardMaterial({color:0x00ffff, emissive:0x00ffff, emissiveIntensity:0.8}))},
+    {n:'Antenna', i:'\uD83D\uDCE1', f:()=>new THREE.Mesh(new THREE.CylinderGeometry(0.03,0.03,0.5,8), getMat('metal'))}
   ],
-  '⚙ Mechanical': [
-    {n:'Gear', i:'⚙', f:()=>{
+  '\u2699 Mechanical': [
+    {n:'Gear', i:'\u2699', f:()=>{
       const g = new THREE.Group();
       const base = new THREE.Mesh(new THREE.CylinderGeometry(0.55,0.55,0.18,24), getMat('metal'));
       g.add(base);
@@ -8079,8 +8094,8 @@ const COMPONENTS = {
       }
       return g;
     }},
-    {n:'Shaft', i:'📏', f:()=>new THREE.Mesh(new THREE.CylinderGeometry(0.1,0.1,2,16), getMat('metal'))},
-    {n:'Bolt', i:'🔩', f:()=>{
+    {n:'Shaft', i:'\uD83D\uDCCF', f:()=>new THREE.Mesh(new THREE.CylinderGeometry(0.1,0.1,2,16), getMat('metal'))},
+    {n:'Bolt', i:'\uD83D\uDD29', f:()=>{
       const g = new THREE.Group();
       const hd = new THREE.Mesh(new THREE.CylinderGeometry(0.2,0.2,0.12,6), getMat('metal'));
       const sh = new THREE.Mesh(new THREE.CylinderGeometry(0.1,0.1,0.7,8), getMat('metal'));
@@ -8088,44 +8103,44 @@ const COMPONENTS = {
       g.add(hd, sh);
       return g;
     }},
-    {n:'Beam', i:'🏗', f:()=>new THREE.Mesh(new THREE.BoxGeometry(2.2,0.35,0.15), getMat('metal'))},
-    {n:'Plate', i:'⬜', f:()=>new THREE.Mesh(new THREE.BoxGeometry(1.6,0.08,1), getMat('metal'))},
-    {n:'Spring', i:'〰', f:()=>{
+    {n:'Beam', i:'\uD83C\uDFD7', f:()=>new THREE.Mesh(new THREE.BoxGeometry(2.2,0.35,0.15), getMat('metal'))},
+    {n:'Plate', i:'\u2B1C', f:()=>new THREE.Mesh(new THREE.BoxGeometry(1.6,0.08,1), getMat('metal'))},
+    {n:'Spring', i:'\u3030', f:()=>{
       const pts = [];
       for(let i=0;i<30;i++){ pts.push(new THREE.Vector3(Math.sin(i*0.6)*0.2, i*0.06-0.9, Math.cos(i*0.6)*0.2)); }
       const curve = new THREE.CatmullRomCurve3(pts);
       const geo = new THREE.TubeGeometry(curve, 80, 0.03, 8, false);
       return new THREE.Mesh(geo, getMat('metal'));
     }},
-    {n:'Bearing', i:'⭕', f:()=>new THREE.Mesh(new THREE.TorusGeometry(0.25,0.06,10,24), getMat('chrome'))},
-    {n:'Battery', i:'🔋', f:()=>new THREE.Mesh(new THREE.BoxGeometry(0.6,0.35,0.4), getMat('green'))},
-    {n:'Motor', i:'⚡', f:()=>new THREE.Mesh(new THREE.CylinderGeometry(0.3,0.3,0.5,16), getMat('blue'))}
+    {n:'Bearing', i:'\u2B55', f:()=>new THREE.Mesh(new THREE.TorusGeometry(0.25,0.06,10,24), getMat('chrome'))},
+    {n:'Battery', i:'\uD83D\uDD0B', f:()=>new THREE.Mesh(new THREE.BoxGeometry(0.6,0.35,0.4), getMat('green'))},
+    {n:'Motor', i:'\u26A1', f:()=>new THREE.Mesh(new THREE.CylinderGeometry(0.3,0.3,0.5,16), getMat('blue'))}
   ],
-  '🔌 PCB & Circuit': [
-    {n:'PCB Board', i:'🟩', f:()=>new THREE.Mesh(new THREE.BoxGeometry(2.2,0.06,1.5), getMat('green'))},
-    {n:'Chip IC', i:'🖥', f:()=>new THREE.Mesh(new THREE.BoxGeometry(0.5,0.08,0.4), getMat('black'))},
-    {n:'Resistor', i:'▪', f:()=>new THREE.Mesh(new THREE.CylinderGeometry(0.06,0.06,0.25,10), getMat('gold'))},
-    {n:'Capacitor', i:'🔵', f:()=>new THREE.Mesh(new THREE.CylinderGeometry(0.12,0.12,0.25,16), getMat('blue'))},
-    {n:'LED', i:'🔴', f:()=>new THREE.Mesh(new THREE.SphereGeometry(0.08,12,12), new THREE.MeshStandardMaterial({color:0xff0000, emissive:0xff0000, emissiveIntensity:1}))},
-    {n:'Connector', i:'🔌', f:()=>new THREE.Mesh(new THREE.BoxGeometry(0.4,0.15,0.15), getMat('gold'))},
-    {n:'Wire', i:'➰', f:()=>{
+  '\uD83D\uDD0C PCB & Circuit': [
+    {n:'PCB Board', i:'\uD83D\uDFE9', f:()=>new THREE.Mesh(new THREE.BoxGeometry(2.2,0.06,1.5), getMat('green'))},
+    {n:'Chip IC', i:'\uD83D\uDDA5', f:()=>new THREE.Mesh(new THREE.BoxGeometry(0.5,0.08,0.4), getMat('black'))},
+    {n:'Resistor', i:'\u25AA', f:()=>new THREE.Mesh(new THREE.CylinderGeometry(0.06,0.06,0.25,10), getMat('gold'))},
+    {n:'Capacitor', i:'\uD83D\uDD35', f:()=>new THREE.Mesh(new THREE.CylinderGeometry(0.12,0.12,0.25,16), getMat('blue'))},
+    {n:'LED', i:'\uD83D\uDD34', f:()=>new THREE.Mesh(new THREE.SphereGeometry(0.08,12,12), new THREE.MeshStandardMaterial({color:0xff0000, emissive:0xff0000, emissiveIntensity:1}))},
+    {n:'Connector', i:'\uD83D\uDD0C', f:()=>new THREE.Mesh(new THREE.BoxGeometry(0.4,0.15,0.15), getMat('gold'))},
+    {n:'Wire', i:'\u27B0', f:()=>{
       const pts = [new THREE.Vector3(-1,0,0), new THREE.Vector3(-0.5,0.2,0), new THREE.Vector3(0.5,0.2,0), new THREE.Vector3(1,0,0)];
       const curve = new THREE.CatmullRomCurve3(pts);
       const geo = new THREE.TubeGeometry(curve, 40, 0.025, 8, false);
       return new THREE.Mesh(geo, getMat('red'));
     }}
   ],
-  '🏠 Building': [
-    {n:'Wall', i:'🧱', f:()=>new THREE.Mesh(new THREE.BoxGeometry(2,2,0.2), getMat('wood'))},
-    {n:'Roof', i:'🔺', f:()=>{
+  '\uD83C\uDFE0 Building': [
+    {n:'Wall', i:'\uD83E\uDDF1', f:()=>new THREE.Mesh(new THREE.BoxGeometry(2,2,0.2), getMat('wood'))},
+    {n:'Roof', i:'\uD83D\uDD3A', f:()=>{
       const sh = new THREE.Shape();
       sh.moveTo(-1.2,0); sh.lineTo(0,1); sh.lineTo(1.2,0); sh.lineTo(-1.2,0);
       const geo = new THREE.ExtrudeGeometry(sh, {depth:1.5, bevelEnabled:false});
       return new THREE.Mesh(geo, getMat('red'));
     }},
-    {n:'Door', i:'🚪', f:()=>new THREE.Mesh(new THREE.BoxGeometry(0.6,1.4,0.1), getMat('wood'))},
-    {n:'Window', i:'🪟', f:()=>new THREE.Mesh(new THREE.BoxGeometry(0.7,0.7,0.08), getMat('glass'))},
-    {n:'Pillar', i:'🏛', f:()=>new THREE.Mesh(new THREE.CylinderGeometry(0.15,0.15,2,12), getMat('metal'))}
+    {n:'Door', i:'\uD83D\uDEAA', f:()=>new THREE.Mesh(new THREE.BoxGeometry(0.6,1.4,0.1), getMat('wood'))},
+    {n:'Window', i:'\uD83E\uDE9F', f:()=>new THREE.Mesh(new THREE.BoxGeometry(0.7,0.7,0.08), getMat('glass'))},
+    {n:'Pillar', i:'\uD83C\uDFDB', f:()=>new THREE.Mesh(new THREE.CylinderGeometry(0.15,0.15,2,12), getMat('metal'))}
   ]
 };
 
@@ -8135,7 +8150,7 @@ function buildLibrary() {
   let catIdx = 0;
   for(const [catName, parts] of Object.entries(COMPONENTS)) {
     const catDiv = document.createElement('div');
-    catDiv.innerHTML = `<div class="cat-header" onclick="toggleCat(${catIdx})" id="cat-h-${catIdx}"><span>${catName}</span><span class="arrow">▶</span></div><div class="cat-body" id="cat-b-${catIdx}"><div class="parts-grid">${parts.map((p, i) => `<div class="part-btn" onclick="addPart('${catName}',${i})"><span class="ico">${p.i}</span>${p.n}</div>`).join('')}</div></div>`;
+    catDiv.innerHTML = '<div class="cat-header" onclick="toggleCat(' + catIdx + ')" id="cat-h-' + catIdx + '"><span>' + catName + '</span><span class="arrow">&#9654;</span></div><div class="cat-body" id="cat-b-' + catIdx + '"><div class="parts-grid">' + parts.map((p, i) => '<div class="part-btn" onclick="addPart(\'' + catName + '\',' + i + ')"><span class="ico">' + p.i + '</span>' + p.n + '</div>').join('') + '</div></div>';
     container.appendChild(catDiv);
     catIdx++;
   }
@@ -8148,15 +8163,15 @@ function toggleCat(idx) {
 }
 
 const TEMPLATES = [
-  {id:'cycle', n:'Cycle', i:'🚲'},{id:'bike', n:'Motor Bike', i:'🏍'},
-  {id:'car', n:'Super Car', i:'🚗'},{id:'airplane', n:'Airplane', i:'✈'},
-  {id:'helicopter', n:'Helicopter', i:'🚁'},{id:'rocket', n:'Rocket', i:'🚀'},
-  {id:'robot', n:'Robot', i:'🤖'},{id:'drone', n:'Drone', i:'🛸'},
-  {id:'pcb', n:'PCB Board', i:'🔌'},{id:'gear', n:'Gears', i:'⚙'}
+  {id:'cycle', n:'Cycle', i:'\uD83D\uDEB2'},{id:'bike', n:'Motor Bike', i:'\uD83C\uDFCD'},
+  {id:'car', n:'Super Car', i:'\uD83D\uDE97'},{id:'airplane', n:'Airplane', i:'\u2708'},
+  {id:'helicopter', n:'Helicopter', i:'\uD83D\uDE81'},{id:'rocket', n:'Rocket', i:'\uD83D\uDE80'},
+  {id:'robot', n:'Robot', i:'\uD83E\uDD16'},{id:'drone', n:'Drone', i:'\uD83D\uDEF8'},
+  {id:'pcb', n:'PCB Board', i:'\uD83D\uDD0C'},{id:'gear', n:'Gears', i:'\u2699'}
 ];
 function buildTemplates() {
   const g = document.getElementById('tplGrid');
-  g.innerHTML = TEMPLATES.map(t => `<div class="tpl-btn" onclick="loadTemplate('${t.id}')"><span class="ico">${t.i}</span>${t.n}</div>`).join('');
+  g.innerHTML = TEMPLATES.map(t => '<div class="tpl-btn" onclick="loadTemplate(\'' + t.id + '\')"><span class="ico">' + t.i + '</span>' + t.n + '</div>').join('');
 }
 
 function addPart(catName, idx) {
@@ -8188,7 +8203,7 @@ function selectObject(obj) {
   } else {
     selectionBox.visible = false;
     document.getElementById('statSel').innerText = 'Nothing selected';
-    document.getElementById('propPanel').innerHTML = `<div class="empty-state"><span class="ico">🎯</span>Click any object in the 3D scene to edit it</div>`;
+    document.getElementById('propPanel').innerHTML = '<div class="empty-state"><span class="ico">&#127919;</span>Click any object in the 3D scene to edit it</div>';
   }
 }
 
@@ -8196,22 +8211,15 @@ function buildPropPanel(obj) {
   const panel = document.getElementById('propPanel');
   const mat = obj.material || (obj.children[0] && obj.children[0].material);
   const col = mat && mat.color ? '#' + mat.color.getHexString() : '#ffcc00';
-  panel.innerHTML = `
-    <div style="font-size:11px;color:#4a9eff;font-weight:800;margin-bottom:10px">🎯 ${obj.userData.type || 'Part'}</div>
-    <div class="prop-row"><div class="prop-label">🎨 Color</div><input type="color" class="prop-color" value="${col}" onchange="changeColor(this.value)"></div>
-    <div class="prop-row"><div class="prop-label">🧱 Material</div><select class="prop-select" onchange="changeMaterial(this.value)"><option value="plastic">Plastic</option><option value="metal">Metal</option><option value="chrome">Chrome</option><option value="rubber">Rubber</option><option value="glass">Glass</option><option value="wood">Wood</option><option value="gold">Gold</option><option value="red">Red Plastic</option><option value="blue">Blue Plastic</option><option value="green">Green Plastic</option><option value="black">Black</option></select></div>
-    <div class="prop-row"><div class="prop-label">📏 Size <span id="sizeVal">1.0</span></div><input type="range" class="prop-slider" min="0.2" max="4" step="0.1" value="1" oninput="changeSize(this.value)"></div>
-    <div class="prop-row"><div class="prop-label">↔ Move X <span id="mxVal">${obj.position.x.toFixed(1)}</span></div><input type="range" class="prop-slider" min="-10" max="10" step="0.1" value="${obj.position.x}" oninput="moveX(this.value)"></div>
-    <div class="prop-row"><div class="prop-label">↕ Move Y <span id="myVal">${obj.position.y.toFixed(1)}</span></div><input type="range" class="prop-slider" min="-2" max="10" step="0.1" value="${obj.position.y}" oninput="moveY(this.value)"></div>
-    <div class="prop-row"><div class="prop-label">↔ Move Z <span id="mzVal">${obj.position.z.toFixed(1)}</span></div><input type="range" class="prop-slider" min="-10" max="10" step="0.1" value="${obj.position.z}" oninput="moveZ(this.value)"></div>
-    <div class="prop-row"><div class="prop-label">🔄 Rotate <span id="rotVal">0°</span></div><input type="range" class="prop-slider" min="0" max="360" step="5" value="0" oninput="rotateY(this.value)"></div>
-    <div class="prop-actions">
-      <button class="prop-act" onclick="duplicateSelected()">📋 Copy</button>
-      <button class="prop-act" onclick="dropToFloor()">⬇ Floor</button>
-      <button class="prop-act" onclick="centerIt()">🎯 Center</button>
-      <button class="prop-act red" onclick="deleteSelected()">🗑 Delete</button>
-    </div>
-  `;
+  panel.innerHTML = '<div style="font-size:11px;color:#4a9eff;font-weight:800;margin-bottom:10px">&#127919; ' + (obj.userData.type || 'Part') + '</div>' +
+    '<div class="prop-row"><div class="prop-label">Color</div><input type="color" class="prop-color" value="' + col + '" onchange="changeColor(this.value)"></div>' +
+    '<div class="prop-row"><div class="prop-label">Material</div><select class="prop-select" onchange="changeMaterial(this.value)"><option value="plastic">Plastic</option><option value="metal">Metal</option><option value="chrome">Chrome</option><option value="rubber">Rubber</option><option value="glass">Glass</option><option value="wood">Wood</option><option value="gold">Gold</option><option value="red">Red Plastic</option><option value="blue">Blue Plastic</option><option value="green">Green Plastic</option><option value="black">Black</option></select></div>' +
+    '<div class="prop-row"><div class="prop-label">Size <span id="sizeVal">1.0</span></div><input type="range" class="prop-slider" min="0.2" max="4" step="0.1" value="1" oninput="changeSize(this.value)"></div>' +
+    '<div class="prop-row"><div class="prop-label">Move X <span id="mxVal">' + obj.position.x.toFixed(1) + '</span></div><input type="range" class="prop-slider" min="-10" max="10" step="0.1" value="' + obj.position.x + '" oninput="moveX(this.value)"></div>' +
+    '<div class="prop-row"><div class="prop-label">Move Y <span id="myVal">' + obj.position.y.toFixed(1) + '</span></div><input type="range" class="prop-slider" min="-2" max="10" step="0.1" value="' + obj.position.y + '" oninput="moveY(this.value)"></div>' +
+    '<div class="prop-row"><div class="prop-label">Move Z <span id="mzVal">' + obj.position.z.toFixed(1) + '</span></div><input type="range" class="prop-slider" min="-10" max="10" step="0.1" value="' + obj.position.z + '" oninput="moveZ(this.value)"></div>' +
+    '<div class="prop-row"><div class="prop-label">Rotate <span id="rotVal">0</span></div><input type="range" class="prop-slider" min="0" max="360" step="5" value="0" oninput="rotateY(this.value)"></div>' +
+    '<div class="prop-actions"><button class="prop-act" onclick="duplicateSelected()">Copy</button><button class="prop-act" onclick="dropToFloor()">Floor</button><button class="prop-act" onclick="centerIt()">Center</button><button class="prop-act red" onclick="deleteSelected()">Delete</button></div>';
 }
 
 function changeColor(hex) { if(!selectedObj) return; const c = new THREE.Color(hex); selectedObj.traverse(o => { if(o.material && o.material.color) o.material.color.set(c); }); }
@@ -8220,7 +8228,7 @@ function changeSize(val) { if(!selectedObj) return; document.getElementById('siz
 function moveX(v) { if(selectedObj) { selectedObj.position.x = parseFloat(v); document.getElementById('mxVal').innerText = parseFloat(v).toFixed(1); updateSelectionBox(); } }
 function moveY(v) { if(selectedObj) { selectedObj.position.y = parseFloat(v); document.getElementById('myVal').innerText = parseFloat(v).toFixed(1); updateSelectionBox(); } }
 function moveZ(v) { if(selectedObj) { selectedObj.position.z = parseFloat(v); document.getElementById('mzVal').innerText = parseFloat(v).toFixed(1); updateSelectionBox(); } }
-function rotateY(v) { if(selectedObj) { selectedObj.rotation.y = parseFloat(v) * Math.PI/180; document.getElementById('rotVal').innerText = v + '°'; updateSelectionBox(); } }
+function rotateY(v) { if(selectedObj) { selectedObj.rotation.y = parseFloat(v) * Math.PI/180; document.getElementById('rotVal').innerText = v; updateSelectionBox(); } }
 function dropToFloor() { if(selectedObj) { selectedObj.position.y = 0.8; updateSelectionBox(); buildPropPanel(selectedObj); } }
 function centerIt() { if(selectedObj) { selectedObj.position.set(0, 0.8, 0); updateSelectionBox(); buildPropPanel(selectedObj); } }
 function duplicateSelected() { if(!selectedObj) return; const clone = selectedObj.clone(); clone.position.x += 1.5; clone.userData = {...selectedObj.userData}; objGroup.add(clone); objectCount++; selectObject(clone); updateStats(); }
@@ -8231,7 +8239,7 @@ function updateStats() { document.getElementById('statCount').innerText = object
 
 function setMode(m) { mode = m; document.getElementById('statMode').innerText = m.charAt(0).toUpperCase() + m.slice(1); document.getElementById('btnMove').classList.toggle('primary', m === 'move'); document.getElementById('btnRotate').classList.toggle('primary', m === 'rotate'); document.getElementById('btnScale').classList.toggle('primary', m === 'scale'); }
 function setView(v) { const d = 12; if(v === 'top') { camera.position.set(0, d, 0.01); controls.target.set(0,0,0); } else if(v === 'front') { camera.position.set(0, 3, d); controls.target.set(0,1,0); } else if(v === 'side') { camera.position.set(d, 3, 0); controls.target.set(0,1,0); } else { camera.position.set(8, 6, 10); controls.target.set(0,1,0); } controls.update(); }
-function toggleSnap() { snapEnabled = !snapEnabled; document.getElementById('btnSnap').innerText = '🧲 Snap: ' + (snapEnabled ? 'ON' : 'OFF'); }
+function toggleSnap() { snapEnabled = !snapEnabled; document.getElementById('btnSnap').innerText = 'Snap: ' + (snapEnabled ? 'ON' : 'OFF'); }
 function toggleGrid() { grid.visible = !grid.visible; }
 
 const raycaster = new THREE.Raycaster();
@@ -8265,83 +8273,92 @@ function loadTemplate(id) {
   if(objGroup.children.length > 0 && !confirm('Load template? Current design will be cleared.')) { document.getElementById('tplSelect').value = ''; return; }
   while(objGroup.children.length > 0) objGroup.remove(objGroup.children[0]);
   objectCount = 0;
+  const CYCLE = COMPONENTS['\uD83D\uDEB2 Cycle Parts'];
+  const BIKE = COMPONENTS['\uD83C\uDFCD Motor Bike'];
+  const CAR = COMPONENTS['\uD83D\uDE97 Car Parts'];
+  const AIR = COMPONENTS['\u2708 Aerospace'];
+  const RKT = COMPONENTS['\uD83D\uDE80 Rocket'];
+  const ROB = COMPONENTS['\uD83E\uDD16 Robot'];
+  const MECH = COMPONENTS['\u2699 Mechanical'];
+  const PCB = COMPONENTS['\uD83D\uDD0C PCB & Circuit'];
+  const BAS = COMPONENTS['\uD83D\uDD27 Basic Shapes'];
   const T = {
     cycle: () => {
-      const w1 = COMPONENTS['🚲 Cycle Parts'][0].f(); w1.position.set(-1.5, 0.8, 0); objGroup.add(w1);
-      const w2 = COMPONENTS['🚲 Cycle Parts'][0].f(); w2.position.set(1.5, 0.8, 0); objGroup.add(w2);
-      const fr = COMPONENTS['🚲 Cycle Parts'][1].f(); fr.position.set(0, 1.2, 0); objGroup.add(fr);
-      const hb = COMPONENTS['🚲 Cycle Parts'][2].f(); hb.position.set(1.5, 2, 0); objGroup.add(hb);
-      const st = COMPONENTS['🚲 Cycle Parts'][3].f(); st.position.set(-0.8, 2, 0); objGroup.add(st);
-      const pd = COMPONENTS['🚲 Cycle Parts'][4].f(); pd.position.set(0, 0.8, 0); objGroup.add(pd);
+      const w1 = CYCLE[0].f(); w1.position.set(-1.5, 0.8, 0); objGroup.add(w1);
+      const w2 = CYCLE[0].f(); w2.position.set(1.5, 0.8, 0); objGroup.add(w2);
+      const fr = CYCLE[1].f(); fr.position.set(0, 1.2, 0); objGroup.add(fr);
+      const hb = CYCLE[2].f(); hb.position.set(1.5, 2, 0); objGroup.add(hb);
+      const st = CYCLE[3].f(); st.position.set(-0.8, 2, 0); objGroup.add(st);
+      const pd = CYCLE[4].f(); pd.position.set(0, 0.8, 0); objGroup.add(pd);
     },
     bike: () => {
-      const w1 = COMPONENTS['🚲 Cycle Parts'][0].f(); w1.position.set(-1.6, 0.8, 0); w1.scale.setScalar(1.2); objGroup.add(w1);
-      const w2 = COMPONENTS['🚲 Cycle Parts'][0].f(); w2.position.set(1.6, 0.8, 0); w2.scale.setScalar(1.2); objGroup.add(w2);
-      const en = COMPONENTS['🏍 Motor Bike'][0].f(); en.position.set(0, 1, 0); objGroup.add(en);
-      const ft = COMPONENTS['🏍 Motor Bike'][1].f(); ft.position.set(-0.3, 1.9, 0); objGroup.add(ft);
-      const st = COMPONENTS['🏍 Motor Bike'][2].f(); st.position.set(-1.3, 1.7, 0); objGroup.add(st);
-      const hb = COMPONENTS['🚲 Cycle Parts'][2].f(); hb.position.set(1.4, 1.9, 0); objGroup.add(hb);
-      const ex = COMPONENTS['🏍 Motor Bike'][3].f(); ex.position.set(-1, 0.6, 0.5); objGroup.add(ex);
+      const w1 = CYCLE[0].f(); w1.position.set(-1.6, 0.8, 0); w1.scale.setScalar(1.2); objGroup.add(w1);
+      const w2 = CYCLE[0].f(); w2.position.set(1.6, 0.8, 0); w2.scale.setScalar(1.2); objGroup.add(w2);
+      const en = BIKE[0].f(); en.position.set(0, 1, 0); objGroup.add(en);
+      const ft = BIKE[1].f(); ft.position.set(-0.3, 1.9, 0); objGroup.add(ft);
+      const st = BIKE[2].f(); st.position.set(-1.3, 1.7, 0); objGroup.add(st);
+      const hb = CYCLE[2].f(); hb.position.set(1.4, 1.9, 0); objGroup.add(hb);
+      const ex = BIKE[3].f(); ex.position.set(-1, 0.6, 0.5); objGroup.add(ex);
     },
     car: () => {
-      const body = COMPONENTS['🚗 Car Parts'][0].f(); body.position.set(0, 0.9, 0); objGroup.add(body);
-      const cab = COMPONENTS['🚗 Car Parts'][1].f(); cab.position.set(0, 1.7, 0); objGroup.add(cab);
+      const body = CAR[0].f(); body.position.set(0, 0.9, 0); objGroup.add(body);
+      const cab = CAR[1].f(); cab.position.set(0, 1.7, 0); objGroup.add(cab);
       const tirePos = [[-1.3,0.35,-0.9],[-1.3,0.35,0.9],[1.3,0.35,-0.9],[1.3,0.35,0.9]];
-      tirePos.forEach(p => { const t = COMPONENTS['🚗 Car Parts'][2].f(); t.position.set(...p); objGroup.add(t); });
-      const hl1 = COMPONENTS['🚗 Car Parts'][3].f(); hl1.position.set(1.3, 0.9, -0.5); objGroup.add(hl1);
-      const hl2 = COMPONENTS['🚗 Car Parts'][3].f(); hl2.position.set(1.3, 0.9, 0.5); objGroup.add(hl2);
-      const sp = COMPONENTS['🚗 Car Parts'][5].f(); sp.position.set(-1.3, 1.4, 0); objGroup.add(sp);
+      tirePos.forEach(p => { const t = CAR[2].f(); t.position.set(...p); objGroup.add(t); });
+      const hl1 = CAR[3].f(); hl1.position.set(1.3, 0.9, -0.5); objGroup.add(hl1);
+      const hl2 = CAR[3].f(); hl2.position.set(1.3, 0.9, 0.5); objGroup.add(hl2);
+      const sp = CAR[5].f(); sp.position.set(-1.3, 1.4, 0); objGroup.add(sp);
     },
     airplane: () => {
-      const fus = COMPONENTS['✈ Aerospace'][0].f(); fus.position.set(0, 1.5, 0); objGroup.add(fus);
-      const wing = COMPONENTS['✈ Aerospace'][1].f(); wing.position.set(0, 1.3, 0); wing.scale.set(1, 1, 1.5); objGroup.add(wing);
-      const fin = COMPONENTS['✈ Aerospace'][2].f(); fin.position.set(-1.4, 2, 0); objGroup.add(fin);
-      const cock = COMPONENTS['✈ Aerospace'][3].f(); cock.position.set(1.4, 1.7, 0); objGroup.add(cock);
+      const fus = AIR[0].f(); fus.position.set(0, 1.5, 0); objGroup.add(fus);
+      const wing = AIR[1].f(); wing.position.set(0, 1.3, 0); wing.scale.set(1, 1, 1.5); objGroup.add(wing);
+      const fin = AIR[2].f(); fin.position.set(-1.4, 2, 0); objGroup.add(fin);
+      const cock = AIR[3].f(); cock.position.set(1.4, 1.7, 0); objGroup.add(cock);
     },
     helicopter: () => {
-      const body = COMPONENTS['✈ Aerospace'][0].f(); body.position.set(0, 1.5, 0); body.scale.set(0.7, 0.7, 0.7); objGroup.add(body);
-      const rotor = COMPONENTS['✈ Aerospace'][4].f(); rotor.position.set(0, 2.5, 0); rotor.scale.set(1.5, 1.5, 1.5); objGroup.add(rotor);
-      const tail = COMPONENTS['✈ Aerospace'][2].f(); tail.position.set(-1.2, 1.8, 0); objGroup.add(tail);
+      const body = AIR[0].f(); body.position.set(0, 1.5, 0); body.scale.set(0.7, 0.7, 0.7); objGroup.add(body);
+      const rotor = AIR[4].f(); rotor.position.set(0, 2.5, 0); rotor.scale.set(1.5, 1.5, 1.5); objGroup.add(rotor);
+      const tail = AIR[2].f(); tail.position.set(-1.2, 1.8, 0); objGroup.add(tail);
     },
     rocket: () => {
-      const body = COMPONENTS['🚀 Rocket'][0].f(); body.position.set(0, 2, 0); objGroup.add(body);
-      const nose = COMPONENTS['🚀 Rocket'][1].f(); nose.position.set(0, 3.5, 0); objGroup.add(nose);
-      const f1 = COMPONENTS['🚀 Rocket'][2].f(); f1.position.set(0.4, 0.5, 0); f1.rotation.y = Math.PI/2; objGroup.add(f1);
-      const f2 = COMPONENTS['🚀 Rocket'][2].f(); f2.position.set(-0.4, 0.5, 0); f2.rotation.y = -Math.PI/2; objGroup.add(f2);
-      const f3 = COMPONENTS['🚀 Rocket'][2].f(); f3.position.set(0, 0.5, 0.4); objGroup.add(f3);
-      const f4 = COMPONENTS['🚀 Rocket'][2].f(); f4.position.set(0, 0.5, -0.4); f4.rotation.y = Math.PI; objGroup.add(f4);
-      const nz = COMPONENTS['🚀 Rocket'][3].f(); nz.position.set(0, 0.5, 0); objGroup.add(nz);
+      const body = RKT[0].f(); body.position.set(0, 2, 0); objGroup.add(body);
+      const nose = RKT[1].f(); nose.position.set(0, 3.5, 0); objGroup.add(nose);
+      const f1 = RKT[2].f(); f1.position.set(0.4, 0.5, 0); f1.rotation.y = Math.PI/2; objGroup.add(f1);
+      const f2 = RKT[2].f(); f2.position.set(-0.4, 0.5, 0); f2.rotation.y = -Math.PI/2; objGroup.add(f2);
+      const f3 = RKT[2].f(); f3.position.set(0, 0.5, 0.4); objGroup.add(f3);
+      const f4 = RKT[2].f(); f4.position.set(0, 0.5, -0.4); f4.rotation.y = Math.PI; objGroup.add(f4);
+      const nz = RKT[3].f(); nz.position.set(0, 0.5, 0); objGroup.add(nz);
     },
     robot: () => {
-      const head = COMPONENTS['🤖 Robot'][0].f(); head.position.set(0, 2.4, 0); objGroup.add(head);
-      const body = COMPONENTS['🤖 Robot'][1].f(); body.position.set(0, 1.3, 0); objGroup.add(body);
-      const armL = COMPONENTS['🤖 Robot'][2].f(); armL.position.set(-0.8, 1.4, 0); objGroup.add(armL);
-      const armR = COMPONENTS['🤖 Robot'][2].f(); armR.position.set(0.8, 1.4, 0); objGroup.add(armR);
-      const legL = COMPONENTS['🤖 Robot'][3].f(); legL.position.set(-0.3, 0.4, 0); objGroup.add(legL);
-      const legR = COMPONENTS['🤖 Robot'][3].f(); legR.position.set(0.3, 0.4, 0); objGroup.add(legR);
-      const eyeL = COMPONENTS['🤖 Robot'][4].f(); eyeL.position.set(-0.2, 2.5, 0.35); objGroup.add(eyeL);
-      const eyeR = COMPONENTS['🤖 Robot'][4].f(); eyeR.position.set(0.2, 2.5, 0.35); objGroup.add(eyeR);
-      const ant = COMPONENTS['🤖 Robot'][5].f(); ant.position.set(0, 2.9, 0); objGroup.add(ant);
+      const head = ROB[0].f(); head.position.set(0, 2.4, 0); objGroup.add(head);
+      const body = ROB[1].f(); body.position.set(0, 1.3, 0); objGroup.add(body);
+      const armL = ROB[2].f(); armL.position.set(-0.8, 1.4, 0); objGroup.add(armL);
+      const armR = ROB[2].f(); armR.position.set(0.8, 1.4, 0); objGroup.add(armR);
+      const legL = ROB[3].f(); legL.position.set(-0.3, 0.4, 0); objGroup.add(legL);
+      const legR = ROB[3].f(); legR.position.set(0.3, 0.4, 0); objGroup.add(legR);
+      const eyeL = ROB[4].f(); eyeL.position.set(-0.2, 2.5, 0.35); objGroup.add(eyeL);
+      const eyeR = ROB[4].f(); eyeR.position.set(0.2, 2.5, 0.35); objGroup.add(eyeR);
+      const ant = ROB[5].f(); ant.position.set(0, 2.9, 0); objGroup.add(ant);
     },
     drone: () => {
-      const body = COMPONENTS['🔧 Basic Shapes'][0].f(); body.scale.setScalar(0.8); body.position.set(0, 1.5, 0); objGroup.add(body);
+      const body = BAS[0].f(); body.scale.setScalar(0.8); body.position.set(0, 1.5, 0); objGroup.add(body);
       const arms = [[-1,-1],[1,-1],[-1,1],[1,1]];
-      arms.forEach(([x,z]) => { const rotor = COMPONENTS['✈ Aerospace'][4].f(); rotor.position.set(x, 1.5, z); objGroup.add(rotor); });
+      arms.forEach(([x,z]) => { const rotor = AIR[4].f(); rotor.position.set(x, 1.5, z); objGroup.add(rotor); });
     },
     pcb: () => {
-      const board = COMPONENTS['🔌 PCB & Circuit'][0].f(); board.position.set(0, 0.5, 0); objGroup.add(board);
-      const chip = COMPONENTS['🔌 PCB & Circuit'][1].f(); chip.position.set(-0.3, 0.6, 0); objGroup.add(chip);
-      const res1 = COMPONENTS['🔌 PCB & Circuit'][2].f(); res1.position.set(0.5, 0.6, -0.3); objGroup.add(res1);
-      const res2 = COMPONENTS['🔌 PCB & Circuit'][2].f(); res2.position.set(0.7, 0.6, -0.3); objGroup.add(res2);
-      const cap = COMPONENTS['🔌 PCB & Circuit'][3].f(); cap.position.set(0.5, 0.6, 0.3); objGroup.add(cap);
-      const led = COMPONENTS['🔌 PCB & Circuit'][4].f(); led.position.set(-0.7, 0.6, 0.4); objGroup.add(led);
-      const conn = COMPONENTS['🔌 PCB & Circuit'][5].f(); conn.position.set(-0.9, 0.6, -0.5); objGroup.add(conn);
+      const board = PCB[0].f(); board.position.set(0, 0.5, 0); objGroup.add(board);
+      const chip = PCB[1].f(); chip.position.set(-0.3, 0.6, 0); objGroup.add(chip);
+      const res1 = PCB[2].f(); res1.position.set(0.5, 0.6, -0.3); objGroup.add(res1);
+      const res2 = PCB[2].f(); res2.position.set(0.7, 0.6, -0.3); objGroup.add(res2);
+      const cap = PCB[3].f(); cap.position.set(0.5, 0.6, 0.3); objGroup.add(cap);
+      const led = PCB[4].f(); led.position.set(-0.7, 0.6, 0.4); objGroup.add(led);
+      const conn = PCB[5].f(); conn.position.set(-0.9, 0.6, -0.5); objGroup.add(conn);
     },
     gear: () => {
-      const g1 = COMPONENTS['⚙ Mechanical'][0].f(); g1.position.set(-0.8, 1, 0); objGroup.add(g1);
-      const g2 = COMPONENTS['⚙ Mechanical'][0].f(); g2.position.set(0.8, 1, 0); g2.scale.setScalar(0.8); objGroup.add(g2);
-      const sh = COMPONENTS['⚙ Mechanical'][1].f(); sh.rotation.z = Math.PI/2; sh.position.set(0, 1, 0); objGroup.add(sh);
-      const br = COMPONENTS['⚙ Mechanical'][6].f(); br.position.set(-0.8, 1, 0); br.rotation.x = Math.PI/2; objGroup.add(br);
+      const g1 = MECH[0].f(); g1.position.set(-0.8, 1, 0); objGroup.add(g1);
+      const g2 = MECH[0].f(); g2.position.set(0.8, 1, 0); g2.scale.setScalar(0.8); objGroup.add(g2);
+      const sh = MECH[1].f(); sh.rotation.z = Math.PI/2; sh.position.set(0, 1, 0); objGroup.add(sh);
+      const br = MECH[6].f(); br.position.set(-0.8, 1, 0); br.rotation.x = Math.PI/2; objGroup.add(br);
     }
   };
   if(T[id]) { T[id](); objectCount = objGroup.children.length; updateStats(); setView('iso'); }
@@ -8353,7 +8370,7 @@ function closeExport() { document.getElementById('exportModal').classList.remove
 function exportPNG() { closeExport(); renderer.render(scene, camera); const link = document.createElement('a'); link.download = 'Clyxess-Design-' + Date.now() + '.png'; link.href = renderer.domElement.toDataURL('image/png'); link.click(); }
 function exportOBJ() {
   closeExport();
-  let objStr = '# Clyxess Studio Export\n# ' + new Date().toISOString() + '\n\n';
+  let objStr = '# Clyxess Studio Export\n';
   let vOffset = 1;
   objStr += 'o ClyxessDesign\n';
   objGroup.traverse(child => {
@@ -8362,9 +8379,9 @@ function exportOBJ() {
       const idx = child.geometry.index;
       const mat = child.matrixWorld;
       const v = new THREE.Vector3();
-      for(let i = 0; i < pos.count; i++) { v.fromBufferAttribute(pos, i).applyMatrix4(mat); objStr += `v ${v.x.toFixed(4)} ${v.y.toFixed(4)} ${v.z.toFixed(4)}\n`; }
-      if(idx) { for(let i = 0; i < idx.count; i += 3) { objStr += `f ${idx.getX(i)+vOffset} ${idx.getX(i+1)+vOffset} ${idx.getX(i+2)+vOffset}\n`; } }
-      else { for(let i = 0; i < pos.count; i += 3) { objStr += `f ${i+vOffset} ${i+1+vOffset} ${i+2+vOffset}\n`; } }
+      for(let i = 0; i < pos.count; i++) { v.fromBufferAttribute(pos, i).applyMatrix4(mat); objStr += 'v ' + v.x.toFixed(4) + ' ' + v.y.toFixed(4) + ' ' + v.z.toFixed(4) + '\n'; }
+      if(idx) { for(let i = 0; i < idx.count; i += 3) { objStr += 'f ' + (idx.getX(i)+vOffset) + ' ' + (idx.getX(i+1)+vOffset) + ' ' + (idx.getX(i+2)+vOffset) + '\n'; } }
+      else { for(let i = 0; i < pos.count; i += 3) { objStr += 'f ' + (i+vOffset) + ' ' + (i+1+vOffset) + ' ' + (i+2+vOffset) + '\n'; } }
       vOffset += pos.count;
     }
   });
@@ -8401,35 +8418,35 @@ function loadProject() {
 
 function animate() { requestAnimationFrame(animate); controls.update(); if(selectedObj) selectionBox.setFromObject(selectedObj); renderer.render(scene, camera); }
 
-// ============ ADVANCED KIDS MODE ============
+// ============ ADVANCED KIDS MODE — Numbering / Blocks / Languages ============
 const LANGS = [
-  {c:'hinglish', n:'Hinglish'},{c:'en', n:'English'},{c:'hi', n:'हिंदी'},{c:'bn', n:'বাংলা'},
-  {c:'te', n:'తెలుగు'},{c:'mr', n:'मराठी'},{c:'ta', n:'தமிழ்'},{c:'gu', n:'ગુજરાતી'},
-  {c:'kn', n:'ಕನ್ನಡ'},{c:'ml', n:'മലയാളം'},{c:'pa', n:'ਪੰਜਾਬੀ'},{c:'or', n:'ଓଡ଼ିଆ'},
-  {c:'ur', n:'اردو'},{c:'ne', n:'नेपाली'},{c:'si', n:'සිංහල'},{c:'zh', n:'中文'},
-  {c:'ja', n:'日本語'},{c:'ko', n:'한국어'},{c:'th', n:'ไทย'},{c:'vi', n:'Tiếng Việt'},
-  {c:'id', n:'Bahasa Indonesia'},{c:'ms', n:'Bahasa Melayu'},{c:'tl', n:'Filipino'},
-  {c:'ar', n:'العربية'},{c:'fa', n:'فارسی'},{c:'he', n:'עברית'},{c:'tr', n:'Türkçe'},
-  {c:'ru', n:'Русский'},{c:'uk', n:'Українська'},{c:'de', n:'Deutsch'},{c:'fr', n:'Français'},
-  {c:'es', n:'Español'},{c:'pt', n:'Português'},{c:'it', n:'Italiano'},{c:'nl', n:'Nederlands'},
-  {c:'pl', n:'Polski'},{c:'sv', n:'Svenska'},{c:'no', n:'Norsk'},{c:'da', n:'Dansk'},
-  {c:'fi', n:'Suomi'},{c:'el', n:'Ελληνικά'},{c:'cs', n:'Čeština'},{c:'hu', n:'Magyar'},
-  {c:'ro', n:'Română'},{c:'bg', n:'Български'},{c:'hr', n:'Hrvatski'},{c:'sr', n:'Српски'},
-  {c:'sk', n:'Slovenčina'},{c:'sl', n:'Slovenščina'},{c:'et', n:'Eesti'},{c:'lv', n:'Latviešu'},
-  {c:'lt', n:'Lietuvių'},{c:'is', n:'Íslenska'},{c:'sw', n:'Kiswahili'},{c:'af', n:'Afrikaans'},
-  {c:'zu', n:'Zulu'},{c:'yo', n:'Yorùbá'},{c:'am', n:'አማርኛ'},{c:'hy', n:'Հայերեն'},
-  {c:'ka', n:'ქართული'},{c:'az', n:'Azərbaycan'},{c:'kk', n:'Қазақ'},{c:'uz', n:'Oʻzbek'},
-  {c:'mn', n:'Монгол'},{c:'my', n:'မြန်မာ'},{c:'km', n:'ខ្មែរ'},{c:'lo', n:'ລາວ'},{c:'eo', n:'Esperanto'}
+  {c:'hinglish', n:'Hinglish'},{c:'en', n:'English'},{c:'hi', n:'Hindi'},{c:'bn', n:'Bengali'},
+  {c:'te', n:'Telugu'},{c:'mr', n:'Marathi'},{c:'ta', n:'Tamil'},{c:'gu', n:'Gujarati'},
+  {c:'kn', n:'Kannada'},{c:'ml', n:'Malayalam'},{c:'pa', n:'Punjabi'},{c:'or', n:'Odia'},
+  {c:'ur', n:'Urdu'},{c:'ne', n:'Nepali'},{c:'si', n:'Sinhala'},{c:'zh', n:'Chinese'},
+  {c:'ja', n:'Japanese'},{c:'ko', n:'Korean'},{c:'th', n:'Thai'},{c:'vi', n:'Vietnamese'},
+  {c:'id', n:'Indonesian'},{c:'ms', n:'Malay'},{c:'tl', n:'Filipino'},
+  {c:'ar', n:'Arabic'},{c:'fa', n:'Persian'},{c:'he', n:'Hebrew'},{c:'tr', n:'Turkish'},
+  {c:'ru', n:'Russian'},{c:'uk', n:'Ukrainian'},{c:'de', n:'German'},{c:'fr', n:'French'},
+  {c:'es', n:'Spanish'},{c:'pt', n:'Portuguese'},{c:'it', n:'Italian'},{c:'nl', n:'Dutch'},
+  {c:'pl', n:'Polish'},{c:'sv', n:'Swedish'},{c:'no', n:'Norwegian'},{c:'da', n:'Danish'},
+  {c:'fi', n:'Finnish'},{c:'el', n:'Greek'},{c:'cs', n:'Czech'},{c:'hu', n:'Hungarian'},
+  {c:'ro', n:'Romanian'},{c:'bg', n:'Bulgarian'},{c:'hr', n:'Croatian'},{c:'sr', n:'Serbian'},
+  {c:'sk', n:'Slovak'},{c:'sl', n:'Slovenian'},{c:'et', n:'Estonian'},{c:'lv', n:'Latvian'},
+  {c:'lt', n:'Lithuanian'},{c:'is', n:'Icelandic'},{c:'sw', n:'Swahili'},{c:'af', n:'Afrikaans'},
+  {c:'zu', n:'Zulu'},{c:'yo', n:'Yoruba'},{c:'am', n:'Amharic'},{c:'hy', n:'Armenian'},
+  {c:'ka', n:'Georgian'},{c:'az', n:'Azerbaijani'},{c:'kk', n:'Kazakh'},{c:'uz', n:'Uzbek'},
+  {c:'mn', n:'Mongolian'},{c:'my', n:'Burmese'},{c:'km', n:'Khmer'},{c:'lo', n:'Lao'},{c:'eo', n:'Esperanto'}
 ];
 
 (function(){
   const sel = document.getElementById('langSel');
-  if(sel) sel.innerHTML = LANGS.map(l=>`<option value="${l.c}">${l.n}</option>`).join('');
+  if(sel) sel.innerHTML = LANGS.map(l => '<option value="' + l.c + '">' + l.n + '</option>').join('');
 })();
 
 function changeLang(){
   const c = document.getElementById('langSel').value;
-  const lang = LANGS.find(l=>l.c===c);
+  const lang = LANGS.find(l => l.c === c);
   document.getElementById('kHint').innerText = lang.n + ' - Click buttons to add';
   if(['ar','he','ur','fa'].includes(c)) document.body.style.direction='rtl';
   else document.body.style.direction='ltr';
@@ -8448,10 +8465,10 @@ function drawK(){
     kctx.translate(o.x, o.y);
     kctx.rotate((o.rot||0)*Math.PI/180);
     kctx.fillStyle = o.color;
-    kctx.strokeStyle = i===selectedIdx?'#00aaff':'#222';
-    kctx.lineWidth = i===selectedIdx?3:1.2;
+    kctx.strokeStyle = i===selectedIdx ? '#00aaff' : '#222';
+    kctx.lineWidth = i===selectedIdx ? 3 : 1.2;
     if(o.type==='text'){
-      kctx.font = 'bold '+(o.size||40)+'px sans-serif';
+      kctx.font = 'bold ' + (o.size||40) + 'px sans-serif';
       kctx.textAlign='center'; kctx.textBaseline='middle';
       kctx.fillText(o.char, 0, 0);
       if(i===selectedIdx){
@@ -8559,29 +8576,7 @@ kcv.addEventListener('wheel', e=>{
 
 function deleteKid(){ if(selectedIdx >= 0){ kObjects.splice(selectedIdx, 1); selectedIdx = -1; drawK(); } }
 function rotateKid(){ if(selectedIdx >= 0){ kObjects[selectedIdx].rot = (kObjects[selectedIdx].rot||0) + 15; drawK(); } }
-function duplicateKid(){ if(selectedIdx >= 0){ const o = {...kObjects[selectedIdx]}; o.x += 30; o.y += 30; kObjects.push(o); selectedIdx = kObjects.length-1; drawK(); } }
-function clearK(){ kObjects = []; drawKBG(); }
-function setKidTool(t){ kTool = t; document.querySelectorAll('.kids-tools .tool-icon').forEach(e=>e.classList.remove('tool-on')); const m={select:'kSelect', pen:'kPen', rect:'kRect', circle:'kCircle'}; if(m[t]) document.getElementById(m[t]).classList.add('tool-on'); }
-
-function startSim(){
-  let t = 0;
-  const id = setInterval(()=>{
-    t += 0.05;
-    kObjects.forEach(o=>{
-      if(o.type === 'propeller') o.rot = (o.rot||0) + 20;
-      if(o.type === 'wing') o.y += Math.sin(t)*0.4;
-      if(o.type === 'rocket') o.y -= 0.8;
-    });
-    drawK();
-    if(t > 6) clearInterval(id);
-  }, 30);
-}
-
-const KID_BLOCKS = {
-  school: [
-    {e:'📚', n:'Book'}, {e:'✏️', n:'Pencil'}, {e:'📐', n:'Ruler'}, {e:'🖍️', n:'Crayon'},
-    {e:'🎒', n:'Bag'}, {e:'📓', n:'Notebook'}, {e:'📏', n:'Scale'}, {e:'🖊️', n:'Pen'},
-    {e:'🖇️', n:'Clip'}, {e:'📎', n:'Pin'}, {
+function duplicateKid(){ if(sel
     
 def render_kids_logic_lab():
     # ============================================================
