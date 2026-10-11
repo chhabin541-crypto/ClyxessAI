@@ -7503,7 +7503,914 @@ setTimeout(function(){resizeCanvas();saveHistory();},300);
                 st.error(f"Invalid: {e}")
         return
         
+def render_art_machinedesign():
+    import streamlit.components.v1 as components
 
+    HTML = r"""<!DOCTYPE html>
+<html><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clyxess AI - Design Studio</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',system-ui,sans-serif}
+html,body{width:100%;height:100%;overflow:hidden;background:#1a1d24;color:#e0e0e0}
+.app{display:flex;flex-direction:column;height:100vh;overflow:hidden}
+
+.ribbon{background:#23262f;border-bottom:1px solid #333842;padding:0 10px;display:flex;align-items:center;gap:8px;height:50px;flex-shrink:0;overflow-x:auto;overflow-y:hidden;white-space:nowrap}
+.ribbon::-webkit-scrollbar{height:4px}
+.ribbon::-webkit-scrollbar-thumb{background:#3a3f4a;border-radius:2px}
+.logo{font-weight:900;font-size:14px;color:#4a9eff;display:flex;align-items:center;gap:6px;flex-shrink:0}
+.logo .badge{background:#ff5c00;color:#fff;font-size:8px;padding:2px 6px;border-radius:8px;font-weight:800}
+.rib-btn{background:#2e323c;border:1px solid #3a3f4a;color:#e0e0e0;padding:6px 12px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;transition:.15s;display:inline-flex;align-items:center;gap:5px;white-space:nowrap;flex-shrink:0;font-family:inherit}
+.rib-btn:hover{background:#3a4050;border-color:#4a9eff}
+.rib-btn.primary{background:#4a9eff;color:#fff;border-color:#4a9eff}
+.rib-btn.primary:hover{background:#5aaeff}
+.rib-btn.danger{background:#c0392b;color:#fff;border-color:#c0392b}
+.rib-btn.danger:hover{background:#e74c3c}
+.rib-sep{width:1px;height:22px;background:#3a3f4a;margin:0 4px;flex-shrink:0}
+.toolbar-title{font-size:10px;color:#7a7f8a;font-weight:700;text-transform:uppercase;letter-spacing:.5px;padding:0 4px;flex-shrink:0}
+
+.mode-switch{display:flex;gap:3px;background:#1a1d24;padding:3px;border-radius:8px;border:1px solid #3a3f4a;flex-shrink:0}
+.mode-switch-btn{background:transparent;border:none;color:#7a7f8a;padding:5px 14px;border-radius:6px;font-size:11px;font-weight:800;cursor:pointer;transition:.15s;font-family:inherit}
+.mode-switch-btn:hover{color:#e0e0e0}
+.mode-switch-btn.active{background:#4a9eff;color:#fff;box-shadow:0 0 10px rgba(74,158,255,.4)}
+.mode-switch-btn.active.kids{background:#ffcc00;color:#000;box-shadow:0 0 10px rgba(255,204,0,.5)}
+
+.main{flex:1;display:flex;overflow:hidden;position:relative;min-height:0}
+
+.left{width:230px;flex-shrink:0;background:#23262f;border-right:1px solid #333842;overflow-y:auto;padding:10px}
+.section-title{font-size:10px;color:#7a7f8a;font-weight:800;text-transform:uppercase;letter-spacing:.5px;margin:10px 0 6px;display:flex;align-items:center;gap:5px}
+.cat-header{background:#2a2e38;border:1px solid #3a3f4a;border-radius:6px;padding:7px 10px;font-size:11px;font-weight:700;cursor:pointer;display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;user-select:none}
+.cat-header:hover{background:#32384a}
+.cat-header .arrow{font-size:9px;color:#7a7f8a;transition:.2s}
+.cat-header.open .arrow{transform:rotate(90deg)}
+.cat-body{display:none;padding:4px 0 6px 0}
+.cat-body.open{display:block}
+.parts-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:4px}
+.part-btn{background:#2e323c;border:1px solid #3a3f4a;border-radius:8px;padding:8px 4px;font-size:9px;text-align:center;cursor:pointer;transition:.15s;color:#e0e0e0;line-height:1.2}
+.part-btn:hover{background:#3a4050;border-color:#4a9eff;transform:translateY(-1px)}
+.part-btn .ico{font-size:18px;display:block;margin-bottom:3px}
+
+.tpl-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:5px}
+.tpl-btn{background:#2e323c;border:1px solid #3a3f4a;border-radius:8px;padding:10px 4px;font-size:10px;text-align:center;cursor:pointer;font-weight:600;color:#e0e0e0;transition:.15s}
+.tpl-btn:hover{background:#4a9eff;border-color:#4a9eff;color:#fff}
+.tpl-btn .ico{font-size:20px;display:block;margin-bottom:4px}
+
+.center{flex:1;position:relative;background:linear-gradient(180deg,#181a20 0%,#1f2229 100%);min-width:0;overflow:hidden}
+#viewport{width:100%;height:100%;display:block;cursor:default}
+.viewport-overlay{position:absolute;top:10px;left:10px;background:#23262fcc;padding:6px 12px;border-radius:8px;font-size:10px;color:#7a7f8a;border:1px solid #3a3f4a;pointer-events:none}
+.viewport-overlay b{color:#4a9eff}
+.bottom-bar{position:absolute;bottom:10px;left:10px;right:10px;background:#23262fcc;padding:6px 14px;border-radius:10px;font-size:10px;color:#7a7f8a;border:1px solid #3a3f4a;display:flex;justify-content:space-between;align-items:center;pointer-events:none}
+.bottom-bar b{color:#4a9eff}
+.view-btns{position:absolute;top:10px;right:10px;display:flex;gap:5px;background:#23262fcc;padding:5px;border-radius:8px;border:1px solid #3a3f4a}
+.view-btn{background:#2e323c;border:1px solid #3a3f4a;color:#e0e0e0;width:32px;height:28px;border-radius:5px;cursor:pointer;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.view-btn:hover{background:#4a9eff;color:#fff;border-color:#4a9eff}
+
+.right{width:250px;flex-shrink:0;background:#23262f;border-left:1px solid #333842;overflow-y:auto;padding:10px}
+.prop-row{margin-bottom:8px}
+.prop-label{font-size:10px;color:#7a7f8a;font-weight:700;display:flex;justify-content:space-between;margin-bottom:3px}
+.prop-label span{color:#4a9eff}
+.prop-slider{width:100%;height:4px;background:#2a2e38;border-radius:2px;-webkit-appearance:none;appearance:none;outline:none}
+.prop-slider::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;background:#4a9eff;border-radius:50%;cursor:pointer;border:2px solid #fff}
+.prop-color{width:100%;height:30px;border:1px solid #3a3f4a;border-radius:6px;cursor:pointer;background:transparent}
+.prop-select{width:100%;background:#1f2229;color:#e0e0e0;border:1px solid #3a3f4a;border-radius:6px;padding:6px;font-size:11px;cursor:pointer}
+.prop-actions{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-top:8px}
+.prop-act{background:#2e323c;border:1px solid #3a3f4a;color:#e0e0e0;padding:7px;border-radius:6px;font-size:10px;font-weight:700;cursor:pointer;transition:.15s;font-family:inherit}
+.prop-act:hover{background:#4a9eff;border-color:#4a9eff;color:#fff}
+.prop-act.red{background:#c0392b;border-color:#c0392b;color:#fff}
+.empty-state{text-align:center;padding:20px 10px;color:#7a7f8a;font-size:11px;line-height:1.6}
+.empty-state .ico{font-size:32px;display:block;margin-bottom:8px;opacity:.5}
+
+.kids-root{width:100%;height:100%;display:flex;overflow:hidden;background:#080a14;color:#fff}
+.kids-tools{width:54px;flex-shrink:0;background:#15182e;border-right:1px solid #ffffff0f;display:flex;flex-direction:column;align-items:center;gap:8px;padding:10px 0}
+.tool-icon{width:38px;height:38px;background:#1a1e36;border:1px solid #ffffff0f;border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px}
+.tool-icon:hover{background:#2a3050}
+.tool-on{outline:2px solid #00ffff;background:#253055!important}
+.kids-panel{width:290px;flex-shrink:0;background:#12162a;border-right:1px solid #ffffff0f;padding:8px;overflow-y:auto;display:flex;flex-direction:column;gap:8px}
+.tab-btn{background:#1e2238;color:#aaa;border:none;padding:5px 12px;border-radius:20px;font-size:10px;font-weight:700;cursor:pointer;margin-right:4px;font-family:inherit}
+.tab-btn.on{background:#ffcc00;color:black}
+.text-input{background:#0b0e1e;color:#00ffff;border:1px solid #00ffff55;border-radius:8px;padding:6px;font-size:11px;width:100%;font-family:inherit}
+.mini-btn{font-size:11px;font-weight:800;padding:6px 12px;border-radius:18px;border:1px solid #ffffff15;cursor:pointer;background:#1e2238;color:#fff;font-family:inherit}
+.mini-btn:hover{background:#2e3a6b}
+.alpha-btn{background:#242a4d;border:1px solid #ffffff15;padding:5px 2px;border-radius:8px;font-size:12px;font-weight:800;cursor:pointer;text-align:center;user-select:none;color:#fff;font-family:inherit}
+.alpha-btn:hover{background:#ffcc00;color:black}
+.kid-part{background:#1e2648;border:1px solid #ffffff12;padding:6px 4px;border-radius:10px;text-align:center;cursor:pointer;font-size:10px;color:#fff}
+.kid-part:hover{background:#2e3a6b}
+.block-item{background:#1e2648;border:1px solid #ffffff12;border-radius:12px;padding:10px 4px;text-align:center;cursor:pointer;font-size:9px;line-height:11px;color:#fff}
+.block-item:hover{background:#2e3a6b;border-color:#ff5c00;transform:translateY(-1px)}
+.block-item b{font-size:10px;display:block}
+.kids-canvas-area{flex:1;background:#e9e9ef;padding:6px;display:flex;flex-direction:column;min-width:0}
+#kCanvas{flex:1;width:100%;background:white;border-radius:8px;margin-top:4px;cursor:move}
+
+.kids-modal{display:none;position:fixed;inset:0;background:#000000d9;backdrop-filter:blur(8px);z-index:99999;justify-content:center;align-items:center;padding:20px}
+.kids-modal.open{display:flex}
+.kids-modal-box{background:#13162c;border:1px solid #ffffff25;border-radius:18px;width:920px;max-height:92vh;display:flex;flex-direction:column;overflow:hidden}
+.kids-modal-head{padding:14px;border-bottom:1px solid #ffffff12;display:flex;justify-content:space-between;align-items:center;color:#fff;font-weight:800}
+.kids-modal-body{padding:12px;overflow-y:auto;flex:1}
+.sec-title{font-size:10px;font-weight:800;color:#00ffff;margin:8px 0 6px 0}
+
+.modal{display:none;position:fixed;inset:0;background:#000000cc;backdrop-filter:blur(6px);z-index:9999;justify-content:center;align-items:center;padding:20px}
+.modal.open{display:flex}
+.modal-box{background:#23262f;border:1px solid #3a3f4a;border-radius:14px;width:100%;max-width:520px;max-height:90vh;overflow:hidden;display:flex;flex-direction:column}
+.modal-head{padding:14px 18px;border-bottom:1px solid #333842;display:flex;justify-content:space-between;align-items:center}
+.modal-head h3{font-size:14px;font-weight:800;color:#4a9eff}
+.modal-close{background:transparent;border:none;color:#e0e0e0;font-size:18px;cursor:pointer;width:30px;height:30px;border-radius:6px}
+.modal-body{padding:16px;overflow-y:auto}
+.modal-body p{font-size:12px;color:#a0a5b0;line-height:1.6;margin-bottom:12px}
+.export-opt{background:#2a2e38;border:1px solid #3a3f4a;border-radius:8px;padding:12px;margin-bottom:8px;cursor:pointer;display:flex;align-items:center;gap:12px;transition:.15s}
+.export-opt:hover{background:#3a4050;border-color:#4a9eff}
+.export-opt .ico{font-size:24px}
+.export-opt b{font-size:12px;display:block}
+.export-opt small{font-size:10px;color:#7a7f8a}
+
+.status{background:#1a1d24;border-top:1px solid #333842;padding:5px 14px;font-size:10px;color:#7a7f8a;display:flex;justify-content:space-between;flex-shrink:0}
+.status b{color:#4a9eff}
+::-webkit-scrollbar{width:8px;height:8px}
+::-webkit-scrollbar-track{background:#1a1d24}
+::-webkit-scrollbar-thumb{background:#3a3f4a;border-radius:4px}
+::-webkit-scrollbar-thumb:hover{background:#4a9eff}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="ribbon">
+    <div class="logo">Clyxess Studio <span class="badge">CAD</span></div>
+    <div class="mode-switch">
+      <button class="mode-switch-btn active" id="btnModeStudio" onclick="switchAppMode('studio')">Studio</button>
+      <button class="mode-switch-btn" id="btnModeKids" onclick="switchAppMode('kids')">Kids</button>
+    </div>
+    <div class="rib-sep"></div>
+    <span class="toolbar-title">Templates:</span>
+    <select class="prop-select" id="tplSelect" style="width:170px" onchange="loadTemplate(this.value)">
+      <option value="">-- Choose Design --</option>
+      <option value="cycle">Simple Cycle</option>
+      <option value="bike">Motor Bike</option>
+      <option value="car">Super Car</option>
+      <option value="airplane">Airplane</option>
+      <option value="helicopter">Helicopter</option>
+      <option value="rocket">Rocket</option>
+      <option value="robot">Robot</option>
+      <option value="drone">Drone</option>
+      <option value="pcb">PCB Board</option>
+      <option value="gear">Gear Assembly</option>
+    </select>
+    <div class="rib-sep"></div>
+    <span class="toolbar-title">Tools:</span>
+    <button class="rib-btn" onclick="setMode('move')" id="btnMove">Move</button>
+    <button class="rib-btn" onclick="setMode('rotate')" id="btnRotate">Rotate</button>
+    <button class="rib-btn" onclick="setMode('scale')" id="btnScale">Scale</button>
+    <div class="rib-sep"></div>
+    <button class="rib-btn" onclick="duplicateSelected()">Copy</button>
+    <button class="rib-btn danger" onclick="deleteSelected()">Delete</button>
+    <button class="rib-btn danger" onclick="clearAll()">Clear</button>
+    <div class="rib-sep"></div>
+    <button class="rib-btn primary" onclick="openExport()">Export</button>
+    <button class="rib-btn" onclick="toggleSnap()" id="btnSnap">Snap: ON</button>
+    <button class="rib-btn" onclick="toggleGrid()">Grid</button>
+  </div>
+
+  <div class="main" id="studioMain" style="display:flex;">
+    <div class="left">
+      <div class="section-title">Readymade Templates</div>
+      <div class="tpl-grid" id="tplGrid"></div>
+      <div class="section-title" style="margin-top:14px">Component Library</div>
+      <div id="catContainer"></div>
+    </div>
+    <div class="center">
+      <canvas id="viewport"></canvas>
+      <div class="viewport-overlay"><b>Left Drag</b> = Rotate | <b>Right Drag</b> = Pan | <b>Scroll</b> = Zoom</div>
+      <div class="view-btns">
+        <button class="view-btn" onclick="setView('top')">TOP</button>
+        <button class="view-btn" onclick="setView('front')">FRT</button>
+        <button class="view-btn" onclick="setView('side')">SD</button>
+        <button class="view-btn" onclick="setView('iso')">ISO</button>
+      </div>
+      <div class="bottom-bar">
+        <span><b id="statCount">0</b> parts in scene</span>
+        <span><b id="statSel">Nothing selected</b></span>
+        <span>Mode: <b id="statMode">Move</b></span>
+      </div>
+    </div>
+    <div class="right">
+      <div class="section-title">Properties</div>
+      <div id="propPanel">
+        <div class="empty-state">Click any object in the 3D scene to edit it</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="main" id="kidsMain" style="display:none;">
+    <div class="kids-root">
+      <div class="kids-tools">
+        <div id="kSelect" onclick="setKidTool('select')" class="tool-icon tool-on">S</div>
+        <div id="kPen" onclick="setKidTool('pen')" class="tool-icon">P</div>
+        <div id="kRect" onclick="setKidTool('rect')" class="tool-icon">R</div>
+        <div id="kCircle" onclick="setKidTool('circle')" class="tool-icon">C</div>
+        <div onclick="deleteKid()" class="tool-icon" style="background:#3a1a1a;">X</div>
+      </div>
+      <div class="kids-panel">
+        <div style="background:#1a1e36;border-radius:10px;padding:8px;border:1px solid #ffffff10;">
+          <div style="font-size:10px;font-weight:800;color:#00ffff;">60+ Languages</div>
+          <select id="langSel" onchange="changeLang()" style="background:#0b0e1e;color:#00ffff;border:1px solid #00ffff55;border-radius:8px;padding:5px;font-size:11px;font-weight:700;width:100%;margin-top:5px;"></select>
+        </div>
+        <div>
+          <button class="tab-btn on" id="tabABC" onclick="switchKidTab('abc',this)">ABC</button>
+          <button class="tab-btn" id="tabNUM" onclick="switchKidTab('num',this)">123</button>
+          <button class="tab-btn" id="tabTXT" onclick="switchKidTab('txt',this)">Text</button>
+        </div>
+        <div id="kidABC" style="background:#1a1e36;border-radius:12px;padding:8px;border:1px solid #ffcc0030;">
+          <div style="font-size:10px;font-weight:800;color:#ffcc00;">A-Z + a-z + 0-9 + Special</div>
+          <div style="font-size:8px;color:#888;margin-top:2px;">Click karo - canvas me aayega</div>
+          <div id="abcGrid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-top:6px;"></div>
+        </div>
+        <div id="kidNUM" style="display:none;background:#1a1e36;border-radius:12px;padding:8px;border:1px solid #00ffff30;">
+          <div style="font-size:10px;font-weight:800;color:#00ffff;">Numbers 1 to 1,00,000</div>
+          <div style="font-size:9px;color:#aaa;margin-top:3px;">Kitne numbers chahiye? (max 100000)</div>
+          <input id="numCount" type="number" min="1" max="100000" value="10" class="text-input" style="margin-top:5px;">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-top:6px;">
+            <button onclick="generateNumbers()" class="mini-btn" style="background:#00ffff;color:black;font-weight:900;">Generate</button>
+            <button onclick="clearNumbers()" class="mini-btn" style="background:#3a1a1a;">Clear</button>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:3px;margin-top:6px;">
+            <button onclick="quickNum(10)" class="alpha-btn">1-10</button>
+            <button onclick="quickNum(50)" class="alpha-btn">1-50</button>
+            <button onclick="quickNum(100)" class="alpha-btn">1-100</button>
+            <button onclick="quickNum(1000)" class="alpha-btn">1K</button>
+            <button onclick="quickNum(10000)" class="alpha-btn">10K</button>
+          </div>
+        </div>
+        <div id="kidTXT" style="display:none;background:#1a1e36;border-radius:12px;padding:8px;border:1px solid #ff5c9e30;">
+          <div style="font-size:10px;font-weight:800;color:#ff5c9e;">Apni Bhasha Me Likho</div>
+          <input id="kidText" type="text" placeholder="Yahan likho..." class="text-input" style="margin-top:6px;">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-top:6px;">
+            <button onclick="addKidText()" class="mini-btn" style="background:#ff5c9e;color:white;font-weight:900;">+ Add</button>
+            <button onclick="document.getElementById('kidText').value=''" class="mini-btn">Clear</button>
+          </div>
+        </div>
+        <div style="background:#1a1e36;border-radius:12px;padding:7px;border:1px solid #00ffff25;">
+          <div style="font-size:10px;font-weight:800;color:#00ffff;">Blocks Library</div>
+          <button onclick="openKidBlocks()" class="mini-btn" style="width:100%;background:#00ffff;color:black;margin-top:6px;font-weight:900;padding:10px;border-radius:12px;">200+ Blocks Kholein</button>
+        </div>
+        <div style="background:#1a1e36;border-radius:12px;padding:7px;border:1px solid #00ffff25;">
+          <div style="font-size:10px;font-weight:800;color:#00ffff;">CHINA SPACE TECH</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px;">
+            <div onclick="addKidPart('wing')" class="kid-part">Wing</div>
+            <div onclick="addKidPart('propeller')" class="kid-part">Prop</div>
+            <div onclick="addKidPart('rocket')" class="kid-part">Rocket</div>
+            <div onclick="addKidPart('satellite')" class="kid-part">Satellite</div>
+            <div onclick="addKidPart('naca')" class="kid-part">NACA</div>
+            <div onclick="addKidPart('solar')" class="kid-part">Solar</div>
+          </div>
+          <button onclick="startSim()" class="mini-btn" style="width:100%;background:#00ffff;color:black;margin-top:6px;font-weight:900;">Fly Simulation</button>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-top:auto;">
+          <button onclick="rotateKid()" class="mini-btn">Rotate</button>
+          <button onclick="duplicateKid()" class="mini-btn">Duplicate</button>
+          <button onclick="deleteKid()" class="mini-btn" style="background:#3a1a1a;">Delete</button>
+          <button onclick="clearK()" class="mini-btn" style="background:#3a1a1a;">Clear</button>
+        </div>
+      </div>
+      <div class="kids-canvas-area">
+        <div id="kHint" style="font-size:10px;color:#333;font-weight:800;">KIDS - Click buttons to add | Drag to move | Wheel to resize</div>
+        <canvas id="kCanvas" width="1300" height="750"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="status">
+    <span><b>Clyxess Studio CAD</b> - Autodesk-style 3D design for kids</span>
+    <span>Made with love by Clyxess AI</span>
+  </div>
+</div>
+
+<div class="modal" id="exportModal">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h3>Export / Download Your Design</h3>
+      <button class="modal-close" onclick="closeExport()">X</button>
+    </div>
+    <div class="modal-body">
+      <p>Choose how you want to save your design.</p>
+      <div class="export-opt" onclick="exportPNG()"><div class="ico">IMG</div><div><b>Download as Image (PNG)</b><small>Share on WhatsApp, Instagram</small></div></div>
+      <div class="export-opt" onclick="exportOBJ()"><div class="ico">OBJ</div><div><b>Download as 3D Model (OBJ)</b><small>Open in Blender, Maya</small></div></div>
+      <div class="export-opt" onclick="saveProject()"><div class="ico">SAV</div><div><b>Save Project (Load Later)</b><small>Save all parts, colors, positions</small></div></div>
+      <div class="export-opt" onclick="loadProject()"><div class="ico">LOD</div><div><b>Load Saved Project</b><small>Continue where you left off</small></div></div>
+    </div>
+  </div>
+</div>
+
+<div class="kids-modal" id="kidBlocksModal" onclick="if(event.target.id==='kidBlocksModal') closeKidBlocks()">
+  <div class="kids-modal-box">
+    <div class="kids-modal-head">
+      <b>Kids Blocks Library - 200+ Blocks</b>
+      <button onclick="closeKidBlocks()" style="background:#2a2a3a;border:none;color:white;width:28px;height:28px;border-radius:50%;cursor:pointer;">X</button>
+    </div>
+    <div class="kids-modal-body">
+      <div class="sec-title">SCHOOL</div>
+      <div id="blockSchool" style="display:grid;grid-template-columns:repeat(6,1fr);gap:6px;"></div>
+      <div class="sec-title">MEDICAL (Body Parts)</div>
+      <div id="blockMedical" style="display:grid;grid-template-columns:repeat(6,1fr);gap:6px;"></div>
+      <div class="sec-title">BIOLOGICAL</div>
+      <div id="blockBio" style="display:grid;grid-template-columns:repeat(6,1fr);gap:6px;"></div>
+      <div class="sec-title">SCIENCE</div>
+      <div id="blockScience" style="display:grid;grid-template-columns:repeat(6,1fr);gap:6px;"></div>
+      <div class="sec-title">ENGINEERING</div>
+      <div id="blockEng" style="display:grid;grid-template-columns:repeat(6,1fr);gap:6px;"></div>
+      <div class="sec-title">NATURE</div>
+      <div id="blockNature" style="display:grid;grid-template-columns:repeat(6,1fr);gap:6px;"></div>
+      <div class="sec-title">SPACE &amp; TECH</div>
+      <div id="blockSpace" style="display:grid;grid-template-columns:repeat(6,1fr);gap:6px;"></div>
+      <div class="sec-title">SHAPES</div>
+      <div id="blockShapes" style="display:grid;grid-template-columns:repeat(6,1fr);gap:6px;"></div>
+    </div>
+  </div>
+</div>
+ <script>
+// ============ MODE SWITCHER ============
+function switchAppMode(mode) {
+  var s = document.getElementById('studioMain');
+  var k = document.getElementById('kidsMain');
+  var bS = document.getElementById('btnModeStudio');
+  var bK = document.getElementById('btnModeKids');
+  if (mode === 'kids') {
+    s.style.display = 'none'; k.style.display = 'flex';
+    bK.classList.add('active'); bK.classList.add('kids'); bS.classList.remove('active');
+    setTimeout(function(){ try { drawK(); } catch(e){} }, 100);
+  } else {
+    k.style.display = 'none'; s.style.display = 'flex';
+    bS.classList.add('active'); bK.classList.remove('active'); bK.classList.remove('kids');
+    setTimeout(function(){ try { resize(); } catch(e){} }, 100);
+  }
+}
+
+const canvas = document.getElementById('viewport');
+const renderer = new THREE.WebGLRenderer({canvas, antialias:true, preserveDrawingBuffer:true});
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.shadowMap.enabled = true;
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x1f2229);
+scene.fog = new THREE.Fog(0x1f2229, 30, 80);
+const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 500);
+camera.position.set(8, 6, 10);
+const controls = new THREE.OrbitControls(camera, canvas);
+controls.enableDamping = true; controls.dampingFactor = 0.08;
+controls.minDistance = 3; controls.maxDistance = 40;
+scene.add(new THREE.AmbientLight(0xffffff, 0.55));
+const dl = new THREE.DirectionalLight(0xffffff, 0.9); dl.position.set(10, 15, 10); dl.castShadow = true; scene.add(dl);
+const fl = new THREE.DirectionalLight(0x88aaff, 0.4); fl.position.set(-10, 8, -10); scene.add(fl);
+const grid = new THREE.GridHelper(40, 40, 0x3a4050, 0x2a2e38);
+grid.material.transparent = true; grid.material.opacity = 0.7; scene.add(grid);
+const objGroup = new THREE.Group(); scene.add(objGroup);
+const selBox = new THREE.BoxHelper(new THREE.Object3D(), 0x4a9eff); selBox.visible = false; scene.add(selBox);
+let mode = 'move', selectedObj = null, snapEnabled = true, isDragging = false;
+let dragStart = {x:0,y:0}, objStartPos = {x:0,y:0,z:0}, objStartRot = {x:0,y:0,z:0}, objectCount = 0;
+
+function resize() {
+  const r = canvas.parentElement.getBoundingClientRect();
+  if (r.width === 0 || r.height === 0) return;
+  renderer.setSize(r.width, r.height, false);
+  camera.aspect = r.width / r.height; camera.updateProjectionMatrix();
+}
+window.addEventListener('resize', resize);
+setTimeout(resize, 100);
+
+const MATERIALS = {
+  plastic: new THREE.MeshStandardMaterial({color:0xffcc00, metalness:0.1, roughness:0.6}),
+  metal: new THREE.MeshStandardMaterial({color:0xc0c5cc, metalness:0.9, roughness:0.25}),
+  chrome: new THREE.MeshStandardMaterial({color:0xffffff, metalness:1.0, roughness:0.05}),
+  rubber: new THREE.MeshStandardMaterial({color:0x222222, metalness:0.0, roughness:0.95}),
+  glass: new THREE.MeshStandardMaterial({color:0x88ccff, metalness:0.1, roughness:0.05, transparent:true, opacity:0.4}),
+  wood: new THREE.MeshStandardMaterial({color:0x8b5a2b, metalness:0.0, roughness:0.85}),
+  gold: new THREE.MeshStandardMaterial({color:0xffd700, metalness:0.9, roughness:0.15}),
+  red: new THREE.MeshStandardMaterial({color:0xe74c3c, metalness:0.2, roughness:0.5}),
+  blue: new THREE.MeshStandardMaterial({color:0x3498db, metalness:0.2, roughness:0.5}),
+  green: new THREE.MeshStandardMaterial({color:0x2ecc71, metalness:0.2, roughness:0.5}),
+  black: new THREE.MeshStandardMaterial({color:0x1a1a1a, metalness:0.3, roughness:0.6})
+};
+function getMat(t) { return MATERIALS[t].clone(); }
+
+const COMPONENTS = {
+  'Basic Shapes': [
+    {n:'Box', f:()=>new THREE.Mesh(new THREE.BoxGeometry(1.5,1.5,1.5), getMat('plastic'))},
+    {n:'Sphere', f:()=>new THREE.Mesh(new THREE.SphereGeometry(0.9,24,24), getMat('plastic'))},
+    {n:'Cylinder', f:()=>new THREE.Mesh(new THREE.CylinderGeometry(0.7,0.7,1.6,24), getMat('plastic'))},
+    {n:'Cone', f:()=>new THREE.Mesh(new THREE.ConeGeometry(0.8,1.6,24), getMat('plastic'))},
+    {n:'Torus', f:()=>new THREE.Mesh(new THREE.TorusGeometry(0.7,0.25,16,32), getMat('plastic'))},
+    {n:'Plane', f:()=>new THREE.Mesh(new THREE.BoxGeometry(2,0.1,2), getMat('plastic'))}
+  ],
+  'Cycle Parts': [
+    {n:'Wheel', f:()=>{
+      const g = new THREE.Group();
+      g.add(new THREE.Mesh(new THREE.TorusGeometry(0.7,0.12,12,32), getMat('rubber')));
+      for(let i=0;i<6;i++){ const s = new THREE.Mesh(new THREE.CylinderGeometry(0.02,0.02,1.3,6), getMat('metal')); s.rotation.z = i*Math.PI/6; g.add(s); }
+      const h = new THREE.Mesh(new THREE.CylinderGeometry(0.08,0.08,0.2,12), getMat('metal')); h.rotation.x = Math.PI/2; g.add(h);
+      return g;
+    }},
+    {n:'Frame', f:()=>{
+      const g = new THREE.Group();
+      const m = getMat('red');
+      const t1 = new THREE.Mesh(new THREE.CylinderGeometry(0.06,0.06,2,8), m); t1.position.set(0,1,0); g.add(t1);
+      const t2 = new THREE.Mesh(new THREE.CylinderGeometry(0.06,0.06,1.4,8), m); t2.rotation.z = -Math.PI/4; t2.position.set(0.5,0.5,0); g.add(t2);
+      const t3 = new THREE.Mesh(new THREE.CylinderGeometry(0.06,0.06,1.4,8), m); t3.rotation.z = Math.PI/4; t3.position.set(-0.5,0.5,0); g.add(t3);
+      return g;
+    }},
+    {n:'Handlebar', f:()=>{
+      const g = new THREE.Group();
+      const b = new THREE.Mesh(new THREE.CylinderGeometry(0.05,0.05,1.2,8), getMat('metal')); b.rotation.z = Math.PI/2; g.add(b);
+      const s = new THREE.Mesh(new THREE.CylinderGeometry(0.05,0.05,0.5,8), getMat('metal')); s.position.y = -0.4; g.add(s);
+      return g;
+    }},
+    {n:'Seat', f:()=>new THREE.Mesh(new THREE.BoxGeometry(0.7,0.15,0.4), getMat('black'))},
+    {n:'Pedal', f:()=>new THREE.Mesh(new THREE.BoxGeometry(0.3,0.1,0.4), getMat('black'))},
+    {n:'Chain', f:()=>new THREE.Mesh(new THREE.TorusGeometry(0.4,0.03,8,32), getMat('metal'))}
+  ],
+  'Car Parts': [
+    {n:'Body', f:()=>new THREE.Mesh(new THREE.BoxGeometry(2.4,0.7,1.4), getMat('red'))},
+    {n:'Cabin', f:()=>{ const c = new THREE.Mesh(new THREE.BoxGeometry(1.2,0.6,1.3), getMat('blue')); c.position.y = 0.6; return c; }},
+    {n:'Tire', f:()=>{ const t = new THREE.Mesh(new THREE.CylinderGeometry(0.35,0.35,0.25,20), getMat('rubber')); t.rotation.z = Math.PI/2; return t; }},
+    {n:'Headlight', f:()=>new THREE.Mesh(new THREE.SphereGeometry(0.15,12,12), new THREE.MeshStandardMaterial({color:0xffffaa, emissive:0xffff88, emissiveIntensity:0.5}))},
+    {n:'Bumper', f:()=>new THREE.Mesh(new THREE.BoxGeometry(0.15,0.3,1.4), getMat('metal'))},
+    {n:'Spoiler', f:()=>new THREE.Mesh(new THREE.BoxGeometry(0.2,0.08,1.4), getMat('black'))}
+  ],
+  'Aerospace': [
+    {n:'Fuselage', f:()=>{ const x = new THREE.Mesh(new THREE.CylinderGeometry(0.4,0.4,2.8,16), getMat('metal')); x.rotation.z = Math.PI/2; return x; }},
+    {n:'Wing', f:()=>new THREE.Mesh(new THREE.BoxGeometry(2.4,0.08,0.9), getMat('metal'))},
+    {n:'Tail Fin', f:()=>new THREE.Mesh(new THREE.BoxGeometry(0.08,0.8,0.7), getMat('red'))},
+    {n:'Cockpit', f:()=>new THREE.Mesh(new THREE.SphereGeometry(0.4,16,12,0,Math.PI*2,0,Math.PI/2), getMat('glass'))},
+    {n:'Propeller', f:()=>{ const g = new THREE.Group(); const b1 = new THREE.Mesh(new THREE.BoxGeometry(1.6,0.06,0.15), getMat('metal')); const b2 = b1.clone(); b2.rotation.y = Math.PI/2; g.add(b1,b2); return g; }},
+    {n:'Jet Engine', f:()=>new THREE.Mesh(new THREE.CylinderGeometry(0.35,0.45,1,16), getMat('chrome'))}
+  ],
+  'Rocket': [
+    {n:'Body', f:()=>new THREE.Mesh(new THREE.CylinderGeometry(0.4,0.4,2.2,16), getMat('metal'))},
+    {n:'Nose Cone', f:()=>new THREE.Mesh(new THREE.ConeGeometry(0.4,0.9,16), getMat('red'))},
+    {n:'Fin', f:()=>{ const sh = new THREE.Shape(); sh.moveTo(0,0); sh.lineTo(0.5,0.8); sh.lineTo(0.5,0); sh.lineTo(0,0); return new THREE.Mesh(new THREE.ExtrudeGeometry(sh,{depth:0.06,bevelEnabled:false}), getMat('red')); }},
+    {n:'Nozzle', f:()=>new THREE.Mesh(new THREE.CylinderGeometry(0.5,0.3,0.5,16), getMat('chrome'))},
+    {n:'Booster', f:()=>new THREE.Mesh(new THREE.CylinderGeometry(0.2,0.2,1.5,12), getMat('gold'))},
+    {n:'Satellite', f:()=>new THREE.Mesh(new THREE.BoxGeometry(0.6,0.4,0.4), getMat('metal'))}
+  ],
+  'Robot': [
+    {n:'Head', f:()=>new THREE.Mesh(new THREE.BoxGeometry(0.8,0.7,0.7), getMat('chrome'))},
+    {n:'Body', f:()=>new THREE.Mesh(new THREE.BoxGeometry(1,1.2,0.7), getMat('blue'))},
+    {n:'Arm', f:()=>new THREE.Mesh(new THREE.CylinderGeometry(0.12,0.12,1,12), getMat('metal'))},
+    {n:'Leg', f:()=>new THREE.Mesh(new THREE.BoxGeometry(0.25,1,0.25), getMat('metal'))},
+    {n:'Eye', f:()=>new THREE.Mesh(new THREE.SphereGeometry(0.1,12,12), new THREE.MeshStandardMaterial({color:0x00ffff, emissive:0x00ffff, emissiveIntensity:0.8}))},
+    {n:'Antenna', f:()=>new THREE.Mesh(new THREE.CylinderGeometry(0.03,0.03,0.5,8), getMat('metal'))}
+  ],
+  'Mechanical': [
+    {n:'Gear', f:()=>{
+      const g = new THREE.Group();
+      g.add(new THREE.Mesh(new THREE.CylinderGeometry(0.55,0.55,0.18,24), getMat('metal')));
+      for(let i=0;i<10;i++){
+        const t = new THREE.Mesh(new THREE.BoxGeometry(0.12,0.2,0.15), getMat('metal'));
+        t.position.set(Math.cos(i*Math.PI/5)*0.6, 0, Math.sin(i*Math.PI/5)*0.6);
+        t.rotation.y = -i*Math.PI/5;
+        g.add(t);
+      }
+      return g;
+    }},
+    {n:'Shaft', f:()=>new THREE.Mesh(new THREE.CylinderGeometry(0.1,0.1,2,16), getMat('metal'))},
+    {n:'Bolt', f:()=>{ const g = new THREE.Group(); const h = new THREE.Mesh(new THREE.CylinderGeometry(0.2,0.2,0.12,6), getMat('metal')); const s = new THREE.Mesh(new THREE.CylinderGeometry(0.1,0.1,0.7,8), getMat('metal')); s.position.y = -0.4; g.add(h,s); return g; }},
+    {n:'Beam', f:()=>new THREE.Mesh(new THREE.BoxGeometry(2.2,0.35,0.15), getMat('metal'))},
+    {n:'Plate', f:()=>new THREE.Mesh(new THREE.BoxGeometry(1.6,0.08,1), getMat('metal'))},
+    {n:'Bearing', f:()=>new THREE.Mesh(new THREE.TorusGeometry(0.25,0.06,10,24), getMat('chrome'))},
+    {n:'Battery', f:()=>new THREE.Mesh(new THREE.BoxGeometry(0.6,0.35,0.4), getMat('green'))},
+    {n:'Motor', f:()=>new THREE.Mesh(new THREE.CylinderGeometry(0.3,0.3,0.5,16), getMat('blue'))}
+  ],
+  'PCB & Circuit': [
+    {n:'PCB Board', f:()=>new THREE.Mesh(new THREE.BoxGeometry(2.2,0.06,1.5), getMat('green'))},
+    {n:'Chip IC', f:()=>new THREE.Mesh(new THREE.BoxGeometry(0.5,0.08,0.4), getMat('black'))},
+    {n:'Resistor', f:()=>new THREE.Mesh(new THREE.CylinderGeometry(0.06,0.06,0.25,10), getMat('gold'))},
+    {n:'Capacitor', f:()=>new THREE.Mesh(new THREE.CylinderGeometry(0.12,0.12,0.25,16), getMat('blue'))},
+    {n:'LED', f:()=>new THREE.Mesh(new THREE.SphereGeometry(0.08,12,12), new THREE.MeshStandardMaterial({color:0xff0000, emissive:0xff0000, emissiveIntensity:1}))},
+    {n:'Connector', f:()=>new THREE.Mesh(new THREE.BoxGeometry(0.4,0.15,0.15), getMat('gold'))}
+  ],
+  'Building': [
+    {n:'Wall', f:()=>new THREE.Mesh(new THREE.BoxGeometry(2,2,0.2), getMat('wood'))},
+    {n:'Roof', f:()=>{ const sh = new THREE.Shape(); sh.moveTo(-1.2,0); sh.lineTo(0,1); sh.lineTo(1.2,0); sh.lineTo(-1.2,0); return new THREE.Mesh(new THREE.ExtrudeGeometry(sh,{depth:1.5,bevelEnabled:false}), getMat('red')); }},
+    {n:'Door', f:()=>new THREE.Mesh(new THREE.BoxGeometry(0.6,1.4,0.1), getMat('wood'))},
+    {n:'Window', f:()=>new THREE.Mesh(new THREE.BoxGeometry(0.7,0.7,0.08), getMat('glass'))},
+    {n:'Pillar', f:()=>new THREE.Mesh(new THREE.CylinderGeometry(0.15,0.15,2,12), getMat('metal'))}
+  ]
+};
+
+function buildLibrary() {
+  const c = document.getElementById('catContainer');
+  c.innerHTML = '';
+  let i = 0;
+  for(const [name, parts] of Object.entries(COMPONENTS)) {
+    const d = document.createElement('div');
+    d.innerHTML = '<div class="cat-header" onclick="toggleCat(' + i + ')" id="cat-h-' + i + '"><span>' + name + '</span><span class="arrow">></span></div><div class="cat-body" id="cat-b-' + i + '"><div class="parts-grid">' + parts.map((p, j) => '<div class="part-btn" onclick="addPart(\'' + name + '\',' + j + ')">' + p.n + '</div>').join('') + '</div></div>';
+    c.appendChild(d);
+    i++;
+  }
+}
+function toggleCat(i) { document.getElementById('cat-h-'+i).classList.toggle('open'); document.getElementById('cat-b-'+i).classList.toggle('open'); }
+
+const TEMPLATES = [
+  {id:'cycle', n:'Cycle'},{id:'bike', n:'Motor Bike'},{id:'car', n:'Super Car'},
+  {id:'airplane', n:'Airplane'},{id:'helicopter', n:'Helicopter'},{id:'rocket', n:'Rocket'},
+  {id:'robot', n:'Robot'},{id:'drone', n:'Drone'},{id:'pcb', n:'PCB Board'},{id:'gear', n:'Gears'}
+];
+function buildTemplates() {
+  document.getElementById('tplGrid').innerHTML = TEMPLATES.map(t => '<div class="tpl-btn" onclick="loadTemplate(\'' + t.id + '\')">' + t.n + '</div>').join('');
+}
+
+function addPart(cat, idx) {
+  const p = COMPONENTS[cat][idx]; const m = p.f();
+  m.userData.type = p.n; m.userData.baseMaterial = 'plastic';
+  m.castShadow = true; m.receiveShadow = true;
+  m.position.set((Math.random()-0.5)*4, 0.8, (Math.random()-0.5)*4);
+  if(snapEnabled) { m.position.x = Math.round(m.position.x*2)/2; m.position.z = Math.round(m.position.z*2)/2; }
+  objGroup.add(m); objectCount++; selectObject(m); updateStats();
+}
+
+function selectObject(o) {
+  if(selectedObj === o) return;
+  selectedObj = o;
+  if(o) { selBox.setFromObject(o); selBox.visible = true; buildPropPanel(o); document.getElementById('statSel').innerText = o.userData.type || 'Part'; }
+  else { selBox.visible = false; document.getElementById('statSel').innerText = 'Nothing selected'; document.getElementById('propPanel').innerHTML = '<div class="empty-state">Click any object in the 3D scene to edit it</div>'; }
+}
+
+function buildPropPanel(o) {
+  const m = o.material || (o.children[0] && o.children[0].material);
+  const c = m && m.color ? '#' + m.color.getHexString() : '#ffcc00';
+  document.getElementById('propPanel').innerHTML =
+    '<div style="font-size:11px;color:#4a9eff;font-weight:800;margin-bottom:10px">' + (o.userData.type||'Part') + '</div>' +
+    '<div class="prop-row"><div class="prop-label">Color</div><input type="color" class="prop-color" value="' + c + '" onchange="changeColor(this.value)"></div>' +
+    '<div class="prop-row"><div class="prop-label">Material</div><select class="prop-select" onchange="changeMaterial(this.value)"><option value="plastic">Plastic</option><option value="metal">Metal</option><option value="chrome">Chrome</option><option value="rubber">Rubber</option><option value="glass">Glass</option><option value="wood">Wood</option><option value="gold">Gold</option><option value="red">Red</option><option value="blue">Blue</option><option value="green">Green</option><option value="black">Black</option></select></div>' +
+    '<div class="prop-row"><div class="prop-label">Size <span id="sizeVal">1.0</span></div><input type="range" class="prop-slider" min="0.2" max="4" step="0.1" value="1" oninput="changeSize(this.value)"></div>' +
+    '<div class="prop-row"><div class="prop-label">Move X <span id="mxVal">' + o.position.x.toFixed(1) + '</span></div><input type="range" class="prop-slider" min="-10" max="10" step="0.1" value="' + o.position.x + '" oninput="moveX(this.value)"></div>' +
+    '<div class="prop-row"><div class="prop-label">Move Y <span id="myVal">' + o.position.y.toFixed(1) + '</span></div><input type="range" class="prop-slider" min="-2" max="10" step="0.1" value="' + o.position.y + '" oninput="moveY(this.value)"></div>' +
+    '<div class="prop-row"><div class="prop-label">Move Z <span id="mzVal">' + o.position.z.toFixed(1) + '</span></div><input type="range" class="prop-slider" min="-10" max="10" step="0.1" value="' + o.position.z + '" oninput="moveZ(this.value)"></div>' +
+    '<div class="prop-row"><div class="prop-label">Rotate <span id="rotVal">0</span></div><input type="range" class="prop-slider" min="0" max="360" step="5" value="0" oninput="rotateY(this.value)"></div>' +
+    '<div class="prop-actions"><button class="prop-act" onclick="duplicateSelected()">Copy</button><button class="prop-act" onclick="dropToFloor()">Floor</button><button class="prop-act" onclick="centerIt()">Center</button><button class="prop-act red" onclick="deleteSelected()">Delete</button></div>';
+}
+
+function changeColor(h) { if(!selectedObj) return; const c = new THREE.Color(h); selectedObj.traverse(o => { if(o.material && o.material.color) o.material.color.set(c); }); }
+function changeMaterial(t) { if(!selectedObj) return; const nm = getMat(t); selectedObj.traverse(o => { if(o.material && o.material.color) { o.material.color.copy(nm.color); o.material.metalness = nm.metalness; o.material.roughness = nm.roughness; } }); }
+function changeSize(v) { if(!selectedObj) return; document.getElementById('sizeVal').innerText = v; selectedObj.scale.setScalar(parseFloat(v)); updateSelBox(); }
+function moveX(v) { if(selectedObj) { selectedObj.position.x = parseFloat(v); document.getElementById('mxVal').innerText = parseFloat(v).toFixed(1); updateSelBox(); } }
+function moveY(v) { if(selectedObj) { selectedObj.position.y = parseFloat(v); document.getElementById('myVal').innerText = parseFloat(v).toFixed(1); updateSelBox(); } }
+function moveZ(v) { if(selectedObj) { selectedObj.position.z = parseFloat(v); document.getElementById('mzVal').innerText = parseFloat(v).toFixed(1); updateSelBox(); } }
+function rotateY(v) { if(selectedObj) { selectedObj.rotation.y = parseFloat(v)*Math.PI/180; document.getElementById('rotVal').innerText = v; updateSelBox(); } }
+function dropToFloor() { if(selectedObj) { selectedObj.position.y = 0.8; updateSelBox(); buildPropPanel(selectedObj); } }
+function centerIt() { if(selectedObj) { selectedObj.position.set(0,0.8,0); updateSelBox(); buildPropPanel(selectedObj); } }
+function duplicateSelected() { if(!selectedObj) return; const c = selectedObj.clone(); c.position.x += 1.5; c.userData = {...selectedObj.userData}; objGroup.add(c); objectCount++; selectObject(c); updateStats(); }
+function deleteSelected() { if(!selectedObj) return; objGroup.remove(selectedObj); selectedObj = null; selBox.visible = false; objectCount--; updateStats(); selectObject(null); }
+function clearAll() { if(!confirm('Clear all parts?')) return; while(objGroup.children.length > 0) objGroup.remove(objGroup.children[0]); objectCount = 0; selectedObj = null; selBox.visible = false; updateStats(); selectObject(null); }
+function updateSelBox() { if(selectedObj) selBox.setFromObject(selectedObj); }
+function updateStats() { document.getElementById('statCount').innerText = objectCount; }
+function setMode(m) { mode = m; document.getElementById('statMode').innerText = m.charAt(0).toUpperCase()+m.slice(1); document.getElementById('btnMove').classList.toggle('primary', m==='move'); document.getElementById('btnRotate').classList.toggle('primary', m==='rotate'); document.getElementById('btnScale').classList.toggle('primary', m==='scale'); }
+function setView(v) { const d = 12; if(v==='top') { camera.position.set(0,d,0.01); controls.target.set(0,0,0); } else if(v==='front') { camera.position.set(0,3,d); controls.target.set(0,1,0); } else if(v==='side') { camera.position.set(d,3,0); controls.target.set(0,1,0); } else { camera.position.set(8,6,10); controls.target.set(0,1,0); } controls.update(); }
+function toggleSnap() { snapEnabled = !snapEnabled; document.getElementById('btnSnap').innerText = 'Snap: ' + (snapEnabled?'ON':'OFF'); }
+function toggleGrid() { grid.visible = !grid.visible; }
+
+const raycaster = new THREE.Raycaster(); const mouse = new THREE.Vector2();
+canvas.addEventListener('click', (e) => {
+  const r = canvas.getBoundingClientRect();
+  mouse.x = ((e.clientX-r.left)/r.width)*2-1; mouse.y = -((e.clientY-r.top)/r.height)*2+1;
+  raycaster.setFromCamera(mouse, camera);
+  const hits = raycaster.intersectObjects(objGroup.children, true);
+  if(hits.length > 0) { let o = hits[0].object; while(o.parent && o.parent !== objGroup) o = o.parent; selectObject(o); } else { selectObject(null); }
+});
+canvas.addEventListener('mousedown', (e) => {
+  if(e.button !== 0 || !selectedObj) return;
+  if(e.shiftKey) { dragStart = {x:e.clientX, y:e.clientY}; objStartRot = {...selectedObj.rotation}; isDragging = true; }
+  else { dragStart = {x:e.clientX, y:e.clientY}; objStartPos = {...selectedObj.position}; isDragging = true; }
+});
+canvas.addEventListener('mousemove', (e) => {
+  if(!isDragging || !selectedObj) return;
+  const dx = (e.clientX-dragStart.x)*0.02; const dz = (e.clientY-dragStart.y)*0.02;
+  if(e.shiftKey) { selectedObj.rotation.y = objStartRot.y + dx*3; }
+  else { selectedObj.position.x = objStartPos.x + dx; selectedObj.position.z = objStartPos.z + dz;
+    if(snapEnabled) { selectedObj.position.x = Math.round(selectedObj.position.x*2)/2; selectedObj.position.z = Math.round(selectedObj.position.z*2)/2; } }
+  updateSelBox();
+});
+canvas.addEventListener('mouseup', () => { if(isDragging) { isDragging = false; if(selectedObj) buildPropPanel(selectedObj); } });
+window.addEventListener('keydown', (e) => {
+  if(e.key === 'Delete' && selectedObj) deleteSelected();
+  if(e.ctrlKey && e.key === 'd') { e.preventDefault(); duplicateSelected(); }
+  if(e.key === 'Escape') selectObject(null);
+});
+
+function loadTemplate(id) {
+  if(!id) return;
+  if(objGroup.children.length > 0 && !confirm('Load template?')) { document.getElementById('tplSelect').value = ''; return; }
+  while(objGroup.children.length > 0) objGroup.remove(objGroup.children[0]);
+  objectCount = 0;
+  const C = COMPONENTS['Cycle Parts']; const CAR = COMPONENTS['Car Parts'];
+  const AIR = COMPONENTS['Aerospace']; const RKT = COMPONENTS['Rocket'];
+  const ROB = COMPONENTS['Robot']; const MECH = COMPONENTS['Mechanical'];
+  const PCB = COMPONENTS['PCB & Circuit']; const BAS = COMPONENTS['Basic Shapes'];
+  const T = {
+    cycle: () => {
+      const w1 = C[0].f(); w1.position.set(-1.5,0.8,0); objGroup.add(w1);
+      const w2 = C[0].f(); w2.position.set(1.5,0.8,0); objGroup.add(w2);
+      const fr = C[1].f(); fr.position.set(0,1.2,0); objGroup.add(fr);
+      const hb = C[2].f(); hb.position.set(1.5,2,0); objGroup.add(hb);
+      const st = C[3].f(); st.position.set(-0.8,2,0); objGroup.add(st);
+      const pd = C[4].f(); pd.position.set(0,0.8,0); objGroup.add(pd);
+    },
+    bike: () => {
+      const w1 = C[0].f(); w1.position.set(-1.6,0.8,0); w1.scale.setScalar(1.2); objGroup.add(w1);
+      const w2 = C[0].f(); w2.position.set(1.6,0.8,0); w2.scale.setScalar(1.2); objGroup.add(w2);
+      const en = C[0].f(); en.position.set(0,1,0); objGroup.add(en);
+      const ft = C[1].f(); ft.position.set(-0.3,1.9,0); objGroup.add(ft);
+      const st = C[3].f(); st.position.set(-1.3,1.7,0); objGroup.add(st);
+      const hb = C[2].f(); hb.position.set(1.4,1.9,0); objGroup.add(hb);
+    },
+    car: () => {
+      const b = CAR[0].f(); b.position.set(0,0.9,0); objGroup.add(b);
+      const c = CAR[1].f(); c.position.set(0,1.7,0); objGroup.add(c);
+      [[-1.3,0.35,-0.9],[-1.3,0.35,0.9],[1.3,0.35,-0.9],[1.3,0.35,0.9]].forEach(p => { const t = CAR[2].f(); t.position.set(p[0],p[1],p[2]); objGroup.add(t); });
+      const h1 = CAR[3].f(); h1.position.set(1.3,0.9,-0.5); objGroup.add(h1);
+      const h2 = CAR[3].f(); h2.position.set(1.3,0.9,0.5); objGroup.add(h2);
+      const s = CAR[5].f(); s.position.set(-1.3,1.4,0); objGroup.add(s);
+    },
+    airplane: () => {
+      const f = AIR[0].f(); f.position.set(0,1.5,0); objGroup.add(f);
+      const w = AIR[1].f(); w.position.set(0,1.3,0); w.scale.set(1,1,1.5); objGroup.add(w);
+      const t = AIR[2].f(); t.position.set(-1.4,2,0); objGroup.add(t);
+      const c = AIR[3].f(); c.position.set(1.4,1.7,0); objGroup.add(c);
+    },
+    helicopter: () => {
+      const b = AIR[0].f(); b.position.set(0,1.5,0); b.scale.set(0.7,0.7,0.7); objGroup.add(b);
+      const r = AIR[4].f(); r.position.set(0,2.5,0); r.scale.set(1.5,1.5,1.5); objGroup.add(r);
+      const t = AIR[2].f(); t.position.set(-1.2,1.8,0); objGroup.add(t);
+    },
+    rocket: () => {
+      const b = RKT[0].f(); b.position.set(0,2,0); objGroup.add(b);
+      const n = RKT[1].f(); n.position.set(0,3.5,0); objGroup.add(n);
+      const f1 = RKT[2].f(); f1.position.set(0.4,0.5,0); f1.rotation.y = Math.PI/2; objGroup.add(f1);
+      const f2 = RKT[2].f(); f2.position.set(-0.4,0.5,0); f2.rotation.y = -Math.PI/2; objGroup.add(f2);
+      const nz = RKT[3].f(); nz.position.set(0,0.5,0); objGroup.add(nz);
+    },
+    robot: () => {
+      const h = ROB[0].f(); h.position.set(0,2.4,0); objGroup.add(h);
+      const b = ROB[1].f(); b.position.set(0,1.3,0); objGroup.add(b);
+      const aL = ROB[2].f(); aL.position.set(-0.8,1.4,0); objGroup.add(aL);
+      const aR = ROB[2].f(); aR.position.set(0.8,1.4,0); objGroup.add(aR);
+      const lL = ROB[3].f(); lL.position.set(-0.3,0.4,0); objGroup.add(lL);
+      const lR = ROB[3].f(); lR.position.set(0.3,0.4,0); objGroup.add(lR);
+      const eL = ROB[4].f(); eL.position.set(-0.2,2.5,0.35); objGroup.add(eL);
+      const eR = ROB[4].f(); eR.position.set(0.2,2.5,0.35); objGroup.add(eR);
+    },
+    drone: () => {
+      const b = BAS[0].f(); b.scale.setScalar(0.8); b.position.set(0,1.5,0); objGroup.add(b);
+      [[-1,-1],[1,-1],[-1,1],[1,1]].forEach(p => { const r = AIR[4].f(); r.position.set(p[0],1.5,p[1]); objGroup.add(r); });
+    },
+    pcb: () => {
+      const b = PCB[0].f(); b.position.set(0,0.5,0); objGroup.add(b);
+      const c = PCB[1].f(); c.position.set(-0.3,0.6,0); objGroup.add(c);
+      const r1 = PCB[2].f(); r1.position.set(0.5,0.6,-0.3); objGroup.add(r1);
+      const cp = PCB[3].f(); cp.position.set(0.5,0.6,0.3); objGroup.add(cp);
+      const ld = PCB[4].f(); ld.position.set(-0.7,0.6,0.4); objGroup.add(ld);
+      const cn = PCB[5].f(); cn.position.set(-0.9,0.6,-0.5); objGroup.add(cn);
+    },
+    gear: () => {
+      const g1 = MECH[0].f(); g1.position.set(-0.8,1,0); objGroup.add(g1);
+      const g2 = MECH[0].f(); g2.position.set(0.8,1,0); g2.scale.setScalar(0.8); objGroup.add(g2);
+      const sh = MECH[1].f(); sh.rotation.z = Math.PI/2; sh.position.set(0,1,0); objGroup.add(sh);
+      const br = MECH[5].f(); br.position.set(-0.8,1,0); br.rotation.x = Math.PI/2; objGroup.add(br);
+    }
+  };
+  if(T[id]) { T[id](); objectCount = objGroup.children.length; updateStats(); setView('iso'); }
+  document.getElementById('tplSelect').value = '';
+}
+
+function openExport() { document.getElementById('exportModal').classList.add('open'); }
+function closeExport() { document.getElementById('exportModal').classList.remove('open'); }
+function exportPNG() { closeExport(); renderer.render(scene, camera); const a = document.createElement('a'); a.download = 'Clyxess-' + Date.now() + '.png'; a.href = renderer.domElement.toDataURL('image/png'); a.click(); }
+function exportOBJ() {
+  closeExport();
+  let s = '# Clyxess Export\n'; let vo = 1; s += 'o Design\n';
+  objGroup.traverse(c => {
+    if(c.isMesh && c.geometry) {
+      const p = c.geometry.attributes.position; const idx = c.geometry.index; const m = c.matrixWorld;
+      const v = new THREE.Vector3();
+      for(let i=0;i<p.count;i++) { v.fromBufferAttribute(p,i).applyMatrix4(m); s += 'v ' + v.x.toFixed(4) + ' ' + v.y.toFixed(4) + ' ' + v.z.toFixed(4) + '\n'; }
+      if(idx) { for(let i=0;i<idx.count;i+=3) { s += 'f ' + (idx.getX(i)+vo) + ' ' + (idx.getX(i+1)+vo) + ' ' + (idx.getX(i+2)+vo) + '\n'; } }
+      vo += p.count;
+    }
+  });
+  const b = new Blob([s], {type:'text/plain'});
+  const a = document.createElement('a'); a.download = 'Clyxess-' + Date.now() + '.obj'; a.href = URL.createObjectURL(b); a.click();
+}
+function saveProject() { closeExport(); const d = { parts: objGroup.children.map(c => ({ type: c.userData.type, pos: [c.position.x,c.position.y,c.position.z], rot: [c.rotation.x,c.rotation.y,c.rotation.z], scale: c.scale.x, color: c.material && c.material.color ? '#'+c.material.color.getHexString() : '#ffcc00' })) }; localStorage.setItem('clyxess_project', JSON.stringify(d)); alert('Saved ' + d.parts.length + ' parts'); }
+function loadProject() { closeExport(); const r = localStorage.getItem('clyxess_project'); if(!r) { alert('No saved project'); return; } try { const d = JSON.parse(r); while(objGroup.children.length > 0) objGroup.remove(objGroup.children[0]); d.parts.forEach(p => { const m = new THREE.Mesh(new THREE.BoxGeometry(1,1,1), new THREE.MeshStandardMaterial({color: new THREE.Color(p.color)})); m.position.set(p.pos[0],p.pos[1],p.pos[2]); m.rotation.set(p.rot[0],p.rot[1],p.rot[2]); m.scale.setScalar(p.scale); m.userData.type = p.type; objGroup.add(m); }); objectCount = objGroup.children.length; updateStats(); alert('Loaded'); } catch(e) { alert('Failed'); } }
+
+function animate() { requestAnimationFrame(animate); controls.update(); if(selectedObj) selBox.setFromObject(selectedObj); renderer.render(scene, camera); }
+
+// ============ ADVANCED KIDS MODE ============
+const LANGS = [
+  {c:'en', n:'English'},{c:'hi', n:'Hindi'},{c:'bn', n:'Bengali'},{c:'te', n:'Telugu'},
+  {c:'mr', n:'Marathi'},{c:'ta', n:'Tamil'},{c:'gu', n:'Gujarati'},{c:'kn', n:'Kannada'},
+  {c:'ml', n:'Malayalam'},{c:'pa', n:'Punjabi'},{c:'ur', n:'Urdu'},{c:'ar', n:'Arabic'},
+  {c:'zh', n:'Chinese'},{c:'ja', n:'Japanese'},{c:'ko', n:'Korean'},{c:'ru', n:'Russian'},
+  {c:'es', n:'Spanish'},{c:'fr', n:'French'},{c:'de', n:'German'},{c:'pt', n:'Portuguese'},
+  {c:'it', n:'Italian'},{c:'tr', n:'Turkish'},{c:'fa', n:'Persian'},{c:'he', n:'Hebrew'},
+  {c:'th', n:'Thai'},{c:'vi', n:'Vietnamese'},{c:'id', n:'Indonesian'},{c:'tl', n:'Filipino'}
+];
+
+(function(){
+  const s = document.getElementById('langSel');
+  if(s) s.innerHTML = LANGS.map(l => '<option value="' + l.c + '">' + l.n + '</option>').join('');
+})();
+
+function changeLang(){
+  const c = document.getElementById('langSel').value;
+  const l = LANGS.find(x => x.c === c);
+  document.getElementById('kHint').innerText = l.n + ' - Click buttons to add';
+  if(['ar','he','ur','fa'].indexOf(c) >= 0) document.body.style.direction = 'rtl';
+  else document.body.style.direction = 'ltr';
+}
+
+let kObjects = [], selectedIdx = -1, isDown = false, dragOff = {x:0,y:0}, kTool = 'select';
+const kcv = document.getElementById('kCanvas');
+const kctx = kcv.getContext('2d');
+
+function drawKBG(){ kctx.fillStyle = 'white'; kctx.fillRect(0,0,kcv.width,kcv.height); }
+
+function drawK(){
+  drawKBG();
+  kObjects.forEach((o,i)=>{
+    kctx.save();
+    kctx.translate(o.x, o.y);
+    kctx.rotate((o.rot||0)*Math.PI/180);
+    kctx.fillStyle = o.color;
+    kctx.strokeStyle = i===selectedIdx ? '#00aaff' : '#222';
+    kctx.lineWidth = i===selectedIdx ? 3 : 1.2;
+    if(o.type === 'text'){
+      kctx.font = 'bold ' + (o.size||40) + 'px sans-serif';
+      kctx.textAlign = 'center'; kctx.textBaseline = 'middle';
+      kctx.fillText(o.char, 0, 0);
+      if(i === selectedIdx){
+        const m = kctx.measureText(o.char);
+        kctx.strokeRect(-m.width/2-8, -(o.size||40)/2-4, m.width+16, (o.size||40)+8);
+      }
+    } else if(o.type === 'rect'){ kctx.fillRect(-o.w/2, -o.h/2, o.w, o.h); }
+    else if(o.type === 'circle'){ kctx.beginPath(); kctx.arc(0,0,o.w/2,0,Math.PI*2); kctx.fill(); }
+    else if(o.type === 'wing'){ kctx.beginPath(); kctx.ellipse(0,0,o.w/2,o.h/3,0,0,Math.PI*2); kctx.fill(); }
+    else if(o.type === 'rocket'){
+      kctx.fillRect(-o.w/3, -o.h/2, o.w*0.66, o.h);
+      kctx.beginPath();
+      kctx.moveTo(0, -o.h/2-12);
+      kctx.lineTo(-o.w/3, -o.h/2);
+      kctx.lineTo(o.w/3, -o.h/2);
+      kctx.closePath(); kctx.fillStyle = 'red'; kctx.fill();
+    }
+    else { kctx.fillRect(-o.w/2, -o.h/2, o.w, o.h); }
+    kctx.restore();
+  });
+}
+
+function addToCanvas(obj){ kObjects.push(obj); selectedIdx = kObjects.length-1; drawK(); }
+
+function addAlpha(ch){
+  const isNum = /[0-9]/.test(ch);
+  const isSpec = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(ch);
+  const color = isNum ? '#0066ff' : isSpec ? '#cc0066' : '#111';
+  addToCanvas({ type:'text', char:ch, x: 350+Math.random()*200, y: 250+Math.random()*150, size: 42, color: color, rot:0 });
+}
+
+function addKidText(){
+  const v = document.getElementById('kidText').value.trim();
+  if(!v) return;
+  addToCanvas({ type:'text', char:v, x: 400+Math.random()*100, y: 300+Math.random()*100, size: 36, color:'#333', rot:0 });
+  document.getElementById('kidText').value = '';
+}
+
+function addKidPart(t){
+  const colors = {'rect':'#ff5a5a','circle':'#00aaff','wing':'#22ff66','rocket':'#ffaa00','satellite':'#7ec8ff','naca':'#22ff66','solar':'#001a66','propeller':'#ff8c00'};
+  addToCanvas({ type:t, x: 350+Math.random()*150, y: 300+Math.random()*80, w: 80, h: 50, color: colors[t]||'#ff8c00', rot:0 });
+}
+
+function generateNumbers(){
+  const n = Math.min(100000, parseInt(document.getElementById('numCount').value)||10);
+  kObjects = kObjects.filter(o => o.type !== 'text' || !/^[0-9]+$/.test(o.char));
+  const cols = 20;
+  for(let i=0;i<n;i++){
+    const num = i+1;
+    const col = i % cols;
+    const row = Math.floor(i / cols);
+    kObjects.push({ type:'text', char: String(num), x: 60+col*60, y: 60+row*32, size: 20, color: '#0066ff', rot:0 });
+  }
+  drawK();
+  document.getElementById('kHint').innerText = n + ' numbers canvas me add ho gaye!';
+}
+function quickNum(n){ document.getElementById('numCount').value = n; generateNumbers(); }
+function clearNumbers(){ kObjects = kObjects.filter(o => o.type !== 'text' || !/^[0-9]+$/.test(o.char)); drawK(); }
+
+function getPos(e){ const r = kcv.getBoundingClientRect(); return {x:(e.clientX-r.left)*(kcv.width/r.width), y:(e.clientY-r.top)*(kcv.height/r.height)}; }
+
+kcv.addEventListener('mousedown', e=>{
+  const p = getPos(e); isDown = true; selectedIdx = -1;
+  for(let i=kObjects.length-1;i>=0;i--){
+    const o = kObjects[i];
+    const w = (o.w || o.size || 40)*1.2;
+    const h = (o.h || o.size || 40)*1.2;
+    if(Math.abs(p.x-o.x) < w && Math.abs(p.y-o.y) < h){ selectedIdx = i; dragOff = {x:p.x-o.x, y:p.y-o.y}; break; }
+  }
+  drawK();
+});
+kcv.addEventListener('mousemove', e=>{
+  if(!isDown || selectedIdx < 0) return;
+  const p = getPos(e);
+  kObjects[selectedIdx].x = p.x - dragOff.x;
+  kObjects[selectedIdx].y = p.y - dragOff.y;
+  drawK();
+});
+kcv.addEventListener('mouseup', ()=>{ isDown = false; });
+kcv.addEventListener('wheel', e=>{
+  if(selectedIdx >= 0){
+    e.preventDefault();
+    const d = e.deltaY > 0 ? -3 : 3;
+    const o = kObjects[selectedIdx];
+    if(o.size) o.size = Math.max(10, Math.min(200, o.size + d));
+    else { o.w = Math.max(20, o.w + d); o.h = Math.max(20, o.h + d*0.7); }
+    drawK();
+  }
+}, {passive:false});
+
+function deleteKid(){ if(selectedIdx >= 0){ kObjects.splice(selectedIdx, 1); selectedIdx = -1; drawK(); } }
+function rotateKid(){ if(selectedIdx >= 0){ kObjects[selectedIdx].rot = (kObjects[selectedIdx].rot||0) + 15; drawK(); } }
+function duplicateKid(){ if(selectedIdx >= 0){ const o = {...kObjects[selectedIdx]}; o.x += 30; o.y += 30; kObjects.push(o); selectedIdx = kObjects.length-1; drawK(); } }
+function clearK(){ kObjects = []; drawKBG(); }
+function setKidTool(t){ kTool = t; document.querySelectorAll('.kids-tools .tool-icon').forEach(x=>x.classList.remove('tool-on')); const m = {select:'kSelect',pen:'kPen',rect:'kRect',circle:'kCircle'}; if(m[t]) document.getElementById(m[t]).classList.add('tool-on'); }
+
+function startSim(){
+  let t = 0;
+  const id = setInterval(()=>{
+    t += 0.05;
+    kObjects.forEach(o=>{
+      if(o.type === 'propeller') o.rot = (o.rot||0) + 20;
+      if(o.type === 'wing') o.y += Math.sin(t)*0.4;
+      if(o.type === 'rocket') o.y -= 0.8;
+    });
+    drawK();
+    if(t > 6) clearInterval(id);
+  }, 30);
+}
+
+const KID_BLOCKS = {
+  school: [{e:'A', n:'Book'},{e:'B', n:'Pencil'},{e:'C', n:'Ruler'},{e:'D', n:'Crayon'},{e:'E', n:'Bag'},{e:'F', n:'Notebook'}],
+  medical: [{e:'1', n:'Heart'},{e:'2', n:'Brain'},{e:'3', n:'Lungs'},{e:'4', n:'Bone'},{e:'5', n:'Eye'},{e:'6', n:'Ear'}],
+  bio: [{e:'7', n:'Seedling'},{e:'8', n:'Leaf'},{e:'9', n:'Tree'},{e:'10', n:'Flower'},{e:'11', n:'Apple'},{e:'12', n:'Banana'}],
+  science: [{e:'13', n:'Microscope'},{e:'14', n:'Telescope'},{e:'15', n:'Flask'},{e:'16', n:'Tube'},{e:'17', n:'Atom'},{e:'18', n:'Magnet'}],
+  eng: [{e:'19', n:'Gear'},{e:'20', n:'Wrench'},{e:'21', n:'Hammer'},{e:'22', n:'Screw'},{e:'23', n:'Bolt'},{e:'24', n:'Tool'}],
+  nature: [{e:'25', n:'Sun'},{e:'26', n:'Moon'},{e:'27', n:'Star'},{e:'28', n:'Cloud'},{e:'29', n:'Rain'},{e:'30', n:'Wave'}],
+  space: [{e:'31', n:'Rocket'},{e:'32', n:'Sat'},{e:'33', n:'Planet'},{e:'34', n:'Earth'},{e:'35', n:'Comet'},{e:'36', n:'Galaxy'}],
+  shapes: [{e:'37', n:'Square'},{e:'38', n:'Circle'},{e:'39', n:'Triangle'},{e:'40', n:'Star'},{e:'41', n:'Heart'},{e:'42', n:'Diamond'}]
+};
+
+function buildBlocksGrid(){
+  for(const [key, arr] of Object.entries(KID_BLOCKS)){
+    const c = document.getElementById('block' + key.charAt(0).toUpperCase() + key.slice(1));
+    if(!c) continue;
+    c.innerHTML = arr.map(b => '<div class="block-item" onclick="addKidBlock(\'' + b.e + '\')"><span style="font-size:22px">' + b.e + '</span><b>' + b.n + '</b></div>').join('');
+  }
+}
+
+function addKidBlock(txt){
+  addToCanvas({ type:'text', char:txt, x: 400+Math.random()*150, y: 300+Math.random()*100, size: 60, color:'#000', rot:0 });
+  closeKidBlocks();
+}
+function openKidBlocks(){ document.getElementById('kidBlocksModal').classList.add('open'); }
+function closeKidBlocks(){ document.getElementById('kidBlocksModal').classList.remove('open'); }
+
+function switchKidTab(tab, el){
+  document.querySelectorAll('.kids-panel .tab-btn').forEach(x=>x.classList.remove('on'));
+  el.classList.add('on');
+  document.getElementById('kidABC').style.display = tab === 'abc' ? 'block' : 'none';
+  document.getElementById('kidNUM').style.display = tab === 'num' ? 'block' : 'none';
+  document.getElementById('kidTXT').style.display = tab === 'txt' ? 'block' : 'none';
+}
+
+(function buildABCGrid(){
+  const all = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'.split('');
+  const grid = document.getElementById('abcGrid');
+  if(grid) grid.innerHTML = all.map(c => '<div class="alpha-btn" onclick="addAlpha(\'' + c + '\')">' + c + '</div>').join('');
+})();
+
+// INIT
+buildLibrary();
+buildTemplates();
+setMode('move');
+setView('iso');
+resize();
+animate();
+setTimeout(() => toggleCat(0), 200);
+buildBlocksGrid();
+drawKBG();
+</script>
+</body>
+</html>
+"""
+
+    components.html(HTML, height=950, scrolling=False) 
     
 def render_kids_logic_lab():
     # ============================================================
