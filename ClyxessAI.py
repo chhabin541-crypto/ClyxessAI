@@ -9951,7 +9951,7 @@ def render_school_chat():
     if search_context:
         system += "\nLIVE WEB INFO:\n" + search_context
 
-     with st.chat_message("assistant"):
+        with st.chat_message("assistant"):
         # SPINNER - User chat karte hi pehle ye ayega
         responding = st.empty()
         responding.markdown("""
