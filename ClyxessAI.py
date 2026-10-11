@@ -9951,29 +9951,12 @@ def render_school_chat():
     if search_context:
         system += "\nLIVE WEB INFO:\n" + search_context
 
-        with st.chat_message("assistant"):
-             # SPINNER - User chat karte hi pehle ye ayega
-             responding = st.empty()
-             responding.markdown("""
-                 <div style='display:flex;align-items:center;gap:10px;color:#aaa'>
-                      <div style='border:2px solid #333;border-top:2px solid #ffcc00;border-radius:50%;width:16px;height:16px;animation:spin 0.8s linear infinite'></div>
-                      <b>Clyxess is responding<span class="dots"></span></b>
-            </div>
-            <style>
-            @keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
-           .dots::after{content:'';animation:dotAnim 1.2s infinite}
-            @keyframes dotAnim{0%{content:''}25%{content:'.'}50%{content:'..'}75%{content:'...'}100%{content:''}}
-            </style>
-            """, unsafe_allow_html=True)
-
-        completion, used_model = get_groq_response(client, st.session_state.messages, system, "")
+    with st.chat_message("assistant"):
+        completion, used_model = get_groq_response(client, messages, system, "")
         if completion is None:
-            responding.empty()
             st.error("AI response नहीं आ पाया. Please try again.")
             return
         response = completion.choices[0].message.content
-        responding.empty()
-
         placeholder = st.empty()
         typed = ""
         for word in response.split(" "):
@@ -9984,8 +9967,7 @@ def render_school_chat():
         if sources:
             st.caption("Sources:\n" + sources)
         st.caption("🔒 ClyxessChat AI | Secure • Fast • Private")
-        st.session_state.messages.append({"role": "assistant", "content": response})
-        save_current_chat_cloud()
+        messages.append({"role": "assistant", "content": response})
         st.rerun()
 
 if mode == "Normal Chat":
