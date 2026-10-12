@@ -10031,33 +10031,33 @@ def render_school_chat():
         system += "\nLIVE WEB INFO:\n" + search_context
 
     with st.chat_message("assistant"):
-    completion, used_model = get_groq_response(client, messages, system, "")
-    if completion is None:
-        st.error("AI response नहीं आ पाया. Please try again.")
-        return
-    response = completion.choices[0].message.content
+        completion, used_model = get_groq_response(client, messages, system, "")
+        if completion is None:
+            st.error("AI response नहीं आ पाया. Please try again.")
+            return
+        response = completion.choices[0].message.content
 
-    # CODE ko user se chupao
-    clean_response = re.sub(r"```python-diagram.*?```", "", response, flags=re.DOTALL | re.IGNORECASE)
-    clean_response = re.sub(r"```python.*?```", "", clean_response, flags=re.DOTALL | re.IGNORECASE)
-    clean_response = clean_response.replace("सरल चित्र (Diagram)", "")
+        # CODE ko user se chupao
+        clean_response = re.sub(r"```python-diagram.*?```", "", response, flags=re.DOTALL | re.IGNORECASE)
+        clean_response = re.sub(r"```python.*?```", "", clean_response, flags=re.DOTALL | re.IGNORECASE)
+        clean_response = clean_response.replace("सरल चित्र (Diagram)", "")
 
-    placeholder = st.empty()
-    typed = ""
-    for word in clean_response.split(" "):
-        typed += word + " "
-        placeholder.markdown(typed + "▌")
-        time.sleep(0.02)
-    placeholder.markdown(clean_response)
+        placeholder = st.empty()
+        typed = ""
+        for word in clean_response.split(" "):
+            typed += word + " "
+            placeholder.markdown(typed + "▌")
+            time.sleep(0.02)
+        placeholder.markdown(clean_response)
 
-    # Image yahan banegi
-    render_diagram_if_needed(response)
+        # Image yahan banegi
+        render_diagram_if_needed(response)
 
-    if sources:
-        st.caption("Sources:\n" + sources)
-    st.caption("🔒 ClyxessChat AI | Secure • Fast • Private")
-    messages.append({"role": "assistant", "content": response})
-    st.rerun()
+        if sources:
+            st.caption("Sources:\n" + sources)
+        st.caption("🔒 ClyxessChat AI | Secure • Fast • Private")
+        messages.append({"role": "assistant", "content": response})
+        st.rerun()
 
 if mode == "Normal Chat":
     render_normal_chat()
