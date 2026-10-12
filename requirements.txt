@@ -7,4 +7,6 @@ tavily-python
 pytz
 openai
 Pillow
-matplotlib
+matplotlib 
+numpy 
+manim
