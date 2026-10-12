@@ -924,7 +924,40 @@ def language_display_name(code):
 # ============================================================
 # TAVILY
 # ============================================================
+def render_diagram_if_needed(response_text):
+    import re
+    import matplotlib.pyplot as plt
+    import streamlit as st
+    import traceback
+    import urllib.parse
 
+    try:
+        m = re.search(r"```python-diagram(.*?)```", response_text, re.DOTALL | re.IGNORECASE)
+        if m:
+            code = m.group(1).strip()
+            plt.close('all')
+            fig, ax = plt.subplots(figsize=(6,6))
+            ax.set_aspect('equal')
+            ax.axis('off')
+            try:
+                exec(code, {"plt": plt, "ax": ax, "fig": fig})
+                st.pyplot(fig)
+            except Exception as e:
+                st.error(f"Diagram error: {e}")
+            finally:
+                plt.close(fig)
+            return
+
+        m2 = re.search(r"```image-prompt(.*?)```", response_text, re.DOTALL | re.IGNORECASE)
+        if m2:
+            prompt = m2.group(1).strip()
+            encoded = urllib.parse.quote(prompt[:400])
+            url = f"https://image.pollinations.ai/prompt/{encoded}?width=800&height=800&nologo=true"
+            st.image(url)
+    except Exception as e:
+        print(f"render error: {e}")
+
+def search_tavily(query):
 def search_tavily(query):
     search_words = [
         "news", "mausam", "weather", "rate", "price",
