@@ -8439,15 +8439,6 @@ drawKBG();
     components.html(HTML, height=950, scrolling=False) 
     
 def render_kids_logic_lab():
-    # ============================================================
-    # Imports अब फंक्शन के अंदर हैं (ताकि कोई conflict न हो)
-    # ============================================================
-    import streamlit as st
-    import streamlit.components.v1 as components
-
-    # ============================================================
-    # यह पूरा HTML/JS गेम Streamlit के अंदर एम्बेड किया जा रहा है
-    # ============================================================
     HTML_TEMPLATE = """
     <!DOCTYPE html>
     <html lang="en">
