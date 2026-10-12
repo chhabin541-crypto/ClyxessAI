@@ -5420,7 +5420,20 @@ def render_physics_lab(client):
     import json
     import re
     import math
-    import streamlit as st
+    import statistics
+    import random
+    import cmath
+
+    # ============================================================
+    # ⭐ UNIVERSAL CONSTANTS (from Code 2)
+    # ============================================================
+    SPEED_OF_LIGHT       = 299792458
+    BOLTZMANN_CONST      = 1.380649e-23
+    SOLAR_LUMINOSITY     = 3.828e26
+    EARTH_MASS           = 5.972e24
+    EARTH_RADIUS         = 6371000
+    GEO_RADIUS           = 42164000
+    VACUUM_PERMEABILITY  = 4 * math.pi * 1e-7
 
     # ============================================================
     # ⭐ LANGUAGE OPTIONS
@@ -5545,10 +5558,10 @@ def render_physics_lab(client):
     # University check
     is_university = "University" in class_level
 
-    # ⭐ DIAGRAM INSTRUCTION (Added as requested)
+    # ⭐ DIAGRAM INSTRUCTION
     diagram_rule = """
     VISUAL DIAGRAM REQUIREMENT:
-    You MUST include a text-based diagram (ASCII art, flowchart, or structured visual representation) in your response to explain the concept visually. 
+    You MUST include a text-based diagram (ASCII art, flowchart, or structured visual representation) in your response to explain the concept visually.
     Use code blocks for the diagram. Example format:
     ```text
       N
@@ -5653,7 +5666,18 @@ Rules:
             base_experiments += [
                 "⚛️ Quantum: Heisenberg Uncertainty",
                 "🌌 Relativity: Time Dilation",
-                "🔥 Thermo: Carnot Engine"
+                "🔥 Thermo: Carnot Engine",
+                # ⭐ From Code 2 (Advanced Physics Engine)
+                "🔋 Future Tech: Antimatter Battery",
+                "💾 Future Tech: Photonic Quantum Chip",
+                "🧊 Future Tech: Room-Temp Superconductor",
+                "🛰️ Future Tech: Space Elevator Tether",
+                "👽 Xenobiology: Silicon Life",
+                "🤖 Multi-Agent Swarm",
+                "🌀 Quantum Superposition (Complex)",
+                "🧬 Xenobiology: Silane Chain Stability",
+                "🔐 Cognitive Security: Anomaly Detection",
+                "⏱️ Reality Sandbox: Time Dilation"
             ]
 
         experiment = st.selectbox("Choose Experiment:", base_experiments, key="phy_experiment")
@@ -5948,7 +5972,7 @@ Rules:
                         st.error(f"❌ {type(e).__name__}")
 
         # ============ UNIVERSITY: HEISENBERG ============
-        elif "Heisenberg" in experiment or "Quantum" in experiment:
+        elif "Heisenberg" in experiment or "Quantum" in experiment and "Superposition" not in experiment:
             st.markdown("### ⚛️ Heisenberg Uncertainty Principle")
             dx_nm = st.slider("Position Uncertainty Δx (nm):", 0.1, 100.0, 1.0, key="q_dx")
             h_bar = 1.0545718e-34
@@ -5969,7 +5993,7 @@ Rules:
                         st.error(f"❌ {type(e).__name__}")
 
         # ============ UNIVERSITY: RELATIVITY ============
-        elif "Relativity" in experiment or "Time Dilation" in experiment:
+        elif "Relativity" in experiment or ("Time Dilation" in experiment and "Reality" not in experiment):
             st.markdown("### 🌌 Special Relativity: Time Dilation")
             v_frac = st.slider("Velocity (as fraction of c):", 0.01, 0.999, 0.5, key="rel_v")
             gamma = 1 / ((1 - v_frac**2) ** 0.5)
@@ -6006,6 +6030,333 @@ Rules:
                     try:
                         r = client.chat.completions.create(model="openai/gpt-oss-120b",
                             messages=[{"role": "user", "content": f"Explain Carnot Engine & 2nd Law of Thermodynamics at University level. {lang_rule}\n{diagram_rule}\n\nT_hot={T_hot}K, T_cold={T_cold}K."}],
+                            temperature=0.6, max_tokens=1500)
+                        st.info(r.choices[0].message.content)
+                    except Exception as e:
+                        st.error(f"❌ {type(e).__name__}")
+
+        # ============================================================
+        # ⭐ NEW: CODE 2 LOGIC — ADVANCED PHYSICS ENGINE MODULES
+        # ============================================================
+
+        # ============ ANTIMATTER BATTERY ============
+        elif "Antimatter Battery" in experiment:
+            st.markdown("### 🔋 Antimatter Positron-Cell Battery")
+            st.caption("E = 2·m·c² (matter + antimatter annihilation)")
+            c1, c2 = st.columns(2)
+            with c1:
+                am_mass = st.slider("Antimatter Mass (grams):", 0.001, 10.0, 1.0, key="am_mass")
+            with c2:
+                efficiency = st.slider("Efficiency:", 0.1, 1.0, 0.95, key="am_eff")
+            m_kg = am_mass / 1000.0
+            total_mass = m_kg * 2
+            energy_j = total_mass * (SPEED_OF_LIGHT ** 2) * efficiency
+            kwh = energy_j / 3.6e6
+            st.info(f"📐 **E = 2·m·c² × η**")
+            st.info(f"📐 2 × {m_kg} kg × (3×10⁸)² × {efficiency} = **{energy_j:.3e} J**")
+            col_a, col_b = st.columns(2)
+            col_a.metric("⚡ Energy", f"{kwh:,.2f} kWh")
+            col_b.metric("🪫 Li-ion Equivalent", f"{kwh/0.27:,.0f} Tons")
+            st.success("✅ Verdict: Max energy density allowed by E=mc²")
+            st.markdown("📝 **Observation:** 1 gram of antimatter ≈ 43 kilotons of TNT equivalent energy.")
+            if st.button("🤖 Explain with AI", key="am_ai_btn"):
+                with st.spinner("Professor is thinking..."):
+                    try:
+                        r = client.chat.completions.create(model="openai/gpt-oss-120b",
+                            messages=[{"role": "user", "content": f"Explain Antimatter Battery (E=2mc², annihilation, positron cells) at University level. {lang_rule}\n{diagram_rule}\n\nMass={am_mass}g, η={efficiency}, Energy={kwh:.2f}kWh. Include physics + tech challenges."}],
+                            temperature=0.6, max_tokens=1500)
+                        st.info(r.choices[0].message.content)
+                    except Exception as e:
+                        st.error(f"❌ {type(e).__name__}")
+
+        # ============ PHOTONIC QUANTUM CHIP ============
+        elif "Photonic Quantum Chip" in experiment:
+            st.markdown("### 💾 Photonic Quantum NPU")
+            st.caption("Landauer Limit: E_min = k_B · T · ln2")
+            c1, c2 = st.columns(2)
+            with c1:
+                chip_area = st.slider("Chip Area (mm²):", 10.0, 1000.0, 400.0, key="chip_area")
+            with c2:
+                temp_k = st.slider("Temperature (K):", 4.0, 400.0, 300.0, key="chip_temp")
+            landauer = BOLTZMANN_CONST * temp_k * math.log(2)
+            optical_clock = 500e12
+            total_nodes = chip_area * 1e14
+            flops = total_nodes * optical_clock
+            power = flops * landauer
+            st.info(f"📐 **E_min = k_B · T · ln2** = **{landauer:.3e} J**")
+            st.info(f"📐 **FLOPS = nodes × 500 THz**")
+            col_a, col_b = st.columns(2)
+            col_a.metric("⚡ Max FLOPS", f"{flops:.3e}")
+            col_b.metric("🔋 Min Power", f"{power:.2f} W")
+            st.success(f"✅ Verdict: {flops/1e24:.2f} YottaFLOPS — Zero Joule heating at light frequency")
+            st.markdown("📝 **Observation:** Optical computing at light frequency breaks thermal barrier of electronics.")
+            if st.button("🤖 Explain with AI", key="chip_ai_btn"):
+                with st.spinner("Professor is thinking..."):
+                    try:
+                        r = client.chat.completions.create(model="openai/gpt-oss-120b",
+                            messages=[{"role": "user", "content": f"Explain Photonic Quantum NPU (Landauer limit, optical clock, zero-heat computing) at University level. {lang_rule}\n{diagram_rule}\n\nArea={chip_area}mm², T={temp_k}K, FLOPS={flops:.3e}, Power={power:.2f}W."}],
+                            temperature=0.6, max_tokens=1500)
+                        st.info(r.choices[0].message.content)
+                    except Exception as e:
+                        st.error(f"❌ {type(e).__name__}")
+
+        # ============ ROOM-TEMP SUPERCONDUCTOR ============
+        elif "Room-Temp Superconductor" in experiment:
+            st.markdown("### 🧊 Room-Temperature Superconductor (RTS)")
+            st.caption("F = B² · A / (2·μ₀)")
+            c1, c2 = st.columns(2)
+            with c1:
+                b_field = st.slider("Magnetic Field (T):", 0.1, 20.0, 5.0, key="rts_b")
+            with c2:
+                area_m2 = st.slider("Area (m²):", 0.1, 10.0, 2.0, key="rts_a")
+            pressure = (b_field ** 2) / (2 * VACUUM_PERMEABILITY)
+            force = pressure * area_m2
+            kg = force / 9.81
+            st.info(f"📐 **Pressure = B² / (2·μ₀)** = **{pressure:,.2f} Pa**")
+            st.info(f"📐 **Force = Pressure × Area** = **{force:,.2f} N**")
+            col_a, col_b = st.columns(2)
+            col_a.metric("⬆️ Levitation Force", f"{force:,.2f} N")
+            col_b.metric("🏋️ Lift Capacity", f"{kg:,.2f} kg")
+            st.success("✅ Verdict: Frictionless levitating cities — Power Loss = 0.00%")
+            st.markdown("📝 **Observation:** Zero resistance = perfect magnetic levitation (like maglev trains, but room temp).")
+            if st.button("🤖 Explain with AI", key="rts_ai_btn"):
+                with st.spinner("Professor is thinking..."):
+                    try:
+                        r = client.chat.completions.create(model="openai/gpt-oss-120b",
+                            messages=[{"role": "user", "content": f"Explain Room-Temp Superconductor & magnetic levitation at University level. {lang_rule}\n{diagram_rule}\n\nB={b_field}T, Area={area_m2}m², Force={force:.2f}N, Lift={kg:.2f}kg."}],
+                            temperature=0.6, max_tokens=1500)
+                        st.info(r.choices[0].message.content)
+                    except Exception as e:
+                        st.error(f"❌ {type(e).__name__}")
+
+        # ============ SPACE ELEVATOR TETHER ============
+        elif "Space Elevator" in experiment and "Rocket" not in experiment:
+            st.markdown("### 🛰️ Carbon-Nanotube Space Elevator Tether")
+            st.caption("Stress = ρ·μ·(1/R_E − 1/R_GEO − ω²(R_GEO²−R_E²)/(2μ))")
+            density = st.slider("Tether Density (kg/m³):", 500.0, 3000.0, 1300.0, key="se_density")
+            mu = 3.986004418e14
+            omega = 7.2921159e-5
+            stress = density * mu * ((1/EARTH_RADIUS) - (1/GEO_RADIUS)
+                     - (omega**2 * (GEO_RADIUS**2 - EARTH_RADIUS**2))/(2*mu))
+            stress_gpa = stress / 1e9
+            st.info(f"📐 **Density = {density} kg/m³**")
+            st.info(f"📐 **Required Strength = {stress_gpa:.2f} GPa**")
+            col_a, col_b = st.columns(2)
+            col_a.metric("💪 Required Strength", f"{stress_gpa:.2f} GPa")
+            col_b.metric("🔩 vs Steel", f"{stress_gpa/2:.0f}× stronger")
+            st.success("✅ Verdict: Carbon-nanotube tether = 1/100th cost of rockets")
+            st.markdown("📝 **Observation:** A tether from Earth surface to GEO orbit lets us climb to space without rockets.")
+            if st.button("🤖 Explain with AI", key="se_ai_btn"):
+                with st.spinner("Professor is thinking..."):
+                    try:
+                        r = client.chat.completions.create(model="openai/gpt-oss-120b",
+                            messages=[{"role": "user", "content": f"Explain Space Elevator tether physics at University level. {lang_rule}\n{diagram_rule}\n\nDensity={density}kg/m³, Stress={stress_gpa:.2f}GPa. Discuss carbon nanotubes & material science."}],
+                            temperature=0.6, max_tokens=1500)
+                        st.info(r.choices[0].message.content)
+                    except Exception as e:
+                        st.error(f"❌ {type(e).__name__}")
+
+        # ============ SILICON LIFE ============
+        elif "Silicon Life" in experiment:
+            st.markdown("### 👽 Silicon-Silane Life (Xenobiology)")
+            st.caption("Alternative biochemistry — Si instead of C, methane instead of water")
+            c1, c2 = st.columns(2)
+            with c1:
+                temp = st.slider("Temperature (K):", 50.0, 400.0, 94.0, key="si_temp")
+            with c2:
+                oxygen = st.checkbox("Oxygen Present?", value=False, key="si_ox")
+            if oxygen and temp > 200:
+                status, viability = "FAILED: Si + O2 = Sand (SiO2)", 0.0
+                st.error(f"❌ {status}")
+            elif temp < 110:
+                status, viability = "STABLE: Silane in liquid methane", 98.5
+                st.success(f"✅ {status}")
+            else:
+                status, viability = "UNSTABLE: Si-Si breaks", 15.0
+                st.warning(f"⚠️ {status}")
+            col_a, col_b = st.columns(2)
+            col_a.metric("🌡️ Temperature", f"{temp}K ({temp-273.15:.1f}°C)")
+            col_b.metric("🧬 Viability", f"{viability}%")
+            st.markdown("📝 **Observation:** Life doesn't need carbon/water — silicon + methane could work at cold temps.")
+            if st.button("🤖 Explain with AI", key="si_ai_btn"):
+                with st.spinner("Professor is thinking..."):
+                    try:
+                        r = client.chat.completions.create(model="openai/gpt-oss-120b",
+                            messages=[{"role": "user", "content": f"Explain Silicon-Silane alternative life chemistry at University level. {lang_rule}\n{diagram_rule}\n\nTemp={temp}K, Oxygen={oxygen}, Status={status}, Viability={viability}%."}],
+                            temperature=0.6, max_tokens=1500)
+                        st.info(r.choices[0].message.content)
+                    except Exception as e:
+                        st.error(f"❌ {type(e).__name__}")
+
+        # ============ MULTI-AGENT SWARM ============
+        elif "Multi-Agent Swarm" in experiment:
+            st.markdown("### 🤖 Multi-Agent Swarm Intelligence")
+            st.caption("Distributed task execution across autonomous agents")
+            objective = st.text_input("Main Objective:", value="BuildAIPlatform", key="swarm_obj")
+            agents_input = st.text_input("Agent Names (comma-separated):", value="Alpha,Beta,Gamma", key="swarm_agents")
+            if st.button("🚀 Execute Swarm Task", key="swarm_run"):
+                agent_names = [a.strip() for a in agents_input.split(",") if a.strip()]
+                if not agent_names:
+                    st.error("❌ Provide at least one agent name.")
+                else:
+                    upObj = objective.upper()
+                    subtasks = [
+                        f"ANALYZE_{upObj}_1",
+                        f"SYNTHESIZE_{upObj}_2",
+                        "EXECUTE_OPTIMIZATION"
+                    ]
+                    results = {}
+                    for idx, agent in enumerate(agent_names):
+                        entropy = sum(ord(c) for c in objective) * (idx + 1)
+                        metric = round(math.sqrt(entropy + 10) * 3.14159, 4)
+                        results[agent] = {
+                            "task": subtasks[idx % len(subtasks)],
+                            "metric": metric,
+                            "status": "COMPLETED"
+                        }
+                    st.success(f"✅ Swarm executed {len(agent_names)} agents successfully")
+                    for agent, data in results.items():
+                        st.markdown(f"**🤖 {agent}**")
+                        st.json(data)
+            if st.button("🤖 Explain with AI", key="swarm_ai_btn"):
+                with st.spinner("Professor is thinking..."):
+                    try:
+                        r = client.chat.completions.create(model="openai/gpt-oss-120b",
+                            messages=[{"role": "user", "content": f"Explain Multi-Agent Swarm Intelligence & distributed task decomposition at University level. {lang_rule}\n{diagram_rule}\n\nObjective='{objective}'. Include entropy metric, coordination, emergent behavior."}],
+                            temperature=0.6, max_tokens=1500)
+                        st.info(r.choices[0].message.content)
+                    except Exception as e:
+                        st.error(f"❌ {type(e).__name__}")
+
+        # ============ QUANTUM SUPERPOSITION (COMPLEX) ============
+        elif "Quantum Superposition (Complex)" in experiment:
+            st.markdown("### 🌀 Quantum Superposition (Complex Amplitudes)")
+            st.caption("|ψ⟩ = α|0⟩ + β|1⟩  where α, β ∈ ℂ")
+            c1, c2 = st.columns(2)
+            with c1:
+                st.markdown("**α (alpha)**")
+                a_r = st.number_input("α real:", value=3.0, key="qs_ar")
+                a_i = st.number_input("α imag:", value=0.0, key="qs_ai")
+            with c2:
+                st.markdown("**β (beta)**")
+                b_r = st.number_input("β real:", value=4.0, key="qs_br")
+                b_i = st.number_input("β imag:", value=0.0, key="qs_bi")
+            alpha = complex(a_r, a_i)
+            beta = complex(b_r, b_i)
+            norm = math.sqrt(abs(alpha)**2 + abs(beta)**2)
+            if norm == 0:
+                st.error("❌ Zero norm — invalid state")
+            else:
+                na, nb = alpha/norm, beta/norm
+                p0 = abs(na)**2 * 100
+                p1 = abs(nb)**2 * 100
+                st.info(f"📐 **Normalization: |α|² + |β|² = 1**")
+                st.info(f"📐 State: |ψ⟩ = ({na:.3f})|0⟩ + ({nb:.3f})|1⟩")
+                col_a, col_b = st.columns(2)
+                col_a.metric("P(|0⟩)", f"{p0:.2f}%")
+                col_b.metric("P(|1⟩)", f"{p1:.2f}%")
+                st.success("✅ Born rule: probabilities from squared amplitudes")
+            if st.button("🤖 Explain with AI", key="qs_ai_btn"):
+                with st.spinner("Professor is thinking..."):
+                    try:
+                        r = client.chat.completions.create(model="openai/gpt-oss-120b",
+                            messages=[{"role": "user", "content": f"Explain Quantum Superposition, complex amplitudes, Born rule at University level. {lang_rule}\n{diagram_rule}\n\nα={alpha}, β={beta}, Normalized: {na}, {nb}. Discuss Hilbert space and measurement."}],
+                            temperature=0.6, max_tokens=1500)
+                        st.info(r.choices[0].message.content)
+                    except Exception as e:
+                        st.error(f"❌ {type(e).__name__}")
+
+        # ============ SILANE CHAIN STABILITY ============
+        elif "Silane Chain Stability" in experiment:
+            st.markdown("### 🧬 Silane Chain Stability (Xenobiology)")
+            st.caption("Stability(SiₙH₂ₙ₊₂) — thermal decomposition model")
+            c1, c2 = st.columns(2)
+            with c1:
+                chain_len = st.slider("Chain Length (Si atoms):", 1, 50, 12, key="sc_len")
+            with c2:
+                temp_k2 = st.slider("Temperature (K):", 20.0, 200.0, 90.0, key="sc_temp")
+            thermal = 0.008314 * temp_k2
+            stability = max(0.0, 100.0 - (thermal * chain_len * 3.2))
+            viable = stability > 45.0 and temp_k2 <= 120.0
+            col_a, col_b = st.columns(2)
+            col_a.metric("🧪 Stability Score", f"{stability:.2f}")
+            col_b.metric("✅ Viable?", "YES" if viable else "NO")
+            if viable:
+                st.success("✅ Stable silane chain — xenobiology possible")
+            else:
+                st.error("❌ Chain breaks down — not viable")
+            st.markdown("📝 **Observation:** Longer chains destabilize faster at higher temps.")
+            if st.button("🤖 Explain with AI", key="sc_ai_btn"):
+                with st.spinner("Professor is thinking..."):
+                    try:
+                        r = client.chat.completions.create(model="openai/gpt-oss-120b",
+                            messages=[{"role": "user", "content": f"Explain Silane (SiₙH₂ₙ₊₂) chain stability & thermal decomposition at University level. {lang_rule}\n{diagram_rule}\n\nChain={chain_len}, T={temp_k2}K, Stability={stability:.2f}, Viable={viable}."}],
+                            temperature=0.6, max_tokens=1500)
+                        st.info(r.choices[0].message.content)
+                    except Exception as e:
+                        st.error(f"❌ {type(e).__name__}")
+
+        # ============ COGNITIVE SECURITY ============
+        elif "Anomaly Detection" in experiment:
+            st.markdown("### 🔐 Cognitive Security — Synthetic Anomaly Detection")
+            st.caption("Statistical test: variance + Shannon entropy")
+            data_input = st.text_input(
+                "Data Stream (comma-separated numbers):",
+                value="1.2, 1.21, 1.19, 1.20, 1.22",
+                key="cs_data"
+            )
+            if st.button("🔍 Analyze Stream", key="cs_run"):
+                try:
+                    data_stream = [float(x.strip()) for x in data_input.split(",") if x.strip()]
+                    if not data_stream:
+                        st.error("❌ Empty stream")
+                    else:
+                        mean_v = statistics.mean(data_stream)
+                        var_v = statistics.variance(data_stream) if len(data_stream) > 1 else 0.0
+                        s = sum(data_stream)
+                        entropy = -sum((x/s)*math.log2(x/s) for x in data_stream if x > 0) if s > 0 else 0.0
+                        is_fake = var_v < 0.05 or entropy < 1.0
+                        col_a, col_b, col_c = st.columns(3)
+                        col_a.metric("📊 Mean", f"{mean_v:.4f}")
+                        col_b.metric("📈 Variance", f"{var_v:.4f}")
+                        col_c.metric("🎲 Entropy", f"{entropy:.4f}")
+                        if is_fake:
+                            st.error("🚨 SYNTHETIC data detected (variance<0.05 OR entropy<1.0)")
+                        else:
+                            st.success("✅ Data appears natural")
+                except Exception as e:
+                    st.error(f"❌ Parse error: {e}")
+            if st.button("🤖 Explain with AI", key="cs_ai_btn"):
+                with st.spinner("Professor is thinking..."):
+                    try:
+                        r = client.chat.completions.create(model="openai/gpt-oss-120b",
+                            messages=[{"role": "user", "content": f"Explain Synthetic Data Detection using variance & Shannon entropy at University level. {lang_rule}\n{diagram_rule}\n\nDiscuss why bots/fake data have low variance and low entropy."}],
+                            temperature=0.6, max_tokens=1500)
+                        st.info(r.choices[0].message.content)
+                    except Exception as e:
+                        st.error(f"❌ {type(e).__name__}")
+
+        # ============ REALITY SANDBOX: TIME DILATION ============
+        elif "Reality Sandbox" in experiment:
+            st.markdown("### ⏱️ Reality Sandbox — Time Dilation Calculator")
+            st.caption("γ = 1 / √(1 − v²/c²)  ·  t_dilated = γ · t_proper")
+            c1, c2 = st.columns(2)
+            with c1:
+                v_frac = st.slider("Velocity (fraction of c):", 0.01, 0.999, 0.95, key="rs_v")
+            with c2:
+                proper_t = st.slider("Proper Time (s):", 1.0, 1000.0, 100.0, key="rs_t")
+            gamma = 1.0 / math.sqrt(1.0 - (v_frac**2))
+            dilated = proper_t * gamma
+            col_a, col_b = st.columns(2)
+            col_a.metric("γ (Lorentz factor)", f"{gamma:.4f}")
+            col_b.metric("⏱️ Dilated Time", f"{dilated:.4f} s")
+            st.info(f"📐 At v = {v_frac}c, proper time = {proper_t}s → dilated = **{dilated:.4f}s**")
+            st.markdown("📝 **Observation:** Faster you go, slower time flows for you (relative to a stationary observer).")
+            if st.button("🤖 Explain with AI", key="rs_ai_btn"):
+                with st.spinner("Professor is thinking..."):
+                    try:
+                        r = client.chat.completions.create(model="openai/gpt-oss-120b",
+                            messages=[{"role": "user", "content": f"Explain Time Dilation & Lorentz factor at University level. {lang_rule}\n{diagram_rule}\n\nv={v_frac}c, t_proper={proper_t}s, γ={gamma:.4f}, t_dilated={dilated:.4f}s. Include twin paradox."}],
                             temperature=0.6, max_tokens=1500)
                         st.info(r.choices[0].message.content)
                     except Exception as e:
@@ -6140,13 +6491,13 @@ Doubt: {doubt}"""
                     st.session_state.phy_doubts.append({"role": "assistant", "content": reply})
 
     # ============================================================
-    # FOOTER (Added as requested)
+    # FOOTER
     # ============================================================
     st.markdown("---")
     st.markdown(
         "<div style='text-align: center; color: gray; padding: 20px; font-size: 0.9em;'>"
         "🔒 ClyxessChat AI secure fast private"
-        "</div>", 
+        "</div>",
         unsafe_allow_html=True
     )
         
