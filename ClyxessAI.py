@@ -9796,7 +9796,7 @@ if mode == "🎨 Creative AI Image Generator":
     render_image_generator(); st.stop() 
 if mode == "🎨 Art Machine Design":
     render_art_machinedesign(); st.stop()       
-if mode == "📚 Kids Logic Lab":
+if mode == "📚 Kids Logic Lab" in mode:
     render_kids_logic_lab(); st.stop() 
 if mode == "🧠 Cyber Security":
     render_cyber_security(); st.stop()       
