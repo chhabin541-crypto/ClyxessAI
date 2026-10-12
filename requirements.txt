@@ -8,5 +8,3 @@ pytz
 openai
 Pillow
 matplotlib 
-numpy 
-manim
