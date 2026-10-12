@@ -9983,6 +9983,7 @@ def render_school_chat():
             index=age_options.index(st.session_state.get("school_age", "1-2 Yrs")),
             key="school_age_selector"
         )
+        st.session_state["school_age"] = school_age
     with c2:
         labels = list(PLAY_LANGUAGES.keys())
         current_label = next((n for n, c in PLAY_LANGUAGES.items() if c == st.session_state.get("school_language", "hi")), labels[0])
@@ -9991,6 +9992,61 @@ def render_school_chat():
             index=labels.index(current_label),
             key="school_language_selector"
         )
+        st.session_state["school_language"] = PLAY_LANGUAGES[school_label]
+
+    # --- Chat History Fix ---
+    import re
+    import time
+
+    if "school_messages" not in st.session_state:
+        st.session_state.school_messages = []
+
+    # purane messages dikhao - CODE KABHI NAHI DIKHEGA
+    for msg in st.session_state.school_messages:
+        with st.chat_message(msg["role"]):
+            content = msg["content"]
+            if msg["role"] == "assistant":
+                cleaned = re.sub(r"```.*?```", "", content, flags=re.DOTALL)
+                cleaned = cleaned.replace("सरल चित्र (Diagram)", "").replace("डायग्राम (Python-Diagram)", "")
+                st.markdown(cleaned)
+                render_diagram_if_needed(content)
+            else:
+                st.markdown(content)
+
+    # --- Naya Message ---
+    if prompt := st.chat_input("Search / ask ClyxessChat AI..."):
+        st.session_state.school_messages.append({"role": "user", "content": prompt})
+        with st.chat_message("user"):
+            st.markdown(prompt)
+
+        with st.chat_message("assistant"):
+            client = get_client()
+            messages = st.session_state.school_messages
+            system = get_system_prompt() # ye tere age/language wala prompt hai
+
+            completion, used_model = get_groq_response(client, messages, system, "")
+            if completion is None:
+                st.error("AI response नहीं आ पाया. Please try again.")
+                return
+            response = completion.choices[0].message.content
+
+            # YAHAN CODE HAT RAHA HAI - FINAL FIX
+            clean_response = re.sub(r"```.*?```", "", response, flags=re.DOTALL)
+
+            placeholder = st.empty()
+            typed = ""
+            for word in clean_response.split(" "):
+                typed += word + " "
+                placeholder.markdown(typed + "▌")
+                time.sleep(0.015)
+            placeholder.markdown(clean_response)
+
+            # Image yahan banegi
+            render_diagram_if_needed(response)
+
+            st.caption("🔒 ClyxessChat AI | Secure • Fast • Private")
+            st.session_state.school_messages.append({"role": "assistant", "content": response})
+            st.rerun()
 
     st.session_state.school_age = school_age
     st.session_state.school_language = PLAY_LANGUAGES[school_label]
