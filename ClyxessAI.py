@@ -9752,7 +9752,7 @@ with st.sidebar:
         "🎮 Play & Learn",
         "🎨 Creative AI Image Generator",
         "📷 Vision Lab", 
-        "🧩 Kids Logic Lab", 
+        "📚 Kids Logic Lab",
         "🧠 Cyber Security", 
         "🎨 Art Machine Design",  
         "🎭 Peer Roleplay Modes",
@@ -9796,7 +9796,7 @@ if mode == "🎨 Creative AI Image Generator":
     render_image_generator(); st.stop() 
 if mode == "🎨 Art Machine Design":
     render_art_machinedesign(); st.stop()       
-if mode == "🧩 Kids Logic Lab":
+if mode == "📚 Kids Logic Lab":
     render_kids_logic_lab(); st.stop() 
 if mode == "🧠 Cyber Security":
     render_cyber_security(); st.stop()       
