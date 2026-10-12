@@ -958,7 +958,6 @@ def render_diagram_if_needed(response_text):
         print(f"render error: {e}")
 
 def search_tavily(query):
-def search_tavily(query):
     search_words = [
         "news", "mausam", "weather", "rate", "price",
         "score", "aaj", "kal", "today", "latest", "breaking"
