@@ -9752,6 +9752,7 @@ with st.sidebar:
         "🎮 Play & Learn",
         "🎨 Creative AI Image Generator",
         "📷 Vision Lab", 
+        "🧩 Kids Logic Lab", 
         "🧠 Cyber Security", 
         "🎨 Art Machine Design",  
         "🎭 Peer Roleplay Modes",
