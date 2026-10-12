@@ -926,45 +926,47 @@ def language_display_name(code):
 # ============================================================
 def render_diagram_if_needed(response_text):
     import re
+    import traceback
     import matplotlib.pyplot as plt
     import streamlit as st
-    import traceback
-
     try:
-        # python-diagram ya python dono dhoondo
-        patterns = [
-            r"```python-diagram(.*?)```",
-            r"```python(.*?)```",
-            r"```(.*?)```"
-        ]
+        # saare code block nikalo
+        blocks = re.findall(r"```(?:python-diagram|python)?(.*?)```", response_text, re.DOTALL | re.IGNORECASE)
         code_to_run = None
-        for pat in patterns:
-            for m in re.finditer(pat, response_text, re.DOTALL | re.IGNORECASE):
-                c = m.group(1).strip()
-                # sirf wahi code jisme diagram ho
-                if "plt." in c or "matplotlib" in c or "Circle" in c or "ax." in c:
-                    code_to_run = c
-                    break
-            if code_to_run:
+        for b in blocks:
+            if "plt" in b or "matplotlib" in b or "ax." in b:
+                code_to_run = b
                 break
+        if not code_to_run and blocks:
+            code_to_run = blocks[0]
 
         if code_to_run:
-            # 'python' word hata do agar shuru me hai
-            if code_to_run.lower().startswith("python"):
-                code_to_run = code_to_run[6:].strip()
+            # upar ka 'python' word hata do
+            c = code_to_run.strip()
+            if c.lower().startswith("python"):
+                c = c[6:].strip()
 
             plt.close('all')
-            fig, ax = plt.subplots(figsize=(6,5))
-            ax.set_aspect('equal')
-            ax.axis('off')
+            # code ko chalao
+            exec_globals = {"plt": plt}
             try:
-                exec(code_to_run, {"plt": plt, "ax": ax, "fig": fig})
+                exec_globals["np"] = __import__("numpy")
+            except:
+                pass
+            local_vars = {}
+            exec(c, exec_globals, local_vars)
+            fig = local_vars.get("fig")
+            if fig is None:
+                try:
+                    fig = plt.gcf()
+                except:
+                    fig = None
+            if fig:
                 st.pyplot(fig)
-            finally:
                 plt.close(fig)
     except Exception as e:
-        print(f"Diagram render failed: {e}")
-        print(traceback.format_exc())
+        print(f"Diagram error: {e}")
+        traceback.print_exc()
 
 def search_tavily(query):
     search_words = [
