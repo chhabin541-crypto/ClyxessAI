@@ -8438,7 +8438,7 @@ drawKBG();
 
     components.html(HTML, height=950, scrolling=False) 
     
-def render_kids_logic_lab():
+def render_kids_logic_lab(client):
     # ============================================================
     # Imports अब फंक्शन के अंदर हैं (ताकि कोई conflict न हो)
     # ============================================================
