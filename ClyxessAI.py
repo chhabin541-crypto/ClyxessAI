@@ -9053,7 +9053,10 @@ def render_kids_logic_lab():
         </script>
     </body>
     </html>
-    """
+        """
+    import streamlit.components.v1 as components
+    components.html(HTML_TEMPLATE, height=950, scrolling=False)
+
 def render_learn_ai(client):
 
     import streamlit as st
