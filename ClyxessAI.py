@@ -929,38 +929,47 @@ def render_diagram_if_needed(response_text):
     import matplotlib.pyplot as plt
     import streamlit as st
     import traceback
-    import urllib.parse
 
     try:
-        m = re.search(r"```python-diagram(.*?)```", response_text, re.DOTALL | re.IGNORECASE)
-        if m:
-            code = m.group(1).strip()
+        # python-diagram ya python dono dhoondo
+        patterns = [
+            r"```python-diagram(.*?)```",
+            r"```python(.*?)```",
+            r"```(.*?)```"
+        ]
+        code_to_run = None
+        for pat in patterns:
+            for m in re.finditer(pat, response_text, re.DOTALL | re.IGNORECASE):
+                c = m.group(1).strip()
+                # sirf wahi code jisme diagram ho
+                if "plt." in c or "matplotlib" in c or "Circle" in c or "ax." in c:
+                    code_to_run = c
+                    break
+            if code_to_run:
+                break
+
+        if code_to_run:
+            # 'python' word hata do agar shuru me hai
+            if code_to_run.lower().startswith("python"):
+                code_to_run = code_to_run[6:].strip()
+
             plt.close('all')
-            fig, ax = plt.subplots(figsize=(6,6))
+            fig, ax = plt.subplots(figsize=(6,5))
             ax.set_aspect('equal')
             ax.axis('off')
             try:
-                exec(code, {"plt": plt, "ax": ax, "fig": fig})
+                exec(code_to_run, {"plt": plt, "ax": ax, "fig": fig})
                 st.pyplot(fig)
-            except Exception as e:
-                st.error(f"Diagram error: {e}")
             finally:
                 plt.close(fig)
-            return
-
-        m2 = re.search(r"```image-prompt(.*?)```", response_text, re.DOTALL | re.IGNORECASE)
-        if m2:
-            prompt = m2.group(1).strip()
-            encoded = urllib.parse.quote(prompt[:400])
-            url = f"https://image.pollinations.ai/prompt/{encoded}?width=800&height=800&nologo=true"
-            st.image(url)
     except Exception as e:
-        print(f"render error: {e}")
+        print(f"Diagram render failed: {e}")
+        print(traceback.format_exc())
 
 def search_tavily(query):
     search_words = [
         "news", "mausam", "weather", "rate", "price",
-        "score", "aaj", "kal", "today", "latest", "breaking"
+        "score", "aaj", "kal", "today", "latest", "train", "breaking"
     ]
 
     if not any(word in query.lower() for word in search_words):
@@ -10022,29 +10031,33 @@ def render_school_chat():
         system += "\nLIVE WEB INFO:\n" + search_context
 
     with st.chat_message("assistant"):
-        completion, used_model = get_groq_response(client, messages, system, "")
-        if completion is None:
-           st.error("AI response नहीं आ पाया. Please try again.")
-           return
-        response = completion.choices[0].message.content
-        clean_response = re.sub(r"```python-diagram.*?```", "", response, flags=re.DOTALL)
-        clean_response = re.sub(r"```image-prompt.*?```", "", clean_response, flags=re.DOTALL)
-        clean_response = re.sub(r"```mermaid.*?```", "", clean_response, flags=re.DOTALL)
+    completion, used_model = get_groq_response(client, messages, system, "")
+    if completion is None:
+        st.error("AI response नहीं आ पाया. Please try again.")
+        return
+    response = completion.choices[0].message.content
 
-        placeholder = st.empty()
-        typed = ""
-        for word in clean_response.split(" "):
-            typed += word + " "
-            placeholder.markdown(typed + "▌")
-            time.sleep(0.02)
-        placeholder.markdown(clean_response)
-        render_diagram_if_needed(response)
+    # CODE ko user se chupao
+    clean_response = re.sub(r"```python-diagram.*?```", "", response, flags=re.DOTALL | re.IGNORECASE)
+    clean_response = re.sub(r"```python.*?```", "", clean_response, flags=re.DOTALL | re.IGNORECASE)
+    clean_response = clean_response.replace("सरल चित्र (Diagram)", "")
 
-        if sources:
-            st.caption("Sources:\n" + sources)
-        st.caption("🔒 ClyxessChat AI | Secure • Fast • Private")
-        messages.append({"role": "assistant", "content": response})
-        st.rerun()
+    placeholder = st.empty()
+    typed = ""
+    for word in clean_response.split(" "):
+        typed += word + " "
+        placeholder.markdown(typed + "▌")
+        time.sleep(0.02)
+    placeholder.markdown(clean_response)
+
+    # Image yahan banegi
+    render_diagram_if_needed(response)
+
+    if sources:
+        st.caption("Sources:\n" + sources)
+    st.caption("🔒 ClyxessChat AI | Secure • Fast • Private")
+    messages.append({"role": "assistant", "content": response})
+    st.rerun()
 
 if mode == "Normal Chat":
     render_normal_chat()
