@@ -9998,7 +9998,6 @@ def render_school_chat():
 
                 # --- NAYA CODE YAHAN SE SHURU ---
                 # Code wala hissa alag rakho, taaki user ko code na dikhe
-                import re
                 clean_response = re.sub(r"```python-diagram.*?```", "", response, flags=re.DOTALL)
                 clean_response = re.sub(r"```image-prompt.*?```", "", clean_response, flags=re.DOTALL)
                 clean_response = re.sub(r"```mermaid.*?```", "", clean_response, flags=re.DOTALL)
