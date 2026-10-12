@@ -9995,18 +9995,31 @@ def render_school_chat():
             st.error("AI response नहीं आ पाया. Please try again.")
             return
         response = completion.choices[0].message.content
-        placeholder = st.empty()
-        typed = ""
-        for word in response.split(" "):
-            typed += word + " "
-            placeholder.markdown(typed + "▌")
-            time.sleep(0.02)
-        placeholder.markdown(response)
-        if sources:
-            st.caption("Sources:\n" + sources)
-        st.caption("🔒 ClyxessChat AI | Secure • Fast • Private")
-        messages.append({"role": "assistant", "content": response})
-        st.rerun()
+
+                # --- NAYA CODE YAHAN SE SHURU ---
+                # Code wala hissa alag rakho, taaki user ko code na dikhe
+                import re
+                clean_response = re.sub(r"```python-diagram.*?```", "", response, flags=re.DOTALL)
+                clean_response = re.sub(r"```image-prompt.*?```", "", clean_response, flags=re.DOTALL)
+                clean_response = re.sub(r"```mermaid.*?```", "", clean_response, flags=re.DOTALL)
+                # --- NAYA CODE YAHAN KHATAM ---
+
+                placeholder = st.empty()
+                typed = ""
+                for word in clean_response.split(" "):
+                    typed += word + " "
+                    placeholder.markdown(typed + "▌")
+                    time.sleep(0.02)
+                placeholder.markdown(clean_response) # ab clean wala dikhega
+
+                # --- DIAGRAM IMAGE YAHAN AYEGI ---
+                render_diagram_if_needed(response)
+
+                if sources:
+                    st.caption("Sources:\n" + sources)
+                st.caption("🔒 ClyxessChat AI | Secure • Fast • Private")
+                messages.append({"role": "assistant", "content": response})
+                st.rerun()
 
 if mode == "Normal Chat":
     render_normal_chat()
