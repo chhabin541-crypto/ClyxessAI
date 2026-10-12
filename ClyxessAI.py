@@ -924,54 +924,11 @@ def language_display_name(code):
 # ============================================================
 # TAVILY
 # ============================================================
-def render_diagram_if_needed(response_text):
-    import re
-    import traceback
-    import matplotlib.pyplot as plt
-    import streamlit as st
-    try:
-        # saare code block nikalo
-        blocks = re.findall(r"```(?:python-diagram|python)?(.*?)```", response_text, re.DOTALL | re.IGNORECASE)
-        code_to_run = None
-        for b in blocks:
-            if "plt" in b or "matplotlib" in b or "ax." in b:
-                code_to_run = b
-                break
-        if not code_to_run and blocks:
-            code_to_run = blocks[0]
-
-        if code_to_run:
-            # upar ka 'python' word hata do
-            c = code_to_run.strip()
-            if c.lower().startswith("python"):
-                c = c[6:].strip()
-
-            plt.close('all')
-            # code ko chalao
-            exec_globals = {"plt": plt}
-            try:
-                exec_globals["np"] = __import__("numpy")
-            except:
-                pass
-            local_vars = {}
-            exec(c, exec_globals, local_vars)
-            fig = local_vars.get("fig")
-            if fig is None:
-                try:
-                    fig = plt.gcf()
-                except:
-                    fig = None
-            if fig:
-                st.pyplot(fig)
-                plt.close(fig)
-    except Exception as e:
-        print(f"Diagram error: {e}")
-        traceback.print_exc()
 
 def search_tavily(query):
     search_words = [
         "news", "mausam", "weather", "rate", "price",
-        "score", "aaj", "kal", "today", "latest", "train", "breaking"
+        "score", "aaj", "kal", "today", "latest", "breaking"
     ]
 
     if not any(word in query.lower() for word in search_words):
@@ -9978,27 +9935,19 @@ def render_school_chat():
     c1, c2 = st.columns(2)
     with c1:
         age_options = ["1-2 Yrs", "3-4 Yrs", "5-6 Yrs", "6-8 Yrs", "8-10 Yrs", "10-11 Yrs", "11+ Yrs"]
-        default_age = st.session_state.get("school_age", "1-2 Yrs")
-        if default_age not in age_options:
-            default_age = "1-2 Yrs"
         school_age = st.selectbox(
             "🎒 Age Group", age_options,
-            index=age_options.index(default_age),
+            index=age_options.index(st.session_state.get("school_age", "1-2 Yrs")),
             key="school_age_selector"
         )
-        st.session_state["school_age"] = school_age
     with c2:
         labels = list(PLAY_LANGUAGES.keys())
-        current_code = st.session_state.get("school_language", "hi")
-        current_label = next((n for n, c in PLAY_LANGUAGES.items() if c == current_code), labels[0])
-        if current_label not in labels:
-            current_label = labels[0]
+        current_label = next((n for n, c in PLAY_LANGUAGES.items() if c == st.session_state.get("school_language", "hi")), labels[0])
         school_label = st.selectbox(
             "🌐 Language", labels,
             index=labels.index(current_label),
             key="school_language_selector"
         )
-        st.session_state["school_language"] = PLAY_LANGUAGES[school_label]
 
     st.session_state.school_age = school_age
     st.session_state.school_language = PLAY_LANGUAGES[school_label]
@@ -10046,23 +9995,13 @@ def render_school_chat():
             st.error("AI response नहीं आ पाया. Please try again.")
             return
         response = completion.choices[0].message.content
-
-        # CODE ko user se chupao
-        clean_response = re.sub(r"```python-diagram.*?```", "", response, flags=re.DOTALL | re.IGNORECASE)
-        clean_response = re.sub(r"```python.*?```", "", clean_response, flags=re.DOTALL | re.IGNORECASE)
-        clean_response = clean_response.replace("सरल चित्र (Diagram)", "")
-
         placeholder = st.empty()
         typed = ""
-        for word in clean_response.split(" "):
+        for word in response.split(" "):
             typed += word + " "
             placeholder.markdown(typed + "▌")
             time.sleep(0.02)
-        placeholder.markdown(clean_response)
-
-        # Image yahan banegi
-        render_diagram_if_needed(response)
-
+        placeholder.markdown(response)
         if sources:
             st.caption("Sources:\n" + sources)
         st.caption("🔒 ClyxessChat AI | Secure • Fast • Private")
