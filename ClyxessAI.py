@@ -4670,7 +4670,7 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',sans-serif;he
 .btn-icon{background:var(--panel2);border:1px solid var(--border);color:var(--text);width:32px;height:32px;border-radius:50%;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center}
 .btn-icon:hover{border-color:var(--accent)}
 .main{display:flex;flex:1;overflow:hidden}
-.left{width:170px;background:var(--panel);border-right:1px solid var(--border);overflow:auto;padding:8px;flex-shrink:0}
+.left{width:140px;background:var(--panel);border-right:1px solid var(--border);overflow:auto;padding:8px;flex-shrink:0}
 .tt{font-size:9px;color:var(--muted);text-transform:uppercase;margin:10px 0 5px;font-weight:700;letter-spacing:0.5px}
 .age{padding:7px 9px;border-radius:8px;font-size:11px;cursor:pointer;color:var(--muted2);margin-bottom:2px;display:flex;justify-content:space-between;align-items:center;transition:0.15s}
 .age:hover{background:var(--panel2);color:var(--text)}
@@ -4680,7 +4680,7 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',sans-serif;he
 .lang:hover{background:var(--panel2);color:var(--text)}
 .lang.active{background:var(--panel2);color:var(--text);border-left:3px solid var(--accent);font-weight:700}
 .tip-box{margin-top:10px;background:var(--accent);padding:10px;border-radius:10px;font-size:10px;line-height:1.4;color:#fff}
-.center{flex:1.8;background:var(--panel2);display:flex;flex-direction:column;min-width:0}
+.center{flex:1;background:var(--panel2);display:flex;flex-direction:column;min-width:0}
 .tabs{display:flex;background:var(--panel);border-bottom:1px solid var(--border)}
 .tab{padding:8px 14px;font-size:11px;color:var(--muted);cursor:pointer;transition:0.2s}
 .tab.active{color:var(--text);background:var(--panel2);border-top:2px solid var(--accent)}
@@ -4691,13 +4691,13 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',sans-serif;he
 .chip{background:var(--panel2);border:1px solid var(--border);color:var(--text);padding:3px 8px;border-radius:6px;font-size:10px;cursor:pointer;font-family:Consolas,monospace}
 .chip:hover{border-color:var(--accent);background:var(--accent);color:#fff}
 .status{padding:5px 10px;background:var(--bg);font-size:10px;color:var(--muted);display:flex;justify-content:space-between}
-.right{width:290px;background:var(--panel);display:flex;flex-direction:column;border-left:1px solid var(--border);flex-shrink:0}
-.rhead{padding:7px 10px;background:var(--panel2);border-bottom:1px solid var(--border);display:flex;justify-content:space-between;font-size:11px}
-.rwrap{flex:1;padding:10px;overflow-y:auto;overflow-x:hidden;background:linear-gradient(135deg,#2a2a35,#1e1e24);display:flex;justify-content:center;align-items:flex-start}
+.right{width:220px;background:var(--panel);display:flex;flex-direction:column;border-left:1px solid var(--border);flex-shrink:0}
+.rhead{padding:7px 10px;background:var(--panel2);border-bottom:1px solid var(--border);display:flex;justify-content:space-between;font-size:10px}
+.rwrap{flex:1;padding:8px;overflow-y:auto;overflow-x:hidden;background:linear-gradient(135deg,#2a2a35,#1e1e24);display:flex;justify-content:center;align-items:flex-start}
 body.light .rwrap{background:linear-gradient(135deg,#e5e7eb,#d1d5db)}
-.mobileFrame{width:240px;height:470px;background:#000;border-radius:28px;padding:6px;box-shadow:0 15px 40px rgba(0,0,0,0.6);border:2px solid #333;margin:0 auto;flex-shrink:0}
-.mobileFrame .notch{width:70px;height:12px;background:#000;border-radius:20px;margin:0 auto 4px;position:relative;z-index:2}
-#prev{width:100%;height:100%;border:none;background:#fff;border-radius:20px;display:block;overflow:auto}
+.mobileFrame{width:200px;height:400px;background:#000;border-radius:24px;padding:5px;box-shadow:0 15px 40px rgba(0,0,0,0.6);border:2px solid #333;margin:0 auto;flex-shrink:0}
+.mobileFrame .notch{width:60px;height:10px;background:#000;border-radius:20px;margin:0 auto 3px;position:relative;z-index:2}
+#prev{width:100%;height:100%;border:none;background:#fff;border-radius:18px;display:block;overflow:auto}
 #qrBox{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:9999;justify-content:center;align-items:center}
 #qrBox .modal{background:var(--panel);padding:18px;border-radius:16px;text-align:center;width:90%;max-width:340px;border:1px solid var(--border)}
 #qrBox h4{color:var(--text);margin-bottom:10px;font-size:14px}
@@ -4783,7 +4783,7 @@ body.light .learnCode{background:#1e293b;color:#67e8f9}
 </div>
 
 <div class="right">
-<div class="rhead"><span>👁 Live Preview (Mobile)</span><span style="color:var(--success)">● Live</span></div>
+<div class="rhead"><span>👁 Live Preview</span><span style="color:var(--success)">● Live</span></div>
 <div class="rwrap">
 <div class="mobileFrame">
 <div class="notch"></div>
@@ -5039,7 +5039,7 @@ function copyAllCode(){
   navigator.clipboard.writeText(code).then(()=>alert('✅ Code copy ho gaya!'));
 }
 
-// ============ QR — HOSTED LINK (WORKING) ============
+// ============ QR — FIXED VERSION ============
 function openQR(){
   document.getElementById('qrBox').style.display='flex';
   newQR();
@@ -5049,12 +5049,13 @@ function newQR(){
   run();
   const box=document.getElementById('qrCanvas');
   const linkInput=document.getElementById('linkInput');
-  box.innerHTML='<p style="padding:20px;color:#fff;font-size:12px">⏳ QR ban raha hai...</p>';
+  box.innerHTML='<p style="padding:20px;color:#666;font-size:12px">⏳ QR ban raha hai...</p>';
   linkInput.value='Generating...';
+  linkInput.setAttribute('data-full','');
 
   const code=buildFullHTML();
-  
-  // Compress code with LZString for smaller size
+
+  // Step 1: Compress the code
   let compressed;
   try {
     compressed = LZString.compressToEncodedURIComponent(code);
@@ -5062,53 +5063,45 @@ function newQR(){
     compressed = encodeURIComponent(code);
   }
 
-  // Build a data URL that contains the FULL code (compressed)
-  // The receiver browser opens this directly
-  const fullHTMLPage = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>My Website</title><script src="https://cdn.jsdelivr.net/npm/lz-string@1.5.0/libs/lz-string.min.js"><\/script><style>body{margin:0;padding:20px;font-family:Arial;background:#f0f0f0}.info{background:#fff;padding:20px;border-radius:12px;max-width:600px;margin:auto;box-shadow:0 4px 12px rgba(0,0,0,0.1);text-align:center}h2{color:#333;margin-top:0}pre{background:#1e293b;color:#67e8f9;padding:15px;border-radius:8px;overflow:auto;font-size:12px;white-space:pre-wrap;text-align:left;max-height:300px}button{background:#6366f1;color:#fff;padding:12px 24px;border:none;border-radius:8px;cursor:pointer;font-size:14px;margin:5px}.ok{background:#22c55e;color:#fff;padding:10px;border-radius:8px;margin-bottom:15px}</style></head><body><div class="info"><div class="ok">✅ Clyxess Kids Coding Lab</div><h2>👋 Tumhara Code Ready Hai!</h2><pre id="c">Loading...</pre><button onclick="cp()">📋 Copy Code</button><button onclick="dl()" style="background:#16a34a">⬇ Download Website</button><p style="color:#666;font-size:13px;margin-top:15px">Download karke browser me kholo — website dikhegi!</p></div><script src="https://cdn.jsdelivr.net/npm/lz-string@1.5.0/libs/lz-string.min.js"><\/script><script>var d=LZString.decompressFromEncodedURIComponent("'+compressed+'");document.getElementById("c").textContent=d;function cp(){navigator.clipboard.writeText(d);alert("✅ Copy ho gaya!")}function dl(){var b=new Blob([d],{type:"text/html"});var a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="Clyxess-Website.html";a.click()}<\/script></body></html>';
+  // Step 2: Build a MINIMAL wrapper page (only ~180 chars) that decompresses and shows the site
+  // This wrapper is small enough to fit in QR even for big code
+  const wrapper =
+    '<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">' +
+    '<script src="https://cdn.jsdelivr.net/npm/lz-string@1.5.0/libs/lz-string.min.js"><\/script></head><body>' +
+    '<script>var d=LZString.decompressFromEncodedURIComponent("' + compressed + '");' +
+    'if(d){document.write(d);}else{document.body.innerHTML="<h2 style=\'font-family:Arial;padding:20px\'>⚠️ Code decode fail — dobara try karo</h2>";}<\/script>' +
+    '</body></html>';
 
-  const b64 = btoa(unescape(encodeURIComponent(fullHTMLPage)));
+  // Step 3: Base64 encode the wrapper
+  const b64 = btoa(unescape(encodeURIComponent(wrapper)));
   const dataUrl = 'data:text/html;base64,' + b64;
 
+  // Step 4: Generate QR if it fits
   box.innerHTML = '';
 
   if(dataUrl.length < 2900){
     new QRCode(box, {
       text: dataUrl,
-      width: 220,
-      height: 220,
-      correctLevel: QRCode.CorrectLevel.L
+      width: 240,
+      height: 240,
+      correctLevel: QRCode.CorrectLevel.M,
+      colorDark: "#000000",
+      colorLight: "#ffffff"
     });
-    linkInput.value = '✅ QR Ready! Phone se scan karo!';
+    linkInput.value = '✅ QR Ready! Scan karo — phone me website khulegi!';
     linkInput.setAttribute('data-full', dataUrl);
   } else {
-    // Fallback: compress the whole page too
-    const smallPage = '<!DOCTYPE html><html><head><meta charset="UTF-8"><script src="https://cdn.jsdelivr.net/npm/lz-string@1.5.0/libs/lz-string.min.js"><\/script></head><body style="font-family:Arial;padding:20px;background:#f0f0f0"><div style="background:#fff;padding:20px;border-radius:12px;max-width:600px;margin:auto"><h2>📱 Tumhara Code</h2><pre id="c" style="background:#1e293b;color:#67e8f9;padding:15px;border-radius:8px;overflow:auto;font-size:11px;white-space:pre-wrap;text-align:left">Loading...</pre><button onclick="navigator.clipboard.writeText(document.getElementById(\'c\').textContent);alert(\'✅ Copy!\')" style="background:#6366f1;color:#fff;padding:12px 24px;border:none;border-radius:8px;cursor:pointer;font-size:14px">📋 Copy</button></div><script>document.getElementById("c").textContent=LZString.decompressFromEncodedURIComponent("' + compressed + '");<\/script></body></html>';
-    
-    const b64Small = btoa(unescape(encodeURIComponent(smallPage)));
-    const smallUrl = 'data:text/html;base64,' + b64Small;
-
-    if(smallUrl.length < 2900){
-      new QRCode(box, {
-        text: smallUrl,
-        width: 220,
-        height: 220,
-        correctLevel: QRCode.CorrectLevel.L
-      });
-      linkInput.value = '✅ QR Ready! Scan karo — code milega!';
-      linkInput.setAttribute('data-full', smallUrl);
-    } else {
-      box.innerHTML = '<div style="padding:15px;color:#fbbf24;font-size:12px;line-height:1.6;text-align:left"><b>📱 Code bahut bada</b><br>QR me nahi aayega. 2 tarike:</div><div style="background:#0a0a0f;padding:10px;border-radius:8px;margin-top:8px;font-size:11px;color:#67e8f9;text-align:left;line-height:1.6">1️⃣ <b>Download</b> button<br>2️⃣ <b>Copy</b> button</div>';
-      linkInput.value = 'Download ya Copy button use karo!';
-      linkInput.setAttribute('data-full', '');
-    }
+    box.innerHTML = '<div style="padding:20px;color:#f59e0b;font-size:12px;text-align:center;line-height:1.6;font-family:Arial"><b>⚠️ Code bahut bada hai</b><br><br>QR me nahi aayega.<br>Chhota code likho, ya <b>Copy</b>/<b>Download</b> button use karo.</div>';
+    linkInput.value = 'Code bahut bada — Copy / Download button use karo';
+    linkInput.setAttribute('data-full', '');
   }
 }
 
 function copyLink(){
   const linkInput=document.getElementById('linkInput');
   const fullLink=linkInput.getAttribute('data-full')||linkInput.value;
-  if(!fullLink||fullLink.includes('Generating')||fullLink.includes('Download')){
-    alert('Pehle New QR generate hone do!');
+  if(!fullLink||fullLink.includes('Generating')||fullLink.includes('bahut bada')||fullLink.includes('Download')){
+    alert('Pehle New QR generate hone do, ya chhota code likho!');
     return;
   }
   navigator.clipboard.writeText(fullLink).then(()=>alert('✅ Link Copy ho gaya!'));
