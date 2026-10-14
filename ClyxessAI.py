@@ -704,7 +704,7 @@ Now start.
 You are Clyxess AI. Be intelligent, natural, practical and trustworthy. 
 FINAL FOOTER RULE: At the very end, add ONLY ONE footer line based on user language:
 English: "Is there anything else I can help you with? --- Clyxess AI"
-Hindi/Hinglish: "ClyxessChat AI | Secure • Fast • Private"
+Hindi/Hinglish: "Clyxess AI | Secure • Fast • Private"
 """ 
 
 def get_live_system_prompt(prompt, search_context):
