@@ -4649,16 +4649,61 @@ def render_coding_lab_mod():
     import streamlit.components.v1 as components
     import socket
 
-    # ============ LAN IP AUTO-DETECT ============
-    try:
-        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        s.connect(("8.8.8.8", 80))
-        lan_ip = s.getsockname()[0]
-        s.close()
-    except Exception:
-        lan_ip = "localhost"
+    # ============ SMART LAN IP DETECTION ============
+    def get_best_lan_ip():
+        candidates = []
+        
+        # Method 1: hostname → all IPs
+        try:
+            hostname = socket.gethostname()
+            for info in socket.getaddrinfo(hostname, None):
+                ip = info[4][0]
+                if ':' not in ip and not ip.startswith('127.'):
+                    candidates.append(ip)
+        except Exception:
+            pass
+        
+        # Method 2: UDP trick
+        try:
+            s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            s.connect(("8.8.8.8", 80))
+            candidates.append(s.getsockname()[0])
+            s.close()
+        except Exception:
+            pass
+        
+        candidates = list(set(candidates))
+        
+        # Prefer 192.168.x.x
+        for ip in candidates:
+            if ip.startswith('192.168.'):
+                return ip, candidates
+        # Then 172.16-31.x.x
+        for ip in candidates:
+            if ip.startswith('172.'):
+                parts = ip.split('.')
+                if len(parts) >= 2 and 16 <= int(parts[1]) <= 31:
+                    return ip, candidates
+        # Then 10.x.x.x
+        for ip in candidates:
+            if ip.startswith('10.'):
+                return ip, candidates
+        
+        return (candidates[0] if candidates else 'localhost'), candidates
 
-    base_url = f"http://{lan_ip}:8501"
+    detected_ip, all_ips = get_best_lan_ip()
+
+    # ============ MANUAL OVERRIDE UI ============
+    with st.expander("⚙️ Network Settings (QR ke liye)", expanded=False):
+        st.caption(f"🔍 Detected: {', '.join(all_ips) if all_ips else 'none'}")
+        user_ip = st.text_input(
+            "Laptop ka LAN IP",
+            value=detected_ip,
+            help="CMD mein `ipconfig` chalao, WiFi adapter ka IPv4 Address dekho"
+        )
+        user_port = st.number_input("Port", value=8501, min_value=1000, max_value=9999)
+
+    base_url = f"http://{user_ip}:{user_port}"
 
     html_code = r'''<!DOCTYPE html>
 <html lang="en">
@@ -4716,6 +4761,7 @@ body.light .rwrap{background:linear-gradient(135deg,#e5e7eb,#d1d5db)}
 #qrBox h4{color:var(--text);margin-bottom:10px;font-size:14px}
 #qrCanvas{background:#fff;padding:8px;border-radius:10px;display:inline-block;min-height:216px;min-width:216px}
 #linkInput{width:100%;margin-top:10px;background:var(--bg);border:1px solid var(--border);color:var(--success);padding:7px;border-radius:6px;font-size:10px;font-family:monospace}
+#qrHint{font-size:10px;color:var(--muted2);margin-top:8px;line-height:1.5;text-align:left}
 .modalBtns{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
 .modalBtns button{flex:1;min-width:80px;padding:9px;border-radius:8px;border:none;cursor:pointer;font-weight:700;font-size:11px}
 #robot{position:fixed;bottom:16px;right:16px;width:54px;height:54px;background:linear-gradient(135deg,#6366f1,#8b5cf6);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;cursor:pointer;z-index:9000;box-shadow:0 8px 24px rgba(99,102,241,0.5);animation:bounce 2s infinite}
@@ -4818,6 +4864,7 @@ body.light .learnCode{background:#1e293b;color:#67e8f9}
 <h4>📱 Mobile me dekho (QR Scan)</h4>
 <div id="qrCanvas"></div>
 <input id="linkInput" readonly placeholder="Link...">
+<div id="qrHint"></div>
 <div class="modalBtns">
 <button onclick="newQR()" style="background:#f59e0b;color:#fff">🔄 New QR</button>
 <button onclick="copyLink()" style="background:var(--accent);color:#fff">📋 Copy</button>
@@ -5052,7 +5099,7 @@ function copyAllCode(){
   navigator.clipboard.writeText(code).then(()=>alert('✅ Code copy ho gaya!'));
 }
 
-// ============ QR — FIXED (LAN URL) ============
+// ============ QR — LAN URL VERSION ============
 function openQR(){
   document.getElementById('qrBox').style.display='flex';
   newQR();
@@ -5062,8 +5109,10 @@ function newQR(){
   run();
   const box=document.getElementById('qrCanvas');
   const linkInput=document.getElementById('linkInput');
+  const hint=document.getElementById('qrHint');
   box.innerHTML='<p style="padding:20px;color:#666;font-size:12px">⏳ QR ban raha hai...</p>';
   linkInput.value='Generating...';
+  hint.innerHTML='';
   linkInput.setAttribute('data-full','');
 
   const code=buildFullHTML();
@@ -5079,13 +5128,13 @@ function newQR(){
   let shareUrl = null;
   let mode = '';
 
-  // Try LAN URL first (real http:// — Chrome opens it!)
+  // Try LAN URL (Chrome will open this directly!)
   if(baseUrl && baseUrl.indexOf('http') === 0 && compressed.length < 2200){
     shareUrl = baseUrl + '/?c=' + compressed;
     mode = 'lan';
   }
 
-  // Fallback: data URL (Chrome built-in scanner will open it)
+  // Fallback: data URL
   if(!shareUrl){
     const wrapper =
       '<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">' +
@@ -5104,7 +5153,7 @@ function newQR(){
   if(!shareUrl){
     box.innerHTML = '<div style="padding:20px;color:#f59e0b;font-size:12px;text-align:center;line-height:1.6"><b>⚠️ Code bahut bada</b><br>Chhota karo, ya <b>Copy</b>/<b>Download</b> use karo.</div>';
     linkInput.value = 'Code bahut bada';
-    linkInput.setAttribute('data-full','');
+    hint.innerHTML = '';
     return;
   }
 
@@ -5119,9 +5168,11 @@ function newQR(){
   });
 
   if(mode === 'lan'){
-    linkInput.value = '✅ QR Ready! Mobile same WiFi pe rakho, phir scan karo.';
+    linkInput.value = '✅ QR Ready! Scan karo!';
+    hint.innerHTML = '📶 <b>Mobile ko SAME WiFi pe rakho</b> (4G off karo). Phir Chrome built-in scanner se scan karo.';
   } else {
-    linkInput.value = '✅ QR Ready! Chrome ka built-in scanner use karo.';
+    linkInput.value = '✅ QR Ready (data mode)!';
+    hint.innerHTML = '📱 Chrome ka <b>built-in QR scanner</b> use karo (Google Lens data: URLs nahi khol sakta).';
   }
   linkInput.setAttribute('data-full', shareUrl);
 }
@@ -5209,7 +5260,6 @@ applyAge('5 Years');
     const decoded = LZString.decompressFromEncodedURIComponent(decodeURIComponent(match[1]));
     if(!decoded) return;
 
-    // Fullscreen preview — replace everything
     document.body.innerHTML = '';
     document.body.style.cssText = 'margin:0;padding:0;overflow:hidden;background:#fff';
     const frame = document.createElement('iframe');
@@ -5226,7 +5276,6 @@ applyAge('5 Years');
 </html>
 '''
 
-    # Inject LAN URL into HTML
     html_code = html_code.replace("__BASE_URL__", base_url)
 
     components.html(html_code, height=950, scrolling=False)
