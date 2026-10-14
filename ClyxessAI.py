@@ -4766,7 +4766,6 @@ def render_coding_lab_mod():
         user_port = st.number_input("Port", value=8501, min_value=1000, max_value=9999)
     base_url = f"http://{user_ip}:{user_port}"
 
-    # Supabase keys - tere secrets se ayega
     SUPA_URL = st.secrets.get("SUPABASE_URL", "")
     SUPA_KEY = st.secrets.get("SUPABASE_ANON_KEY", "")
 
@@ -5126,7 +5125,7 @@ function copyAllCode(){
   navigator.clipboard.writeText(code).then(()=>alert('✅ Code copy ho gaya!'));
 }
 
-// === FINAL FIX - HAR CODE KA QR BANEGA ===
+// === FINAL FIX - 310 LINE KA BHI QR TURANT BANEGA + ORIGINAL LINK ===
 function openQR(){
   document.getElementById('qrBox').style.display='flex';
   newQR();
@@ -5139,6 +5138,7 @@ async function newQR(){
   box.innerHTML='<p style="padding:20px;color:#666;font-size:12px">⏳ QR ban raha hai...</p>';
   linkInput.value='Generating...';
   hint.innerHTML='';
+
   const code=buildFullHTML();
   let compressed;
   try{ compressed = LZString.compressToEncodedURIComponent(code); }
@@ -5154,50 +5154,46 @@ async function newQR(){
   }catch(e){}
 
   const randomId = Math.random().toString(36).substring(2,8);
-  let shareUrl = "";
 
-  // Chhota code = direct QR
-  if(compressed.length < 1800){
-    shareUrl = publicBase + "/?r=" + randomId + "&c=" + compressed;
-  } else {
-    // Bada code = Supabase me save karke chhota QR - HAMESHA BANEGA
+  if(compressed.length >= 1800){
+    const shortUrl = publicBase + "/?p=" + randomId;
+    box.innerHTML='';
+    try{
+      new QRCode(box, {text: shortUrl, width: 260, height: 260, correctLevel: QRCode.CorrectLevel.M});
+      linkInput.value = shortUrl;
+      hint.innerHTML = '⏳ Bada code hai ('+code.length+' chars), save ho raha hai... ID: '+randomId;
+    }catch(err){
+      box.innerHTML = 'QR Error: '+err.message;
+      return;
+    }
     try{
       const supaUrl = "__SUPABASE_URL__";
       const supaKey = "__SUPABASE_KEY__";
-      if(supaUrl && supaKey && supaUrl.startsWith("http")){
-        const client = supabase.createClient(supaUrl, supaKey);
-        const { error } = await client.from('clyxess_pages').insert([{ id: randomId, html: code }]);
-        if(error) throw error;
-        shareUrl = publicBase + "/?p=" + randomId;
-      } else {
-        // Agar keys nahi hain to bhi QR banega, bas link bada hoga
-        shareUrl = publicBase + "/?r=" + randomId + "&c=" + compressed;
+      if(!supaUrl || supaUrl.length < 10 || supaUrl.includes("__")){
+        hint.innerHTML = '❌ SUPABASE_URL secrets me nahi hai! Streamlit Secrets check karo. QR to ban gaya par save nahi hoga.';
+        return;
       }
+      const client = supabase.createClient(supaUrl, supaKey);
+      const { error } = await client.from('clyxess_pages').insert([{ id: randomId, html: code }]);
+      if(error) throw error;
+      linkInput.value = shortUrl;
+      hint.innerHTML = '✅ 310 line ka short QR ban gaya! Original link: '+randomId+' - Har mobile pe khulega';
     }catch(err){
       console.error(err);
-      shareUrl = publicBase + "/?r=" + randomId + "&c=" + compressed;
+      hint.innerHTML = '❌ Supabase save fail: ' + (err.message || err) + ' | Table me RLS policy allow karo';
     }
+    return;
   }
 
+  const shareUrl = publicBase + "/?r=" + randomId + "&c=" + compressed;
   box.innerHTML='';
   try{
     new QRCode(box, {text: shareUrl, width: 260, height: 260, correctLevel: QRCode.CorrectLevel.M});
     linkInput.value = shareUrl;
-    if(compressed.length >= 1800){
-      hint.innerHTML = '✅ Bada code tha, short link QR bana diya! ID: '+randomId+' - Har mobile pe khulega';
-    } else {
-      hint.innerHTML = '✅ Naya Link: '+randomId+' | Kisi bhi Mobile pe khulega';
-    }
+    hint.innerHTML = '✅ Naya Link: '+randomId+' | Kisi bhi Mobile pe khulega';
   }catch(err){
-    // Last fallback - bhi QR banega
     linkInput.value = shareUrl;
-    box.innerHTML='';
-    try{
-      new QRCode(box, {text: shareUrl, width: 200, height: 200, correctLevel: QRCode.CorrectLevel.L});
-    }catch(e){
-      box.innerHTML='<div style="padding:20px;color:#22c55e;text-align:center">✅ Link ready!<br>'+randomId+'</div>';
-    }
-    hint.innerHTML = '✅ Link ready! ID: '+randomId;
+    hint.innerHTML = 'QR Error: '+err.message;
   }
 }
 function copyLink(){
@@ -5256,17 +5252,49 @@ let timer;
   });
 });
 applyAge('5 Years');
-(function checkSharedPreview(){
+
+// === FINAL PREVIEW FIX -?p aur?c DONO KHULEGA ===
+(async function checkSharedPreview(){
   try {
-    let url = '';
-    try{ url = window.location.href || ''; }catch(e){}
-    if(!url){ try{ url = window.parent.location.href || ''; }catch(e){} }
-    if(!url) return;
     const params = new URLSearchParams(window.location.search);
+    const pId = params.get('p');
+    const rId = params.get('r');
     let c = params.get('c');
+
+    //?p= wala - Supabase se bada code lao (310 line)
+    if(pId){
+      document.body.innerHTML='<div style="display:flex;justify-content:center;align-items:center;height:100vh;font-family:sans-serif;background:#f4f4f7;color:#333"><p>⏳ Loading Clyxess Page... ID: '+pId+'</p></div>';
+      try{
+        const supaUrl = "__SUPABASE_URL__";
+        const supaKey = "__SUPABASE_KEY__";
+        const client = supabase.createClient(supaUrl, supaKey);
+        const { data, error } = await client.from('clyxess_pages').select('html').eq('id', pId).single();
+        if(error) throw error;
+        if(!data) throw new Error('Data not found');
+        document.body.innerHTML='';
+        document.body.style.cssText='margin:0;padding:0;overflow:hidden;background:#fff';
+        const frame=document.createElement('iframe');
+        frame.style.cssText='position:fixed;inset:0;width:100vw;height:100vh;border:none;background:#fff';
+        frame.setAttribute('sandbox','allow-scripts allow-same-origin allow-modals allow-forms allow-popups');
+        frame.srcdoc=data.html;
+        document.body.appendChild(frame);
+      }catch(e){
+        document.body.innerHTML='<div style="padding:40px;text-align:center;font-family:sans-serif"><h2>❌ Page nahi mila</h2><p>ID: '+pId+'</p><p style="color:#666;font-size:12px">'+ (e.message||e) +'</p><p>Supabase table check karo</p></div>';
+      }
+      return;
+    }
+
+    //?c= wala - chhota code
     if(!c){
-      const match = url.match(/[?&]c=([^&#]+)/);
-      if(match) c = match[1];
+      try{
+        let url = '';
+        try{ url = window.location.href || ''; }catch(e){}
+        if(!url){ try{ url = window.parent.location.href || ''; }catch(e){} }
+        if(url){
+          const match = url.match(/[?&]c=([^&#]+)/);
+          if(match) c = match[1];
+        }
+      }catch(e){}
     }
     if(!c) return;
     let decoded = null;
@@ -5279,7 +5307,7 @@ applyAge('5 Years');
     frame.setAttribute('sandbox','allow-scripts allow-same-origin allow-modals allow-forms allow-popups');
     frame.srcdoc=decoded;
     document.body.appendChild(frame);
-  }catch(e){}
+  }catch(e){ console.error(e); }
 })();
 </script>
 </body>
