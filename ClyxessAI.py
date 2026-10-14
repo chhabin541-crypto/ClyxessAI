@@ -4647,6 +4647,19 @@ Rules:
 
 def render_coding_lab_mod():
     import streamlit.components.v1 as components
+    import socket
+
+    # ============ LAN IP AUTO-DETECT ============
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(("8.8.8.8", 80))
+        lan_ip = s.getsockname()[0]
+        s.close()
+    except Exception:
+        lan_ip = "localhost"
+
+    base_url = f"http://{lan_ip}:8501"
+
     html_code = r'''<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5039,7 +5052,7 @@ function copyAllCode(){
   navigator.clipboard.writeText(code).then(()=>alert('✅ Code copy ho gaya!'));
 }
 
-// ============ QR — FIXED VERSION ============
+// ============ QR — FIXED (LAN URL) ============
 function openQR(){
   document.getElementById('qrBox').style.display='flex';
   newQR();
@@ -5055,7 +5068,6 @@ function newQR(){
 
   const code=buildFullHTML();
 
-  // Step 1: Compress the code
   let compressed;
   try {
     compressed = LZString.compressToEncodedURIComponent(code);
@@ -5063,45 +5075,62 @@ function newQR(){
     compressed = encodeURIComponent(code);
   }
 
-  // Step 2: Build a MINIMAL wrapper page (only ~180 chars) that decompresses and shows the site
-  // This wrapper is small enough to fit in QR even for big code
-  const wrapper =
-    '<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">' +
-    '<script src="https://cdn.jsdelivr.net/npm/lz-string@1.5.0/libs/lz-string.min.js"><\/script></head><body>' +
-    '<script>var d=LZString.decompressFromEncodedURIComponent("' + compressed + '");' +
-    'if(d){document.write(d);}else{document.body.innerHTML="<h2 style=\'font-family:Arial;padding:20px\'>⚠️ Code decode fail — dobara try karo</h2>";}<\/script>' +
-    '</body></html>';
+  const baseUrl = "__BASE_URL__";
+  let shareUrl = null;
+  let mode = '';
 
-  // Step 3: Base64 encode the wrapper
-  const b64 = btoa(unescape(encodeURIComponent(wrapper)));
-  const dataUrl = 'data:text/html;base64,' + b64;
-
-  // Step 4: Generate QR if it fits
-  box.innerHTML = '';
-
-  if(dataUrl.length < 2900){
-    new QRCode(box, {
-      text: dataUrl,
-      width: 240,
-      height: 240,
-      correctLevel: QRCode.CorrectLevel.M,
-      colorDark: "#000000",
-      colorLight: "#ffffff"
-    });
-    linkInput.value = '✅ QR Ready! Scan karo — phone me website khulegi!';
-    linkInput.setAttribute('data-full', dataUrl);
-  } else {
-    box.innerHTML = '<div style="padding:20px;color:#f59e0b;font-size:12px;text-align:center;line-height:1.6;font-family:Arial"><b>⚠️ Code bahut bada hai</b><br><br>QR me nahi aayega.<br>Chhota code likho, ya <b>Copy</b>/<b>Download</b> button use karo.</div>';
-    linkInput.value = 'Code bahut bada — Copy / Download button use karo';
-    linkInput.setAttribute('data-full', '');
+  // Try LAN URL first (real http:// — Chrome opens it!)
+  if(baseUrl && baseUrl.indexOf('http') === 0 && compressed.length < 2200){
+    shareUrl = baseUrl + '/?c=' + compressed;
+    mode = 'lan';
   }
+
+  // Fallback: data URL (Chrome built-in scanner will open it)
+  if(!shareUrl){
+    const wrapper =
+      '<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">' +
+      '<script src="https://cdn.jsdelivr.net/npm/lz-string@1.5.0/libs/lz-string.min.js"><\/script></head><body>' +
+      '<script>var d=LZString.decompressFromEncodedURIComponent("' + compressed + '");' +
+      'if(d){document.write(d);}else{document.body.innerHTML="<h2 style=\'font-family:Arial;padding:20px\'>⚠️ Decode fail<\/h2>";}<\/script>' +
+      '</body></html>';
+    const b64 = btoa(unescape(encodeURIComponent(wrapper)));
+    const dataUrl = 'data:text/html;base64,' + b64;
+    if(dataUrl.length < 2900){
+      shareUrl = dataUrl;
+      mode = 'data';
+    }
+  }
+
+  if(!shareUrl){
+    box.innerHTML = '<div style="padding:20px;color:#f59e0b;font-size:12px;text-align:center;line-height:1.6"><b>⚠️ Code bahut bada</b><br>Chhota karo, ya <b>Copy</b>/<b>Download</b> use karo.</div>';
+    linkInput.value = 'Code bahut bada';
+    linkInput.setAttribute('data-full','');
+    return;
+  }
+
+  box.innerHTML = '';
+  new QRCode(box, {
+    text: shareUrl,
+    width: 240,
+    height: 240,
+    correctLevel: QRCode.CorrectLevel.L,
+    colorDark: "#000000",
+    colorLight: "#ffffff"
+  });
+
+  if(mode === 'lan'){
+    linkInput.value = '✅ QR Ready! Mobile same WiFi pe rakho, phir scan karo.';
+  } else {
+    linkInput.value = '✅ QR Ready! Chrome ka built-in scanner use karo.';
+  }
+  linkInput.setAttribute('data-full', shareUrl);
 }
 
 function copyLink(){
   const linkInput=document.getElementById('linkInput');
   const fullLink=linkInput.getAttribute('data-full')||linkInput.value;
   if(!fullLink||fullLink.includes('Generating')||fullLink.includes('bahut bada')||fullLink.includes('Download')){
-    alert('Pehle New QR generate hone do, ya chhota code likho!');
+    alert('Pehle New QR generate hone do!');
     return;
   }
   navigator.clipboard.writeText(fullLink).then(()=>alert('✅ Link Copy ho gaya!'));
@@ -5165,10 +5194,41 @@ let timer;
 });
 
 applyAge('5 Years');
+
+// ============ MOBILE SHARED PREVIEW ============
+(function checkSharedPreview(){
+  try {
+    let url = '';
+    try { url = window.parent.location.href || ''; } catch(e){}
+    if(!url) url = document.referrer || '';
+    if(!url) return;
+
+    const match = url.match(/[?&]c=([^&#]+)/);
+    if(!match) return;
+
+    const decoded = LZString.decompressFromEncodedURIComponent(decodeURIComponent(match[1]));
+    if(!decoded) return;
+
+    // Fullscreen preview — replace everything
+    document.body.innerHTML = '';
+    document.body.style.cssText = 'margin:0;padding:0;overflow:hidden;background:#fff';
+    const frame = document.createElement('iframe');
+    frame.style.cssText = 'position:fixed;inset:0;width:100vw;height:100vh;border:none;background:#fff';
+    frame.setAttribute('sandbox','allow-scripts allow-same-origin allow-modals allow-forms allow-popups');
+    frame.srcdoc = decoded;
+    document.body.appendChild(frame);
+  } catch(e){
+    console.log('Shared preview not active:', e.message);
+  }
+})();
 </script>
 </body>
 </html>
 '''
+
+    # Inject LAN URL into HTML
+    html_code = html_code.replace("__BASE_URL__", base_url)
+
     components.html(html_code, height=950, scrolling=False)
 
 def render_learn_finance(client):
