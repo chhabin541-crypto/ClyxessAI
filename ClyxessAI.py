@@ -14,24 +14,51 @@ except Exception:
     mic_recorder = None
 
 # ====== YEH BLOCK SABSE UPAR DAL - ISSE BACCHE KI WEBSITE KHULEGI ======
-# Agar link me ?c= hai to matlab bacche ki website kholni hai, AI nahi
 params = st.query_params
-if "c" in params:
-    c_val = params.get("c", "")
-    # Streamlit ka header hatao, sirf bacche ka code dikhao
+
+# --- NAYA FIX: BADA CODE (310 line) KE LIYE?p= WALA ---
+if "p" in params:
+    p_val = params.get("p", "")
     st.set_page_config(page_title="My Website", layout="wide")
-    # CSS se Streamlit ka menu hatao
     st.markdown("""
     <style>
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
     header {visibility: hidden;}
-    .stApp {background: white; padding: 0; margin: 0;}
+   .stApp {background: white; padding: 0; margin: 0;}
     </style>
     """, unsafe_allow_html=True)
-    
+
+    try:
+        # Supabase se bada code uthao
+        supa_url = st.secrets["SUPABASE_URL"]
+        supa_key = st.secrets["SUPABASE_ANON_KEY"]
+        supa = create_client(supa_url, supa_key)
+        res = supa.table("clyxess_pages").select("html").eq("id", p_val).execute()
+        if res.data and len(res.data) > 0:
+            html_code = res.data[0]["html"]
+            import streamlit.components.v1 as components
+            components.html(html_code, height=1000, scrolling=True)
+        else:
+            st.error(f"ID {p_val} nahi mila. QR dubara banao.")
+    except Exception as e:
+        st.error(f"Supabase Error: {e}")
+    st.stop()
+
+# --- PURANA WALA CHHOTA CODE KE LIYE?c= WALA (Tera wahi code, same to same) ---
+if "c" in params:
+    c_val = params.get("c", "")
+    st.set_page_config(page_title="My Website", layout="wide")
+    st.markdown("""
+    <style>
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
+    header {visibility: hidden;}
+   .stApp {background: white; padding: 0; margin: 0;}
+    </style>
+    """, unsafe_allow_html=True)
+
     import streamlit.components.v1 as components
-    # JS se decompress karke bacche ki website dikhao
     components.html(f"""
     <!DOCTYPE html>
     <html>
