@@ -4841,9 +4841,9 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',sans-serif;he
 <div class="tab" onclick="switchTab('js',this)">⚡ script.js</div>
 </div>
 <div class="editorWrap">
-<textarea class="editor active" id="editorHTML" placeholder="HTML yahan likho..."></textarea>
-<textarea class="editor" id="editorCSS" placeholder="CSS yahan likho..."></textarea>
-<textarea class="editor" id="editorJS" placeholder="JavaScript yahan likho..."></textarea>
+<textarea class="editor active" id="editorHTML"></textarea>
+<textarea class="editor" id="editorCSS"></textarea>
+<textarea class="editor" id="editorJS"></textarea>
 </div>
 <div class="toolrow">
 <span class="chip" onclick="insertTag('h1')">&lt;h1&gt;</span>
@@ -4903,7 +4903,18 @@ const LEARN_CARDS = [
   {title:"🔘 Button", preview:`<button style="padding:10px 20px;background:#f59e0b;color:#fff;border:none;border-radius:10px;font-weight:bold">Mujhe Dabao!</button>`, code:`<button>Mujhe Dabao!</button>`, tip:"Button ke liye <button> use karo."},
   {title:"🖼️ Image", preview:`<img src="https://cdn-icons-png.flaticon.com/512/616/616408.png" width="70">`, code:`<img src="IMAGE-LINK" width="100">`, tip:"Image ke liye <img> use karo."},
   {title:"🔗 Link", preview:`<a href="#" style="color:#6366f1;text-decoration:underline">Click Karo</a>`, code:`<a href="https://google.com">Google</a>`, tip:"Link ke liye <a href='...'> use karo."},
-  {title:"📋 List", preview:`<ul style="margin:0;padding-left:20px;color:#333"><li>Class 1 - Drawing</li><li>Class 2 - Coding</li></ul>`, code:`<ul>\n <li>Class 1 - Drawing</li>\n <li>Class 2 - Coding</li>\n</ul>`, tip:"List ke liye <ul> aur <li> use karo."}
+  {title:"📋 List", preview:`<ul style="margin:0;padding-left:20px;color:#333"><li>Class 1 - Drawing</li><li>Class 2 - Coding</li></ul>`, code:`<ul>\n <li>Class 1 - Drawing</li>\n <li>Class 2 - Coding</li>\n</ul>`, tip:"List ke liye <ul> aur <li> use karo."},
+  {title:"📊 Slider", preview:`<input type="range" min="0" max="100" value="50" style="width:150px">`, code:`<input type="range" min="0" max="100">`, tip:"Slider ke liye input type='range' likho."},
+  {title:"✍️ Input Box", preview:`<input type="text" placeholder="Naam..." style="padding:8px;border-radius:6px;border:1px solid #ccc">`, code:`<input type="text" placeholder="Naam likho...">`, tip:"Input ke liye input type='text' use karo."},
+  {title:"🎯 Alert", preview:`<button onclick="alert('Wah! 🌟')" style="padding:8px 16px;background:#22c55e;color:#fff;border:none;border-radius:8px">Click Karo</button>`, code:`<button onclick="alert('Wah!')">Click Karo</button>`, tip:"onclick='alert(...)' se click pe popup aata hai."},
+  {title:"🖍️ Background Color", preview:`<div style="background:#fef9c3;padding:15px;border-radius:10px;color:#333;width:100%;text-align:center">Rangila Box!</div>`, code:`<div style="background:#fef9c3;padding:15px">Rangila Box!</div>`, tip:"background: color se box rangila hota hai."},
+  {title:"⬛ Box Border", preview:`<div style="border:3px solid #dc2626;padding:12px;border-radius:10px;color:#333;width:100%;text-align:center">Mera Box</div>`, code:`<div style="border:3px solid red;padding:12px">Mera Box</div>`, tip:"border: 3px solid red se border aata hai."},
+  {title:"🎬 Emoji", preview:`<div style="font-size:30px">😀 🚀 ❤️ 🌟 🎉</div>`, code:`😀 🚀 ❤️ 🌟 🎉`, tip:"Emoji seedha code me likho!"},
+  {title:"🖼️ Circle Image", preview:`<img src="https://cdn-icons-png.flaticon.com/512/616/616408.png" width="70" style="border-radius:50%">`, code:`<img src="LINK" style="border-radius:50%">`, tip:"border-radius:50% se gol image banti hai."},
+  {title:"📐 Center Text", preview:`<div style="text-align:center;color:#333">Yeh Center Me Hai</div>`, code:`<div style="text-align:center">Yeh Center Me Hai</div>`, tip:"text-align:center se text center aata hai."},
+  {title:"🎮 Score Game", preview:`<div style="text-align:center"><p style="margin:0;color:#333">Score: <b id="demoScore">0</b></p><button onclick="document.getElementById('demoScore').innerText++" style="padding:6px 12px;background:#f59e0b;color:#fff;border:none;border-radius:6px">+1</button></div>`, code:`<p>Score: <span id="s">0</span></p>\n<button onclick="document.getElementById('s').innerText++">+1</button>`, tip:"Click pe score badhao!"},
+  {title:"🌈 Gradient", preview:`<div style="background:linear-gradient(135deg,#667eea,#764ba2);padding:15px;color:#fff;border-radius:10px;width:100%;text-align:center">Gradient!</div>`, code:`<div style="background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;padding:15px">Gradient!</div>`, tip:"2 rang mix karne ke liye gradient use karo."},
+  {title:"💬 Flex Box", preview:`<div style="display:flex;gap:8px"><div style="background:#333;color:#fff;padding:8px;border-radius:8px">Side</div><div style="background:#eee;color:#333;padding:8px;border-radius:8px;flex:1">Main</div></div>`, code:`<div style="display:flex">\n <div>Side</div>\n <div>Main</div>\n</div>`, tip:"display:flex se side-by-side boxes bante hain."}
 ];
 const ageTemplates={
 "5 Years":{html:`<h1>👋 Hello! Mera Naam Aman Hai</h1>\n<p>Main 5 saal ka hu!</p>\n<h2 style="color:blue">Mera favourite color BLUE hai</h2>\n<button onclick="alert('Wah! 🌟')">Mujhe Dabao!</button>`,css:`body{text-align:center;padding:30px;background:#fef9c3;font-family:Comic Sans MS;margin:0}\nh1{background:#fff;padding:15px;border-radius:15px}\nbutton{padding:15px 30px;background:orange;color:#fff;border:none;border-radius:20px;font-size:16px}`,js:`// Sirf click karo!`,tipTitle:"5 Years Tip:",tipText:"Apna naam likho. Blue ko RED karo!"},
@@ -5081,7 +5092,8 @@ function copyAllCode(){
   const code='HTML:\n'+document.getElementById('editorHTML').value+'\n\nCSS:\n'+document.getElementById('editorCSS').value+'\n\nJS:\n'+document.getElementById('editorJS').value;
   navigator.clipboard.writeText(code).then(()=>alert('✅ Code copy ho gaya!'));
 }
-// ============ QR FINAL - BADA CODE BHI KHULEGA ============
+
+// FINAL FIX - NO LIMIT
 function openQR(){
   document.getElementById('qrBox').style.display='flex';
   newQR();
@@ -5108,36 +5120,27 @@ function newQR(){
   }catch(e){}
   const randomId = Math.random().toString(36).substring(2,8);
   let shareUrl = publicBase + "/?r=" + randomId + "&c=" + compressed;
-  // BADA CODE BLOCK HATA DIYA - AB KOI LIMIT NAHI
   box.innerHTML='';
   try{
-    new QRCode(box, {
-      text: shareUrl,
-      width: 260,
-      height: 260,
-      correctLevel: QRCode.CorrectLevel.L
-    });
+    new QRCode(box, {text: shareUrl, width: 260, height: 260, correctLevel: QRCode.CorrectLevel.L});
     linkInput.value = shareUrl;
-    if(shareUrl.length > 3000){
-      hint.innerHTML = '⚠️ Bada code ('+shareUrl.length+' chars) par QR ban gaya | ID: '+randomId+' | Agar scan na ho to Copy Link use karo';
-    } else {
-      hint.innerHTML = '✅ Naya Link: '+randomId+' | Kisi bhi Mobile / Jio / WiFi pe khulega';
-    }
+    hint.innerHTML = '✅ Naya Link: '+randomId+' | Kisi bhi Mobile pe khulega';
   }catch(err){
-    box.innerHTML='<div style="padding:20px;color:#22c55e;font-size:12px;text-align:center">✅ Link ban gaya!<br>QR bahut bada hai, Copy se kholo<br><b>'+randomId+'</b></div>';
     linkInput.value = shareUrl;
-    hint.innerHTML = 'QR library limit cross, par Copy Link 100% kaam karega';
+    box.innerHTML='<div style="padding:20px;color:#22c55e;font-size:12px;text-align:center">✅ Link ready!<br>ID: '+randomId+'<br>Copy se kholo</div>';
+    hint.innerHTML = 'QR thoda bada tha, par Copy Link 100% kaam karega';
   }
 }
 function copyLink(){
   const fullLink=document.getElementById('linkInput').value;
   if(!fullLink||fullLink.includes('Generating')){
-    alert('Pehle New QR generate hone do!');
+    alert('Pehle QR generate hone do!');
     return;
   }
   navigator.clipboard.writeText(fullLink).then(()=>alert('✅ Link Copy ho gaya!'));
 }
 function closeQR(){ document.getElementById('qrBox').style.display='none'; }
+
 function openLearn(){
   const grid=document.getElementById('learnGrid');
   grid.innerHTML=LEARN_CARDS.map((c,i)=>`
