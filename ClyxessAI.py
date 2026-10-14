@@ -4732,12 +4732,10 @@ def render_coding_lab_mod():
         return (candidates[0] if candidates else 'localhost'), candidates
 
     detected_ip, all_ips = get_best_lan_ip()
-
     with st.expander("⚙️ Network Settings (QR ke liye)", expanded=False):
         st.caption(f"🔍 Detected: {', '.join(all_ips) if all_ips else 'none'}")
         user_ip = st.text_input("Laptop ka LAN IP", value=detected_ip)
         user_port = st.number_input("Port", value=8501, min_value=1000, max_value=9999)
-
     base_url = f"http://{user_ip}:{user_port}"
 
     html_code = r'''<!DOCTYPE html>
@@ -4761,71 +4759,55 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',sans-serif;he
 .btn{background:var(--panel2);border:1px solid var(--border);color:var(--text);padding:6px 10px;border-radius:9px;font-size:11px;cursor:pointer;transition:0.2s}
 .btn:hover{border-color:var(--accent);background:var(--accent);color:#fff}
 .btn-icon{background:var(--panel2);border:1px solid var(--border);color:var(--text);width:32px;height:32px;border-radius:50%;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center}
-.btn-icon:hover{border-color:var(--accent)}
 .main{display:flex;flex:1;overflow:hidden}
 .left{width:140px;background:var(--panel);border-right:1px solid var(--border);overflow:auto;padding:8px;flex-shrink:0}
-.tt{font-size:9px;color:var(--muted);text-transform:uppercase;margin:10px 0 5px;font-weight:700;letter-spacing:0.5px}
-.age{padding:7px 9px;border-radius:8px;font-size:11px;cursor:pointer;color:var(--muted2);margin-bottom:2px;display:flex;justify-content:space-between;align-items:center;transition:0.15s}
+.tt{font-size:9px;color:var(--muted);text-transform:uppercase;margin:10px 0 5px;font-weight:700}
+.age{padding:7px 9px;border-radius:8px;font-size:11px;cursor:pointer;color:var(--muted2);margin-bottom:2px;display:flex;justify-content:space-between;align-items:center}
 .age:hover{background:var(--panel2);color:var(--text)}
 .age.active{background:var(--accent);color:#fff;font-weight:700}
-.age.cls{font-size:9px;opacity:0.8;font-weight:600}
 .lang{padding:6px 9px;border-radius:6px;font-size:10px;cursor:pointer;color:var(--muted2);margin-bottom:2px}
 .lang:hover{background:var(--panel2);color:var(--text)}
 .lang.active{background:var(--panel2);color:var(--text);border-left:3px solid var(--accent);font-weight:700}
 .tip-box{margin-top:10px;background:var(--accent);padding:10px;border-radius:10px;font-size:10px;line-height:1.4;color:#fff}
 .center{flex:1;background:var(--panel2);display:flex;flex-direction:column;min-width:0}
 .tabs{display:flex;background:var(--panel);border-bottom:1px solid var(--border)}
-.tab{padding:8px 14px;font-size:11px;color:var(--muted);cursor:pointer;transition:0.2s}
+.tab{padding:8px 14px;font-size:11px;color:var(--muted);cursor:pointer}
 .tab.active{color:var(--text);background:var(--panel2);border-top:2px solid var(--accent)}
 .editorWrap{flex:1;position:relative;display:flex;flex-direction:column;min-height:0}
 .editor{flex:1;background:var(--panel2);color:var(--text);border:none;padding:14px;font-family:Consolas,monospace;font-size:13px;line-height:1.7;resize:none;outline:none;display:none;min-height:0}
 .editor.active{display:block}
 .toolrow{display:flex;flex-wrap:wrap;gap:4px;padding:6px 8px;background:var(--panel);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
-.chip{background:var(--panel2);border:1px solid var(--border);color:var(--text);padding:3px 8px;border-radius:6px;font-size:10px;cursor:pointer;font-family:Consolas,monospace}
+.chip{background:var(--panel2);border:1px solid var(--border);color:var(--text);padding:3px 8px;border-radius:6px;font-size:10px;cursor:pointer}
 .chip:hover{border-color:var(--accent);background:var(--accent);color:#fff}
 .status{padding:5px 10px;background:var(--bg);font-size:10px;color:var(--muted);display:flex;justify-content:space-between}
 .right{width:220px;background:var(--panel);display:flex;flex-direction:column;border-left:1px solid var(--border);flex-shrink:0}
 .rhead{padding:7px 10px;background:var(--panel2);border-bottom:1px solid var(--border);display:flex;justify-content:space-between;font-size:10px}
 .rwrap{flex:1;padding:8px;overflow-y:auto;overflow-x:hidden;background:linear-gradient(135deg,#2a2a35,#1e1e24);display:flex;justify-content:center;align-items:flex-start}
-body.light.rwrap{background:linear-gradient(135deg,#e5e7eb,#d1d5db)}
 .mobileFrame{width:200px;height:400px;background:#000;border-radius:24px;padding:5px;box-shadow:0 15px 40px rgba(0,0,0,0.6);border:2px solid #333;margin:0 auto;flex-shrink:0}
-.mobileFrame.notch{width:60px;height:10px;background:#000;border-radius:20px;margin:0 auto 3px;position:relative;z-index:2}
-#prev{width:100%;height:100%;border:none;background:#fff;border-radius:18px;display:block;overflow:auto}
+.mobileFrame.notch{width:60px;height:10px;background:#000;border-radius:20px;margin:0 auto 3px}
+#prev{width:100%;height:100%;border:none;background:#fff;border-radius:18px;display:block}
 #qrBox{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:9999;justify-content:center;align-items:center}
 #qrBox.modal{background:var(--panel);padding:18px;border-radius:16px;text-align:center;width:90%;max-width:360px;border:1px solid var(--border)}
-#qrBox h4{color:var(--text);margin-bottom:10px;font-size:14px}
 #qrCanvas{background:#fff;padding:8px;border-radius:10px;display:inline-block;min-height:200px;min-width:200px}
 .linkRow{display:flex;gap:6px;margin-top:10px;align-items:center}
 #linkInput{flex:1;background:var(--bg);border:1px solid var(--border);color:var(--success);padding:8px;border-radius:6px;font-size:10px;font-family:monospace}
-.smallCopy{background:var(--accent);color:#fff;border:none;padding:8px 12px;border-radius:6px;font-size:10px;cursor:pointer;font-weight:700;white-space:nowrap}
-.smallCopy:hover{background:#4f46e5}
+.smallCopy{background:var(--accent);color:#fff;border:none;padding:8px 12px;border-radius:6px;font-size:10px;cursor:pointer;font-weight:700}
 #qrHint{font-size:10px;color:var(--muted2);margin-top:8px;line-height:1.5;text-align:left;word-break:break-all}
-.modalBtns{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
+.modalBtns{display:flex;gap:6px;margin-top:10px}
 .modalBtns button{flex:1;min-width:80px;padding:9px;border-radius:8px;border:none;cursor:pointer;font-weight:700;font-size:11px}
-#robot{position:fixed;bottom:16px;right:16px;width:54px;height:54px;background:linear-gradient(135deg,#6366f1,#8b5cf6);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;cursor:pointer;z-index:9000;box-shadow:0 8px 24px rgba(99,102,241,0.5);animation:bounce 2s infinite}
-@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
-#robotChat{display:none;position:fixed;bottom:80px;right:16px;width:290px;background:var(--panel);border:2px solid var(--accent);border-radius:16px;padding:12px;z-index:9001;box-shadow:0 12px 40px rgba(0,0,0,0.5);max-height:380px;overflow:auto}
-#robotChat h4{color:var(--accent);margin-bottom:8px;font-size:12px;display:flex;justify-content:space-between;align-items:center}
+#robot{position:fixed;bottom:16px;right:16px;width:54px;height:54px;background:linear-gradient(135deg,#6366f1,#8b5cf6);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;cursor:pointer;z-index:9000}
+#robotChat{display:none;position:fixed;bottom:80px;right:16px;width:290px;background:var(--panel);border:2px solid var(--accent);border-radius:16px;padding:12px;z-index:9001;max-height:380px;overflow:auto}
+#robotChat h4{color:var(--accent);margin-bottom:8px;font-size:12px;display:flex;justify-content:space-between}
 #robotMsg{color:var(--text);font-size:11px;line-height:1.5;background:var(--panel2);padding:10px;border-radius:10px;border-left:3px solid var(--accent)}
-#robotMsg.tip{display:block;margin-bottom:6px;padding-left:6px;border-left:2px solid var(--success)}
-#robotMsg.err{display:block;margin-bottom:6px;padding-left:6px;border-left:2px solid #ef4444;color:#f87171}
-#emojiPanel{display:none;position:fixed;background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:8px;z-index:10000;max-width:280px;box-shadow:0 10px 30px rgba(0,0,0,0.5)}
-#emojiPanel span{font-size:20px;cursor:pointer;padding:3px;display:inline-block;border-radius:4px}
-#emojiPanel span:hover{background:var(--accent)}
+#emojiPanel{display:none;position:fixed;background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:8px;z-index:10000;max-width:280px}
+#emojiPanel span{font-size:20px;cursor:pointer;padding:3px;display:inline-block}
 #learnPanel{display:none;position:fixed;inset:0;background:var(--bg);z-index:9500;overflow-y:auto;padding:20px}
 #learnPanel.open{display:block}
 .learnHead{display:flex;justify-content:space-between;align-items:center;max-width:1100px;margin:0 auto 20px;padding:12px 16px;background:var(--panel);border-radius:12px;border:1px solid var(--border)}
-.learnHead h2{margin:0;font-size:18px;color:var(--text)}
 .learnGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;max-width:1100px;margin:0 auto}
-.learnCard{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:14px;transition:0.2s}
-.learnCard:hover{border-color:var(--accent);transform:translateY(-2px)}
-.learnCard h3{color:var(--accent);font-size:14px;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.learnCard{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:14px}
 .learnPreview{background:#fff;border-radius:10px;padding:12px;min-height:80px;margin-bottom:10px;color:#111;font-size:13px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:6px;overflow:hidden}
-.learnCode{background:#0a0a0f;color:#a5f3fc;font-family:Consolas,monospace;font-size:11px;padding:10px;border-radius:8px;white-space:pre-wrap;word-break:break-all;max-height:140px;overflow:auto;line-height:1.5;position:relative}
-.learnCode.copyBtn{position:absolute;top:6px;right:6px;background:#6366f1;color:#fff;border:none;padding:3px 8px;border-radius:5px;font-size:9px;cursor:pointer;font-family:Arial}
-.learnCode.copyBtn:hover{background:#4f46e5}
-.learnTip{font-size:11px;color:var(--muted2);margin-top:8px;line-height:1.4}
-body.light.learnCode{background:#1e293b;color:#67e8f9}
+.learnCode{background:#0a0a0f;color:#a5f3fc;font-family:Consolas,monospace;font-size:11px;padding:10px;border-radius:8px;white-space:pre-wrap;word-break:break-all;max-height:140px;overflow:auto;position:relative}
 </style>
 </head>
 <body>
@@ -4846,14 +4828,12 @@ body.light.learnCode{background:#1e293b;color:#67e8f9}
 <button class="btn" style="border-color:#f59e0b;color:#fbbf24" onclick="openQR()">📱 QR</button>
 <button class="btn-icon" onclick="toggleTheme()" id="themeBtn">🌙</button>
 </div>
-
 <div class="main">
 <div class="left">
 <div class="tt">🎂 Age / Class</div><div id="ageList"></div>
 <div class="tt">💻 Language</div><div id="langList"></div>
 <div class="tip-box"><b id="tipTitle">Tip:</b><br><span id="tipText">Welcome!</span></div>
 </div>
-
 <div class="center">
 <div class="tabs">
 <div class="tab active" onclick="switchTab('html',this)">📄 index.html</div>
@@ -4878,7 +4858,6 @@ body.light.learnCode{background:#1e293b;color:#67e8f9}
 </div>
 <div class="status"><span>✅ Auto-save + Auto-Run ON</span><span id="status">Ready</span></div>
 </div>
-
 <div class="right">
 <div class="rhead"><span>👁 Live Preview</span><span style="color:var(--success)">● Live</span></div>
 <div class="rwrap">
@@ -4889,7 +4868,6 @@ body.light.learnCode{background:#1e293b;color:#67e8f9}
 </div>
 </div>
 </div>
-
 <div id="learnPanel">
 <div class="learnHead">
 <h2>📚 Learn Coding — Ek Ek Cheez Seekho!</h2>
@@ -4897,7 +4875,6 @@ body.light.learnCode{background:#1e293b;color:#67e8f9}
 </div>
 <div class="learnGrid" id="learnGrid"></div>
 </div>
-
 <div id="qrBox"><div class="modal">
 <h4>📱 Mobile me dekho (QR Scan)</h4>
 <div id="qrCanvas"></div>
@@ -4911,14 +4888,12 @@ body.light.learnCode{background:#1e293b;color:#67e8f9}
 <button onclick="closeQR()" style="background:var(--panel2);color:var(--text);border:1px solid var(--border)">✕ Close</button>
 </div>
 </div></div>
-
 <div id="emojiPanel"></div>
 <div id="robot" onclick="toggleRobot()">🤖</div>
 <div id="robotChat">
 <h4>Coding Help <span onclick="toggleRobot()" style="cursor:pointer">✕</span></h4>
 <div id="robotMsg">Namaste! Code likho, main check karta hoon! 😊</div>
 </div>
-
 <script>
 const CLS_MAP={"5 Years":"Class 1","6 Years":"Class 1","7 Years":"Class 2","8 Years":"Class 3","9 Years":"Class 4","10 Years":"Class 5","11-12 Years":"Class 6-7","13-14 Years":"Class 8-9","15-16 Years":"Class 10","17-18 Years":"Class 11-12","18+ Years":"College"};
 const LEARN_CARDS = [
@@ -4928,20 +4903,8 @@ const LEARN_CARDS = [
   {title:"🔘 Button", preview:`<button style="padding:10px 20px;background:#f59e0b;color:#fff;border:none;border-radius:10px;font-weight:bold">Mujhe Dabao!</button>`, code:`<button>Mujhe Dabao!</button>`, tip:"Button ke liye <button> use karo."},
   {title:"🖼️ Image", preview:`<img src="https://cdn-icons-png.flaticon.com/512/616/616408.png" width="70">`, code:`<img src="IMAGE-LINK" width="100">`, tip:"Image ke liye <img> use karo."},
   {title:"🔗 Link", preview:`<a href="#" style="color:#6366f1;text-decoration:underline">Click Karo</a>`, code:`<a href="https://google.com">Google</a>`, tip:"Link ke liye <a href='...'> use karo."},
-  {title:"📋 List", preview:`<ul style="margin:0;padding-left:20px;color:#333"><li>Class 1 - Drawing</li><li>Class 2 - Coding</li></ul>`, code:`<ul>\n <li>Class 1 - Drawing</li>\n <li>Class 2 - Coding</li>\n</ul>`, tip:"List ke liye <ul> aur <li> use karo."},
-  {title:"📊 Slider", preview:`<input type="range" min="0" max="100" value="50" style="width:150px">`, code:`<input type="range" min="0" max="100">`, tip:"Slider ke liye input type='range' likho."},
-  {title:"✍️ Input Box", preview:`<input type="text" placeholder="Naam..." style="padding:8px;border-radius:6px;border:1px solid #ccc">`, code:`<input type="text" placeholder="Naam likho...">`, tip:"Input ke liye input type='text' use karo."},
-  {title:"🎯 Alert", preview:`<button onclick="alert('Wah! 🌟')" style="padding:8px 16px;background:#22c55e;color:#fff;border:none;border-radius:8px">Click Karo</button>`, code:`<button onclick="alert('Wah!')">Click Karo</button>`, tip:"onclick='alert(...)' se click pe popup aata hai."},
-  {title:"🖍️ Background Color", preview:`<div style="background:#fef9c3;padding:15px;border-radius:10px;color:#333;width:100%;text-align:center">Rangila Box!</div>`, code:`<div style="background:#fef9c3;padding:15px">Rangila Box!</div>`, tip:"background: color se box rangila hota hai."},
-  {title:"⬛ Box Border", preview:`<div style="border:3px solid #dc2626;padding:12px;border-radius:10px;color:#333;width:100%;text-align:center">Mera Box</div>`, code:`<div style="border:3px solid red;padding:12px">Mera Box</div>`, tip:"border: 3px solid red se border aata hai."},
-  {title:"🎬 Emoji", preview:`<div style="font-size:30px">😀 🚀 ❤️ 🌟 🎉</div>`, code:`😀 🚀 ❤️ 🌟 🎉`, tip:"Emoji seedha code me likho!"},
-  {title:"🖼️ Circle Image", preview:`<img src="https://cdn-icons-png.flaticon.com/512/616/616408.png" width="70" style="border-radius:50%">`, code:`<img src="LINK" style="border-radius:50%">`, tip:"border-radius:50% se gol image banti hai."},
-  {title:"📐 Center Text", preview:`<div style="text-align:center;color:#333">Yeh Center Me Hai</div>`, code:`<div style="text-align:center">Yeh Center Me Hai</div>`, tip:"text-align:center se text center aata hai."},
-  {title:"🎮 Score Game", preview:`<div style="text-align:center"><p style="margin:0;color:#333">Score: <b id="demoScore">0</b></p><button onclick="document.getElementById('demoScore').innerText++" style="padding:6px 12px;background:#f59e0b;color:#fff;border:none;border-radius:6px">+1</button></div>`, code:`<p>Score: <span id="s">0</span></p>\n<button onclick="document.getElementById('s').innerText++">+1</button>`, tip:"Click pe score badhao!"},
-  {title:"🌈 Gradient", preview:`<div style="background:linear-gradient(135deg,#667eea,#764ba2);padding:15px;color:#fff;border-radius:10px;width:100%;text-align:center">Gradient!</div>`, code:`<div style="background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;padding:15px">Gradient!</div>`, tip:"2 rang mix karne ke liye gradient use karo."},
-  {title:"💬 Flex Box", preview:`<div style="display:flex;gap:8px"><div style="background:#333;color:#fff;padding:8px;border-radius:8px">Side</div><div style="background:#eee;color:#333;padding:8px;border-radius:8px;flex:1">Main</div></div>`, code:`<div style="display:flex">\n <div>Side</div>\n <div>Main</div>\n</div>`, tip:"display:flex se side-by-side boxes bante hain."}
+  {title:"📋 List", preview:`<ul style="margin:0;padding-left:20px;color:#333"><li>Class 1 - Drawing</li><li>Class 2 - Coding</li></ul>`, code:`<ul>\n <li>Class 1 - Drawing</li>\n <li>Class 2 - Coding</li>\n</ul>`, tip:"List ke liye <ul> aur <li> use karo."}
 ];
-
 const ageTemplates={
 "5 Years":{html:`<h1>👋 Hello! Mera Naam Aman Hai</h1>\n<p>Main 5 saal ka hu!</p>\n<h2 style="color:blue">Mera favourite color BLUE hai</h2>\n<button onclick="alert('Wah! 🌟')">Mujhe Dabao!</button>`,css:`body{text-align:center;padding:30px;background:#fef9c3;font-family:Comic Sans MS;margin:0}\nh1{background:#fff;padding:15px;border-radius:15px}\nbutton{padding:15px 30px;background:orange;color:#fff;border:none;border-radius:20px;font-size:16px}`,js:`// Sirf click karo!`,tipTitle:"5 Years Tip:",tipText:"Apna naam likho. Blue ko RED karo!"},
 "6 Years":{html:`<h1>🔤 ABCD</h1>\n<div class="box">A for Apple 🍎</div>\n<div class="box">B for Ball ⚽</div>\n<button onclick="this.innerText='Shabash! 🌟'">Click Karo</button>`,css:`body{text-align:center;padding:20px;background:#dcfce7;margin:0}\n.box{background:#fff;margin:10px;padding:15px;border-radius:15px;font-size:20px}\nbutton{padding:10px 20px;background:#6366f1;color:#fff;border:none;border-radius:10px}`,js:`// Kuch nahi`,tipTitle:"6 Years Tip:",tipText:"Apna fruit likho!"},
@@ -4955,23 +4918,19 @@ const ageTemplates={
 "17-18 Years":{html:`<div class="chat">\n<h1>💬 Chat App</h1>\n<div class="bubble left">Hi! Kaisa laga? 😊</div>\n<div class="bubble right">Solid hai! 🔥</div>\n<input placeholder="Message...">\n</div>`,css:`body{background:#f3f4f6;padding:20px;font-family:Arial;margin:0}\n.chat{max-width:340px;margin:auto;background:#fff;border-radius:15px;padding:15px}\n.bubble{padding:10px;border-radius:10px;margin:6px 0;max-width:75%}\n.left{background:#e0e7ff}\n.right{background:#dcfce7;margin-left:auto}\ninput{width:100%;padding:10px;border-radius:20px;border:1px solid #ddd;margin-top:10px;box-sizing:border-box}`,js:`// Real chat banao!`,tipTitle:"17-18 Tip:",tipText:"JS se connect karo!"},
 "18+ Years":{html:`<!DOCTYPE html>\n<html><head><title>My Pro Website</title></head><body>\n<h1>🚀 Pro Coder</h1>\n<p>Full website khud likho!</p>\n<button onclick="alert('Pro!')">Click</button>\n</body></html>`,css:`body{padding:20px;font-family:Arial;margin:0}`,js:`// Full stack!`,tipTitle:"18+ Tip:",tipText:"React, Node try karo!"}
 };
-
 const readyMade={
 r1:{html:`<h1>🌟 My First Page</h1>\n<p>Naam <b style="color:blue">Aman</b> hai</p>\n<button onclick="alert('Hi!')">Hello</button>`,css:`body{text-align:center;padding:30px;background:#fef9c3;margin:0}\nbutton{padding:12px 20px;background:orange;border:none;border-radius:20px;color:#fff}`,js:`// First page!`},
 r2:{html:`<h1>🎨 Colour Game</h1>\n<div class="row">\n<div onclick="document.body.style.background='pink'" class="c" style="background:red"></div>\n<div onclick="document.body.style.background='lightblue'" class="c" style="background:blue"></div>\n<div onclick="document.body.style.background='lightgreen'" class="c" style="background:green"></div>\n</div>`,css:`body{text-align:center;padding:30px;transition:0.5s;margin:0}\n.row{display:flex;gap:10px;justify-content:center}\n.c{width:60px;height:60px;border-radius:50%;cursor:pointer}`,js:`// Colours!`},
 r3:{html:`<header class="head"><b>🛒 Mini Shop</b><span>Cart</span></header>\n<div class="cont">\n<h2>Toys - 50% OFF!</h2>\n<div class="card"><p>🧸 Teddy - ₹299</p><button>Buy</button></div>\n</div>`,css:`body{margin:0;background:#f0fdf4;font-family:Arial}\n.head{background:#fff;padding:12px;display:flex;justify-content:space-between;box-shadow:0 2px 8px #0001}\n.cont{padding:20px}\n.card{background:#fff;padding:15px;border-radius:12px;max-width:280px}\n.card button{background:#16a34a;color:#fff;padding:8px 16px;border:none;border-radius:8px;cursor:pointer}`,js:`// Shop!`}
 };
-
 const LANGUAGES=["HTML","CSS","JavaScript","Python","Java","C","C++","C#","PHP","Ruby","Go","Rust","Swift","Kotlin","TypeScript","SQL","Scratch (Block)","Block Coding","R","MATLAB"];
 const ages=Object.keys(ageTemplates);
 document.getElementById('ageList').innerHTML=ages.map((a,i)=>`<div class="age ${i===0?'active':''}" onclick="selectAge('${a}',this)"><span>${a}</span><span class="cls">${CLS_MAP[a]||''}</span></div>`).join('');
 document.getElementById('ageSelect').innerHTML='<option>Select Age</option>'+ages.map(a=>`<option value="${a}">${a} (${CLS_MAP[a]||''})</option>`).join('');
 document.getElementById('langList').innerHTML=LANGUAGES.slice(0,9).map((l,i)=>`<div class="lang ${i===0?'active':''}" onclick="selectLang('${l}',this)">${l}</div>`).join('');
 document.getElementById('langSelect').innerHTML=LANGUAGES.map(l=>`<option>${l}</option>`).join('');
-
 let currentTab='html';
 let currentAge='5 Years';
-
 function switchTab(tab,el){
   currentTab=tab;
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
@@ -5122,8 +5081,7 @@ function copyAllCode(){
   const code='HTML:\n'+document.getElementById('editorHTML').value+'\n\nCSS:\n'+document.getElementById('editorCSS').value+'\n\nJS:\n'+document.getElementById('editorJS').value;
   navigator.clipboard.writeText(code).then(()=>alert('✅ Code copy ho gaya!'));
 }
-
-// ============ QR — FINAL FIX — PUBLIC URL + SMALL QR + RANDOM ALPHABET ============
+// ============ QR FINAL - BADA CODE BHI KHULEGA ============
 function openQR(){
   document.getElementById('qrBox').style.display='flex';
   newQR();
@@ -5136,12 +5094,10 @@ function newQR(){
   box.innerHTML='<p style="padding:20px;color:#666;font-size:12px">⏳ QR ban raha hai...</p>';
   linkInput.value='Generating...';
   hint.innerHTML='';
-
   const code=buildFullHTML();
   let compressed;
   try{ compressed = LZString.compressToEncodedURIComponent(code); }
   catch(e){ compressed = encodeURIComponent(code); }
-
   let publicBase = "https://clyxessai-hyxke8fceedptrtgbhq4sx.streamlit.app";
   try{
     let origin = window.location.origin;
@@ -5150,39 +5106,38 @@ function newQR(){
     try{ pOrigin = window.parent.location.origin; }catch(e){}
     if(pOrigin && pOrigin.startsWith("https://")) publicBase = pOrigin;
   }catch(e){}
-
   const randomId = Math.random().toString(36).substring(2,8);
   let shareUrl = publicBase + "/?r=" + randomId + "&c=" + compressed;
-
-  if(compressed.length > 1800){
-    box.innerHTML='<div style="padding:20px;color:#f59e0b;font-size:12px;text-align:center">⚠️ Code thoda bada hai<br>Image hatao ya CSS chhota karo phir New QR dabao</div>';
-    linkInput.value='Code bada hai - chhota karo';
-    hint.innerHTML='';
-    return;
-  }
-
+  // BADA CODE BLOCK HATA DIYA - AB KOI LIMIT NAHI
   box.innerHTML='';
-  new QRCode(box, {
-    text: shareUrl,
-    width: 200,
-    height: 200,
-    correctLevel: QRCode.CorrectLevel.M
-  });
-
-  linkInput.value = shareUrl;
-  hint.innerHTML = '✅ Naya Link: ' + randomId + ' | Kisi bhi Mobile / Jio / WiFi pe khulega';
+  try{
+    new QRCode(box, {
+      text: shareUrl,
+      width: 260,
+      height: 260,
+      correctLevel: QRCode.CorrectLevel.L
+    });
+    linkInput.value = shareUrl;
+    if(shareUrl.length > 3000){
+      hint.innerHTML = '⚠️ Bada code ('+shareUrl.length+' chars) par QR ban gaya | ID: '+randomId+' | Agar scan na ho to Copy Link use karo';
+    } else {
+      hint.innerHTML = '✅ Naya Link: '+randomId+' | Kisi bhi Mobile / Jio / WiFi pe khulega';
+    }
+  }catch(err){
+    box.innerHTML='<div style="padding:20px;color:#22c55e;font-size:12px;text-align:center">✅ Link ban gaya!<br>QR bahut bada hai, Copy se kholo<br><b>'+randomId+'</b></div>';
+    linkInput.value = shareUrl;
+    hint.innerHTML = 'QR library limit cross, par Copy Link 100% kaam karega';
+  }
 }
 function copyLink(){
-  const linkInput=document.getElementById('linkInput');
-  const fullLink=linkInput.value;
-  if(!fullLink||fullLink.includes('Generating')||fullLink.includes('bada hai')){
+  const fullLink=document.getElementById('linkInput').value;
+  if(!fullLink||fullLink.includes('Generating')){
     alert('Pehle New QR generate hone do!');
     return;
   }
   navigator.clipboard.writeText(fullLink).then(()=>alert('✅ Link Copy ho gaya!'));
 }
 function closeQR(){ document.getElementById('qrBox').style.display='none'; }
-
 function openLearn(){
   const grid=document.getElementById('learnGrid');
   grid.innerHTML=LEARN_CARDS.map((c,i)=>`
@@ -5229,7 +5184,6 @@ let timer;
   });
 });
 applyAge('5 Years');
-
 (function checkSharedPreview(){
   try {
     let url = '';
