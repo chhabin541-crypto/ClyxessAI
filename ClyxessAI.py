@@ -13,10 +13,61 @@ try:
 except Exception:
     mic_recorder = None
 
-# ============================================================
+# ====== YEH BLOCK SABSE UPAR DAL - ISSE BACCHE KI WEBSITE KHULEGI ======
+# Agar link me ?c= hai to matlab bacche ki website kholni hai, AI nahi
+params = st.query_params
+if "c" in params:
+    c_val = params.get("c", "")
+    # Streamlit ka header hatao, sirf bacche ka code dikhao
+    st.set_page_config(page_title="My Website", layout="wide")
+    # CSS se Streamlit ka menu hatao
+    st.markdown("""
+    <style>
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
+    header {visibility: hidden;}
+    .stApp {background: white; padding: 0; margin: 0;}
+    </style>
+    """, unsafe_allow_html=True)
+    
+    import streamlit.components.v1 as components
+    # JS se decompress karke bacche ki website dikhao
+    components.html(f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/lz-string@1.5.0/libs/lz-string.min.js"></script>
+    </head>
+    <body style="margin:0;padding:0;">
+    <script>
+        try {{
+            let c = `{c_val}`;
+            c = decodeURIComponent(c);
+            let html = LZString.decompressFromEncodedURIComponent(c);
+            if(html) {{
+                document.open();
+                document.write(html);
+                document.close();
+            }} else {{
+                document.body.innerHTML = "<h2 style='font-family:Arial;text-align:center;padding:50px'>⚠️ Link kharab hai</h2>";
+            }}
+        }} catch(e) {{
+            document.body.innerHTML = "<h2>Error: "+e.message+"</h2>";
+        }}
+    </script>
+    </body>
+    </html>
+    """, height=1000, scrolling=True)
+    st.stop()
+# ====== PREVIEW BLOCK KHATAM ======
+
+# Uske baad tera normal Clyxess AI ka code shuru
+# ####################################################################
 # CLYXESS AI
 # NORMAL CHAT + CREATIVE LAB + PLAY & LEARN
-# ============================================================
+# ####################################################################
 
 st.set_page_config(
     page_title="ClyxessChat AI",
