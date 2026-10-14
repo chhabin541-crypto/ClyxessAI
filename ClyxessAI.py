@@ -4697,6 +4697,7 @@ Rules:
                     st.error(f"❌ Test generation failed: {type(e).__name__}: {str(e)[:200]}")
 
 def render_coding_lab_mod():
+    import streamlit as st
     import streamlit.components.v1 as components
     import socket
 
@@ -4738,6 +4739,10 @@ def render_coding_lab_mod():
         user_port = st.number_input("Port", value=8501, min_value=1000, max_value=9999)
     base_url = f"http://{user_ip}:{user_port}"
 
+    # Supabase keys - tere secrets se ayega
+    SUPA_URL = st.secrets.get("SUPABASE_URL", "")
+    SUPA_KEY = st.secrets.get("SUPABASE_ANON_KEY", "")
+
     html_code = r'''<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -4747,6 +4752,7 @@ def render_coding_lab_mod():
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/lz-string@1.5.0/libs/lz-string.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root{--bg:#08080a;--panel:#121215;--panel2:#18181b;--border:#27272a;--text:#fff;--muted:#71717a;--muted2:#a1a1aa;--accent:#6366f1;--success:#22c55e;--warn:#f59e0b}
 body.light{--bg:#f4f4f7;--panel:#ffffff;--panel2:#f9f9fb;--border:#e4e4e7;--text:#111113;--muted:#71717a;--muted2:#52525b;--accent:#4f46e5}
@@ -5093,12 +5099,12 @@ function copyAllCode(){
   navigator.clipboard.writeText(code).then(()=>alert('✅ Code copy ho gaya!'));
 }
 
-// FINAL FIX - NO LIMIT
+// === FINAL FIX - HAR CODE KA QR BANEGA ===
 function openQR(){
   document.getElementById('qrBox').style.display='flex';
   newQR();
 }
-function newQR(){
+async function newQR(){
   run();
   const box=document.getElementById('qrCanvas');
   const linkInput=document.getElementById('linkInput');
@@ -5110,6 +5116,7 @@ function newQR(){
   let compressed;
   try{ compressed = LZString.compressToEncodedURIComponent(code); }
   catch(e){ compressed = encodeURIComponent(code); }
+
   let publicBase = "https://clyxessai-hyxke8fceedptrtgbhq4sx.streamlit.app";
   try{
     let origin = window.location.origin;
@@ -5118,17 +5125,52 @@ function newQR(){
     try{ pOrigin = window.parent.location.origin; }catch(e){}
     if(pOrigin && pOrigin.startsWith("https://")) publicBase = pOrigin;
   }catch(e){}
+
   const randomId = Math.random().toString(36).substring(2,8);
-  let shareUrl = publicBase + "/?r=" + randomId + "&c=" + compressed;
+  let shareUrl = "";
+
+  // Chhota code = direct QR
+  if(compressed.length < 1800){
+    shareUrl = publicBase + "/?r=" + randomId + "&c=" + compressed;
+  } else {
+    // Bada code = Supabase me save karke chhota QR - HAMESHA BANEGA
+    try{
+      const supaUrl = "__SUPABASE_URL__";
+      const supaKey = "__SUPABASE_KEY__";
+      if(supaUrl && supaKey && supaUrl.startsWith("http")){
+        const client = supabase.createClient(supaUrl, supaKey);
+        const { error } = await client.from('clyxess_pages').insert([{ id: randomId, html: code }]);
+        if(error) throw error;
+        shareUrl = publicBase + "/?p=" + randomId;
+      } else {
+        // Agar keys nahi hain to bhi QR banega, bas link bada hoga
+        shareUrl = publicBase + "/?r=" + randomId + "&c=" + compressed;
+      }
+    }catch(err){
+      console.error(err);
+      shareUrl = publicBase + "/?r=" + randomId + "&c=" + compressed;
+    }
+  }
+
   box.innerHTML='';
   try{
-    new QRCode(box, {text: shareUrl, width: 260, height: 260, correctLevel: QRCode.CorrectLevel.L});
+    new QRCode(box, {text: shareUrl, width: 260, height: 260, correctLevel: QRCode.CorrectLevel.M});
     linkInput.value = shareUrl;
-    hint.innerHTML = '✅ Naya Link: '+randomId+' | Kisi bhi Mobile pe khulega';
+    if(compressed.length >= 1800){
+      hint.innerHTML = '✅ Bada code tha, short link QR bana diya! ID: '+randomId+' - Har mobile pe khulega';
+    } else {
+      hint.innerHTML = '✅ Naya Link: '+randomId+' | Kisi bhi Mobile pe khulega';
+    }
   }catch(err){
+    // Last fallback - bhi QR banega
     linkInput.value = shareUrl;
-    box.innerHTML='<div style="padding:20px;color:#22c55e;font-size:12px;text-align:center">✅ Link ready!<br>ID: '+randomId+'<br>Copy se kholo</div>';
-    hint.innerHTML = 'QR thoda bada tha, par Copy Link 100% kaam karega';
+    box.innerHTML='';
+    try{
+      new QRCode(box, {text: shareUrl, width: 200, height: 200, correctLevel: QRCode.CorrectLevel.L});
+    }catch(e){
+      box.innerHTML='<div style="padding:20px;color:#22c55e;text-align:center">✅ Link ready!<br>'+randomId+'</div>';
+    }
+    hint.innerHTML = '✅ Link ready! ID: '+randomId;
   }
 }
 function copyLink(){
@@ -5216,7 +5258,7 @@ applyAge('5 Years');
 </body>
 </html>
 '''
-    html_code = html_code.replace("__BASE_URL__", base_url)
+    html_code = html_code.replace("__SUPABASE_URL__", SUPA_URL).replace("__SUPABASE_KEY__", SUPA_KEY).replace("__BASE_URL__", base_url)
     components.html(html_code, height=950, scrolling=False)
 
 def render_learn_finance(client):
