@@ -6611,7 +6611,7 @@ Rules: simple language, real-life examples, engaging, end with a quick question.
             gamma = 1.0 / math.sqrt(1.0 - (v_frac**2))
             c1, c2 = st.columns(2)
             c1.metric("γ", f"{gamma:.4f}")
-            c2.metric("⏱️ Dilated", f"{proper_t * gamma:.4f} s")
+            c2.metric("⏱️ Dilated", f"{proper_t * gamma:.4f} s") 
 # ============================================================
     # ⭐ TAB 3: MEGA ROCKET LAB 2050
     # ============================================================
@@ -7006,6 +7006,7 @@ Doubt: {doubt}"""
         "</div>",
         unsafe_allow_html=True
     )
+        
 def render_datascienceand_machinelearning():
     import os
     import json
