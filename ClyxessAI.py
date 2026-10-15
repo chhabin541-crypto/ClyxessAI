@@ -5622,6 +5622,9 @@ def render_physics_lab(client):
     import statistics
     import random
     import cmath
+    import time
+    import numpy as np
+    import plotly.graph_objects as go
 
     # ============================================================
     # ⭐ UNIVERSAL CONSTANTS (from Code 2)
@@ -5633,6 +5636,7 @@ def render_physics_lab(client):
     EARTH_RADIUS         = 6371000
     GEO_RADIUS           = 42164000
     VACUUM_PERMEABILITY  = 4 * math.pi * 1e-7
+    SPEED_OF_LIGHT_KMH   = 1079252849  # ⭐ from Code 2 (Time Machine)
 
     # ============================================================
     # ⭐ LANGUAGE OPTIONS
@@ -5722,6 +5726,29 @@ def render_physics_lab(client):
     }
 
     # ============================================================
+    # ⭐ TIME MACHINE 2050 — GAMING CSS (from Code 2)
+    # ============================================================
+    st.markdown("""
+    <style>
+    .advance-box {
+        border: 2px solid #00FFCC;
+        border-radius: 20px;
+        padding: 20px;
+        background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+        box-shadow: 0 0 20px #00FFCC;
+        color: white;
+    }
+    .metric-card {
+        background: #1a1a2e;
+        border-radius: 15px;
+        padding: 10px;
+        text-align: center;
+        border: 1px solid #00FFCC;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
+    # ============================================================
     # HEADER
     # ============================================================
     st.markdown('<div class="header"><h1>⚛️ Physics Lab — Clyxess AI School</h1></div>', unsafe_allow_html=True)
@@ -5775,9 +5802,11 @@ def render_physics_lab(client):
     """
 
     # ============================================================
-    # TABS
+    # TABS (⭐ Updated — added Time Machine 2050)
     # ============================================================
-    tab1, tab2, tab3, tab4 = st.tabs(["📖 Learn", "🧪 Virtual Lab", "🎯 Challenge", "💬 Ask a Doubt"])
+    tab1, tab2, tab3, tab4, tab5 = st.tabs([
+        "📖 Learn", "🧪 Virtual Lab", "🚀 Time Machine 2050", "🎯 Challenge", "💬 Ask a Doubt"
+    ])
 
     # ============================================================
     # TAB 1: LEARN
@@ -5866,7 +5895,6 @@ Rules:
                 "⚛️ Quantum: Heisenberg Uncertainty",
                 "🌌 Relativity: Time Dilation",
                 "🔥 Thermo: Carnot Engine",
-                # ⭐ From Code 2 (Advanced Physics Engine)
                 "🔋 Future Tech: Antimatter Battery",
                 "💾 Future Tech: Photonic Quantum Chip",
                 "🧊 Future Tech: Room-Temp Superconductor",
@@ -6234,10 +6262,6 @@ Rules:
                     except Exception as e:
                         st.error(f"❌ {type(e).__name__}")
 
-        # ============================================================
-        # ⭐ NEW: CODE 2 LOGIC — ADVANCED PHYSICS ENGINE MODULES
-        # ============================================================
-
         # ============ ANTIMATTER BATTERY ============
         elif "Antimatter Battery" in experiment:
             st.markdown("### 🔋 Antimatter Positron-Cell Battery")
@@ -6562,9 +6586,142 @@ Rules:
                         st.error(f"❌ {type(e).__name__}")
 
     # ============================================================
-    # TAB 3: CHALLENGE
+    # ⭐ TAB 3: TIME MACHINE 2050 (NEW — from Code 2)
     # ============================================================
     with tab3:
+        st.markdown("### 🚀 Kids Logic Lab — YEAR 2050")
+        st.markdown("बच्चों! ये सिर्फ़ सिमुलेशन नहीं, ये तुम्हारा खुद का **Time-Machine Game** है!")
+
+        # --- CONTROLS ---
+        ctrl1, ctrl2, ctrl3 = st.columns(3)
+        with ctrl1:
+            mag_freq = st.slider("🧲 Magnetic Frequency (GHz)", 1, 1000, 100, 50, key="tm_mag")
+        with ctrl2:
+            space_bend = st.slider("🌌 Space-Time Warp (%)", 0, 100, 10, 5, key="tm_warp")
+        with ctrl3:
+            quantum_boost = st.toggle("⚛️ Quantum Boost", False, key="tm_qboost")
+
+        # --- PHYSICS CALCULATION ---
+        calculated_speed = mag_freq * 500000
+        if space_bend > 0:
+            calculated_speed *= (1 + (space_bend / 20))
+        if quantum_boost:
+            calculated_speed *= 5
+        if calculated_speed >= SPEED_OF_LIGHT_KMH:
+            calculated_speed = SPEED_OF_LIGHT_KMH * 0.9999
+
+        earth_hours = 8760
+        speed_ratio = calculated_speed / SPEED_OF_LIGHT_KMH
+        time_dilation_factor = math.sqrt(1 - (speed_ratio ** 2))
+        rocket_hours_passed = earth_hours * time_dilation_factor
+        days_saved = (earth_hours - rocket_hours_passed) / 24
+        speed_percentage = (calculated_speed / SPEED_OF_LIGHT_KMH) * 100
+
+        # --- GAMING HUD ---
+        xp = int(speed_percentage * 13)
+        level = int(speed_percentage // 14) + 1
+
+        st.markdown("### 🎮 MISSION: REACH YEAR 2050")
+        c1, c2, c3, c4 = st.columns(4)
+        c1.metric("⭐ XP", f"{xp}")
+        c2.metric("🏆 LEVEL", f"0{level}")
+        c3.metric("⚡ SPEED", f"{speed_percentage:.1f}% C")
+        c4.metric("⏳ TIME SAVED", f"{days_saved:.0f} Days")
+
+        col_p1, col_p2 = st.columns(2)
+        with col_p1:
+            st.write("🧲 Magnetic Power")
+            st.progress(min(mag_freq/1000, 1.0))
+        with col_p2:
+            st.write(f"🌌 Warp Stability: {space_bend}%")
+            st.progress(space_bend/100)
+
+        st.divider()
+
+        # --- MAIN LAB ---
+        col1, col2 = st.columns([2, 1])
+        with col1:
+            st.subheader("🌌 3D Space-Time Fabric View")
+            grid_size = 25
+            x_grid = np.linspace(-5, 5, grid_size)
+            y_grid = np.linspace(-5, 5, grid_size)
+            X, Y = np.meshgrid(x_grid, y_grid)
+            distortion_depth = (space_bend / 15) + (speed_percentage / 20)
+            Z = - distortion_depth * np.exp(-(X**2 + Y**2) / 6)
+            fig_3d = go.Figure(data=[go.Surface(z=Z, x=X, y=Y, colorscale='Electric', opacity=0.85)])
+            fig_3d.add_trace(go.Scatter3d(x=[0], y=[0], z=[Z.min()+0.5], mode='markers',
+                marker=dict(size=14, color='#00FFCC', symbol='diamond'), name="Rocket 2050"))
+            fig_3d.update_layout(
+                scene=dict(
+                    xaxis=dict(visible=False),
+                    yaxis=dict(visible=False),
+                    zaxis=dict(visible=False),
+                    bgcolor="black"
+                ),
+                margin=dict(l=0, r=0, b=0, t=20),
+                height=450,
+                paper_bgcolor="rgba(0,0,0,0)"
+            )
+            st.plotly_chart(fig_3d, use_container_width=True)
+
+        with col2:
+            st.subheader("📊 Telemetry")
+            st.metric("Rocket Speed", f"{int(calculated_speed):,} km/h")
+            st.metric("Earth Time", "365 Days")
+            st.metric("Rocket Time", f"{(rocket_hours_passed/24):.1f} Days")
+            if speed_percentage > 80:
+                st.success(f"🎉 TIME JUMP READY! {days_saved:.0f} din future me!")
+            else:
+                st.warning("🔒 80% Speed pe Jump Unlock Hoga")
+
+        # --- SPECIAL ADVANCE SECTION ---
+        st.markdown("---")
+        st.markdown("""
+        <div class="advance-box">
+        <h2>⚛️ ADVANCE QUANTUM LAB - SPECIAL SECTION</h2>
+        <p>Ye section sirf Pro Pilots ke liye hai! Yahan se tum Time ko todoge.</p>
+        </div>
+        """, unsafe_allow_html=True)
+
+        st.write("")
+        adv1, adv2, adv3 = st.columns(3)
+        with adv1:
+            st.markdown("#### 🧠 Einstein Logic")
+            st.code(f"t' = t * sqrt(1 - v²/c²)\n= {rocket_hours_passed:.2f} hrs", language="python")
+            st.info("Speed badhne pe Rocket ka time slow hota hai")
+        with adv2:
+            st.markdown("#### 🌀 Warp Core")
+            if space_bend > 70 and speed_percentage > 85:
+                st.success("WARP CORE: OVERDRIVE 🔥")
+                st.snow()
+            elif space_bend > 40:
+                st.warning("WARP CORE: STABLE")
+            else:
+                st.error("WARP CORE: LOW")
+        with adv3:
+            st.markdown("#### ⚛️ Quantum Entanglement")
+            if quantum_boost:
+                st.success("ENTANGLEMENT: ACTIVE - 5x BOOST!")
+                st.balloons()
+            else:
+                st.write("Boost OFF hai. Upar se ON karo.")
+
+        # --- FINAL JUMP BUTTON ---
+        st.write("")
+        if st.button("🌀 INITIATE 2050 TIME JUMP - HOLD WARP", use_container_width=True, type="primary", key="tm_jump"):
+            if speed_percentage < 80:
+                st.error("Mission Failed! Pehle 80% Speed toh lao, Pilot!")
+            else:
+                with st.spinner("Quantum Tunneling... Space Bending..."):
+                    time.sleep(2)
+                st.balloons()
+                st.success(f"🚀 SUCCESS! Tum {days_saved:.0f} din Future me pahuch gaye! Year 2050 Welcome!")
+                st.markdown(f"### 👨‍🎓 Certificate: Level {level} Time Traveler - XP {xp}")
+
+    # ============================================================
+    # TAB 4: CHALLENGE (⭐ renamed from tab3)
+    # ============================================================
+    with tab4:
         st.subheader("🎯 Physics Challenge")
 
         if st.button("🚀 Start Physics Quiz", key="phy_start_quiz"):
@@ -6631,9 +6788,9 @@ Return ONLY valid JSON array:
                     st.rerun()
 
     # ============================================================
-    # TAB 4: ASK A DOUBT
+    # TAB 5: ASK A DOUBT (⭐ renamed from tab4)
     # ============================================================
-    with tab4:
+    with tab5:
         st.subheader("💬 Ask a Physics Doubt")
 
         if "phy_doubts" not in st.session_state:
