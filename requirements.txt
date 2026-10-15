@@ -8,3 +8,5 @@ pytz
 openai
 Pillow
 matplotlib 
+numpy
+plotly
