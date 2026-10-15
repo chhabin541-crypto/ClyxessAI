@@ -5627,7 +5627,7 @@ def render_physics_lab(client):
     import plotly.graph_objects as go
 
     # ============================================================
-    # ⭐ UNIVERSAL CONSTANTS (from Code 2)
+    # ⭐ UNIVERSAL CONSTANTS
     # ============================================================
     SPEED_OF_LIGHT       = 299792458
     BOLTZMANN_CONST      = 1.380649e-23
@@ -5636,7 +5636,211 @@ def render_physics_lab(client):
     EARTH_RADIUS         = 6371000
     GEO_RADIUS           = 42164000
     VACUUM_PERMEABILITY  = 4 * math.pi * 1e-7
-    SPEED_OF_LIGHT_KMH   = 1079252849  # ⭐ from Code 2 (Time Machine)
+    SPEED_OF_LIGHT_KMH   = 1079252849
+
+    # ============================================================
+    # ⭐ UI TRANSLATION DICTIONARY
+    # ============================================================
+    UI_TEXT = {
+        "English": {
+            "title": "⚛️ Physics Lab — Clyxess AI School",
+            "caption": "School level to University research level — real physics, real experiments",
+            "tab_learn": "📖 Learn", "tab_vlab": "🧪 Virtual Lab",
+            "tab_2050": "🛸 Mega Rocket Lab 2050", "tab_chal": "🎯 Challenge",
+            "tab_doubt": "💬 Ask a Doubt",
+            "level_label": "🎓 Select Class / Level",
+            "lang_label": "🌐 Response Language",
+        },
+        "हिंदी (Hindi)": {
+            "title": "⚛️ भौतिकी प्रयोगशाला — Clyxess AI स्कूल",
+            "caption": "स्कूल स्तर से यूनिवर्सिटी रिसर्च स्तर तक — असली भौतिकी, असली प्रयोग",
+            "tab_learn": "📖 सीखो", "tab_vlab": "🧪 वर्चुअल लैब",
+            "tab_2050": "🛸 मेगा रॉकेट लैब 2050", "tab_chal": "🎯 चुनौती",
+            "tab_doubt": "💬 सवाल पूछो",
+            "level_label": "🎓 कक्षा / स्तर चुनें",
+            "lang_label": "🌐 उत्तर की भाषा",
+        },
+        "Hinglish (Hindi + English)": {
+            "title": "⚛️ Physics Lab — Clyxess AI School",
+            "caption": "School level se University research level tak — real physics, real experiments",
+            "tab_learn": "📖 Seekho", "tab_vlab": "🧪 Virtual Lab",
+            "tab_2050": "🛸 Mega Rocket Lab 2050", "tab_chal": "🎯 Challenge",
+            "tab_doubt": "💬 Doubt Poochho",
+            "level_label": "🎓 Class / Level chuno",
+            "lang_label": "🌐 Answer Language",
+        },
+        "मराठी (Marathi)": {
+            "title": "⚛️ भौतिकी प्रयोगशाळा — Clyxess AI स्कूल",
+            "caption": "शाळेच्या पातळीपासून युनिव्हर्सिटी संशोधन पातळीपर्यंत",
+            "tab_learn": "📖 शिका", "tab_vlab": "🧪 व्हर्च्युअल लॅब",
+            "tab_2050": "🛸 मेगा रॉकेट लॅब 2050", "tab_chal": "🎯 आव्हान",
+            "tab_doubt": "💬 शंका विचारा",
+            "level_label": "🎓 वर्ग / स्तर निवडा",
+            "lang_label": "🌐 उत्तर भाषा",
+        },
+        "বাংলা (Bengali)": {
+            "title": "⚛️ পদার্থবিজ্ঞান ল্যাব — Clyxess AI স্কুল",
+            "caption": "স্কুল স্তর থেকে বিশ্ববিদ্যালয় গবেষণা স্তর পর্যন্ত",
+            "tab_learn": "📖 শেখো", "tab_vlab": "🧪 ভার্চুয়াল ল্যাব",
+            "tab_2050": "🛸 মেগা রকেট ল্যাব 2050", "tab_chal": "🎯 চ্যালেঞ্জ",
+            "tab_doubt": "💬 প্রশ্ন করো",
+            "level_label": "🎓 ক্লাস / স্তর নির্বাচন করুন",
+            "lang_label": "🌐 উত্তরের ভাষা",
+        },
+        "தமிழ் (Tamil)": {
+            "title": "⚛️ இயற்பியல் ஆய்வகம் — Clyxess AI பள்ளி",
+            "caption": "பள்ளி நிலை முதல் பல்கலைக்கழக ஆராய்ச்சி நிலை வரை",
+            "tab_learn": "📖 கற்க", "tab_vlab": "🧪 மெய்நிகர் ஆய்வகம்",
+            "tab_2050": "🛸 மெகா ராக்கெட் ஆய்வகம் 2050", "tab_chal": "🎯 சவால்",
+            "tab_doubt": "💬 சந்தேகம் கேள்",
+            "level_label": "🎓 வகுப்பு / நிலை",
+            "lang_label": "🌐 பதில் மொழி",
+        },
+        "తెలుగు (Telugu)": {
+            "title": "⚛️ భౌతిక శాస్త్ర ప్రయోగశాల — Clyxess AI పాఠశాల",
+            "caption": "పాఠశాల స్థాయి నుండి విశ్వవిద్యాలయ పరిశోధన స్థాయి వరకు",
+            "tab_learn": "📖 నేర్చుకో", "tab_vlab": "🧪 వర్చువల్ ల్యాబ్",
+            "tab_2050": "🛸 మెగా రాకెట్ ల్యాబ్ 2050", "tab_chal": "🎯 సవాలు",
+            "tab_doubt": "💬 సందేహం అడగండి",
+            "level_label": "🎓 తరగతి / స్థాయి",
+            "lang_label": "🌐 సమాధాన భాష",
+        },
+        "ગુજરાતી (Gujarati)": {
+            "title": "⚛️ ભૌતિકશાસ્ત્ર પ્રયોગશાળા — Clyxess AI શાળા",
+            "caption": "શાળા સ્તરથી યુનિવર્સિટી સંશોધન સ્તર સુધી",
+            "tab_learn": "📖 શીખો", "tab_vlab": "🧪 વર્ચ્યુઅલ લેબ",
+            "tab_2050": "🛸 મેગા રોકેટ લેબ 2050", "tab_chal": "🎯 પડકાર",
+            "tab_doubt": "💬 પ્રશ્ન પૂછો",
+            "level_label": "🎓 વર્ગ / સ્તર પસંદ કરો",
+            "lang_label": "🌐 જવાબની ભાષા",
+        },
+        "ಕನ್ನಡ (Kannada)": {
+            "title": "⚛️ ಭೌತಶಾಸ್ತ್ರ ಪ್ರಯೋಗಾಲಯ — Clyxess AI ಶಾಲೆ",
+            "caption": "ಶಾಲಾ ಮಟ್ಟದಿಂದ ವಿಶ್ವವಿದ್ಯಾಲಯ ಸಂಶೋಧನಾ ಮಟ್ಟದವರೆಗೆ",
+            "tab_learn": "📖 ಕಲಿಯಿರಿ", "tab_vlab": "🧪 ವರ್ಚುವಲ್ ಲ್ಯಾಬ್",
+            "tab_2050": "🛸 ಮೆಗಾ ರಾಕೆಟ್ ಲ್ಯಾಬ್ 2050", "tab_chal": "🎯 ಸವಾಲು",
+            "tab_doubt": "💬 ಸಂದೇಹ ಕೇಳಿ",
+            "level_label": "🎓 ತರಗತಿ / ಮಟ್ಟ",
+            "lang_label": "🌐 ಉತ್ತರ ಭಾಷೆ",
+        },
+        "മലയാളം (Malayalam)": {
+            "title": "⚛️ ഭൗതികശാസ്ത്ര ലാബ് — Clyxess AI സ്കൂൾ",
+            "caption": "സ്കൂൾ തലം മുതൽ യൂണിവേഴ്സിറ്റി ഗവേഷണ തലം വരെ",
+            "tab_learn": "📖 പഠിക്കുക", "tab_vlab": "🧪 വെർച്വൽ ലാബ്",
+            "tab_2050": "🛸 മെഗാ റോക്കറ്റ് ലാബ് 2050", "tab_chal": "🎯 വെല്ലുവിളി",
+            "tab_doubt": "💬 സംശയം ചോദിക്കുക",
+            "level_label": "🎓 ക്ലാസ് / ലെവൽ",
+            "lang_label": "🌐 ഉത്തര ഭാഷ",
+        },
+        "ਪੰਜਾਬੀ (Punjabi)": {
+            "title": "⚛️ ਭੌਤਿਕ ਵਿਗਿਆਨ ਲੈਬ — Clyxess AI ਸਕੂਲ",
+            "caption": "ਸਕੂਲ ਪੱਧਰ ਤੋਂ ਯੂਨੀਵਰਸਿਟੀ ਖੋਜ ਪੱਧਰ ਤੱਕ",
+            "tab_learn": "📖 ਸਿੱਖੋ", "tab_vlab": "🧪 ਵਰਚੁਅਲ ਲੈਬ",
+            "tab_2050": "🛸 ਮੈਗਾ ਰਾਕੇਟ ਲੈਬ 2050", "tab_chal": "🎯 ਚੁਣੌਤੀ",
+            "tab_doubt": "💬 ਸਵਾਲ ਪੁੱਛੋ",
+            "level_label": "🎓 ਕਲਾਸ / ਪੱਧਰ",
+            "lang_label": "🌐 ਜਵਾਬ ਦੀ ਭਾਸ਼ਾ",
+        },
+        "Español (Spanish)": {
+            "title": "⚛️ Laboratorio de Física — Clyxess AI School",
+            "caption": "Desde nivel escolar hasta investigación universitaria",
+            "tab_learn": "📖 Aprender", "tab_vlab": "🧪 Laboratorio Virtual",
+            "tab_2050": "🛸 Mega Rocket Lab 2050", "tab_chal": "🎯 Desafío",
+            "tab_doubt": "💬 Preguntar",
+            "level_label": "🎓 Seleccionar Clase / Nivel",
+            "lang_label": "🌐 Idioma de respuesta",
+        },
+        "Français (French)": {
+            "title": "⚛️ Laboratoire de Physique — Clyxess AI School",
+            "caption": "Du niveau scolaire à la recherche universitaire",
+            "tab_learn": "📖 Apprendre", "tab_vlab": "🧪 Labo Virtuel",
+            "tab_2050": "🛸 Mega Rocket Lab 2050", "tab_chal": "🎯 Défi",
+            "tab_doubt": "💬 Poser une question",
+            "level_label": "🎓 Choisir Classe / Niveau",
+            "lang_label": "🌐 Langue de réponse",
+        },
+        "Deutsch (German)": {
+            "title": "⚛️ Physik-Labor — Clyxess AI School",
+            "caption": "Von Schulniveau bis Universitätsforschung",
+            "tab_learn": "📖 Lernen", "tab_vlab": "🧪 Virtuelles Labor",
+            "tab_2050": "🛸 Mega Rocket Lab 2050", "tab_chal": "🎯 Herausforderung",
+            "tab_doubt": "💬 Frage stellen",
+            "level_label": "🎓 Klasse / Niveau wählen",
+            "lang_label": "🌐 Antwortsprache",
+        },
+        "Italiano (Italian)": {
+            "title": "⚛️ Laboratorio di Fisica — Clyxess AI School",
+            "caption": "Dal livello scolastico alla ricerca universitaria",
+            "tab_learn": "📖 Impara", "tab_vlab": "🧪 Laboratorio Virtuale",
+            "tab_2050": "🛸 Mega Rocket Lab 2050", "tab_chal": "🎯 Sfida",
+            "tab_doubt": "💬 Chiedi",
+            "level_label": "🎓 Seleziona Classe / Livello",
+            "lang_label": "🌐 Lingua di risposta",
+        },
+        "Português (Portuguese)": {
+            "title": "⚛️ Laboratório de Física — Clyxess AI School",
+            "caption": "Do nível escolar à pesquisa universitária",
+            "tab_learn": "📖 Aprender", "tab_vlab": "🧪 Lab Virtual",
+            "tab_2050": "🛸 Mega Rocket Lab 2050", "tab_chal": "🎯 Desafio",
+            "tab_doubt": "💬 Perguntar",
+            "level_label": "🎓 Selecionar Classe / Nível",
+            "lang_label": "🌐 Idioma da resposta",
+        },
+        "Русский (Russian)": {
+            "title": "⚛️ Физическая лаборатория — Clyxess AI School",
+            "caption": "От школьного уровня до университетских исследований",
+            "tab_learn": "📖 Учиться", "tab_vlab": "🧪 Виртуальная лаборатория",
+            "tab_2050": "🛸 Мега Ракетная Лаборатория 2050", "tab_chal": "🎯 Вызов",
+            "tab_doubt": "💬 Задать вопрос",
+            "level_label": "🎓 Выбрать класс / уровень",
+            "lang_label": "🌐 Язык ответа",
+        },
+        "日本語 (Japanese)": {
+            "title": "⚛️ 物理ラボ — Clyxess AI School",
+            "caption": "学校レベルから大学研究レベルまで",
+            "tab_learn": "📖 学ぶ", "tab_vlab": "🧪 バーチャルラボ",
+            "tab_2050": "🛸 メガロケットラボ 2050", "tab_chal": "🎯 チャレンジ",
+            "tab_doubt": "💬 質問する",
+            "level_label": "🎓 クラス / レベルを選択",
+            "lang_label": "🌐 回答言語",
+        },
+        "中文 (Chinese)": {
+            "title": "⚛️ 物理实验室 — Clyxess AI School",
+            "caption": "从学校水平到大学研究水平",
+            "tab_learn": "📖 学习", "tab_vlab": "🧪 虚拟实验室",
+            "tab_2050": "🛸 巨型火箭实验室 2050", "tab_chal": "🎯 挑战",
+            "tab_doubt": "💬 提问",
+            "level_label": "🎓 选择班级 / 级别",
+            "lang_label": "🌐 回答语言",
+        },
+        "한국어 (Korean)": {
+            "title": "⚛️ 물리학 실험실 — Clyxess AI School",
+            "caption": "학교 수준부터 대학 연구 수준까지",
+            "tab_learn": "📖 배우기", "tab_vlab": "🧪 가상 실험실",
+            "tab_2050": "🛸 메가 로켓 랩 2050", "tab_chal": "🎯 도전",
+            "tab_doubt": "💬 질문하기",
+            "level_label": "🎓 학급 / 레벨 선택",
+            "lang_label": "🌐 응답 언어",
+        },
+        "العربية (Arabic)": {
+            "title": "⚛️ مختبر الفيزياء — Clyxess AI School",
+            "caption": "من المستوى المدرسي إلى مستوى البحث الجامعي",
+            "tab_learn": "📖 تعلم", "tab_vlab": "🧪 المختبر الافتراضي",
+            "tab_2050": "🛸 مختبر الصواريخ العملاق 2050", "tab_chal": "🎯 تحدي",
+            "tab_doubt": "💬 اسأل",
+            "level_label": "🎓 اختر الصف / المستوى",
+            "lang_label": "🌐 لغة الرد",
+        },
+        "فارسی (Persian)": {
+            "title": "⚛️ آزمایشگاه فیزیک — Clyxess AI School",
+            "caption": "از سطح مدرسه تا سطح تحقیقات دانشگاهی",
+            "tab_learn": "📖 یاد بگیر", "tab_vlab": "🧪 آزمایشگاه مجازی",
+            "tab_2050": "🛸 آزمایشگاه موشک مگا 2050", "tab_chal": "🎯 چالش",
+            "tab_doubt": "💬 سؤال بپرس",
+            "level_label": "🎓 انتخاب کلاس / سطح",
+            "lang_label": "🌐 زبان پاسخ",
+        },
+    }
 
     # ============================================================
     # ⭐ LANGUAGE OPTIONS
@@ -5684,78 +5888,68 @@ def render_physics_lab(client):
     ]
 
     # ============================================================
-    # ⭐ LEVEL-BASED TOPICS
+    # ⭐ LEVEL TOPICS
     # ============================================================
     LEVEL_TOPICS = {
-        "Class 5-6": [
-            "Light and Shadows", "Sound Around Us", "Magnets", "Simple Machines",
-            "Gravity Basics", "Friction", "Water Cycle", "Air and Pressure"
-        ],
-        "Class 7-8": [
-            "Motion and Speed", "Force and Pressure", "Energy", "Heat",
-            "Light Reflection", "Electricity Basics", "Sound Waves"
-        ],
-        "Class 9-10": [
-            "Newton's Laws", "Work, Energy & Power", "Gravitation", "Waves",
-            "Sound", "Light - Reflection & Refraction", "Electricity", "Magnetism"
-        ],
-        "Class 11-12": [
-            "Kinematics", "Laws of Motion", "Work & Energy", "Rotational Motion",
-            "Thermodynamics", "Oscillations & Waves", "Electrostatics",
-            "Current Electricity", "Magnetism", "EMI & AC", "Optics",
-            "Dual Nature of Matter", "Atoms & Nuclei", "Semiconductors"
-        ],
-        "University Level": [
-            "⚙️ Classical Mechanics (Lagrangian & Hamiltonian)",
-            "🌊 Electrodynamics (Maxwell's Equations)",
-            "⚛️ Quantum Mechanics (Schrödinger Equation)",
-            "🔥 Statistical Mechanics & Thermodynamics",
-            "🌌 General Relativity (Einstein Field Equations)",
-            "🔬 Quantum Field Theory (QFT)",
-            "🧪 Particle Physics (Standard Model)",
-            "💎 Condensed Matter Physics",
-            "💻 Computational Physics (Simulations)",
-            "🌀 Quantum Computing & Information",
-            "🕳️ Black Holes & Cosmology",
-            "🧬 Biophysics",
-            "🌟 Astrophysics & Stellar Physics",
-            "🔮 String Theory (Introduction)",
-            "📡 Plasma Physics",
-            "⚡ Quantum Optics & Photonics"
-        ]
+        "Class 5-6": ["Light and Shadows", "Sound Around Us", "Magnets", "Simple Machines",
+                      "Gravity Basics", "Friction", "Water Cycle", "Air and Pressure"],
+        "Class 7-8": ["Motion and Speed", "Force and Pressure", "Energy", "Heat",
+                      "Light Reflection", "Electricity Basics", "Sound Waves"],
+        "Class 9-10": ["Newton's Laws", "Work, Energy & Power", "Gravitation", "Waves",
+                       "Sound", "Light - Reflection & Refraction", "Electricity", "Magnetism"],
+        "Class 11-12": ["Kinematics", "Laws of Motion", "Work & Energy", "Rotational Motion",
+                        "Thermodynamics", "Oscillations & Waves", "Electrostatics",
+                        "Current Electricity", "Magnetism", "EMI & AC", "Optics",
+                        "Dual Nature of Matter", "Atoms & Nuclei", "Semiconductors"],
+        "University Level": ["⚙️ Classical Mechanics", "🌊 Electrodynamics",
+                             "⚛️ Quantum Mechanics", "🔥 Statistical Mechanics",
+                             "🌌 General Relativity", "🔬 QFT", "🧪 Particle Physics",
+                             "💎 Condensed Matter", "💻 Computational Physics",
+                             "🌀 Quantum Computing", "🕳️ Black Holes", "🧬 Biophysics",
+                             "🌟 Astrophysics", "🔮 String Theory", "📡 Plasma Physics",
+                             "⚡ Quantum Optics"]
     }
 
     # ============================================================
-    # ⭐ TIME MACHINE 2050 — GAMING CSS (from Code 2)
+    # ⭐ CSS
     # ============================================================
     st.markdown("""
     <style>
     .advance-box {
-        border: 2px solid #00FFCC;
-        border-radius: 20px;
-        padding: 20px;
+        border: 2px solid #00FFCC; border-radius: 20px; padding: 20px;
         background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
-        box-shadow: 0 0 20px #00FFCC;
-        color: white;
+        box-shadow: 0 0 20px #00FFCC; color: white;
     }
-    .metric-card {
-        background: #1a1a2e;
-        border-radius: 15px;
-        padding: 10px;
-        text-align: center;
-        border: 1px solid #00FFCC;
+    .cockpit-card {
+        border: 2px solid #00FFCC; border-radius: 20px; padding: 20px;
+        background: linear-gradient(135deg, #050716, #11153b);
+        box-shadow: 0 0 25px rgba(0, 255, 204, 0.3); color: white; margin-bottom: 20px;
+    }
+    .innovation-box {
+        border: 2px dashed #FF3366; border-radius: 20px; padding: 25px;
+        background: #09021a; box-shadow: 0 0 20px rgba(255, 51, 102, 0.2); color: white;
+    }
+    .explain-card {
+        border: 2px solid #00FFCC; border-radius: 20px; padding: 25px;
+        background: linear-gradient(180deg, #060b19 0%, #0d1b3e 100%);
+        box-shadow: 0 0 30px rgba(0, 255, 204, 0.2); color: white; margin-top: 20px;
+    }
+    .math-badge {
+        background-color: #ff3366; color: white; padding: 4px 10px;
+        border-radius: 8px; font-weight: bold; font-size: 13px;
+    }
+    .physics-badge {
+        background-color: #00FFCC; color: #050716; padding: 4px 10px;
+        border-radius: 8px; font-weight: bold; font-size: 13px;
+    }
+    .instrument-label {
+        color: #00FFCC; font-weight: bold; font-size: 14px; letter-spacing: 1px;
     }
     </style>
     """, unsafe_allow_html=True)
 
     # ============================================================
-    # HEADER
-    # ============================================================
-    st.markdown('<div class="header"><h1>⚛️ Physics Lab — Clyxess AI School</h1></div>', unsafe_allow_html=True)
-    st.caption("School level se University research level tak — real physics, real experiments")
-
-    # ============================================================
-    # LEVEL + LANGUAGE
+    # LEVEL + LANGUAGE SELECTORS
     # ============================================================
     col_lvl, col_lang = st.columns([2, 1])
 
@@ -5773,39 +5967,84 @@ def render_physics_lab(client):
             key="physics_language_select"
         )
 
-    # Language rule
+    # ---- Language Rule ----
     if "Auto Detect" in language_choice:
         lang_rule = "Reply in the SAME language as the student's question. Match their language exactly."
-        clean_name = "the student's language"
+        clean_name = "English"
     else:
         clean_name = language_choice.split(" ", 1)[-1].split("(")[0].strip()
         lang_rule = f"ALWAYS reply in {clean_name} ONLY. Do not switch languages."
 
+    # ---- UI Language Mapping ----
+    if "Auto Detect" in language_choice:
+        ui_lang_key = "English"
+    elif "Hindi" in language_choice and "Hinglish" not in language_choice:
+        ui_lang_key = "हिंदी (Hindi)"
+    elif "Hinglish" in language_choice:
+        ui_lang_key = "Hinglish (Hindi + English)"
+    elif "Marathi" in language_choice:
+        ui_lang_key = "मराठी (Marathi)"
+    elif "Bengali" in language_choice:
+        ui_lang_key = "বাংলা (Bengali)"
+    elif "Tamil" in language_choice:
+        ui_lang_key = "தமிழ் (Tamil)"
+    elif "Telugu" in language_choice:
+        ui_lang_key = "తెలుగు (Telugu)"
+    elif "Gujarati" in language_choice:
+        ui_lang_key = "ગુજરાતી (Gujarati)"
+    elif "Kannada" in language_choice:
+        ui_lang_key = "ಕನ್ನಡ (Kannada)"
+    elif "Malayalam" in language_choice:
+        ui_lang_key = "മലയാളം (Malayalam)"
+    elif "Punjabi" in language_choice:
+        ui_lang_key = "ਪੰਜਾਬੀ (Punjabi)"
+    elif "Spanish" in language_choice:
+        ui_lang_key = "Español (Spanish)"
+    elif "French" in language_choice:
+        ui_lang_key = "Français (French)"
+    elif "German" in language_choice:
+        ui_lang_key = "Deutsch (German)"
+    elif "Italian" in language_choice:
+        ui_lang_key = "Italiano (Italian)"
+    elif "Portuguese" in language_choice:
+        ui_lang_key = "Português (Portuguese)"
+    elif "Russian" in language_choice:
+        ui_lang_key = "Русский (Russian)"
+    elif "Japanese" in language_choice:
+        ui_lang_key = "日本語 (Japanese)"
+    elif "Chinese" in language_choice:
+        ui_lang_key = "中文 (Chinese)"
+    elif "Korean" in language_choice:
+        ui_lang_key = "한국어 (Korean)"
+    elif "Arabic" in language_choice:
+        ui_lang_key = "العربية (Arabic)"
+    elif "Persian" in language_choice:
+        ui_lang_key = "فارسی (Persian)"
+    else:
+        ui_lang_key = "English"
+
+    ui = UI_TEXT.get(ui_lang_key, UI_TEXT["English"])
+
     # University check
     is_university = "University" in class_level
 
-    # ⭐ DIAGRAM INSTRUCTION
+    # Diagram rule
     diagram_rule = """
     VISUAL DIAGRAM REQUIREMENT:
-    You MUST include a text-based diagram (ASCII art, flowchart, or structured visual representation) in your response to explain the concept visually.
-    Use code blocks for the diagram. Example format:
-    ```text
-      N
-      ↑
-      |
-    ← • → F
-      |
-      ↓
-     mg
-    ```
-    Make sure the diagram is relevant to the topic/question.
+    You MUST include a text-based diagram (ASCII art, flowchart) in a code block.
     """
 
     # ============================================================
-    # TABS (⭐ Updated — added Time Machine 2050)
+    # HEADER (translated)
+    # ============================================================
+    st.markdown(f'<div class="header"><h1>{ui["title"]}</h1></div>', unsafe_allow_html=True)
+    st.caption(ui["caption"])
+
+    # ============================================================
+    # TABS (translated)
     # ============================================================
     tab1, tab2, tab3, tab4, tab5 = st.tabs([
-        "📖 Learn", "🧪 Virtual Lab", "🚀 Time Machine 2050", "🎯 Challenge", "💬 Ask a Doubt"
+        ui["tab_learn"], ui["tab_vlab"], ui["tab_2050"], ui["tab_chal"], ui["tab_doubt"]
     ])
 
     # ============================================================
@@ -5813,51 +6052,34 @@ def render_physics_lab(client):
     # ============================================================
     with tab1:
         st.subheader("📖 Physics Concepts")
-
         topics_list = LEVEL_TOPICS.get(class_level, LEVEL_TOPICS["Class 9-10"])
         topic = st.selectbox("Topic:", topics_list, key="phy_topic_learn")
 
         if st.button("🚀 Explain this Topic", key="phy_explain_btn"):
             with st.spinner("Professor is thinking..."):
                 if is_university:
-                    prompt = f"""You are a PROFESSOR at a top research university (MIT/Stanford/Tsinghua level) teaching Physics.
+                    prompt = f"""You are a PROFESSOR at MIT/Stanford/Tsinghua level.
 
 TOPIC: {topic}
-STUDENT LEVEL: University / Postgraduate
+LEVEL: University / Postgraduate
 
 {lang_rule}
 {diagram_rule}
 
-Teach like a real university professor:
-1. **Definition & Scope** — What is this field?
-2. **Mathematical Framework** — Key equations and structure
-3. **Physical Interpretation** — What the math means physically
-4. **Real Applications** — Research, industry, technology
-5. **Historical Context** — How we discovered this
-6. **Open Problems** — What's still unknown
-7. **Recommended Reading** — Famous textbooks (Landau, Griffiths, Feynman, Sakurai, etc.)
-
-Format:
+Structure:
 🎓 Definition & Scope
 📐 Mathematical Framework
 🔬 Physical Interpretation
 🌍 Applications
 📚 Key Textbook
-❓ Challenge Question
-
-Use rigorous language. Include equations as text (E = mc², iℏ∂ψ/∂t = Ĥψ, etc.)."""
+❓ Challenge Question"""
                 else:
-                    prompt = f"""You are a Physics Teacher. Explain '{topic}' to a student of {class_level}.
+                    prompt = f"""You are a Physics Teacher. Explain '{topic}' to a {class_level} student.
 
 {lang_rule}
 {diagram_rule}
 
-Rules:
-- Simple language suited to {class_level}
-- Real-life examples (cricket, cars, space, everyday objects)
-- Engaging, not boring
-- End with one quick question
-- Clear headings and emojis"""
+Rules: simple language, real-life examples, engaging, end with a quick question."""
 
                 try:
                     response = client.chat.completions.create(
@@ -5876,41 +6098,27 @@ Rules:
         st.subheader("🧪 Interactive Virtual Lab")
 
         base_experiments = [
-            "🚀 Space Tech: Rocket Launch",
-            "🌍 Gravity: Weight on Planets",
-            "☀️ Renewable Energy: Solar Power",
-            "⚡ Electric Circuit: Ohm's Law",
-            "🎢 Energy: Roller Coaster",
-            "🏀 Motion: Projectile Throw",
-            "🔔 Waves: Pendulum",
-            "💡 Light: Refraction",
-            "🌊 Sound: Wavelength",
-            "🧲 Magnetism: Field Strength",
-            "🚗 Friction: Car Braking",
-            "🌡️ Heat: Conduction"
+            "🚀 Space Tech: Rocket Launch", "🌍 Gravity: Weight on Planets",
+            "☀️ Renewable Energy: Solar Power", "⚡ Electric Circuit: Ohm's Law",
+            "🎢 Energy: Roller Coaster", "🏀 Motion: Projectile Throw",
+            "🔔 Waves: Pendulum", "💡 Light: Refraction", "🌊 Sound: Wavelength",
+            "🧲 Magnetism: Field Strength", "🚗 Friction: Car Braking", "🌡️ Heat: Conduction"
         ]
 
         if is_university:
             base_experiments += [
-                "⚛️ Quantum: Heisenberg Uncertainty",
-                "🌌 Relativity: Time Dilation",
-                "🔥 Thermo: Carnot Engine",
-                "🔋 Future Tech: Antimatter Battery",
-                "💾 Future Tech: Photonic Quantum Chip",
-                "🧊 Future Tech: Room-Temp Superconductor",
-                "🛰️ Future Tech: Space Elevator Tether",
-                "👽 Xenobiology: Silicon Life",
-                "🤖 Multi-Agent Swarm",
-                "🌀 Quantum Superposition (Complex)",
-                "🧬 Xenobiology: Silane Chain Stability",
-                "🔐 Cognitive Security: Anomaly Detection",
+                "⚛️ Quantum: Heisenberg Uncertainty", "🌌 Relativity: Time Dilation",
+                "🔥 Thermo: Carnot Engine", "🔋 Future Tech: Antimatter Battery",
+                "💾 Future Tech: Photonic Quantum Chip", "🧊 Future Tech: Room-Temp Superconductor",
+                "🛰️ Future Tech: Space Elevator Tether", "👽 Xenobiology: Silicon Life",
+                "🤖 Multi-Agent Swarm", "🌀 Quantum Superposition (Complex)",
+                "🧬 Xenobiology: Silane Chain Stability", "🔐 Cognitive Security: Anomaly Detection",
                 "⏱️ Reality Sandbox: Time Dilation"
             ]
 
         experiment = st.selectbox("Choose Experiment:", base_experiments, key="phy_experiment")
         st.markdown("---")
 
-        # ============ ROCKET LAUNCH ============
         if "Rocket Launch" in experiment:
             st.markdown("### 🚀 Rocket Launch Simulation")
             c1, c2 = st.columns(2)
@@ -5919,49 +6127,42 @@ Rules:
             with c2:
                 mass = st.slider("Rocket Mass (kg):", 500, 5000, 2000, key="rocket_mass")
             g = 9.8
-            net = thrust - (mass * g)
-            acc = net / mass
-            st.info(f"📐 **Acceleration = (Thrust − Mass × Gravity) / Mass**")
-            st.info(f"📐 ({thrust} − {mass} × {g}) / {mass} = **{acc:.2f} m/s²**")
+            acc = (thrust - mass * g) / mass
+            st.info(f"📐 **a = (Thrust − m·g) / m**  →  **{acc:.2f} m/s²**")
             if acc > 0:
-                st.success(f"🚀 Rocket will launch! Acceleration: {acc:.2f} m/s²")
+                st.success(f"🚀 Rocket will launch! Acc: {acc:.2f} m/s²")
             else:
                 st.error("❌ Rocket won't lift!")
-            st.markdown("📝 **Observation:** Thrust ↑ → Acceleration ↑ · Mass ↑ → Acceleration ↓")
             if st.button("🤖 Explain with AI", key="rocket_ai_btn"):
                 with st.spinner("AI is thinking..."):
-                    p = f"Explain Rocket Launch (Thrust, Mass, Acceleration, Net Force) to a {class_level} student. {lang_rule}\n{diagram_rule}\n\nThrust={thrust}N, Mass={mass}kg, Acceleration={acc:.2f}m/s²."
                     try:
                         r = client.chat.completions.create(model="openai/gpt-oss-120b",
-                            messages=[{"role": "user", "content": p}], temperature=0.7, max_tokens=1000)
-                        st.info(r.choices[0].message.content)
-                    except Exception as e:
-                        st.error(f"❌ {type(e).__name__}")
-
-        # ============ GRAVITY ============
-        elif "Gravity" in experiment:
-            st.markdown("### 🌍 Weight on Different Planets")
-            mass = st.slider("Your Mass (kg):", 10, 100, 50, key="gravity_mass")
-            planet = st.selectbox("Planet:",
-                ["Earth (9.8)", "Moon (1.6)", "Mars (3.7)", "Jupiter (24.8)", "Venus (8.9)", "Saturn (10.4)"],
-                key="planet_select")
-            g_map = {"Earth (9.8)": 9.8, "Moon (1.6)": 1.6, "Mars (3.7)": 3.7,
-                     "Jupiter (24.8)": 24.8, "Venus (8.9)": 8.9, "Saturn (10.4)": 10.4}
-            weight = mass * g_map[planet]
-            st.info(f"📐 **Weight = Mass × Gravity**")
-            st.metric("Weight", f"{weight:.2f} N")
-            st.markdown("📝 **Observation:** Mass same everywhere. Weight changes with gravity.")
-            if st.button("🤖 Explain with AI", key="gravity_ai_btn"):
-                with st.spinner("AI is thinking..."):
-                    try:
-                        r = client.chat.completions.create(model="openai/gpt-oss-120b",
-                            messages=[{"role": "user", "content": f"Explain Mass vs Weight to a {class_level} student. {lang_rule}\n{diagram_rule}\n\nOn {planet}: {mass}kg → {weight:.2f}N."}],
+                            messages=[{"role": "user", "content": f"Explain Rocket Launch to {class_level}. {lang_rule}\n{diagram_rule}\n\nThrust={thrust}N, Mass={mass}kg, Acc={acc:.2f}m/s²."}],
                             temperature=0.7, max_tokens=1000)
                         st.info(r.choices[0].message.content)
                     except Exception as e:
                         st.error(f"❌ {type(e).__name__}")
 
-        # ============ SOLAR ============
+        elif "Gravity" in experiment:
+            st.markdown("### 🌍 Weight on Different Planets")
+            mass = st.slider("Your Mass (kg):", 10, 100, 50, key="gravity_mass")
+            planet = st.selectbox("Planet:", ["Earth (9.8)", "Moon (1.6)", "Mars (3.7)",
+                "Jupiter (24.8)", "Venus (8.9)", "Saturn (10.4)"], key="planet_select")
+            g_map = {"Earth (9.8)": 9.8, "Moon (1.6)": 1.6, "Mars (3.7)": 3.7,
+                     "Jupiter (24.8)": 24.8, "Venus (8.9)": 8.9, "Saturn (10.4)": 10.4}
+            weight = mass * g_map[planet]
+            st.info(f"📐 **Weight = Mass × Gravity**")
+            st.metric("Weight", f"{weight:.2f} N")
+            if st.button("🤖 Explain with AI", key="gravity_ai_btn"):
+                with st.spinner("AI is thinking..."):
+                    try:
+                        r = client.chat.completions.create(model="openai/gpt-oss-120b",
+                            messages=[{"role": "user", "content": f"Explain Mass vs Weight to {class_level}. {lang_rule}\n{diagram_rule}\n\nOn {planet}: {mass}kg → {weight:.2f}N."}],
+                            temperature=0.7, max_tokens=1000)
+                        st.info(r.choices[0].message.content)
+                    except Exception as e:
+                        st.error(f"❌ {type(e).__name__}")
+
         elif "Solar" in experiment:
             st.markdown("### ☀️ Solar Panel Output")
             c1, c2 = st.columns(2)
@@ -5970,21 +6171,18 @@ Rules:
             with c2:
                 area = st.slider("Panel Area (m²):", 1.0, 20.0, 5.0, key="solar_area")
             energy = sunlight * area * 0.18
-            st.info(f"📐 **Energy = Sunlight × Area × Efficiency (18%)**")
-            st.info(f"📐 {sunlight} × {area} × 0.18 = **{energy:.2f} kWh**")
+            st.info(f"📐 **Energy = Sunlight × Area × Efficiency** = **{energy:.2f} kWh**")
             st.metric("⚡ Energy", f"{energy:.2f} kWh")
-            st.markdown("📝 **Observation:** More sunlight + bigger panel = more electricity.")
             if st.button("🤖 Explain with AI", key="solar_ai_btn"):
                 with st.spinner("AI is thinking..."):
                     try:
                         r = client.chat.completions.create(model="openai/gpt-oss-120b",
-                            messages=[{"role": "user", "content": f"Explain Solar Energy to a {class_level} student. {lang_rule}\n{diagram_rule}\n\nSunlight={sunlight}%, Area={area}m², Energy={energy:.2f}kWh."}],
+                            messages=[{"role": "user", "content": f"Explain Solar Energy to {class_level}. {lang_rule}\n{diagram_rule}\n\nSunlight={sunlight}%, Area={area}m², Energy={energy:.2f}kWh."}],
                             temperature=0.7, max_tokens=1000)
                         st.info(r.choices[0].message.content)
                     except Exception as e:
                         st.error(f"❌ {type(e).__name__}")
 
-        # ============ OHM'S LAW ============
         elif "Ohm" in experiment:
             st.markdown("### ⚡ Ohm's Law: V = I × R")
             c1, c2 = st.columns(2)
@@ -5993,21 +6191,18 @@ Rules:
             with c2:
                 resistance = st.slider("Resistance (Ω):", 1, 100, 10, key="ohm_r")
             v = current * resistance
-            st.info(f"📐 **V = I × R**")
-            st.info(f"📐 {current} × {resistance} = **{v:.2f} V**")
+            st.info(f"📐 **V = I × R** = **{v:.2f} V**")
             st.metric("Voltage", f"{v:.2f} V")
-            st.markdown("📝 **Observation:** More current or resistance = more voltage.")
             if st.button("🤖 Explain with AI", key="ohm_ai_btn"):
                 with st.spinner("AI is thinking..."):
                     try:
                         r = client.chat.completions.create(model="openai/gpt-oss-120b",
-                            messages=[{"role": "user", "content": f"Explain Ohm's Law to a {class_level} student. {lang_rule}\n{diagram_rule}\n\nI={current}A, R={resistance}Ω, V={v:.2f}V."}],
+                            messages=[{"role": "user", "content": f"Explain Ohm's Law to {class_level}. {lang_rule}\n{diagram_rule}\n\nI={current}A, R={resistance}Ω, V={v:.2f}V."}],
                             temperature=0.7, max_tokens=1000)
                         st.info(r.choices[0].message.content)
                     except Exception as e:
                         st.error(f"❌ {type(e).__name__}")
 
-        # ============ ROLLER COASTER ============
         elif "Roller" in experiment:
             st.markdown("### 🎢 Roller Coaster Energy")
             c1, c2 = st.columns(2)
@@ -6017,92 +6212,78 @@ Rules:
                 mass = st.slider("Cart Mass (kg):", 100, 1000, 300, key="rc_m")
             pe = mass * 9.8 * height
             v_bottom = (2 * 9.8 * height) ** 0.5
-            st.info(f"📐 **PE = m × g × h** = **{pe:.0f} J**")
-            st.info(f"📐 **Speed = √(2gh)** = **{v_bottom:.2f} m/s**")
-            st.metric("Energy", f"{pe:.0f} J")
-            st.markdown("📝 **Observation:** Higher hill = more energy = faster.")
+            st.info(f"📐 **PE = {pe:.0f} J · v = {v_bottom:.2f} m/s**")
             if st.button("🤖 Explain with AI", key="rc_ai_btn"):
                 with st.spinner("AI is thinking..."):
                     try:
                         r = client.chat.completions.create(model="openai/gpt-oss-120b",
-                            messages=[{"role": "user", "content": f"Explain Roller Coaster energy to a {class_level} student. {lang_rule}\n{diagram_rule}\n\nHeight={height}m, Mass={mass}kg, PE={pe:.0f}J, v_bottom={v_bottom:.2f}m/s."}],
+                            messages=[{"role": "user", "content": f"Explain Roller Coaster energy to {class_level}. {lang_rule}\n{diagram_rule}\n\nH={height}m, M={mass}kg, PE={pe:.0f}J."}],
                             temperature=0.7, max_tokens=1000)
                         st.info(r.choices[0].message.content)
                     except Exception as e:
                         st.error(f"❌ {type(e).__name__}")
 
-        # ============ PROJECTILE ============
         elif "Projectile" in experiment:
             st.markdown("### 🏀 Projectile Motion")
             c1, c2 = st.columns(2)
             with c1:
-                velocity = st.slider("Initial Velocity (m/s):", 5, 50, 20, key="proj_v")
+                velocity = st.slider("Velocity (m/s):", 5, 50, 20, key="proj_v")
             with c2:
                 angle = st.slider("Angle (°):", 10, 80, 45, key="proj_a")
-            g = 9.8
-            range_m = (velocity**2) * math.sin(2 * math.radians(angle)) / g
-            max_h = (velocity**2) * (math.sin(math.radians(angle))**2) / (2 * g)
-            st.info(f"📐 **Range = v² × sin(2θ) / g** = **{range_m:.2f} m**")
-            st.info(f"📐 **Max Height = v² × sin²(θ) / (2g)** = **{max_h:.2f} m**")
-            st.metric("Range", f"{range_m:.2f} m")
-            st.markdown("📝 **Observation:** Best range at 45°.")
+            range_m = (velocity**2) * math.sin(2 * math.radians(angle)) / 9.8
+            max_h = (velocity**2) * (math.sin(math.radians(angle))**2) / (2 * 9.8)
+            st.info(f"📐 **Range = {range_m:.2f} m · Max H = {max_h:.2f} m**")
             if st.button("🤖 Explain with AI", key="proj_ai_btn"):
                 with st.spinner("AI is thinking..."):
                     try:
                         r = client.chat.completions.create(model="openai/gpt-oss-120b",
-                            messages=[{"role": "user", "content": f"Explain Projectile Motion to a {class_level} student. {lang_rule}\n{diagram_rule}\n\nv={velocity}m/s, angle={angle}°, range={range_m:.2f}m."}],
+                            messages=[{"role": "user", "content": f"Explain Projectile Motion to {class_level}. {lang_rule}\n{diagram_rule}\n\nv={velocity}m/s, angle={angle}°."}],
                             temperature=0.7, max_tokens=1000)
                         st.info(r.choices[0].message.content)
                     except Exception as e:
                         st.error(f"❌ {type(e).__name__}")
 
-        # ============ PENDULUM ============
         elif "Pendulum" in experiment:
             st.markdown("### 🔔 Simple Pendulum")
             length = st.slider("Length (m):", 0.1, 5.0, 1.0, key="pend_l")
             t_period = 2 * math.pi * math.sqrt(length / 9.8)
-            st.info(f"📐 **T = 2π × √(L/g)** = **{t_period:.3f} s**")
+            st.info(f"📐 **T = 2π√(L/g) = {t_period:.3f} s**")
             st.metric("Time Period", f"{t_period:.3f} s")
-            st.markdown("📝 **Observation:** Mass does NOT affect time period!")
             if st.button("🤖 Explain with AI", key="pend_ai_btn"):
                 with st.spinner("AI is thinking..."):
                     try:
                         r = client.chat.completions.create(model="openai/gpt-oss-120b",
-                            messages=[{"role": "user", "content": f"Explain Simple Pendulum to a {class_level} student. {lang_rule}\n{diagram_rule}\n\nLength={length}m, T={t_period:.3f}s."}],
+                            messages=[{"role": "user", "content": f"Explain Simple Pendulum to {class_level}. {lang_rule}\n{diagram_rule}\n\nL={length}m, T={t_period:.3f}s."}],
                             temperature=0.7, max_tokens=1000)
                         st.info(r.choices[0].message.content)
                     except Exception as e:
                         st.error(f"❌ {type(e).__name__}")
 
-        # ============ LIGHT REFRACTION ============
         elif "Light" in experiment:
-            st.markdown("### 💡 Snell's Law — Light Refraction")
+            st.markdown("### 💡 Snell's Law")
             c1, c2 = st.columns(2)
             with c1:
                 angle_i = st.slider("Incident Angle (°):", 1, 85, 30, key="snell_i")
             with c2:
-                medium = st.selectbox("Medium:", [("Water", 1.33), ("Glass", 1.5), ("Diamond", 2.42)], format_func=lambda x: x[0], key="snell_m")
-            n2 = medium[1]
-            sin_r = math.sin(math.radians(angle_i)) / n2
+                medium = st.selectbox("Medium:", [("Water", 1.33), ("Glass", 1.5), ("Diamond", 2.42)],
+                    format_func=lambda x: x[0], key="snell_m")
+            sin_r = math.sin(math.radians(angle_i)) / medium[1]
             if sin_r <= 1:
                 angle_r = math.degrees(math.asin(sin_r))
-                st.info(f"📐 **n₁·sin(θ₁) = n₂·sin(θ₂)**")
-                st.info(f"📐 Refracted angle = **{angle_r:.2f}°** in {medium[0]}")
+                st.info(f"📐 **Refracted angle = {angle_r:.2f}°**")
                 st.metric("Refraction Angle", f"{angle_r:.2f}°")
             else:
                 st.warning("🌟 Total Internal Reflection!")
-            st.markdown("📝 **Observation:** Light bends in denser medium.")
             if st.button("🤖 Explain with AI", key="light_ai_btn"):
                 with st.spinner("AI is thinking..."):
                     try:
                         r = client.chat.completions.create(model="openai/gpt-oss-120b",
-                            messages=[{"role": "user", "content": f"Explain Snell's Law to a {class_level} student. {lang_rule}\n{diagram_rule}\n\nAngle={angle_i}°, Medium={medium[0]}."}],
+                            messages=[{"role": "user", "content": f"Explain Snell's Law to {class_level}. {lang_rule}\n{diagram_rule}\n\nAngle={angle_i}°, Medium={medium[0]}."}],
                             temperature=0.7, max_tokens=1000)
                         st.info(r.choices[0].message.content)
                     except Exception as e:
                         st.error(f"❌ {type(e).__name__}")
 
-        # ============ SOUND ============
         elif "Sound" in experiment:
             st.markdown("### 🌊 Sound Wave")
             c1, c2 = st.columns(2)
@@ -6112,44 +6293,38 @@ Rules:
                 temp = st.slider("Temperature (°C):", 0, 40, 25, key="sound_t")
             speed = 331 + 0.6 * temp
             wl = speed / freq
-            st.info(f"📐 **Speed = 331 + 0.6 × T** = **{speed:.1f} m/s**")
-            st.info(f"📐 **Wavelength = Speed / Frequency** = **{wl:.3f} m**")
+            st.info(f"📐 **Speed = {speed:.1f} m/s · λ = {wl:.3f} m**")
             st.metric("Wavelength", f"{wl:.3f} m")
-            st.markdown("📝 **Observation:** Higher frequency = shorter wavelength.")
             if st.button("🤖 Explain with AI", key="sound_ai_btn"):
                 with st.spinner("AI is thinking..."):
                     try:
                         r = client.chat.completions.create(model="openai/gpt-oss-120b",
-                            messages=[{"role": "user", "content": f"Explain Sound Waves to a {class_level} student. {lang_rule}\n{diagram_rule}\n\nf={freq}Hz, T={temp}°C, λ={wl:.3f}m."}],
+                            messages=[{"role": "user", "content": f"Explain Sound Waves to {class_level}. {lang_rule}\n{diagram_rule}\n\nf={freq}Hz, T={temp}°C."}],
                             temperature=0.7, max_tokens=1000)
                         st.info(r.choices[0].message.content)
                     except Exception as e:
                         st.error(f"❌ {type(e).__name__}")
 
-        # ============ MAGNETISM ============
         elif "Magnet" in experiment:
-            st.markdown("### 🧲 Magnetic Field Around Wire")
+            st.markdown("### 🧲 Magnetic Field")
             c1, c2 = st.columns(2)
             with c1:
                 current = st.slider("Current (A):", 0.1, 20.0, 5.0, key="mag_i")
             with c2:
                 distance = st.slider("Distance (cm):", 1, 50, 10, key="mag_d")
-            B = (4e-7 * 3.14159 * current) / (2 * 3.14159 * (distance/100))
-            st.info(f"📐 **B = μ₀·I / (2π·r)**")
-            st.info(f"📐 B = **{B*1e6:.2f} μT**")
+            B = (4e-7 * math.pi * current) / (2 * math.pi * (distance/100))
+            st.info(f"📐 **B = μ₀·I/(2π·r) = {B*1e6:.2f} μT**")
             st.metric("Magnetic Field", f"{B*1e6:.2f} μT")
-            st.markdown("📝 **Observation:** More current = stronger field.")
             if st.button("🤖 Explain with AI", key="mag_ai_btn"):
                 with st.spinner("AI is thinking..."):
                     try:
                         r = client.chat.completions.create(model="openai/gpt-oss-120b",
-                            messages=[{"role": "user", "content": f"Explain Magnetic Field around wire to a {class_level} student. {lang_rule}\n{diagram_rule}\n\nI={current}A, distance={distance}cm."}],
+                            messages=[{"role": "user", "content": f"Explain Magnetic Field to {class_level}. {lang_rule}\n{diagram_rule}\n\nI={current}A, d={distance}cm."}],
                             temperature=0.7, max_tokens=1000)
                         st.info(r.choices[0].message.content)
                     except Exception as e:
                         st.error(f"❌ {type(e).__name__}")
 
-        # ============ FRICTION ============
         elif "Friction" in experiment:
             st.markdown("### 🚗 Car Braking Distance")
             c1, c2 = st.columns(2)
@@ -6157,569 +6332,562 @@ Rules:
                 speed_kmh = st.slider("Speed (km/h):", 10, 150, 60, key="br_s")
             with c2:
                 friction = st.slider("Friction μ:", 0.1, 1.0, 0.7, key="br_f")
-            speed_ms = speed_kmh / 3.6
-            dist = (speed_ms**2) / (2 * friction * 9.8)
-            st.info(f"📐 **Distance = v² / (2 × μ × g)** = **{dist:.2f} m**")
+            dist = ((speed_kmh / 3.6)**2) / (2 * friction * 9.8)
+            st.info(f"📐 **Distance = {dist:.2f} m**")
             st.metric("Braking Distance", f"{dist:.2f} m")
-            st.markdown("📝 **Observation:** Double speed = 4× distance!")
             if st.button("🤖 Explain with AI", key="br_ai_btn"):
                 with st.spinner("AI is thinking..."):
                     try:
                         r = client.chat.completions.create(model="openai/gpt-oss-120b",
-                            messages=[{"role": "user", "content": f"Explain Braking Distance to a {class_level} student. {lang_rule}\n{diagram_rule}\n\nSpeed={speed_kmh}km/h, μ={friction}, Distance={dist:.2f}m."}],
+                            messages=[{"role": "user", "content": f"Explain Braking Distance to {class_level}. {lang_rule}\n{diagram_rule}\n\nSpeed={speed_kmh}km/h, μ={friction}."}],
                             temperature=0.7, max_tokens=1000)
                         st.info(r.choices[0].message.content)
                     except Exception as e:
                         st.error(f"❌ {type(e).__name__}")
 
-        # ============ HEAT ============
         elif "Heat" in experiment:
             st.markdown("### 🌡️ Heat Conduction")
             c1, c2 = st.columns(2)
             with c1:
-                material = st.selectbox("Material:",
-                    [("Copper (400)", 400), ("Aluminium (237)", 237), ("Iron (80)", 80), ("Glass (1)", 1), ("Wood (0.15)", 0.15)],
+                material = st.selectbox("Material:", [("Copper", 400), ("Aluminium", 237),
+                    ("Iron", 80), ("Glass", 1), ("Wood", 0.15)],
                     format_func=lambda x: x[0], key="heat_mat")
             with c2:
                 area = st.slider("Area (m²):", 0.1, 5.0, 1.0, key="heat_area")
             dt = st.slider("ΔT (°C):", 5, 100, 30, key="heat_dt")
             thick = st.slider("Thickness (m):", 0.01, 0.5, 0.1, key="heat_th")
             rate = (material[1] * area * dt) / thick
-            st.info(f"📐 **Q/t = k·A·ΔT/L** = **{rate:.2f} W**")
+            st.info(f"📐 **Q/t = k·A·ΔT/L = {rate:.2f} W**")
             st.metric("Heat Rate", f"{rate:.2f} W")
-            st.markdown("📝 **Observation:** Metal conducts fast. Wood is insulator.")
             if st.button("🤖 Explain with AI", key="heat_ai_btn"):
                 with st.spinner("AI is thinking..."):
                     try:
                         r = client.chat.completions.create(model="openai/gpt-oss-120b",
-                            messages=[{"role": "user", "content": f"Explain Heat Conduction to a {class_level} student. {lang_rule}\n{diagram_rule}\n\nMaterial={material[0]}, Rate={rate:.2f}W."}],
+                            messages=[{"role": "user", "content": f"Explain Heat Conduction to {class_level}. {lang_rule}\n{diagram_rule}\n\nMaterial={material[0]}."}],
                             temperature=0.7, max_tokens=1000)
                         st.info(r.choices[0].message.content)
                     except Exception as e:
                         st.error(f"❌ {type(e).__name__}")
 
-        # ============ UNIVERSITY: HEISENBERG ============
-        elif "Heisenberg" in experiment or "Quantum" in experiment and "Superposition" not in experiment:
-            st.markdown("### ⚛️ Heisenberg Uncertainty Principle")
-            dx_nm = st.slider("Position Uncertainty Δx (nm):", 0.1, 100.0, 1.0, key="q_dx")
-            h_bar = 1.0545718e-34
-            dx = dx_nm * 1e-9
-            dp = h_bar / (2 * dx)
-            st.info(f"📐 **Δx · Δp ≥ ℏ/2**")
-            st.info(f"📐 Δp ≥ **{dp:.4e} kg·m/s**")
-            st.metric("Momentum Uncertainty", f"{dp:.4e} kg·m/s")
-            st.markdown("📝 **Observation:** More precision in position = less in momentum. FUNDAMENTAL limit.")
+        elif "Heisenberg" in experiment or ("Quantum" in experiment and "Superposition" not in experiment):
+            st.markdown("### ⚛️ Heisenberg Uncertainty")
+            dx_nm = st.slider("Δx (nm):", 0.1, 100.0, 1.0, key="q_dx")
+            dp = 1.0545718e-34 / (2 * dx_nm * 1e-9)
+            st.info(f"📐 **Δx·Δp ≥ ℏ/2 → Δp = {dp:.4e} kg·m/s**")
+            st.metric("Δp", f"{dp:.4e} kg·m/s")
             if st.button("🤖 Explain with AI", key="q_ai_btn"):
                 with st.spinner("Professor is thinking..."):
                     try:
                         r = client.chat.completions.create(model="openai/gpt-oss-120b",
-                            messages=[{"role": "user", "content": f"Explain Heisenberg Uncertainty Principle at University physics level. {lang_rule}\n{diagram_rule}\n\nΔx={dx_nm}nm, Δp={dp:.4e}kg·m/s. Include mathematical derivation and physical interpretation."}],
+                            messages=[{"role": "user", "content": f"Explain Heisenberg Uncertainty at University level. {lang_rule}\n{diagram_rule}\n\nΔx={dx_nm}nm."}],
                             temperature=0.6, max_tokens=1500)
                         st.info(r.choices[0].message.content)
                     except Exception as e:
                         st.error(f"❌ {type(e).__name__}")
 
-        # ============ UNIVERSITY: RELATIVITY ============
         elif "Relativity" in experiment or ("Time Dilation" in experiment and "Reality" not in experiment):
-            st.markdown("### 🌌 Special Relativity: Time Dilation")
-            v_frac = st.slider("Velocity (as fraction of c):", 0.01, 0.999, 0.5, key="rel_v")
+            st.markdown("### 🌌 Special Relativity")
+            v_frac = st.slider("v/c:", 0.01, 0.999, 0.5, key="rel_v")
             gamma = 1 / ((1 - v_frac**2) ** 0.5)
-            st.info(f"📐 **γ = 1 / √(1 − v²/c²)** = **{gamma:.4f}**")
+            st.info(f"📐 **γ = 1/√(1−v²/c²) = {gamma:.4f}**")
             st.metric("Time Dilation", f"{gamma:.4f}×")
-            st.markdown(f"📝 **Observation:** At {v_frac}c, 1 sec on ship = {gamma:.4f} sec on Earth.")
             if st.button("🤖 Explain with AI", key="rel_ai_btn"):
                 with st.spinner("Professor is thinking..."):
                     try:
                         r = client.chat.completions.create(model="openai/gpt-oss-120b",
-                            messages=[{"role": "user", "content": f"Explain Special Relativity Time Dilation at University level. {lang_rule}\n{diagram_rule}\n\nv={v_frac}c, γ={gamma:.4f}. Include Lorentz transformation and physical meaning."}],
+                            messages=[{"role": "user", "content": f"Explain Special Relativity at University. {lang_rule}\n{diagram_rule}\n\nv={v_frac}c, γ={gamma:.4f}."}],
                             temperature=0.6, max_tokens=1500)
                         st.info(r.choices[0].message.content)
                     except Exception as e:
                         st.error(f"❌ {type(e).__name__}")
 
-        # ============ UNIVERSITY: CARNOT ============
         elif "Carnot" in experiment:
-            st.markdown("### 🔥 Carnot Engine Efficiency")
+            st.markdown("### 🔥 Carnot Engine")
             c1, c2 = st.columns(2)
             with c1:
-                T_hot = st.slider("Hot Reservoir (K):", 300, 2000, 800, key="carnot_h")
+                T_hot = st.slider("Hot (K):", 300, 2000, 800, key="carnot_h")
             with c2:
-                T_cold = st.slider("Cold Reservoir (K):", 100, 500, 300, key="carnot_c")
+                T_cold = st.slider("Cold (K):", 100, 500, 300, key="carnot_c")
             if T_hot > T_cold:
-                eta = 1 - (T_cold / T_hot)
-                st.info(f"📐 **η = 1 − (T_cold / T_hot)** = **{eta*100:.2f}%**")
-                st.metric("Max Efficiency", f"{eta*100:.2f}%")
-                st.markdown("📝 **Observation:** No engine can reach 100% (2nd Law).")
+                eta = (1 - T_cold / T_hot) * 100
+                st.info(f"📐 **η = {eta:.2f}%**")
+                st.metric("Max Efficiency", f"{eta:.2f}%")
             else:
-                st.error("Hot temp must exceed cold temp.")
+                st.error("T_hot must > T_cold")
             if st.button("🤖 Explain with AI", key="carnot_ai_btn"):
                 with st.spinner("Professor is thinking..."):
                     try:
                         r = client.chat.completions.create(model="openai/gpt-oss-120b",
-                            messages=[{"role": "user", "content": f"Explain Carnot Engine & 2nd Law of Thermodynamics at University level. {lang_rule}\n{diagram_rule}\n\nT_hot={T_hot}K, T_cold={T_cold}K."}],
+                            messages=[{"role": "user", "content": f"Explain Carnot Engine at University. {lang_rule}\n{diagram_rule}\n\nT_h={T_hot}K, T_c={T_cold}K."}],
                             temperature=0.6, max_tokens=1500)
                         st.info(r.choices[0].message.content)
                     except Exception as e:
                         st.error(f"❌ {type(e).__name__}")
 
-        # ============ ANTIMATTER BATTERY ============
         elif "Antimatter Battery" in experiment:
-            st.markdown("### 🔋 Antimatter Positron-Cell Battery")
-            st.caption("E = 2·m·c² (matter + antimatter annihilation)")
+            st.markdown("### 🔋 Antimatter Battery")
             c1, c2 = st.columns(2)
             with c1:
-                am_mass = st.slider("Antimatter Mass (grams):", 0.001, 10.0, 1.0, key="am_mass")
+                am_mass = st.slider("Antimatter (g):", 0.001, 10.0, 1.0, key="am_mass")
             with c2:
                 efficiency = st.slider("Efficiency:", 0.1, 1.0, 0.95, key="am_eff")
             m_kg = am_mass / 1000.0
-            total_mass = m_kg * 2
-            energy_j = total_mass * (SPEED_OF_LIGHT ** 2) * efficiency
+            energy_j = (m_kg * 2) * (SPEED_OF_LIGHT ** 2) * efficiency
             kwh = energy_j / 3.6e6
-            st.info(f"📐 **E = 2·m·c² × η**")
-            st.info(f"📐 2 × {m_kg} kg × (3×10⁸)² × {efficiency} = **{energy_j:.3e} J**")
-            col_a, col_b = st.columns(2)
-            col_a.metric("⚡ Energy", f"{kwh:,.2f} kWh")
-            col_b.metric("🪫 Li-ion Equivalent", f"{kwh/0.27:,.0f} Tons")
-            st.success("✅ Verdict: Max energy density allowed by E=mc²")
-            st.markdown("📝 **Observation:** 1 gram of antimatter ≈ 43 kilotons of TNT equivalent energy.")
+            c1, c2 = st.columns(2)
+            c1.metric("⚡ Energy", f"{kwh:,.2f} kWh")
+            c2.metric("🪫 Li-ion Eq.", f"{kwh/0.27:,.0f} Tons")
             if st.button("🤖 Explain with AI", key="am_ai_btn"):
                 with st.spinner("Professor is thinking..."):
                     try:
                         r = client.chat.completions.create(model="openai/gpt-oss-120b",
-                            messages=[{"role": "user", "content": f"Explain Antimatter Battery (E=2mc², annihilation, positron cells) at University level. {lang_rule}\n{diagram_rule}\n\nMass={am_mass}g, η={efficiency}, Energy={kwh:.2f}kWh. Include physics + tech challenges."}],
+                            messages=[{"role": "user", "content": f"Explain Antimatter Battery at University. {lang_rule}\n{diagram_rule}\n\nMass={am_mass}g."}],
                             temperature=0.6, max_tokens=1500)
                         st.info(r.choices[0].message.content)
                     except Exception as e:
                         st.error(f"❌ {type(e).__name__}")
 
-        # ============ PHOTONIC QUANTUM CHIP ============
         elif "Photonic Quantum Chip" in experiment:
             st.markdown("### 💾 Photonic Quantum NPU")
-            st.caption("Landauer Limit: E_min = k_B · T · ln2")
-            c1, c2 = st.columns(2)
-            with c1:
-                chip_area = st.slider("Chip Area (mm²):", 10.0, 1000.0, 400.0, key="chip_area")
-            with c2:
-                temp_k = st.slider("Temperature (K):", 4.0, 400.0, 300.0, key="chip_temp")
+            area = st.slider("Chip Area (mm²):", 10.0, 1000.0, 400.0, key="chip_area")
+            temp_k = st.slider("Temp (K):", 4.0, 400.0, 300.0, key="chip_temp")
             landauer = BOLTZMANN_CONST * temp_k * math.log(2)
-            optical_clock = 500e12
-            total_nodes = chip_area * 1e14
-            flops = total_nodes * optical_clock
+            flops = (area * 1e14) * 500e12
             power = flops * landauer
-            st.info(f"📐 **E_min = k_B · T · ln2** = **{landauer:.3e} J**")
-            st.info(f"📐 **FLOPS = nodes × 500 THz**")
-            col_a, col_b = st.columns(2)
-            col_a.metric("⚡ Max FLOPS", f"{flops:.3e}")
-            col_b.metric("🔋 Min Power", f"{power:.2f} W")
-            st.success(f"✅ Verdict: {flops/1e24:.2f} YottaFLOPS — Zero Joule heating at light frequency")
-            st.markdown("📝 **Observation:** Optical computing at light frequency breaks thermal barrier of electronics.")
+            st.info(f"📐 **E_min = k_B·T·ln2 = {landauer:.3e} J**")
+            c1, c2 = st.columns(2)
+            c1.metric("⚡ FLOPS", f"{flops:.3e}")
+            c2.metric("🔋 Power", f"{power:.2f} W")
             if st.button("🤖 Explain with AI", key="chip_ai_btn"):
                 with st.spinner("Professor is thinking..."):
                     try:
                         r = client.chat.completions.create(model="openai/gpt-oss-120b",
-                            messages=[{"role": "user", "content": f"Explain Photonic Quantum NPU (Landauer limit, optical clock, zero-heat computing) at University level. {lang_rule}\n{diagram_rule}\n\nArea={chip_area}mm², T={temp_k}K, FLOPS={flops:.3e}, Power={power:.2f}W."}],
+                            messages=[{"role": "user", "content": f"Explain Photonic Quantum NPU at University. {lang_rule}\n{diagram_rule}\n\nArea={area}mm², T={temp_k}K."}],
                             temperature=0.6, max_tokens=1500)
                         st.info(r.choices[0].message.content)
                     except Exception as e:
                         st.error(f"❌ {type(e).__name__}")
 
-        # ============ ROOM-TEMP SUPERCONDUCTOR ============
         elif "Room-Temp Superconductor" in experiment:
-            st.markdown("### 🧊 Room-Temperature Superconductor (RTS)")
-            st.caption("F = B² · A / (2·μ₀)")
+            st.markdown("### 🧊 Room-Temp Superconductor")
             c1, c2 = st.columns(2)
             with c1:
-                b_field = st.slider("Magnetic Field (T):", 0.1, 20.0, 5.0, key="rts_b")
+                b_field = st.slider("B (T):", 0.1, 20.0, 5.0, key="rts_b")
             with c2:
                 area_m2 = st.slider("Area (m²):", 0.1, 10.0, 2.0, key="rts_a")
-            pressure = (b_field ** 2) / (2 * VACUUM_PERMEABILITY)
-            force = pressure * area_m2
+            force = ((b_field ** 2) / (2 * VACUUM_PERMEABILITY)) * area_m2
             kg = force / 9.81
-            st.info(f"📐 **Pressure = B² / (2·μ₀)** = **{pressure:,.2f} Pa**")
-            st.info(f"📐 **Force = Pressure × Area** = **{force:,.2f} N**")
-            col_a, col_b = st.columns(2)
-            col_a.metric("⬆️ Levitation Force", f"{force:,.2f} N")
-            col_b.metric("🏋️ Lift Capacity", f"{kg:,.2f} kg")
-            st.success("✅ Verdict: Frictionless levitating cities — Power Loss = 0.00%")
-            st.markdown("📝 **Observation:** Zero resistance = perfect magnetic levitation (like maglev trains, but room temp).")
+            c1, c2 = st.columns(2)
+            c1.metric("⬆️ Force", f"{force:,.2f} N")
+            c2.metric("🏋️ Lift", f"{kg:,.2f} kg")
             if st.button("🤖 Explain with AI", key="rts_ai_btn"):
                 with st.spinner("Professor is thinking..."):
                     try:
                         r = client.chat.completions.create(model="openai/gpt-oss-120b",
-                            messages=[{"role": "user", "content": f"Explain Room-Temp Superconductor & magnetic levitation at University level. {lang_rule}\n{diagram_rule}\n\nB={b_field}T, Area={area_m2}m², Force={force:.2f}N, Lift={kg:.2f}kg."}],
+                            messages=[{"role": "user", "content": f"Explain Room-Temp Superconductor at University. {lang_rule}\n{diagram_rule}\n\nB={b_field}T."}],
                             temperature=0.6, max_tokens=1500)
                         st.info(r.choices[0].message.content)
                     except Exception as e:
                         st.error(f"❌ {type(e).__name__}")
 
-        # ============ SPACE ELEVATOR TETHER ============
-        elif "Space Elevator" in experiment and "Rocket" not in experiment:
-            st.markdown("### 🛰️ Carbon-Nanotube Space Elevator Tether")
-            st.caption("Stress = ρ·μ·(1/R_E − 1/R_GEO − ω²(R_GEO²−R_E²)/(2μ))")
-            density = st.slider("Tether Density (kg/m³):", 500.0, 3000.0, 1300.0, key="se_density")
+        elif "Space Elevator" in experiment:
+            st.markdown("### 🛰️ Space Elevator Tether")
+            density = st.slider("Density (kg/m³):", 500.0, 3000.0, 1300.0, key="se_density")
             mu = 3.986004418e14
             omega = 7.2921159e-5
             stress = density * mu * ((1/EARTH_RADIUS) - (1/GEO_RADIUS)
                      - (omega**2 * (GEO_RADIUS**2 - EARTH_RADIUS**2))/(2*mu))
             stress_gpa = stress / 1e9
-            st.info(f"📐 **Density = {density} kg/m³**")
-            st.info(f"📐 **Required Strength = {stress_gpa:.2f} GPa**")
-            col_a, col_b = st.columns(2)
-            col_a.metric("💪 Required Strength", f"{stress_gpa:.2f} GPa")
-            col_b.metric("🔩 vs Steel", f"{stress_gpa/2:.0f}× stronger")
-            st.success("✅ Verdict: Carbon-nanotube tether = 1/100th cost of rockets")
-            st.markdown("📝 **Observation:** A tether from Earth surface to GEO orbit lets us climb to space without rockets.")
+            st.metric("💪 Required Strength", f"{stress_gpa:.2f} GPa")
             if st.button("🤖 Explain with AI", key="se_ai_btn"):
                 with st.spinner("Professor is thinking..."):
                     try:
                         r = client.chat.completions.create(model="openai/gpt-oss-120b",
-                            messages=[{"role": "user", "content": f"Explain Space Elevator tether physics at University level. {lang_rule}\n{diagram_rule}\n\nDensity={density}kg/m³, Stress={stress_gpa:.2f}GPa. Discuss carbon nanotubes & material science."}],
+                            messages=[{"role": "user", "content": f"Explain Space Elevator at University. {lang_rule}\n{diagram_rule}\n\nDensity={density}kg/m³."}],
                             temperature=0.6, max_tokens=1500)
                         st.info(r.choices[0].message.content)
                     except Exception as e:
                         st.error(f"❌ {type(e).__name__}")
 
-        # ============ SILICON LIFE ============
         elif "Silicon Life" in experiment:
-            st.markdown("### 👽 Silicon-Silane Life (Xenobiology)")
-            st.caption("Alternative biochemistry — Si instead of C, methane instead of water")
+            st.markdown("### 👽 Silicon Life")
             c1, c2 = st.columns(2)
             with c1:
-                temp = st.slider("Temperature (K):", 50.0, 400.0, 94.0, key="si_temp")
+                temp = st.slider("Temp (K):", 50.0, 400.0, 94.0, key="si_temp")
             with c2:
-                oxygen = st.checkbox("Oxygen Present?", value=False, key="si_ox")
+                oxygen = st.checkbox("Oxygen?", value=False, key="si_ox")
             if oxygen and temp > 200:
-                status, viability = "FAILED: Si + O2 = Sand (SiO2)", 0.0
-                st.error(f"❌ {status}")
+                st.error("❌ FAILED: Si + O2 = Sand")
             elif temp < 110:
-                status, viability = "STABLE: Silane in liquid methane", 98.5
-                st.success(f"✅ {status}")
+                st.success("✅ STABLE: Silane in methane")
             else:
-                status, viability = "UNSTABLE: Si-Si breaks", 15.0
-                st.warning(f"⚠️ {status}")
-            col_a, col_b = st.columns(2)
-            col_a.metric("🌡️ Temperature", f"{temp}K ({temp-273.15:.1f}°C)")
-            col_b.metric("🧬 Viability", f"{viability}%")
-            st.markdown("📝 **Observation:** Life doesn't need carbon/water — silicon + methane could work at cold temps.")
+                st.warning("⚠️ UNSTABLE")
             if st.button("🤖 Explain with AI", key="si_ai_btn"):
                 with st.spinner("Professor is thinking..."):
                     try:
                         r = client.chat.completions.create(model="openai/gpt-oss-120b",
-                            messages=[{"role": "user", "content": f"Explain Silicon-Silane alternative life chemistry at University level. {lang_rule}\n{diagram_rule}\n\nTemp={temp}K, Oxygen={oxygen}, Status={status}, Viability={viability}%."}],
+                            messages=[{"role": "user", "content": f"Explain Silicon Life at University. {lang_rule}\n{diagram_rule}\n\nTemp={temp}K."}],
                             temperature=0.6, max_tokens=1500)
                         st.info(r.choices[0].message.content)
                     except Exception as e:
                         st.error(f"❌ {type(e).__name__}")
 
-        # ============ MULTI-AGENT SWARM ============
         elif "Multi-Agent Swarm" in experiment:
-            st.markdown("### 🤖 Multi-Agent Swarm Intelligence")
-            st.caption("Distributed task execution across autonomous agents")
-            objective = st.text_input("Main Objective:", value="BuildAIPlatform", key="swarm_obj")
-            agents_input = st.text_input("Agent Names (comma-separated):", value="Alpha,Beta,Gamma", key="swarm_agents")
-            if st.button("🚀 Execute Swarm Task", key="swarm_run"):
+            st.markdown("### 🤖 Multi-Agent Swarm")
+            objective = st.text_input("Objective:", value="BuildAIPlatform", key="swarm_obj")
+            agents_input = st.text_input("Agents:", value="Alpha,Beta,Gamma", key="swarm_agents")
+            if st.button("🚀 Run Swarm", key="swarm_run"):
                 agent_names = [a.strip() for a in agents_input.split(",") if a.strip()]
-                if not agent_names:
-                    st.error("❌ Provide at least one agent name.")
-                else:
-                    upObj = objective.upper()
-                    subtasks = [
-                        f"ANALYZE_{upObj}_1",
-                        f"SYNTHESIZE_{upObj}_2",
-                        "EXECUTE_OPTIMIZATION"
-                    ]
-                    results = {}
-                    for idx, agent in enumerate(agent_names):
-                        entropy = sum(ord(c) for c in objective) * (idx + 1)
-                        metric = round(math.sqrt(entropy + 10) * 3.14159, 4)
-                        results[agent] = {
-                            "task": subtasks[idx % len(subtasks)],
-                            "metric": metric,
-                            "status": "COMPLETED"
-                        }
-                    st.success(f"✅ Swarm executed {len(agent_names)} agents successfully")
-                    for agent, data in results.items():
-                        st.markdown(f"**🤖 {agent}**")
-                        st.json(data)
-            if st.button("🤖 Explain with AI", key="swarm_ai_btn"):
-                with st.spinner("Professor is thinking..."):
-                    try:
-                        r = client.chat.completions.create(model="openai/gpt-oss-120b",
-                            messages=[{"role": "user", "content": f"Explain Multi-Agent Swarm Intelligence & distributed task decomposition at University level. {lang_rule}\n{diagram_rule}\n\nObjective='{objective}'. Include entropy metric, coordination, emergent behavior."}],
-                            temperature=0.6, max_tokens=1500)
-                        st.info(r.choices[0].message.content)
-                    except Exception as e:
-                        st.error(f"❌ {type(e).__name__}")
+                results = {}
+                for idx, agent in enumerate(agent_names):
+                    entropy = sum(ord(c) for c in objective) * (idx + 1)
+                    metric = round(math.sqrt(entropy + 10) * 3.14159, 4)
+                    results[agent] = {"task": f"ANALYZE_{objective.upper()}_{idx+1}", "metric": metric, "status": "COMPLETED"}
+                for agent, data in results.items():
+                    st.markdown(f"**🤖 {agent}**")
+                    st.json(data)
 
-        # ============ QUANTUM SUPERPOSITION (COMPLEX) ============
         elif "Quantum Superposition (Complex)" in experiment:
-            st.markdown("### 🌀 Quantum Superposition (Complex Amplitudes)")
-            st.caption("|ψ⟩ = α|0⟩ + β|1⟩  where α, β ∈ ℂ")
+            st.markdown("### 🌀 Quantum Superposition")
             c1, c2 = st.columns(2)
             with c1:
-                st.markdown("**α (alpha)**")
                 a_r = st.number_input("α real:", value=3.0, key="qs_ar")
                 a_i = st.number_input("α imag:", value=0.0, key="qs_ai")
             with c2:
-                st.markdown("**β (beta)**")
                 b_r = st.number_input("β real:", value=4.0, key="qs_br")
                 b_i = st.number_input("β imag:", value=0.0, key="qs_bi")
             alpha = complex(a_r, a_i)
             beta = complex(b_r, b_i)
             norm = math.sqrt(abs(alpha)**2 + abs(beta)**2)
-            if norm == 0:
-                st.error("❌ Zero norm — invalid state")
-            else:
+            if norm > 0:
                 na, nb = alpha/norm, beta/norm
-                p0 = abs(na)**2 * 100
-                p1 = abs(nb)**2 * 100
-                st.info(f"📐 **Normalization: |α|² + |β|² = 1**")
-                st.info(f"📐 State: |ψ⟩ = ({na:.3f})|0⟩ + ({nb:.3f})|1⟩")
-                col_a, col_b = st.columns(2)
-                col_a.metric("P(|0⟩)", f"{p0:.2f}%")
-                col_b.metric("P(|1⟩)", f"{p1:.2f}%")
-                st.success("✅ Born rule: probabilities from squared amplitudes")
-            if st.button("🤖 Explain with AI", key="qs_ai_btn"):
-                with st.spinner("Professor is thinking..."):
-                    try:
-                        r = client.chat.completions.create(model="openai/gpt-oss-120b",
-                            messages=[{"role": "user", "content": f"Explain Quantum Superposition, complex amplitudes, Born rule at University level. {lang_rule}\n{diagram_rule}\n\nα={alpha}, β={beta}, Normalized: {na}, {nb}. Discuss Hilbert space and measurement."}],
-                            temperature=0.6, max_tokens=1500)
-                        st.info(r.choices[0].message.content)
-                    except Exception as e:
-                        st.error(f"❌ {type(e).__name__}")
+                c1, c2 = st.columns(2)
+                c1.metric("P(|0⟩)", f"{abs(na)**2 * 100:.2f}%")
+                c2.metric("P(|1⟩)", f"{abs(nb)**2 * 100:.2f}%")
 
-        # ============ SILANE CHAIN STABILITY ============
         elif "Silane Chain Stability" in experiment:
-            st.markdown("### 🧬 Silane Chain Stability (Xenobiology)")
-            st.caption("Stability(SiₙH₂ₙ₊₂) — thermal decomposition model")
+            st.markdown("### 🧬 Silane Chain Stability")
             c1, c2 = st.columns(2)
             with c1:
-                chain_len = st.slider("Chain Length (Si atoms):", 1, 50, 12, key="sc_len")
+                chain_len = st.slider("Chain Length:", 1, 50, 12, key="sc_len")
             with c2:
-                temp_k2 = st.slider("Temperature (K):", 20.0, 200.0, 90.0, key="sc_temp")
-            thermal = 0.008314 * temp_k2
-            stability = max(0.0, 100.0 - (thermal * chain_len * 3.2))
+                temp_k2 = st.slider("Temp (K):", 20.0, 200.0, 90.0, key="sc_temp")
+            stability = max(0.0, 100.0 - (0.008314 * temp_k2 * chain_len * 3.2))
             viable = stability > 45.0 and temp_k2 <= 120.0
-            col_a, col_b = st.columns(2)
-            col_a.metric("🧪 Stability Score", f"{stability:.2f}")
-            col_b.metric("✅ Viable?", "YES" if viable else "NO")
-            if viable:
-                st.success("✅ Stable silane chain — xenobiology possible")
-            else:
-                st.error("❌ Chain breaks down — not viable")
-            st.markdown("📝 **Observation:** Longer chains destabilize faster at higher temps.")
-            if st.button("🤖 Explain with AI", key="sc_ai_btn"):
-                with st.spinner("Professor is thinking..."):
-                    try:
-                        r = client.chat.completions.create(model="openai/gpt-oss-120b",
-                            messages=[{"role": "user", "content": f"Explain Silane (SiₙH₂ₙ₊₂) chain stability & thermal decomposition at University level. {lang_rule}\n{diagram_rule}\n\nChain={chain_len}, T={temp_k2}K, Stability={stability:.2f}, Viable={viable}."}],
-                            temperature=0.6, max_tokens=1500)
-                        st.info(r.choices[0].message.content)
-                    except Exception as e:
-                        st.error(f"❌ {type(e).__name__}")
+            c1, c2 = st.columns(2)
+            c1.metric("🧪 Stability", f"{stability:.2f}")
+            c2.metric("✅ Viable?", "YES" if viable else "NO")
 
-        # ============ COGNITIVE SECURITY ============
         elif "Anomaly Detection" in experiment:
-            st.markdown("### 🔐 Cognitive Security — Synthetic Anomaly Detection")
-            st.caption("Statistical test: variance + Shannon entropy")
-            data_input = st.text_input(
-                "Data Stream (comma-separated numbers):",
-                value="1.2, 1.21, 1.19, 1.20, 1.22",
-                key="cs_data"
-            )
-            if st.button("🔍 Analyze Stream", key="cs_run"):
+            st.markdown("### 🔐 Anomaly Detection")
+            data_input = st.text_input("Data (comma-separated):", value="1.2, 1.21, 1.19, 1.20, 1.22", key="cs_data")
+            if st.button("🔍 Analyze", key="cs_run"):
                 try:
-                    data_stream = [float(x.strip()) for x in data_input.split(",") if x.strip()]
-                    if not data_stream:
-                        st.error("❌ Empty stream")
-                    else:
-                        mean_v = statistics.mean(data_stream)
-                        var_v = statistics.variance(data_stream) if len(data_stream) > 1 else 0.0
-                        s = sum(data_stream)
-                        entropy = -sum((x/s)*math.log2(x/s) for x in data_stream if x > 0) if s > 0 else 0.0
+                    ds = [float(x.strip()) for x in data_input.split(",") if x.strip()]
+                    if ds:
+                        mean_v = statistics.mean(ds)
+                        var_v = statistics.variance(ds) if len(ds) > 1 else 0.0
+                        s = sum(ds)
+                        entropy = -sum((x/s)*math.log2(x/s) for x in ds if x > 0) if s > 0 else 0.0
                         is_fake = var_v < 0.05 or entropy < 1.0
-                        col_a, col_b, col_c = st.columns(3)
-                        col_a.metric("📊 Mean", f"{mean_v:.4f}")
-                        col_b.metric("📈 Variance", f"{var_v:.4f}")
-                        col_c.metric("🎲 Entropy", f"{entropy:.4f}")
+                        c1, c2, c3 = st.columns(3)
+                        c1.metric("Mean", f"{mean_v:.4f}")
+                        c2.metric("Variance", f"{var_v:.4f}")
+                        c3.metric("Entropy", f"{entropy:.4f}")
                         if is_fake:
-                            st.error("🚨 SYNTHETIC data detected (variance<0.05 OR entropy<1.0)")
+                            st.error("🚨 SYNTHETIC data detected")
                         else:
-                            st.success("✅ Data appears natural")
+                            st.success("✅ Natural data")
                 except Exception as e:
-                    st.error(f"❌ Parse error: {e}")
-            if st.button("🤖 Explain with AI", key="cs_ai_btn"):
-                with st.spinner("Professor is thinking..."):
-                    try:
-                        r = client.chat.completions.create(model="openai/gpt-oss-120b",
-                            messages=[{"role": "user", "content": f"Explain Synthetic Data Detection using variance & Shannon entropy at University level. {lang_rule}\n{diagram_rule}\n\nDiscuss why bots/fake data have low variance and low entropy."}],
-                            temperature=0.6, max_tokens=1500)
-                        st.info(r.choices[0].message.content)
-                    except Exception as e:
-                        st.error(f"❌ {type(e).__name__}")
+                    st.error(f"❌ {e}")
 
-        # ============ REALITY SANDBOX: TIME DILATION ============
         elif "Reality Sandbox" in experiment:
-            st.markdown("### ⏱️ Reality Sandbox — Time Dilation Calculator")
-            st.caption("γ = 1 / √(1 − v²/c²)  ·  t_dilated = γ · t_proper")
+            st.markdown("### ⏱️ Reality Sandbox")
             c1, c2 = st.columns(2)
             with c1:
-                v_frac = st.slider("Velocity (fraction of c):", 0.01, 0.999, 0.95, key="rs_v")
+                v_frac = st.slider("v/c:", 0.01, 0.999, 0.95, key="rs_v")
             with c2:
                 proper_t = st.slider("Proper Time (s):", 1.0, 1000.0, 100.0, key="rs_t")
             gamma = 1.0 / math.sqrt(1.0 - (v_frac**2))
-            dilated = proper_t * gamma
-            col_a, col_b = st.columns(2)
-            col_a.metric("γ (Lorentz factor)", f"{gamma:.4f}")
-            col_b.metric("⏱️ Dilated Time", f"{dilated:.4f} s")
-            st.info(f"📐 At v = {v_frac}c, proper time = {proper_t}s → dilated = **{dilated:.4f}s**")
-            st.markdown("📝 **Observation:** Faster you go, slower time flows for you (relative to a stationary observer).")
-            if st.button("🤖 Explain with AI", key="rs_ai_btn"):
-                with st.spinner("Professor is thinking..."):
-                    try:
-                        r = client.chat.completions.create(model="openai/gpt-oss-120b",
-                            messages=[{"role": "user", "content": f"Explain Time Dilation & Lorentz factor at University level. {lang_rule}\n{diagram_rule}\n\nv={v_frac}c, t_proper={proper_t}s, γ={gamma:.4f}, t_dilated={dilated:.4f}s. Include twin paradox."}],
-                            temperature=0.6, max_tokens=1500)
-                        st.info(r.choices[0].message.content)
-                    except Exception as e:
-                        st.error(f"❌ {type(e).__name__}")
-
-    # ============================================================
-    # ⭐ TAB 3: TIME MACHINE 2050 (NEW — from Code 2)
+            c1, c2 = st.columns(2)
+            c1.metric("γ", f"{gamma:.4f}")
+            c2.metric("⏱️ Dilated", f"{proper_t * gamma:.4f} s")
+# ============================================================
+    # ⭐ TAB 3: MEGA ROCKET LAB 2050
     # ============================================================
     with tab3:
-        st.markdown("### 🚀 Kids Logic Lab — YEAR 2050")
-        st.markdown("बच्चों! ये सिर्फ़ सिमुलेशन नहीं, ये तुम्हारा खुद का **Time-Machine Game** है!")
+        st.markdown("### 🛸 CLYXESS MEGA LOGIC LAB - YEAR 2050")
+        st.markdown("### 🗺️ Enterprise Multi-Planet Mission Control & Science Exploration")
 
-        # --- CONTROLS ---
-        ctrl1, ctrl2, ctrl3 = st.columns(3)
-        with ctrl1:
-            mag_freq = st.slider("🧲 Magnetic Frequency (GHz)", 1, 1000, 100, 50, key="tm_mag")
-        with ctrl2:
-            space_bend = st.slider("🌌 Space-Time Warp (%)", 0, 100, 10, 5, key="tm_warp")
-        with ctrl3:
-            quantum_boost = st.toggle("⚛️ Quantum Boost", False, key="tm_qboost")
+        # --- MASTER CELESTIAL DATABASE ---
+        celestial_database = {
+            "Moon (चंद्रमा)": {
+                "distance_km": 384400, "gravity": 1.62,
+                "description": "धरती का सबसे पास का साथी। यहाँ मैग्नेटिक हाईवे बनाना सबसे आसान है।",
+                "color": "#e1e1e1", "radius_scale": 1.5,
+                "physics_explain": """
+                <ul>
+                    <li><b>Gravitational Force (F = mg):</b> चंद्रमा का द्रव्यमान छोटा होने के कारण इसकी ग्रेविटी धरती से 6 गुना कम (1.62 m/s²) है। यहाँ रॉकेट को रोकने के लिए बहुत कम बल चाहिए।</li>
+                    <li><b>Magnetic Acceleration:</b> चंद्रमा पर वायुमंडल नहीं है, हवा का घर्षण 0 है। न्यूटन के तीसरे नियम (Action-Reaction) के कारण रॉकेट बिना रुकावट सुपरसोनिक गति पकड़ लेता है।</li>
+                </ul>
+                """,
+                "math_explain": """
+                <ul>
+                    <li><b>Ratio & Proportions:</b> धरती पर 60 kg वजन → चंद्रमा पर 60 × (1.62/9.8) ≈ 10 kg।</li>
+                    <li><b>Velocity Equation (v = d/t):</b> 3,84,400 किमी को 15 घंटे में तय = 25,626 किमी/घंटा।</li>
+                </ul>
+                """
+            },
+            "Mars (मंगल ग्रह)": {
+                "distance_km": 225000000, "gravity": 3.71,
+                "description": "लाल ग्रह। यहाँ पहुँचने के लिए हाई-फ्रीक्वेंसी इलेक्ट्रॉन्स की भारी बौछार चाहिए।",
+                "color": "#ff6633", "radius_scale": 2.2,
+                "physics_explain": """
+                <ul>
+                    <li><b>Atmospheric Drag:</b> मंगल पर पतला CO₂ वायुमंडल। रॉकेट प्रवेश करेगा तो 'सोनिक शॉकवेव' बनेगी। हमारी 2050 तकनीक 'Acoustic Energy Harvesting' से इसे बैटरी चार्ज में बदल देती है!</li>
+                    <li><b>Magnetic Deflection:</b> मंगल का Magnetosphere नष्ट है, सौर हवाएं सीधे टकराएंगी। हमारा इंजन कृत्रिम मैग्नेटिक शील्ड बनाता है।</li>
+                </ul>
+                """,
+                "math_explain": """
+                <ul>
+                    <li><b>Linear Scale Jump:</b> मंगल की दूरी चंद्रमा से 585 गुना! केमिकल रॉकेट (30,000 km/h) से = 312 दिन।</li>
+                    <li><b>2050 Matrix Optimization:</b> 40% लाइट स्पीड पर सफर चंद घंटों में। Calculus graph: Constant Distance vs Variable Velocity.</li>
+                </ul>
+                """
+            },
+            "Jupiter (बृहस्पति)": {
+                "distance_km": 778000000, "gravity": 24.79,
+                "description": "भयंकर ग्रेविटी वाला गैस का दानव। इसका चुंबकीय क्षेत्र बहुत शक्तिशाली है।",
+                "color": "#ffcc99", "radius_scale": 4.5,
+                "physics_explain": """
+                <ul>
+                    <li><b>Intense Gravitational Collapse:</b> बृहस्पति की ग्रेविटी धरती से 2.5 गुना (24.79 m/s²)। रॉकेट को Anti-Gravity Compensator Matrix चाहिए।</li>
+                    <li><b>Natural Plasma Engine:</b> बृहस्पति का चुंबकीय क्षेत्र ब्रह्मांड में सबसे बड़ा। रॉकेट यहाँ से इलेक्ट्रॉन्स खींचकर रीचार्ज हो सकता है।</li>
+                </ul>
+                """,
+                "math_explain": """
+                <ul>
+                    <li><b>Inverse-Square Law (F ∝ 1/r²):</b> दूरी आधी → बल 4 गुना।</li>
+                    <li><b>Vector Balancing:</b> थ्रस्ट और ग्रेविटेशनल फ़ोर्स संतुलित करना। Anti-Gravity स्लाइडर की मदद से।</li>
+                </ul>
+                """
+            },
+            "Black Hole (Gargantua)": {
+                "distance_km": 40000000000000, "gravity": 999.99,
+                "description": "अनंत गुरुत्वाकर्षण! यहाँ समय और अंतरिक्ष के सारे नियम टूट जाते हैं।",
+                "color": "#6600cc", "radius_scale": 6.0,
+                "physics_explain": """
+                <ul>
+                    <li><b>Einstein's General Relativity:</b> ब्लैक होल का द्रव्यमान Space-Time को गहरे कुएं की तरह मोड़ देता है। 'इवेंट होराइज़न' के पास प्रकाश भी बाहर नहीं निकल सकता।</li>
+                    <li><b>Extreme Time Dilation:</b> ब्लैक होल के पास 1 घंटा = धरती पर कई साल!</li>
+                </ul>
+                """,
+                "math_explain": """
+                <ul>
+                    <li><b>Infinity Equations:</b> Singularity पर सारे समीकरण ÷ 0 हो जाते हैं → 'अनंत'।</li>
+                    <li><b>Time Dilation Factor:</b> 99.99% c पर Lorentz equation √(1−v²/c²) → 0.01. रॉकेट की घड़ी 100 गुना धीमी!</li>
+                </ul>
+                """
+            }
+        }
+
+        # --- SIDEBAR CONTROLS ---
+        with st.sidebar:
+            st.header("🎯 Mission Target")
+            selected_body = st.selectbox("🚀 Choose Target", list(celestial_database.keys()), key="mrl_target")
+
+            body_data = celestial_database[selected_body]
+            base_distance = body_data["distance_km"]
+            local_gravity = body_data["gravity"]
+
+            st.divider()
+            st.header("🕹️ Engine Calibration")
+
+            engine_type = st.selectbox(
+                "⚛️ Rocket Engine Tech",
+                ["High-Frequency Magnetic Engine 🧲", "Quantum Fusion Drive 🌀", "Warp Core Accelerator 🌌"],
+                key="mrl_engine"
+            )
+
+            rocket_speed_percentage = st.slider(
+                "⚡ Throttle (% of Light Speed)",
+                min_value=0.1, max_value=99.9, value=40.0, step=0.5, key="mrl_speed"
+            )
+
+            magnetic_frequency = st.slider(
+                "🧲 Electron Field (GHz)",
+                min_value=10, max_value=2000, value=500, step=50, key="mrl_magfreq"
+            )
+
+            anti_gravity_matrix = st.slider(
+                "🛡️ Anti-Gravity Shield",
+                min_value=0.0, max_value=50.0, value=float(local_gravity), step=0.5, key="mrl_antigrav"
+            )
 
         # --- PHYSICS CALCULATION ---
-        calculated_speed = mag_freq * 500000
-        if space_bend > 0:
-            calculated_speed *= (1 + (space_bend / 20))
-        if quantum_boost:
-            calculated_speed *= 5
-        if calculated_speed >= SPEED_OF_LIGHT_KMH:
-            calculated_speed = SPEED_OF_LIGHT_KMH * 0.9999
+        SPEED_OF_LIGHT_KMH_MRL = 1079252849
+        actual_speed_kmh = (rocket_speed_percentage / 100) * SPEED_OF_LIGHT_KMH_MRL
 
-        earth_hours = 8760
-        speed_ratio = calculated_speed / SPEED_OF_LIGHT_KMH
-        time_dilation_factor = math.sqrt(1 - (speed_ratio ** 2))
-        rocket_hours_passed = earth_hours * time_dilation_factor
-        days_saved = (earth_hours - rocket_hours_passed) / 24
-        speed_percentage = (calculated_speed / SPEED_OF_LIGHT_KMH) * 100
+        if "Magnetic Engine" in engine_type:
+            actual_speed_kmh *= (1 + (magnetic_frequency / 2000))
+        elif "Quantum Fusion" in engine_type:
+            actual_speed_kmh *= 1.3
 
-        # --- GAMING HUD ---
-        xp = int(speed_percentage * 13)
-        level = int(speed_percentage // 14) + 1
+        if actual_speed_kmh >= SPEED_OF_LIGHT_KMH_MRL:
+            actual_speed_kmh = SPEED_OF_LIGHT_KMH_MRL * 0.9999
 
-        st.markdown("### 🎮 MISSION: REACH YEAR 2050")
-        c1, c2, c3, c4 = st.columns(4)
-        c1.metric("⭐ XP", f"{xp}")
-        c2.metric("🏆 LEVEL", f"0{level}")
-        c3.metric("⚡ SPEED", f"{speed_percentage:.1f}% C")
-        c4.metric("⏳ TIME SAVED", f"{days_saved:.0f} Days")
+        travel_time_hours = base_distance / actual_speed_kmh
+        speed_ratio_mrl = actual_speed_kmh / SPEED_OF_LIGHT_KMH_MRL
+        time_dilation_mrl = math.sqrt(1 - (speed_ratio_mrl ** 2))
 
-        col_p1, col_p2 = st.columns(2)
-        with col_p1:
-            st.write("🧲 Magnetic Power")
-            st.progress(min(mag_freq/1000, 1.0))
-        with col_p2:
-            st.write(f"🌌 Warp Stability: {space_bend}%")
-            st.progress(space_bend/100)
+        # --- MAIN LAYOUT ---
+        col_visuals, col_instruments = st.columns([2, 1])
 
-        st.divider()
+        with col_visuals:
+            st.write("### 🌌 Live 3D Space Continuum")
 
-        # --- MAIN LAB ---
-        col1, col2 = st.columns([2, 1])
-        with col1:
-            st.subheader("🌌 3D Space-Time Fabric View")
-            grid_size = 25
-            x_grid = np.linspace(-5, 5, grid_size)
-            y_grid = np.linspace(-5, 5, grid_size)
-            X, Y = np.meshgrid(x_grid, y_grid)
-            distortion_depth = (space_bend / 15) + (speed_percentage / 20)
-            Z = - distortion_depth * np.exp(-(X**2 + Y**2) / 6)
-            fig_3d = go.Figure(data=[go.Surface(z=Z, x=X, y=Y, colorscale='Electric', opacity=0.85)])
-            fig_3d.add_trace(go.Scatter3d(x=[0], y=[0], z=[Z.min()+0.5], mode='markers',
-                marker=dict(size=14, color='#00FFCC', symbol='diamond'), name="Rocket 2050"))
-            fig_3d.update_layout(
+            fig_master = go.Figure()
+
+            # Earth
+            fig_master.add_trace(go.Scatter3d(
+                x=[0], y=[0], z=[0], mode='markers+text',
+                marker=dict(size=20, color='#1f77b4', opacity=0.9),
+                name="Earth", text=["Earth"], textposition="top center"
+            ))
+
+            # Satellite ring
+            sat_t = np.linspace(0, 2 * np.pi, 50)
+            fig_master.add_trace(go.Scatter3d(
+                x=1.5 * np.cos(sat_t), y=1.5 * np.sin(sat_t), z=np.zeros(50),
+                mode='lines', line=dict(color='#00FFCC', width=2, dash='dash'),
+                name="Satellite Ring"
+            ))
+
+            # Destination
+            dest_idx = 5.0
+            fig_master.add_trace(go.Scatter3d(
+                x=[dest_idx], y=[dest_idx], z=[1.0], mode='markers+text',
+                marker=dict(size=20 * body_data["radius_scale"], color=body_data["color"], opacity=0.9),
+                name=selected_body, text=[selected_body.split(" ")[0]], textposition="top center"
+            ))
+
+            # Rocket trajectory
+            rocket_path_t = np.linspace(0, 1, 30)
+            rx = dest_idx * rocket_path_t
+            ry = dest_idx * rocket_path_t
+            rz = np.sin(np.pi * rocket_path_t) * 1.5
+            fig_master.add_trace(go.Scatter3d(
+                x=rx, y=ry, z=rz, mode='lines',
+                line=dict(color='#FF3366', width=4), name="Rocket Path"
+            ))
+
+            fig_master.add_trace(go.Scatter3d(
+                x=[rx[15]], y=[ry[15]], z=[rz[15]], mode='markers',
+                marker=dict(size=10, color='#FF3366', symbol='diamond'), name="Rocket"
+            ))
+
+            fig_master.update_layout(
                 scene=dict(
-                    xaxis=dict(visible=False),
-                    yaxis=dict(visible=False),
-                    zaxis=dict(visible=False),
+                    xaxis=dict(backgroundcolor="black", showbackground=True, color="white"),
+                    yaxis=dict(backgroundcolor="black", showbackground=True, color="white"),
+                    zaxis=dict(backgroundcolor="black", showbackground=True, color="white"),
                     bgcolor="black"
                 ),
-                margin=dict(l=0, r=0, b=0, t=20),
-                height=450,
-                paper_bgcolor="rgba(0,0,0,0)"
+                paper_bgcolor="black", font=dict(color="white"),
+                height=550, margin=dict(l=0, r=0, b=0, t=30),
+                legend=dict(bgcolor="rgba(0,0,0,0.5)", font=dict(color="white"))
             )
-            st.plotly_chart(fig_3d, use_container_width=True)
+            st.plotly_chart(fig_master, use_container_width=True)
 
-        with col2:
-            st.subheader("📊 Telemetry")
-            st.metric("Rocket Speed", f"{int(calculated_speed):,} km/h")
-            st.metric("Earth Time", "365 Days")
-            st.metric("Rocket Time", f"{(rocket_hours_passed/24):.1f} Days")
-            if speed_percentage > 80:
-                st.success(f"🎉 TIME JUMP READY! {days_saved:.0f} din future me!")
+        with col_instruments:
+            st.markdown('<div class="cockpit-card">', unsafe_allow_html=True)
+            st.markdown('<span class="instrument-label">📊 FLIGHT INSTRUMENTS</span>', unsafe_allow_html=True)
+            st.write("")
+            st.metric("🎯 Target", selected_body)
+            st.metric("🛣️ Distance", f"{base_distance:,} km")
+            st.metric("🚀 Speed", f"{int(actual_speed_kmh):,} km/h")
+            st.metric("⚡ % of c", f"{rocket_speed_percentage:.1f}%")
+
+            if travel_time_hours < 1:
+                time_str = f"{travel_time_hours * 60:.1f} min"
+            elif travel_time_hours < 24:
+                time_str = f"{travel_time_hours:.2f} hrs"
             else:
-                st.warning("🔒 80% Speed pe Jump Unlock Hoga")
+                time_str = f"{travel_time_hours / 24:.2f} days"
 
-        # --- SPECIAL ADVANCE SECTION ---
-        st.markdown("---")
-        st.markdown("""
-        <div class="advance-box">
-        <h2>⚛️ ADVANCE QUANTUM LAB - SPECIAL SECTION</h2>
-        <p>Ye section sirf Pro Pilots ke liye hai! Yahan se tum Time ko todoge.</p>
-        </div>
-        """, unsafe_allow_html=True)
+            st.metric("⏱️ Travel Time", time_str)
+            st.metric("⏳ Time Dilation", f"{time_dilation_mrl:.6f}×")
+            st.markdown('</div>', unsafe_allow_html=True)
 
+            st.markdown('<div class="innovation-box">', unsafe_allow_html=True)
+            if travel_time_hours < 24:
+                st.success("✅ MISSION FEASIBLE - Day trip!")
+            elif travel_time_hours < 24 * 30:
+                st.warning("⚠️ LONG MISSION - Multi-day")
+            else:
+                st.error("🚨 EXTREME - Months/Years")
+            st.markdown('</div>', unsafe_allow_html=True)
+
+        # --- PLANET DETAILS ---
         st.write("")
-        adv1, adv2, adv3 = st.columns(3)
-        with adv1:
-            st.markdown("#### 🧠 Einstein Logic")
-            st.code(f"t' = t * sqrt(1 - v²/c²)\n= {rocket_hours_passed:.2f} hrs", language="python")
-            st.info("Speed badhne pe Rocket ka time slow hota hai")
-        with adv2:
-            st.markdown("#### 🌀 Warp Core")
-            if space_bend > 70 and speed_percentage > 85:
-                st.success("WARP CORE: OVERDRIVE 🔥")
-                st.snow()
-            elif space_bend > 40:
-                st.warning("WARP CORE: STABLE")
-            else:
-                st.error("WARP CORE: LOW")
-        with adv3:
-            st.markdown("#### ⚛️ Quantum Entanglement")
-            if quantum_boost:
-                st.success("ENTANGLEMENT: ACTIVE - 5x BOOST!")
-                st.balloons()
-            else:
-                st.write("Boost OFF hai. Upar se ON karo.")
+        st.markdown(f"### 🪐 Target: {selected_body}")
+        st.info(f"**Description:** {body_data['description']}")
+        st.info(f"**Local Gravity:** {local_gravity} m/s² · **Distance:** {base_distance:,} km")
 
-        # --- FINAL JUMP BUTTON ---
+        # --- EXPLAIN CARDS ---
         st.write("")
-        if st.button("🌀 INITIATE 2050 TIME JUMP - HOLD WARP", use_container_width=True, type="primary", key="tm_jump"):
-            if speed_percentage < 80:
-                st.error("Mission Failed! Pehle 80% Speed toh lao, Pilot!")
+        col_phy, col_math = st.columns(2)
+
+        with col_phy:
+            st.markdown(f"""
+            <div class="explain-card">
+                <span class="physics-badge">⚛️ PHYSICS EXPLAINED</span>
+                <h4 style="color:#00FFCC; margin-top:15px;">🔬 {selected_body}</h4>
+                {body_data['physics_explain']}
+            </div>
+            """, unsafe_allow_html=True)
+
+        with col_math:
+            st.markdown(f"""
+            <div class="explain-card">
+                <span class="math-badge">📐 MATH EXPLAINED</span>
+                <h4 style="color:#FF3366; margin-top:15px;">🧮 {selected_body}</h4>
+                {body_data['math_explain']}
+            </div>
+            """, unsafe_allow_html=True)
+
+        # --- TELEMETRY LOG ---
+        st.write("")
+        st.markdown("### 📡 Live Mission Telemetry")
+        st.code(f"""
+MISSION TO: {selected_body}
+=================================
+Engine       : {engine_type}
+Throttle     : {rocket_speed_percentage}% of c
+Speed        : {int(actual_speed_kmh):,} km/h
+Mag Freq     : {magnetic_frequency} GHz
+Anti-Grav    : {anti_gravity_matrix} units
+=================================
+Distance     : {base_distance:,} km
+Travel Time  : {time_str}
+Time Dilation: {time_dilation_mrl:.6f}
+Status       : {"READY" if travel_time_hours < 24 * 365 else "EXTENDED"}
+        """, language="text")
+
+        # --- LAUNCH BUTTON ---
+        st.write("")
+        if st.button("🚀 INITIATE LAUNCH SEQUENCE", use_container_width=True, type="primary", key="mrl_launch"):
+            if actual_speed_kmh < 100000:
+                st.error("❌ Speed too low! Increase throttle.")
             else:
-                with st.spinner("Quantum Tunneling... Space Bending..."):
+                with st.spinner("🔥 Igniting Magnetic Engines..."):
                     time.sleep(2)
                 st.balloons()
-                st.success(f"🚀 SUCCESS! Tum {days_saved:.0f} din Future me pahuch gaye! Year 2050 Welcome!")
-                st.markdown(f"### 👨‍🎓 Certificate: Level {level} Time Traveler - XP {xp}")
+                st.success(f"🚀 SUCCESS! Reached **{selected_body}** in {time_str}!")
+                st.markdown(f"### 🏆 Mission Accomplished — Space Pilot Certified! ⭐")
 
     # ============================================================
-    # TAB 4: CHALLENGE (⭐ renamed from tab3)
+    # TAB 4: CHALLENGE
     # ============================================================
     with tab4:
         st.subheader("🎯 Physics Challenge")
@@ -6727,19 +6895,13 @@ Rules:
         if st.button("🚀 Start Physics Quiz", key="phy_start_quiz"):
             with st.spinner("Making questions..."):
                 if is_university:
-                    quiz_prompt = f"""Create 5 MCQ questions on ADVANCED Physics (Quantum Mechanics, Relativity, Electrodynamics, Statistical Mechanics) at University level.
-
+                    quiz_prompt = f"""Create 5 MCQ on ADVANCED Physics at University level.
 {lang_rule}
-
-Return ONLY valid JSON array:
-[{{"question":"...", "options":["A","B","C","D"], "answer":"A", "explanation":"..."}}]"""
+Return ONLY JSON: [{{"question":"...","options":["A","B","C","D"],"answer":"A","explanation":"..."}}]"""
                 else:
-                    quiz_prompt = f"""Create 5 MCQ questions on Physics for a {class_level} student.
-
+                    quiz_prompt = f"""Create 5 MCQ on Physics for {class_level}.
 {lang_rule}
-
-Return ONLY valid JSON array:
-[{{"question":"...", "options":["A","B","C","D"], "answer":"A", "explanation":"..."}}]"""
+Return ONLY JSON: [{{"question":"...","options":["A","B","C","D"],"answer":"A","explanation":"..."}}]"""
 
                 try:
                     completion = client.chat.completions.create(
@@ -6749,8 +6911,7 @@ Return ONLY valid JSON array:
                     )
                     raw = completion.choices[0].message.content
                     match = re.search(r"\[[\s\S]*\]", raw)
-                    if not match:
-                        raise ValueError("No JSON found")
+                    if not match: raise ValueError("No JSON")
                     quiz_data = json.loads(match.group(0))
                     st.session_state.phy_quiz_data = quiz_data
                     st.session_state.phy_quiz_score = 0
@@ -6788,7 +6949,7 @@ Return ONLY valid JSON array:
                     st.rerun()
 
     # ============================================================
-    # TAB 5: ASK A DOUBT (⭐ renamed from tab4)
+    # TAB 5: ASK A DOUBT
     # ============================================================
     with tab5:
         st.subheader("💬 Ask a Physics Doubt")
@@ -6800,7 +6961,7 @@ Return ONLY valid JSON array:
             with st.chat_message(msg["role"]):
                 st.markdown(msg["content"])
 
-        doubt = st.chat_input("Ask any Physics question (Space, Quantum, Energy...)")
+        doubt = st.chat_input("Ask any Physics question...")
 
         if doubt:
             st.session_state.phy_doubts.append({"role": "user", "content": doubt})
@@ -6810,27 +6971,16 @@ Return ONLY valid JSON array:
             with st.chat_message("assistant"):
                 with st.spinner("Teacher is thinking..."):
                     if is_university:
-                        prompt = f"""You are a Physics Professor at MIT/Stanford/Tsinghua level. Answer this university-level question.
-
+                        prompt = f"""You are a Physics Professor at MIT level.
 {lang_rule}
 {diagram_rule}
-
 Question: {doubt}
 
-Structure your answer:
-1. Direct Answer
-2. Mathematical Reasoning (equations as text)
-3. Physical Interpretation
-4. Reference (paper or textbook if relevant)
-5. Follow-up question for deeper thinking
-
-Be rigorous but clear."""
+Structure: Direct Answer, Math Reasoning, Physical Interpretation, Reference, Follow-up."""
                     else:
-                        prompt = f"""You are a loving Physics Teacher. Answer this doubt for a {class_level} student.
-
+                        prompt = f"""You are a loving Physics Teacher for {class_level}.
 {lang_rule}
 {diagram_rule}
-
 Doubt: {doubt}"""
 
                     try:
@@ -6856,7 +7006,6 @@ Doubt: {doubt}"""
         "</div>",
         unsafe_allow_html=True
     )
-        
 def render_datascienceand_machinelearning():
     import os
     import json
