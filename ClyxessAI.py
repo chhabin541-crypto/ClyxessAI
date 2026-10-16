@@ -856,7 +856,8 @@ Footer: "Wadhīk kai madad ghurje Sā? --- Clyxess AI | Secure • Fast • Priv
 
 USER PROMPT: {prompt}
 LIVE WEB INFO: {search_context}
-"""
+""" 
+
 def detect_query_type(prompt: str) -> dict:
     """
     Query ko classify karta hai.
