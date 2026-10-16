@@ -1189,19 +1189,42 @@ def transcribe_audio_with_groq(client, audio_bytes):
 def language_display_name(code):
     return next((name.split(" ", 1)[-1] for name, value in PLAY_LANGUAGES.items() if value == code), "English")
 
-# ============================================================
-# TAVILY
-# ============================================================
-
 def search_tavily(query):
+    q = query.lower().strip()
+    
+    # ⭐ EXPANDED search triggers — festivals, sports, events, sab
     search_words = [
-        "news", "mausam", "weather", "rate", "price",
-        "score", "aaj", "kal", "today", "latest", "breaking"
+        # English basics
+        "news", "weather", "rate", "price", "score", "today", "tomorrow",
+        "latest", "breaking", "live", "current", "when", "date", "schedule",
+        "result", "election", "exam", "release", "trailer", "match",
+        "cricket", "ipl", "movie", "film", "stock", "share",
+        "gold", "silver", "petrol", "diesel", "dollar",
+        # Hindi
+        "aaj", "आज", "kal", "कल", "mausam", "मौसम", "barish", "बारिश",
+        "khabar", "खबर", "samachar", "समाचार", "ताज़ा", "ताजा",
+        "kab", "कब", "result", "परिणाम", "chunav", "चुनाव", "score", "स्कोर",
+        # 🎉 Festivals
+        "diwali", "दिवाली", "deepawali", "holi", "होली", "eid", "ईद",
+        "rakhi", "राखी", "dussehra", "दशहरा", "navratri", "नवरात्रि",
+        "ganesh", "गणेश", "janmashtami", "जन्माष्टमी", "christmas", "क्रिसमस",
+        "chhath", "छठ", "pongal", "onam", "baisakhi", "lohri",
+        "makarsankranti", "karwa chauth", "bhai dooj", "festival", "tyohar", "त्योहार",
+        # 🏏 Sports
+        "sports", "khel", "खेल", "football", "kabaddi", "olympic",
+        # 🌡️ Weather
+        "temperature", "तापमान", "rain", "garmi", "sardi",
     ]
-
-    if not any(word in query.lower() for word in search_words):
-        return "", ""
-
+    
+    # ⭐ Extra check: query mein saal (2026) ya question word hai toh search karo
+    import re as _re
+    has_year = bool(_re.search(r"\b(20\d{2})\b", q))
+    has_question = any(w in q for w in ["kab", "कब", "when", "date", "तारीख", "kya", "क्या"])
+    
+    if not any(word in q for word in search_words):
+        if not (has_year or has_question):
+            return "", ""
+    
     try:
         url = "https://api.tavily.com/search"
         payload = {
@@ -1211,24 +1234,38 @@ def search_tavily(query):
             "max_results": 5,
             "include_answer": True
         }
-
-        response = requests.post(
-            url,
-            json=payload,
-            timeout=15
-        )
-
+        
+        response = requests.post(url, json=payload, timeout=15)
         data = response.json()
-
-        context = data.get("answer", "")
-
+        
+        # ⭐ FIX: BOTH answer AND results[] use karo
+        context_parts = []
+        
+        # Tavily ka direct answer (agar mila)
+        tavily_answer = data.get("answer", "")
+        if tavily_answer:
+            context_parts.append(f"Quick Answer: {tavily_answer}")
+        
+        # ⭐ results[] array se REAL data nikaalo
+        results_list = data.get("results", [])
+        if results_list:
+            context_parts.append("\nDetailed Sources:")
+            for i, r in enumerate(results_list, 1):
+                title = r.get("title", "")
+                url_r = r.get("url", "")
+                content = r.get("content", "")[:700]
+                context_parts.append(f"\n[{i}] {title}\nURL: {url_r}\nInfo: {content}")
+        
+        context = "\n".join(context_parts)
+        
+        # Sources (top 5)
         sources = "\n".join([
             f"{i+1}. [{r['title']}]({r['url']})"
-            for i, r in enumerate(data.get("results", [])[:3])
+            for i, r in enumerate(results_list[:5])
         ])
-
+        
         return context, sources
-
+    
     except Exception:
         return "", ""
 
