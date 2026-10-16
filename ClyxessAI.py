@@ -857,7 +857,200 @@ Footer: "Wadhīk kai madad ghurje Sā? --- Clyxess AI | Secure • Fast • Priv
 USER PROMPT: {prompt}
 LIVE WEB INFO: {search_context}
 """
+# ============================================================
+# ⭐ LIVE WEB SEARCH ENGINE
+# ============================================================
 
+def needs_web_search(user_query: str) -> bool:
+    """Detect karta hai ki query ko live web info chahiye ya nahi."""
+    q = user_query.lower().strip()
+    
+    live_keywords = [
+        # 🎉 FESTIVALS (all languages)
+        "diwali", "दिवाली", "deepawali", "दीपावली", "dipawali", "தீபாவளி", "దీపావళి", "দীপাবলি", "दिवाळी",
+        "holi", "होली", "rakhi", "राखी", "raksha bandhan", "रक्षाबंधन",
+        "dussehra", "दशहरा", "navratri", "नवरात्रि", "ganesh", "गणेश", "गणपति",
+        "janmashtami", "जन्माष्टमी", "ram navami", "रामनवमी", "shivratri", "शिवरात्रि",
+        "karwa chauth", "करवा चौथ", "chhath", "छठ", "bhai dooj", "भाई दूज",
+        "makarsankranti", "मकर संक्रांति", "pongal", "पोंगल", "onam", "ओणम",
+        "baisakhi", "बैसाखी", "lohri", "लोहड़ी", "gudi padwa", "गुड़ी पाड़वा",
+        "eid", "ईद", "bakrid", "बकरीद", "muharram", "मुहर्रम",
+        "christmas", "क्रिसमस", "easter", "ईस्टर", "good friday",
+        "new year", "नया साल", "nav varsh",
+        
+        # 🏏 CRICKET / SPORTS
+        "cricket", "क्रिकेट", "ipl", "आईपीएल", "match", "मैच",
+        "score", "स्कोर", "live score", "लाइव स्कोर",
+        "india vs", "ind vs", "world cup", "वर्ल्ड कप",
+        "t20", "odi", "test match", "test series",
+        "bcci", "icc", "virat", "rohit", "dhoni", "kohli",
+        "football", "फुटबॉल", "olympic", "ओलंपिक", "olympics",
+        "kabaddi", "कबड्डी", "hockey", "हॉकी", "tennis", "टेनिस",
+        "badminton", "बैडमिंटन", "match kab", "match today",
+        
+        # 📰 NEWS (all languages)
+        "news", "न्यूज़", "न्यूज", "खबर", "ख़बर", "khabar", "samachar", "समाचार",
+        "breaking", "ताज़ा", "ताजा", "latest", "live news", "aaj ki khabar",
+        "आज की खबर", "headline", "हेडलाइन", "raipur news", "delhi news",
+        "mumbai news", "india news", "world news", "दुनिया", "वर्ल्ड",
+        "செய்தி", "వార్తలు", "সংবাদ", "বাতৰি", "haber", "noticias",
+        "nouvelles", "nachrichten", "notizie", "новости", "ニュース", "新闻", "뉴스",
+        
+        # 🌦️ WEATHER
+        "weather", "मौसम", "mausam", "barish", "बारिश", "rain",
+        "temperature", "तापमान", "garmi", "गर्मी", "sardi", "सर्दी",
+        
+        # 💰 PRICE / RATE
+        "price", "कीमत", "rate", "रेट", "stock", "share", "gold rate",
+        "सोने का भाव", "silver rate", "चांदी", "petrol", "पेट्रोल",
+        "diesel", "डीजल", "dollar", "डॉलर", "rupee", "rupees",
+        "sensex", "nifty", "बाजार", "market",
+        
+        # 🗳️ EVENTS
+        "election", "चुनाव", "result", "परिणाम", "schedule", "शेड्यूल",
+        "release", "रिलीज़", "release date", "exam date", "परीक्षा",
+        "exam kab", "admit card", "result kab", "रिजल्ट कब",
+        
+        # 🎬 MOVIE / ENTERTAINMENT
+        "movie", "मूवी", "film", "फिल्म", "box office", "trailer", "ट्रेलर",
+        "web series", "ott", "netflix", "prime video", "hotstar",
+        "bollywood", "hollywood",
+        
+        # ⏰ TIME-SENSITIVE (all languages)
+        "aaj", "आज", "today", "abhi", "अभी", "right now", "kal", "कल",
+        "tomorrow", "kitne baje", "कितने बजे", "kab hai", "कब है",
+        "kab hoga", "कब होगा", "kab hain", "कब हैं", "kab manaya", "कब मनाया",
+        "date kya", "तारीख", "tithi", "तिथि", "muhurat", "मुहूर्त",
+        "panchang", "पंचांग", "when is", "when will", "what date",
+        "cuándo", "quand", "wann", "quando", "когда", "いつ", "什么时候", "언제",
+        
+        # 🚗 TRAFFIC
+        "traffic", "ट्रैफिक", "train", "ट्रेन", "flight", "delay", "देरी",
+        
+        # 🌐 LIVE / VIDEO
+        "live", "लाइव", "stream", "स्ट्रीम", "youtube", "video", "वीडियो",
+    ]
+    
+    if any(k in q for k in live_keywords):
+        return True
+    
+    # Pattern: 2024/2025/2026 + date question
+    if re.search(r"\b(202\d)\b", q):
+        if any(w in q for w in ["kab", "कब", "when", "date", "तारीख", "cuándo", "quand"]):
+            return True
+    
+    return False
+
+
+def search_web(query: str, max_results: int = 5) -> list:
+    """Tavily se real-time web search karta hai — kisi bhi language mein."""
+    try:
+        from tavily import TavilyClient
+        api_key = st.secrets.get("TAVILY_API_KEY", "")
+        if not api_key:
+            return []
+        
+        tvly = TavilyClient(api_key=api_key)
+        response = tvly.search(
+            query=query,
+            max_results=max_results,
+            search_depth="advanced",
+            include_answer=True,
+            include_raw_content=False
+        )
+        
+        results = []
+        
+        # Tavily ka direct summary answer
+        tavily_answer = response.get("answer", "")
+        if tavily_answer:
+            results.append({
+                "type": "answer",
+                "content": tavily_answer,
+                "url": ""
+            })
+        
+        # Individual sources with URLs
+        for r in response.get("results", []):
+            results.append({
+                "type": "source",
+                "title": r.get("title", ""),
+                "url": r.get("url", ""),
+                "content": r.get("content", "")[:600],
+                "score": r.get("score", 0)
+            })
+        
+        return results
+    except Exception:
+        return []
+
+
+def format_search_context(user_query: str, results: list) -> str:
+    """
+    Search results ko AI ke liye readable format mein convert karta hai.
+    NEWS queries ke liye YouTube + Google News links MANDATORY hain.
+    """
+    if not results:
+        return ""
+    
+    ctx = "\n=== LIVE WEB SEARCH RESULTS ===\n"
+    ctx += f"Search Query: {user_query}\n"
+    ctx += f"Search Time: {datetime.datetime.now().strftime('%d %B %Y, %H:%M IST')}\n\n"
+    
+    # Tavily direct answer
+    for r in results:
+        if r.get("type") == "answer":
+            ctx += f"📌 QUICK ANSWER (Tavily Summary):\n{r['content']}\n\n"
+    
+    # Website sources with URLs
+    ctx += "📎 WEBSITE SOURCES (cite karo):\n"
+    source_num = 1
+    for r in results:
+        if r.get("type") == "source" and r.get("url"):
+            ctx += f"\n[{source_num}] {r['title']}\n"
+            ctx += f"    URL: {r['url']}\n"
+            ctx += f"    Content: {r['content']}\n"
+            source_num += 1
+    
+    # ⭐ MANDATORY: YouTube + Google News links
+    yt_query = urllib.parse.quote_plus(user_query)
+    news_query = urllib.parse.quote_plus(user_query)
+    
+    ctx += f"\n\n🔗 MANDATORY LINKS (user ko ZAROOR dikhao):\n"
+    ctx += f"📺 YouTube Search: https://www.youtube.com/results?search_query={yt_query}\n"
+    ctx += f"📰 Google News: https://news.google.com/search?q={news_query}\n"
+    ctx += f"🌐 Google Search: https://www.google.com/search?q={news_query}\n"
+    
+    ctx += "\n=== END OF SEARCH RESULTS ===\n"
+    
+    # AI ko instructions
+    ctx += "\n\n⚠️ AI KE LIYE CRITICAL INSTRUCTIONS:\n"
+    ctx += "1. Upar ke LIVE WEB SEARCH RESULTS ko USE karo — yeh REAL-TIME data hai.\n"
+    ctx += "2. Har source ka URL markdown link ke roop mein jawab mein daalo: [Source Name](URL)\n"
+    ctx += "3. 📺 YouTube link aur 📰 Google News link ZAROOR include karo (mandatory).\n"
+    ctx += "4. Festival dates kabhi guess mat karo — sirf live data use karo.\n"
+    ctx += "5. Agar search results khali hain, toh bolo: 'Confirmed info nahi mila.'\n"
+    ctx += "6. Jawab user ki bhasha mein do (Tamil, Telugu, Bengali, English, etc.).\n"
+    ctx += "7. Jawab ke end mein '🔗 Sources' section banao — saare URLs wahan list karo.\n"
+    
+    return ctx
+
+
+def get_live_context_for_prompt(user_query: str) -> str:
+    """
+    Single helper — check + search + format sab ek saath.
+    Returns formatted context string, ya empty string agar search ki zaroorat nahi.
+    """
+    if not needs_web_search(user_query):
+        return ""
+    
+    with st.spinner("🌐 Live web search ho raha hai..."):
+        results = search_web(user_query, max_results=5)
+    
+    if not results:
+        return "\n⚠️ Live search results nahi mile. User ko bolo confirmed info nahi hai.\n"
+    
+    return format_search_context(user_query, results)
 def get_school_system_prompt(age_group, lang="Auto 🟢 (Maa khud samajh jayegi)", persona="Maa + Teacher", subject="General"):
     
     # Language Logic Setup
