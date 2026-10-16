@@ -10837,6 +10837,7 @@ def _chat_voice_input(key):
     return ""
 
 def render_normal_chat():
+    import urllib.parse
    
     _render_chat_history(st.session_state.messages)
 
@@ -10867,10 +10868,91 @@ def render_normal_chat():
         save_current_chat_cloud()
         st.rerun()
 
-    search_context, sources = search_tavily(prompt)
+    # ============ QUERY TYPE DETECT ============
+    q = prompt.lower().strip()
+    needs_search = False
+    want_youtube = False
+    want_news = False
+    want_sources = False
+
+    identity_words = ["tum kaun", "tumhara naam", "aapka naam", "apka naam", "your name",
+                      "who are you", "kisne banaya", "tumhe kisne", "apko kisne", "who made you",
+                      "creator", "nirmata", "tumko kisne", "tujhe kisne"]
+    greeting_words = ["hi", "hello", "namaste", "namaskar", "thanks", "thank you", "shukriya",
+                      "kaise ho", "how are you", "bye", "good morning", "good night"]
+
+    if any(w in q for w in identity_words):
+        pass
+    elif any(w in q for w in greeting_words) and len(q) < 30:
+        pass
+    elif any(w in q for w in ["news", "khabar", "खबर", "samachar", "समाचार", "headline",
+                              "breaking", "raipur news", "delhi news", "mumbai news",
+                              "aaj ki khabar", "ताज़ा खबर", "live news"]):
+        needs_search, want_youtube, want_news, want_sources = True, True, True, True
+    elif any(w in q for w in ["cricket", "क्रिकेट", "ipl", "match", "मैच", "score", "स्कोर",
+                              "india vs", "world cup", "t20", "odi", "test match",
+                              "football", "kabaddi", "olympic", "virat", "rohit", "kohli", "dhoni"]):
+        needs_search, want_youtube, want_sources = True, True, True
+    elif any(w in q for w in ["diwali", "दिवाली", "deepawali", "holi", "होली", "eid", "ईद",
+                              "rakhi", "राखी", "dussehra", "दशहरा", "navratri", "नवरात्रि",
+                              "ganesh", "गणेश", "janmashtami", "जन्माष्टमी", "christmas",
+                              "क्रिसमस", "chhath", "छठ", "pongal", "onam", "baisakhi", "lohri",
+                              "makarsankranti", "karwa chauth", "bhai dooj", "festival",
+                              "tyohar", "त्योहार"]):
+        needs_search, want_youtube, want_sources = True, True, True
+    elif any(w in q for w in ["weather", "मौसम", "mausam", "barish", "बारिश",
+                              "temperature", "तापमान"]):
+        needs_search, want_sources = True, True
+    elif any(w in q for w in ["gold rate", "silver rate", "petrol price", "diesel price",
+                              "dollar rate", "sensex", "nifty", "share price",
+                              "सोने का भाव", "चांदी", "gold price"]):
+        needs_search, want_sources = True, True
+    elif any(w in q for w in ["trailer", "ट्रेलर", "movie", "फिल्म", "box office",
+                              "web series", "netflix", "hotstar", "video", "वीडियो"]):
+        needs_search, want_youtube, want_sources = True, True, True
+    elif any(w in q for w in ["election", "चुनाव", "result", "परिणाम", "exam", "परीक्षा",
+                              "admit card", "release", "रिलीज़", "schedule",
+                              "kab hai", "कब है", "kab hoga", "कब होगा"]):
+        needs_search, want_sources = True, True
+    elif any(w in q for w in ["aaj", "आज", "today", "kal", "कल", "tomorrow"]):
+        needs_search, want_sources = True, True
+
+    # ============ SEARCH (only if needed) ============
+    search_context, sources = "", ""
+    if needs_search:
+        try:
+            result = search_tavily(prompt)
+            if isinstance(result, tuple) and len(result) >= 2:
+                search_context, sources = result[0], result[1]
+        except Exception:
+            search_context, sources = "", ""
+
+    # ============ LINKS (only if needed) ============
+    youtube_link = None
+    google_news_link = None
+    if want_youtube:
+        youtube_link = f"https://www.youtube.com/results?search_query={urllib.parse.quote_plus(prompt)}"
+    if want_news:
+        google_news_link = f"https://news.google.com/search?q={urllib.parse.quote_plus(prompt)}"
+
+    # ============ SYSTEM PROMPT ============
     system = NORMAL_SYSTEM_PROMPT + "\nLIVE INDIA CLOCK: " + get_india_datetime_context()
-    if search_context:
-        system += "\nLIVE WEB INFO:\n" + search_context
+
+    if needs_search:
+        system += """
+
+### LIVE DATA RULES ###
+1. FESTIVAL / EVENT DATES: Training data se date mat batao. SIRF LIVE WEB INFO use karo.
+2. NEWS / CRICKET / WEATHER / PRICE: LIVE WEB INFO se real-time data do.
+3. Source URLs markdown format mein: [Source Name](URL)
+4. Agar LIVE WEB INFO khali hai toh bolo: "Confirmed info nahi mila."
+5. Kuch bhi invent mat karo.
+6. Reply in user's language.
+"""
+        if search_context:
+            system += "\n\n=== LIVE WEB INFO ===\n" + search_context + "\n=== END ===\n"
+    else:
+        system += "\n\n### RULES ###\n1. Clean answer do.\n2. Koi Sources/Links section mat add karo.\n3. Koi URL mat add karo.\n4. Reply in user's language.\n"
 
     with st.chat_message("assistant"):
         # SPINNER - User chat karte hi pehle ye ayega
@@ -10902,8 +10984,20 @@ def render_normal_chat():
             placeholder.markdown(typed + "▌")
             time.sleep(0.01)
         placeholder.markdown(response)
-        if sources:
-            st.caption("Sources:\n" + sources)
+
+        # ============ CONDITIONAL SOURCES ============
+        show_links = want_youtube or want_news or (want_sources and sources)
+        if show_links:
+            with st.expander("🔗 Sources & Links", expanded=False):
+                if youtube_link:
+                    st.markdown(f"**📺 YouTube:** [Watch video]({youtube_link})")
+                if google_news_link:
+                    st.markdown(f"**📰 Google News:** [Read news]({google_news_link})")
+                if want_sources and sources:
+                    st.markdown("---")
+                    st.markdown("**📎 Website Sources:**")
+                    st.markdown(sources)
+
         st.caption("🔒 Clyxess AI | Secure • Fast • Private")
         st.session_state.messages.append({"role": "assistant", "content": response})
         save_current_chat_cloud()
