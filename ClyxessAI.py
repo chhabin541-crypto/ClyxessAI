@@ -10306,7 +10306,7 @@ Encourage independent thinking. Do not humiliate.
                         except Exception as e:
                             st.error(f"❌ Evaluation failed: {type(e).__name__}: {str(e)[:150]}")
 
-    # ========================================================
+   # ========================================================
     # TAB 4: QUIZ / ASSESSMENT
     # ========================================================
     with tab_quiz:
@@ -10322,7 +10322,10 @@ Create {quiz_size} MCQ questions.
 Student: {age_level} | Topic: {quiz_topic} | Difficulty: {quiz_level}
 🌐 LANGUAGE: {lang_rule}
 
-Return ONLY valid JSON array:
+CRITICAL: Return ONLY valid JSON array. No markdown, no explanation, no extra text.
+Start with [ and end with ].
+
+Format:
 [
   {{"question": "...", "options": ["A","B","C","D"], "answer": "A", "explanation": "..."}}
 ]
@@ -10331,30 +10334,63 @@ Return ONLY valid JSON array:
                 try:
                     result = client.chat.completions.create(
                         model="openai/gpt-oss-120b",
-                        messages=[{"role": "user", "content": quiz_prompt}],
+                        messages=[
+                            {"role": "system", "content": "You output ONLY valid JSON array. No markdown, no explanations, no code blocks. Start with [ and end with ]."},
+                            {"role": "user", "content": quiz_prompt}
+                        ],
                         temperature=0.35, max_tokens=5000
                     )
                     raw = result.choices[0].message.content.strip()
+                    
+                    # Remove markdown code blocks if AI added them
+                    raw = re.sub(r"```json\s*", "", raw)
+                    raw = re.sub(r"```\s*", "", raw)
+                    raw = raw.strip()
+                    
+                    # Extract JSON array (from first [ to last ])
                     match = re.search(r"\[[\s\S]*\]", raw)
                     if not match:
                         raise ValueError("No JSON array found in response")
+                    
                     quiz = json.loads(match.group(0))
                     valid_questions = []
+                    
                     for q in quiz:
-                        if not isinstance(q, dict): continue
+                        if not isinstance(q, dict): 
+                            continue
                         opts = q.get("options", [])
                         ans = q.get("answer", "")
-                        if isinstance(opts, list) and len(opts) == 4 and ans in opts:
+                        
+                        # Fixed: answer is a letter (A/B/C/D), not in options text
+                        if (isinstance(opts, list) 
+                            and len(opts) == 4 
+                            and isinstance(ans, str)
+                            and ans.strip().upper() in ["A", "B", "C", "D"]):
+                            
+                            q["answer"] = ans.strip().upper()
+                            q["options"] = [str(o) for o in opts]
                             valid_questions.append(q)
+                    
                     if not valid_questions:
                         raise ValueError("No valid questions")
+                    
                     st.session_state.ai_quiz_data = valid_questions
                     st.session_state.ai_quiz_index = 0
                     st.session_state.ai_quiz_score = 0
                     st.session_state.ai_quiz_running = True
                     st.rerun()
+                    
+                except json.JSONDecodeError as e:
+                    st.error(f"❌ JSON parse error: {e}")
+                    with st.expander("🔍 Show raw response"):
+                        st.code(raw[:2000])
                 except Exception as e:
                     st.error(f"❌ Quiz failed: {type(e).__name__}: {str(e)[:200]}")
+                    with st.expander("🔍 Show raw response"):
+                        try:
+                            st.code(raw[:2000])
+                        except Exception:
+                            st.code("Response not captured")
 
         if st.session_state.ai_quiz_running:
             quiz = st.session_state.ai_quiz_data
