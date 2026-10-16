@@ -857,6 +857,147 @@ Footer: "Wadhīk kai madad ghurje Sā? --- Clyxess AI | Secure • Fast • Priv
 USER PROMPT: {prompt}
 LIVE WEB INFO: {search_context}
 """
+def detect_query_type(prompt: str) -> dict:
+    """
+    Query ko classify karta hai.
+    Returns: {
+        'needs_search': bool,
+        'want_youtube': bool,
+        'want_news': bool,
+        'want_sources': bool,
+        'category': str
+    }
+    """
+    q = prompt.lower().strip()
+    
+    # Identity / greeting — NO search, NO links
+    identity_words = ["tum kaun", "tumhara naam", "your name", "who are you",
+                      "kisne banaya", "who made you", "tumhe kisne",
+                      "creator", "apka naam", "apko kisne"]
+    if any(w in q for w in identity_words):
+        return {"needs_search": False, "want_youtube": False,
+                "want_news": False, "want_sources": False, "category": "identity"}
+    
+    # Greeting/thanks — NO search
+    greeting_words = ["hi", "hello", "namaste", "thanks", "thank you", "shukriya",
+                      "kaise ho", "how are you", "bye", "good morning", "good night"]
+    if any(w in q for w in greeting_words) and len(q) < 30:
+        return {"needs_search": False, "want_youtube": False,
+                "want_news": False, "want_sources": False, "category": "greeting"}
+    
+    # News — YouTube + Google News + Sources
+    news_words = ["news", "khabar", "खबर", "samachar", "समाचार", "headline", "headlines",
+                  "breaking", "raipur news", "delhi news", "mumbai news", "aaj ki khabar"]
+    if any(w in q for w in news_words):
+        return {"needs_search": True, "want_youtube": True,
+                "want_news": True, "want_sources": True, "category": "news"}
+    
+    # Live events (cricket, sports, match) — YouTube + Sources, NO Google News
+    sports_words = ["cricket", "ipl", "match", "score", "live score", "india vs",
+                    "world cup", "t20", "odi", "football", "kabaddi",
+                    "olympic", "match ka", "khel", "खेल"]
+    if any(w in q for w in sports_words):
+        return {"needs_search": True, "want_youtube": True,
+                "want_news": False, "want_sources": True, "category": "sports"}
+    
+    # Festivals — YouTube + Sources
+    festival_words = ["diwali", "holi", "eid", "rakhi", "dussehra", "navratri",
+                      "christmas", "ganesh", "janmashtami", "festival", "tyohar",
+                      "त्योहार", "पर्व", "chhath", "pongal", "onam"]
+    if any(w in q for w in festival_words):
+        return {"needs_search": True, "want_youtube": True,
+                "want_news": False, "want_sources": True, "category": "festival"}
+    
+    # Weather — Sources only
+    weather_words = ["weather", "mausam", "मौसम", "barish", "बारिश", "temperature",
+                     "तापमान", "rain"]
+    if any(w in q for w in weather_words):
+        return {"needs_search": True, "want_youtube": False,
+                "want_news": False, "want_sources": True, "category": "weather"}
+    
+    # Price / Rate — Sources only
+    price_words = ["gold rate", "silver rate", "petrol price", "diesel price",
+                   "dollar rate", "sensex", "nifty", "share price", "sone ka bhav",
+                   "सोने का भाव", "चांदी", "rupee rate"]
+    if any(w in q for w in price_words):
+        return {"needs_search": True, "want_youtube": False,
+                "want_news": False, "want_sources": True, "category": "price"}
+    
+    # Movie / Trailer / Video — YouTube + Sources
+    movie_words = ["trailer", "ट्रेलर", "movie", "film", "box office",
+                   "web series", "netflix", "amazon prime", "hotstar",
+                   "video", "watch"]
+    if any(w in q for w in movie_words):
+        return {"needs_search": True, "want_youtube": True,
+                "want_news": False, "want_sources": True, "category": "movie"}
+    
+    # General live queries (today, tomorrow, kab) with event word
+    live_general = ["aaj", "आज", "today", "kab hai", "कब है", "kab hoga",
+                    "when is", "when will", "kab hain"]
+    event_context = ["election", "result", "exam", "admit card", "release",
+                     "schedule", "date"]
+    if any(w in q for w in live_general) or any(w in q for w in event_context):
+        return {"needs_search": True, "want_youtube": False,
+                "want_news": False, "want_sources": True, "category": "event"}
+    
+    # Educational / General knowledge — NO search, NO links
+    return {"needs_search": False, "want_youtube": False,
+            "want_news": False, "want_sources": False, "category": "educational"}
+
+
+def search_tavily(prompt: str, max_results: int = 5):
+    """
+    Tavily se search karta hai — sirf jab zaroorat ho.
+    Returns: (search_context, sources_text, query_info)
+    """
+    info = detect_query_type(prompt)
+    
+    # Agar search nahi chahiye — empty return
+    if not info["needs_search"]:
+        return "", "", info
+    
+    try:
+        from tavily import TavilyClient
+        key = st.secrets.get("TAVILY_API_KEY", "")
+        if not key:
+            return "", "", info
+        
+        tvly = TavilyClient(api_key=key)
+        result = tvly.search(
+            query=prompt,
+            max_results=max_results,
+            search_depth="advanced",
+            include_answer=True
+        )
+        
+        results_list = result.get("results", [])
+        if not results_list:
+            return "", "", info
+        
+        # Context build
+        context = "=== LIVE WEB SEARCH RESULTS ===\n"
+        context += f"Query: {prompt}\n"
+        context += f"Time: {datetime.datetime.now().strftime('%d %B %Y, %H:%M IST')}\n\n"
+        
+        tavily_answer = result.get("answer")
+        if tavily_answer:
+            context += f"QUICK ANSWER: {tavily_answer}\n\n"
+        
+        context += "SOURCES:\n"
+        sources_text = ""
+        for i, r in enumerate(results_list, 1):
+            title = r.get("title", "")
+            url = r.get("url", "")
+            content = r.get("content", "")[:600]
+            
+            context += f"\n[{i}] {title}\n    URL: {url}\n    Content: {content}\n"
+            sources_text += f"\n[{i}] [{title}]({url})"
+        
+        context += "\n=== END LIVE WEB RESULTS ===\n"
+        return context, sources_text, info
+    
+    except Exception:
+        return "", "", info
 
 def get_school_system_prompt(age_group, lang="Auto 🟢 (Maa khud samajh jayegi)", persona="Maa + Teacher", subject="General"):
     
