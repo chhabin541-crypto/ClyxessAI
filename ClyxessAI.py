@@ -10955,13 +10955,49 @@ def render_normal_chat():
         save_current_chat_cloud()
         st.rerun()
 
+    # ⭐ STEP 1: Search karo
     search_context, sources = search_tavily(prompt)
+    
+    # ⭐ STEP 2: YouTube + Google News links banao
+    yt_query = urllib.parse.quote_plus(prompt)
+    youtube_link = f"https://www.youtube.com/results?search_query={yt_query}"
+    google_news_link = f"https://news.google.com/search?q={yt_query}"
+    
+    # ⭐ STEP 3: Enhanced system prompt with festival + live rules
     system = NORMAL_SYSTEM_PROMPT + "\nLIVE INDIA CLOCK: " + get_india_datetime_context()
+    
+    system += """
+
+### CRITICAL LIVE DATA RULES ###
+
+1. FESTIVAL DATES (Diwali, Holi, Eid, Rakhi, Christmas, etc.):
+   - KABHI bhi training data se date mat batao — sab har saal change hoti hain.
+   - SIRF LIVE WEB INFO use karo agar diya gaya hai.
+   - Agar LIVE WEB INFO khali hai toh bolo: "Confirmed info nahi mila, kripya online check karein."
+
+2. NEWS / CRICKET SCORE / WEATHER / PRICE:
+   - LIVE WEB INFO use karo — real-time data hai.
+   - Source URLs cite karo markdown format mein: [Source Name](URL)
+
+3. LINKS TO INCLUDE (MANDATORY):
+   - 📺 YouTube link: {YT_LINK}
+   - 📰 Google News link: {GN_LINK}
+   - 🌐 Website source URLs from LIVE WEB INFO
+
+4. HONESTY:
+   - Kuch bhi invent mat karo. Agar data nahi mila toh clearly bolo.
+
+5. LANGUAGE:
+   - Reply in the SAME language as user's question.
+
+### END RULES ###
+""".replace("{YT_LINK}", youtube_link).replace("{GN_LINK}", google_news_link)
+    
     if search_context:
-        system += "\nLIVE WEB INFO:\n" + search_context
+        system += "\n\n=== LIVE WEB INFO ===\n" + search_context + "\n=== END LIVE WEB INFO ===\n"
 
     with st.chat_message("assistant"):
-        # SPINNER - User chat karte hi pehle ye ayega
+        # SPINNER
         responding = st.empty()
         responding.markdown("""
             <div style='display:flex;align-items:center;gap:10px;color:#aaa'>
@@ -10990,8 +11026,16 @@ def render_normal_chat():
             placeholder.markdown(typed + "▌")
             time.sleep(0.01)
         placeholder.markdown(response)
-        if sources:
-            st.caption("Sources:\n" + sources)
+        
+        # ⭐ STEP 4: Sources Expander (better than plain caption)
+        with st.expander("🔗 Sources & Live Links", expanded=False):
+            st.markdown(f"**📺 Watch on YouTube:** [{youtube_link}]({youtube_link})")
+            st.markdown(f"**📰 Read on Google News:** [{google_news_link}]({google_news_link})")
+            if sources:
+                st.markdown("---")
+                st.markdown("**📎 Website Sources:**")
+                st.markdown(sources)
+        
         st.caption("🔒 Clyxess AI | Secure • Fast • Private")
         st.session_state.messages.append({"role": "assistant", "content": response})
         save_current_chat_cloud()
