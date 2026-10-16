@@ -857,147 +857,6 @@ Footer: "Wadhīk kai madad ghurje Sā? --- Clyxess AI | Secure • Fast • Priv
 USER PROMPT: {prompt}
 LIVE WEB INFO: {search_context}
 """
-def detect_query_type(prompt: str) -> dict:
-    """
-    Query ko classify karta hai.
-    Returns: {
-        'needs_search': bool,
-        'want_youtube': bool,
-        'want_news': bool,
-        'want_sources': bool,
-        'category': str
-    }
-    """
-    q = prompt.lower().strip()
-    
-    # Identity / greeting — NO search, NO links
-    identity_words = ["tum kaun", "tumhara naam", "your name", "who are you",
-                      "kisne banaya", "who made you", "tumhe kisne",
-                      "creator", "apka naam", "apko kisne"]
-    if any(w in q for w in identity_words):
-        return {"needs_search": False, "want_youtube": False,
-                "want_news": False, "want_sources": False, "category": "identity"}
-    
-    # Greeting/thanks — NO search
-    greeting_words = ["hi", "hello", "namaste", "thanks", "thank you", "shukriya",
-                      "kaise ho", "how are you", "bye", "good morning", "good night"]
-    if any(w in q for w in greeting_words) and len(q) < 30:
-        return {"needs_search": False, "want_youtube": False,
-                "want_news": False, "want_sources": False, "category": "greeting"}
-    
-    # News — YouTube + Google News + Sources
-    news_words = ["news", "khabar", "खबर", "samachar", "समाचार", "headline", "headlines",
-                  "breaking", "raipur news", "delhi news", "mumbai news", "aaj ki khabar"]
-    if any(w in q for w in news_words):
-        return {"needs_search": True, "want_youtube": True,
-                "want_news": True, "want_sources": True, "category": "news"}
-    
-    # Live events (cricket, sports, match) — YouTube + Sources, NO Google News
-    sports_words = ["cricket", "ipl", "match", "score", "live score", "india vs",
-                    "world cup", "t20", "odi", "football", "kabaddi",
-                    "olympic", "match ka", "khel", "खेल"]
-    if any(w in q for w in sports_words):
-        return {"needs_search": True, "want_youtube": True,
-                "want_news": False, "want_sources": True, "category": "sports"}
-    
-    # Festivals — YouTube + Sources
-    festival_words = ["diwali", "holi", "eid", "rakhi", "dussehra", "navratri",
-                      "christmas", "ganesh", "janmashtami", "festival", "tyohar",
-                      "त्योहार", "पर्व", "chhath", "pongal", "onam"]
-    if any(w in q for w in festival_words):
-        return {"needs_search": True, "want_youtube": True,
-                "want_news": False, "want_sources": True, "category": "festival"}
-    
-    # Weather — Sources only
-    weather_words = ["weather", "mausam", "मौसम", "barish", "बारिश", "temperature",
-                     "तापमान", "rain"]
-    if any(w in q for w in weather_words):
-        return {"needs_search": True, "want_youtube": False,
-                "want_news": False, "want_sources": True, "category": "weather"}
-    
-    # Price / Rate — Sources only
-    price_words = ["gold rate", "silver rate", "petrol price", "diesel price",
-                   "dollar rate", "sensex", "nifty", "share price", "sone ka bhav",
-                   "सोने का भाव", "चांदी", "rupee rate"]
-    if any(w in q for w in price_words):
-        return {"needs_search": True, "want_youtube": False,
-                "want_news": False, "want_sources": True, "category": "price"}
-    
-    # Movie / Trailer / Video — YouTube + Sources
-    movie_words = ["trailer", "ट्रेलर", "movie", "film", "box office",
-                   "web series", "netflix", "amazon prime", "hotstar",
-                   "video", "watch"]
-    if any(w in q for w in movie_words):
-        return {"needs_search": True, "want_youtube": True,
-                "want_news": False, "want_sources": True, "category": "movie"}
-    
-    # General live queries (today, tomorrow, kab) with event word
-    live_general = ["aaj", "आज", "today", "kab hai", "कब है", "kab hoga",
-                    "when is", "when will", "kab hain"]
-    event_context = ["election", "result", "exam", "admit card", "release",
-                     "schedule", "date"]
-    if any(w in q for w in live_general) or any(w in q for w in event_context):
-        return {"needs_search": True, "want_youtube": False,
-                "want_news": False, "want_sources": True, "category": "event"}
-    
-    # Educational / General knowledge — NO search, NO links
-    return {"needs_search": False, "want_youtube": False,
-            "want_news": False, "want_sources": False, "category": "educational"}
-
-
-def search_tavily(prompt: str, max_results: int = 5):
-    """
-    Tavily se search karta hai — sirf jab zaroorat ho.
-    Returns: (search_context, sources_text, query_info)
-    """
-    info = detect_query_type(prompt)
-    
-    # Agar search nahi chahiye — empty return
-    if not info["needs_search"]:
-        return "", "", info
-    
-    try:
-        from tavily import TavilyClient
-        key = st.secrets.get("TAVILY_API_KEY", "")
-        if not key:
-            return "", "", info
-        
-        tvly = TavilyClient(api_key=key)
-        result = tvly.search(
-            query=prompt,
-            max_results=max_results,
-            search_depth="advanced",
-            include_answer=True
-        )
-        
-        results_list = result.get("results", [])
-        if not results_list:
-            return "", "", info
-        
-        # Context build
-        context = "=== LIVE WEB SEARCH RESULTS ===\n"
-        context += f"Query: {prompt}\n"
-        context += f"Time: {datetime.datetime.now().strftime('%d %B %Y, %H:%M IST')}\n\n"
-        
-        tavily_answer = result.get("answer")
-        if tavily_answer:
-            context += f"QUICK ANSWER: {tavily_answer}\n\n"
-        
-        context += "SOURCES:\n"
-        sources_text = ""
-        for i, r in enumerate(results_list, 1):
-            title = r.get("title", "")
-            url = r.get("url", "")
-            content = r.get("content", "")[:600]
-            
-            context += f"\n[{i}] {title}\n    URL: {url}\n    Content: {content}\n"
-            sources_text += f"\n[{i}] [{title}]({url})"
-        
-        context += "\n=== END LIVE WEB RESULTS ===\n"
-        return context, sources_text, info
-    
-    except Exception:
-        return "", "", info 
 
 def get_school_system_prompt(age_group, lang="Auto 🟢 (Maa khud samajh jayegi)", persona="Maa + Teacher", subject="General"):
     
@@ -10447,7 +10306,7 @@ Encourage independent thinking. Do not humiliate.
                         except Exception as e:
                             st.error(f"❌ Evaluation failed: {type(e).__name__}: {str(e)[:150]}")
 
-   # ========================================================
+    # ========================================================
     # TAB 4: QUIZ / ASSESSMENT
     # ========================================================
     with tab_quiz:
@@ -10463,10 +10322,7 @@ Create {quiz_size} MCQ questions.
 Student: {age_level} | Topic: {quiz_topic} | Difficulty: {quiz_level}
 🌐 LANGUAGE: {lang_rule}
 
-CRITICAL: Return ONLY valid JSON array. No markdown, no explanation, no extra text.
-Start with [ and end with ].
-
-Format:
+Return ONLY valid JSON array:
 [
   {{"question": "...", "options": ["A","B","C","D"], "answer": "A", "explanation": "..."}}
 ]
@@ -10475,63 +10331,30 @@ Format:
                 try:
                     result = client.chat.completions.create(
                         model="openai/gpt-oss-120b",
-                        messages=[
-                            {"role": "system", "content": "You output ONLY valid JSON array. No markdown, no explanations, no code blocks. Start with [ and end with ]."},
-                            {"role": "user", "content": quiz_prompt}
-                        ],
+                        messages=[{"role": "user", "content": quiz_prompt}],
                         temperature=0.35, max_tokens=5000
                     )
                     raw = result.choices[0].message.content.strip()
-                    
-                    # Remove markdown code blocks if AI added them
-                    raw = re.sub(r"```json\s*", "", raw)
-                    raw = re.sub(r"```\s*", "", raw)
-                    raw = raw.strip()
-                    
-                    # Extract JSON array (from first [ to last ])
                     match = re.search(r"\[[\s\S]*\]", raw)
                     if not match:
                         raise ValueError("No JSON array found in response")
-                    
                     quiz = json.loads(match.group(0))
                     valid_questions = []
-                    
                     for q in quiz:
-                        if not isinstance(q, dict): 
-                            continue
+                        if not isinstance(q, dict): continue
                         opts = q.get("options", [])
                         ans = q.get("answer", "")
-                        
-                        # Fixed: answer is a letter (A/B/C/D), not in options text
-                        if (isinstance(opts, list) 
-                            and len(opts) == 4 
-                            and isinstance(ans, str)
-                            and ans.strip().upper() in ["A", "B", "C", "D"]):
-                            
-                            q["answer"] = ans.strip().upper()
-                            q["options"] = [str(o) for o in opts]
+                        if isinstance(opts, list) and len(opts) == 4 and ans in opts:
                             valid_questions.append(q)
-                    
                     if not valid_questions:
                         raise ValueError("No valid questions")
-                    
                     st.session_state.ai_quiz_data = valid_questions
                     st.session_state.ai_quiz_index = 0
                     st.session_state.ai_quiz_score = 0
                     st.session_state.ai_quiz_running = True
                     st.rerun()
-                    
-                except json.JSONDecodeError as e:
-                    st.error(f"❌ JSON parse error: {e}")
-                    with st.expander("🔍 Show raw response"):
-                        st.code(raw[:2000])
                 except Exception as e:
                     st.error(f"❌ Quiz failed: {type(e).__name__}: {str(e)[:200]}")
-                    with st.expander("🔍 Show raw response"):
-                        try:
-                            st.code(raw[:2000])
-                        except Exception:
-                            st.code("Response not captured")
 
         if st.session_state.ai_quiz_running:
             quiz = st.session_state.ai_quiz_data
@@ -10871,10 +10694,9 @@ def _chat_voice_input(key):
     if audio:
         return transcribe_audio_with_groq(client, audio.get("bytes", b""))
     return ""
-   
+
 def render_normal_chat():
-    import urllib.parse
-    
+   
     _render_chat_history(st.session_state.messages)
 
     voice_prompt = _chat_voice_input("normal_chat_mic")
@@ -10889,7 +10711,6 @@ def render_normal_chat():
     with st.chat_message("user"):
         st.markdown(f'<div class="user-bubble">{prompt}</div>', unsafe_allow_html=True)
 
-    # ============ IMAGE REQUEST ============
     if _explicit_image_request(prompt):
         with st.chat_message("assistant"):
             with st.spinner("🎨 Image bana raha hu..."):
@@ -10905,184 +10726,13 @@ def render_normal_chat():
         save_current_chat_cloud()
         st.rerun()
 
-    # ============ ⭐ QUERY TYPE DETECTION ============
-    q = prompt.lower().strip()
-    
-    # Defaults
-    needs_search = False
-    want_youtube = False
-    want_news = False
-    want_sources = False
-    
-    # --- Identity / Greeting — NO search, NO links ---
-    identity_words = [
-        "tum kaun", "tumhara naam", "aapka naam", "apka naam", "your name",
-        "who are you", "kisne banaya", "tumhe kisne", "apko kisne", "who made you",
-        "creator", "nirmata", "tumko kisne", "tujhe kisne"
-    ]
-    greeting_words = [
-        "hi", "hello", "namaste", "namaskar", "thanks", "thank you", "shukriya",
-        "kaise ho", "how are you", "bye", "good morning", "good night",
-        "good evening", "good afternoon"
-    ]
-    
-    is_identity = any(w in q for w in identity_words)
-    is_greeting = any(w in q for w in greeting_words) and len(q) < 30
-    
-    if is_identity or is_greeting:
-        needs_search = False
-        want_youtube = False
-        want_news = False
-        want_sources = False
-    
-    # --- News — YouTube + Google News + Sources ---
-    elif any(w in q for w in [
-        "news", "khabar", "खबर", "samachar", "समाचार", "headline", "headlines",
-        "breaking", "raipur news", "delhi news", "mumbai news", "aaj ki khabar",
-        "आज की खबर", "ताज़ा खबर", "ताजा खबर", "live news", "live khabar"
-    ]):
-        needs_search = True
-        want_youtube = True
-        want_news = True
-        want_sources = True
-    
-    # --- Sports / Cricket — YouTube + Sources ---
-    elif any(w in q for w in [
-        "cricket", "क्रिकेट", "ipl", "आईपीएल", "match", "मैच", "score", "स्कोर",
-        "live score", "india vs", "ind vs", "world cup", "t20", "odi", "test match",
-        "football", "फुटबॉल", "kabaddi", "कबड्डी", "olympic", "ओलंपिक",
-        "khel", "खेल", "virat", "rohit", "kohli", "dhoni"
-    ]):
-        needs_search = True
-        want_youtube = True
-        want_news = False
-        want_sources = True
-    
-    # --- Festival — YouTube + Sources ---
-    elif any(w in q for w in [
-        "diwali", "दिवाली", "deepawali", "दीपावली", "dipawali",
-        "holi", "होली", "eid", "ईद", "rakhi", "राखी", "raksha bandhan",
-        "dussehra", "दशहरा", "navratri", "नवरात्रि", "ganesh", "गणेश",
-        "janmashtami", "जन्माष्टमी", "christmas", "क्रिसमस", "chhath", "छठ",
-        "pongal", "पोंगल", "onam", "ओणम", "baisakhi", "बैसाखी", "lohri", "लोहड़ी",
-        "makarsankranti", "मकर संक्रांति", "karwa chauth", "करवा चौथ",
-        "bhai dooj", "भाई दूज", "gudi padwa", "गुड़ी पाड़वा",
-        "festival", "tyohar", "त्योहार", "parv", "पर्व"
-    ]):
-        needs_search = True
-        want_youtube = True
-        want_news = False
-        want_sources = True
-    
-    # --- Weather — Sources only ---
-    elif any(w in q for w in [
-        "weather", "मौसम", "mausam", "barish", "बारिश", "temperature",
-        "तापमान", "rain", "garmi", "गर्मी", "sardi", "सर्दी"
-    ]):
-        needs_search = True
-        want_youtube = False
-        want_news = False
-        want_sources = True
-    
-    # --- Price / Rate — Sources only ---
-    elif any(w in q for w in [
-        "gold rate", "silver rate", "petrol price", "diesel price", "dollar rate",
-        "sensex", "nifty", "share price", "sone ka bhav", "सोने का भाव",
-        "चांदी", "rupee rate", "silver price", "gold price", "सोना"
-    ]):
-        needs_search = True
-        want_youtube = False
-        want_news = False
-        want_sources = True
-    
-    # --- Movie / Trailer — YouTube + Sources ---
-    elif any(w in q for w in [
-        "trailer", "ट्रेलर", "movie", "मूवी", "film", "फिल्म", "box office",
-        "web series", "netflix", "amazon prime", "hotstar", "video", "वीडियो"
-    ]):
-        needs_search = True
-        want_youtube = True
-        want_news = False
-        want_sources = True
-    
-    # --- Event / Date — Sources only ---
-    elif any(w in q for w in [
-        "election", "चुनाव", "result", "परिणाम", "exam", "परीक्षा",
-        "admit card", "release", "रिलीज़", "schedule", "शेड्यूल",
-        "kab hai", "कब है", "kab hoga", "कब होगा", "kab hain", "कब हैं"
-    ]):
-        needs_search = True
-        want_youtube = False
-        want_news = False
-        want_sources = True
-    
-    # --- Aaj/today (without specific event) — Sources only ---
-    elif any(w in q for w in ["aaj", "आज", "today", "kal", "कल", "tomorrow"]):
-        needs_search = True
-        want_youtube = False
-        want_news = False
-        want_sources = True
-    
-    # --- Everything else = educational/general — NO search, NO links ---
-    else:
-        needs_search = False
-        want_youtube = False
-        want_news = False
-        want_sources = False
-    
-    # ============ ⭐ SEARCH (only if needed) ============
-    search_context, sources = "", ""
-    
-    if needs_search:
-        try:
-            result = search_tavily(prompt)
-            if isinstance(result, tuple) and len(result) >= 2:
-                search_context, sources = result[0], result[1]
-        except Exception:
-            search_context, sources = "", ""
-    
-    # ============ ⭐ BUILD LINKS (only if needed) ============
-    youtube_link = None
-    google_news_link = None
-    
-    if want_youtube:
-        yt_q = urllib.parse.quote_plus(prompt)
-        youtube_link = f"https://www.youtube.com/results?search_query={yt_q}"
-    
-    if want_news:
-        news_q = urllib.parse.quote_plus(prompt)
-        google_news_link = f"https://news.google.com/search?q={news_q}"
-    
-    # ============ ⭐ SYSTEM PROMPT ============
+    search_context, sources = search_tavily(prompt)
     system = NORMAL_SYSTEM_PROMPT + "\nLIVE INDIA CLOCK: " + get_india_datetime_context()
-    
-    if needs_search:
-        system += """
+    if search_context:
+        system += "\nLIVE WEB INFO:\n" + search_context
 
-### LIVE DATA RULES ###
-1. FESTIVAL / EVENT DATES: KABHI training data se date mat batao. SIRF LIVE WEB INFO use karo.
-2. NEWS / CRICKET / WEATHER / PRICE: LIVE WEB INFO se real-time data do.
-3. Source URLs cite karo markdown format mein: [Source Name](URL)
-4. Agar LIVE WEB INFO khali hai toh clearly bolo: "Confirmed info nahi mila."
-5. Kuch bhi invent mat karo — dates, scores, URLs, facts.
-6. Reply in user's language.
-7. Response ke end mein "🔗 Sources" section banao.
-"""
-        if search_context:
-            system += "\n\n=== LIVE WEB INFO ===\n" + search_context + "\n=== END LIVE WEB INFO ===\n"
-    else:
-        system += """
-
-### RULES ###
-1. Clean answer do — koi "Sources" section, koi "Related Links" mat add karo.
-2. Koi URL, YouTube link, Google News link mat add karo.
-3. Sirf seedha jawab do user ke sawaal ka.
-4. Reply in user's language.
-"""
-
-    # ============ ⭐ RESPONSE ============
     with st.chat_message("assistant"):
-        # Spinner
+        # SPINNER - User chat karte hi pehle ye ayega
         responding = st.empty()
         responding.markdown("""
             <div style='display:flex;align-items:center;gap:10px;color:#aaa'>
@@ -11091,7 +10741,7 @@ def render_normal_chat():
             </div>
             <style>
             @keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
-            .dots::after{content:'';animation:dotAnim 1.2s infinite}
+           .dots::after{content:'';animation:dotAnim 1.2s infinite}
             @keyframes dotAnim{0%{content:''}25%{content:'.'}50%{content:'..'}75%{content:'...'}100%{content:''}}
             </style>
         """, unsafe_allow_html=True)
@@ -11104,7 +10754,6 @@ def render_normal_chat():
         response = completion.choices[0].message.content
         responding.empty()
 
-        # Typewriter effect
         placeholder = st.empty()
         typed = ""
         for word in response.split(" "):
@@ -11112,21 +10761,8 @@ def render_normal_chat():
             placeholder.markdown(typed + "▌")
             time.sleep(0.01)
         placeholder.markdown(response)
-        
-        # ============ ⭐ CONDITIONAL SOURCES ============
-        show_links = want_youtube or want_news or (want_sources and sources)
-        
-        if show_links:
-            with st.expander("🔗 Sources & Links", expanded=False):
-                if youtube_link:
-                    st.markdown(f"**📺 YouTube:** [Watch video]({youtube_link})")
-                if google_news_link:
-                    st.markdown(f"**📰 Google News:** [Read news]({google_news_link})")
-                if want_sources and sources:
-                    st.markdown("---")
-                    st.markdown("**📎 Website Sources:**")
-                    st.markdown(sources)
-        
+        if sources:
+            st.caption("Sources:\n" + sources)
         st.caption("🔒 Clyxess AI | Secure • Fast • Private")
         st.session_state.messages.append({"role": "assistant", "content": response})
         save_current_chat_cloud()
