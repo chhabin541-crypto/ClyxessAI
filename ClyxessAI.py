@@ -10924,6 +10924,40 @@ def _chat_voice_input(key):
         return transcribe_audio_with_groq(client, audio.get("bytes", b""))
     return ""
 
+# ===== TEMPORARY TEST BUTTON — DELETE AFTER CHECKING =====
+if st.button("🔍 TEST TAVILY API", key="debug_tavily"):
+    try:
+        from tavily import TavilyClient
+        
+        # 1. Check API key
+        key = st.secrets.get("TAVILY_API_KEY", "")
+        st.write(f"**1. API Key present:** {bool(key)}")
+        if key:
+            st.write(f"**2. Key prefix:** `{key[:25]}...`")
+            st.write(f"**3. Key length:** {len(key)} characters")
+        else:
+            st.error("❌ API KEY MISSING in secrets!")
+            st.stop()
+        
+        # 2. Try API call
+        tvly = TavilyClient(api_key=key)
+        result = tvly.search(
+            query="Diwali 2026 date India",
+            max_results=3,
+            search_depth="basic"
+        )
+        
+        # 3. Show result
+        st.success(f"✅ API CALLED SUCCESSFULLY")
+        st.write(f"**4. Results count:** {len(result.get('results', []))}")
+        st.write(f"**5. Answer field:** {result.get('answer', 'NO ANSWER')}")
+        
+        with st.expander("🔍 Full raw response"):
+            st.json(result)
+    
+    except Exception as e:
+        st.error(f"❌ ERROR: {type(e).__name__}")
+        st.code(str(e))    
 def render_normal_chat():
    
     _render_chat_history(st.session_state.messages)
