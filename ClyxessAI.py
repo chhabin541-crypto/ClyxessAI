@@ -9538,7 +9538,7 @@ def render_aero_lab():
             
             /* Right Side Transform Panel */
             #transform-panel {
-                position: absolute; top: 70px; right: 20px; width: 290px; background: var(--panel-bg);
+                position: absolute; top: 70px; right: 20px; width: 200px; background: var(--panel-bg);
                 border: 2px solid var(--border-color); border-radius: 10px; padding: 15px;
                 color: var(--text-color); box-shadow: 0 0 20px rgba(0,0,0,0.5);
                 display: none; flex-direction: column; gap: 8px; z-index: 100;
