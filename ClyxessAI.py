@@ -10019,7 +10019,7 @@ def render_aero_lab():
     </html>
     """
     
-    components.html(three_js_code, height=800)
+    components.html(three_js_code, height=900)
 
     st.divider()
 
