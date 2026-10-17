@@ -9492,7 +9492,7 @@ def render_aero_lab():
     """, unsafe_allow_html=True)
 
     st.write("## 🛩️ Aeronautical 3D CAD & Wind Tunnel Lab")
-    st.markdown("Top bar se parts add karein. Kisi part par **ek click** karke uski **Material, Position, Rotation aur Color** change karein!")
+    st.markdown("Top bar se parts add karein. Kisi part par **ek click** karke ya **Right Panel ki List** se usko select karke edit karein!")
 
     if "aero_chat_log" not in st.session_state:
         st.session_state.aero_chat_log = [
@@ -9518,7 +9518,7 @@ def render_aero_lab():
                 --border-color: #0077b6; --button-bg: #0077b6; --button-text: #ffffff;
             }
             body { margin: 0; overflow: hidden; background-color: var(--bg-color); font-family: 'Segoe UI', sans-serif; transition: 0.3s; }
-            #canvas-container { width: 100vw; height: calc(100vh - 60px); display: block; }
+            #canvas-container { width: 100vw; height: calc(100vh - 60px); display: block; cursor: default; }
             
             /* Top Bar */
             #topbar {
@@ -9534,24 +9534,34 @@ def render_aero_lab():
             button { background: var(--button-bg); color: var(--button-text); font-weight: bold; transition: 0.2s; }
             button:hover { transform: scale(1.05); }
             button.danger { background: #FF3366; color: white; border-color: #FF3366; }
+            button.danger:hover { background: #cc0033; }
             
             /* Right Side Transform Panel */
             #transform-panel {
-                position: absolute; top: 70px; right: 20px; width: 280px; background: var(--panel-bg);
+                position: absolute; top: 70px; right: 20px; width: 290px; background: var(--panel-bg);
                 border: 2px solid var(--border-color); border-radius: 10px; padding: 15px;
                 color: var(--text-color); box-shadow: 0 0 20px rgba(0,0,0,0.5);
-                display: none; flex-direction: column; gap: 10px; z-index: 100;
+                display: none; flex-direction: column; gap: 8px; z-index: 100;
             }
-            #transform-panel h4 { margin: 0; color: var(--border-color); font-size: 14px; border-bottom: 1px solid var(--border-color); padding-bottom: 5px; }
+            #transform-panel h4 { margin: 0; color: var(--border-color); font-size: 14px; border-bottom: 1px solid var(--border-color); padding-bottom: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
             
             .control-row { display: flex; justify-content: space-between; align-items: center; gap: 5px; margin-top: 5px; }
             .control-row label { font-size: 12px; width: 40px; }
             .btn-group { display: flex; gap: 3px; flex: 1; }
             .btn-group button { flex: 1; padding: 4px; font-size: 11px; }
             
-            .section-title { font-size: 11px; font-weight: bold; color: #aaa; margin-top: 10px; }
+            .section-title { font-size: 11px; font-weight: bold; color: #aaa; margin-top: 8px; }
             .info-box { background: rgba(0,0,0,0.2); padding: 8px; border-radius: 5px; font-size: 11px; line-height: 1.3; }
             .diagram { height: 60px; background: rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center; margin-top: 5px; border-radius: 5px;}
+            
+            /* Scene List Style */
+            #sceneList {
+                width: 100%; padding: 5px; border-radius: 5px; background: var(--bg-color);
+                color: var(--text-color); border: 1px solid var(--border-color); outline: none;
+                font-size: 12px; overflow-y: auto;
+            }
+            #sceneList option { padding: 6px; cursor: pointer; }
+            #sceneList option:checked { background-color: var(--border-color); color: var(--button-text); font-weight: bold; }
         </style>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
@@ -9561,23 +9571,28 @@ def render_aero_lab():
         <div id="topbar">
             <div class="group">
                 <select id="langSelect" onchange="changeLanguage()">
-                    <option value="en">🇬🇧 EN</option>
+                    <option value="en">🇬🇧 English</option>
                     <option value="hi">🇮🇳 हिंदी</option>
                     <option value="hinglish">🇮🇳 Hinglish</option>
+                    <option value="zh">🇨🇳 中文</option>
+                    <option value="ja">🇯🇵 日本語</option>
+                    <option value="ru">🇷🇺 Русский</option>
+                    <option value="es">🇪🇸 Español</option>
+                    <option value="fr">🇫🇷 Français</option>
+                    <option value="de">🇩🇪 Deutsch</option>
+                    <option value="ta">🇮🇳 தமிழ்</option>
+                    <option value="te">🇮🇳 తెలుగు</option>
+                    <option value="bn">🇮🇳 বাংলা</option>
+                    <option value="mr">🇮🇳 मराठी</option>
                 </select>
                 <button onclick="toggleTheme()" id="themeBtn">☀️ Light</button>
             </div>
 
             <div class="group">
-                <select id="partCategory" style="width: 100px;">
-                    <option value="wings">Wings</option>
-                    <option value="rotors">Rotors</option>
-                    <option value="engines">Engines</option>
-                    <option value="body">Body</option>
-                    <option value="gear">Gear</option>
-                </select>
-                <select id="partList" style="width: 130px;"></select>
+                <select id="partCategory" style="width: 130px;"></select>
+                <select id="partList" style="width: 160px;"></select>
                 <button onclick="addSelectedPart()" id="btnAdd">➕ Add</button>
+                <button class="danger" onclick="clearAllParts()" id="btnClear">🗑️ Clear All</button>
             </div>
         </div>
 
@@ -9585,56 +9600,49 @@ def render_aero_lab():
 
         <!-- Transform & Material Panel -->
         <div id="transform-panel">
-            <h4 id="panel-title">Selected Part</h4>
             
-            <div class="section-title">🎨 Material & Color</div>
+            <!-- ⭐ SCENE LIST (SELECT FROM HERE) ⭐ -->
+            <div class="section-title" id="lbl_scene">📋 Scene Objects (Select)</div>
+            <select id="sceneList" size="4" onchange="selectFromList()"></select>
+
+            <h4 id="panel-title" style="margin-top:10px;">Select a part...</h4>
+            
+            <div class="section-title" id="lbl_mat">🎨 Material & Color</div>
             <select id="materialSelect" onchange="changeMaterial()" style="width:100%">
-                <option value="plastic">Plastic</option>
-                <option value="metal">Metal</option>
-                <option value="chrome">Chrome (Shiny)</option>
-                <option value="rubber">Rubber</option>
-                <option value="glass">Glass (Transparent)</option>
-                <option value="wood">Wood</option>
-                <option value="gold">Gold</option>
+                <option value="plastic" id="mat_plastic">Plastic</option>
+                <option value="metal" id="mat_metal">Metal</option>
+                <option value="chrome" id="mat_chrome">Chrome</option>
+                <option value="rubber" id="mat_rubber">Rubber</option>
+                <option value="glass" id="mat_glass">Glass</option>
+                <option value="wood" id="mat_wood">Wood</option>
+                <option value="gold" id="mat_gold">Gold</option>
             </select>
             <div class="control-row">
-                <label>Color:</label>
+                <label id="lbl_color">Color:</label>
                 <input type="color" id="colorPicker" value="#FF3366" onchange="changeColor(this.value)" style="width:100%; height:25px;">
             </div>
 
-            <div class="section-title">↔️ Move Position</div>
-            <div class="control-row">
-                <label>X:</label><div class="btn-group"><button onclick="moveObj('x', -0.5)">-</button><button onclick="moveObj('x', 0.5)">+</button></div>
-            </div>
-            <div class="control-row">
-                <label>Y:</label><div class="btn-group"><button onclick="moveObj('y', -0.5)">-</button><button onclick="moveObj('y', 0.5)">+</button></div>
-            </div>
-            <div class="control-row">
-                <label>Z:</label><div class="btn-group"><button onclick="moveObj('z', -0.5)">-</button><button onclick="moveObj('z', 0.5)">+</button></div>
-            </div>
+            <div class="section-title" id="lbl_move">↔️ Move Position</div>
+            <div class="control-row"><label>X:</label><div class="btn-group"><button onclick="moveObj('x', -0.5)">-</button><button onclick="moveObj('x', 0.5)">+</button></div></div>
+            <div class="control-row"><label>Y:</label><div class="btn-group"><button onclick="moveObj('y', -0.5)">-</button><button onclick="moveObj('y', 0.5)">+</button></div></div>
+            <div class="control-row"><label>Z:</label><div class="btn-group"><button onclick="moveObj('z', -0.5)">-</button><button onclick="moveObj('z', 0.5)">+</button></div></div>
 
-            <div class="section-title">🔄 Rotate Part</div>
-            <div class="control-row">
-                <label>X:</label><div class="btn-group"><button onclick="rotateObj('x', -0.1)">-</button><button onclick="rotateObj('x', 0.1)">+</button></div>
-            </div>
-            <div class="control-row">
-                <label>Y:</label><div class="btn-group"><button onclick="rotateObj('y', -0.1)">-</button><button onclick="rotateObj('y', 0.1)">+</button></div>
-            </div>
-            <div class="control-row">
-                <label>Z:</label><div class="btn-group"><button onclick="rotateObj('z', -0.1)">-</button><button onclick="rotateObj('z', 0.1)">+</button></div>
-            </div>
+            <div class="section-title" id="lbl_rot">🔄 Rotate Part</div>
+            <div class="control-row"><label>X:</label><div class="btn-group"><button onclick="rotateObj('x', -0.1)">-</button><button onclick="rotateObj('x', 0.1)">+</button></div></div>
+            <div class="control-row"><label>Y:</label><div class="btn-group"><button onclick="rotateObj('y', -0.1)">-</button><button onclick="rotateObj('y', 0.1)">+</button></div></div>
+            <div class="control-row"><label>Z:</label><div class="btn-group"><button onclick="rotateObj('z', -0.1)">-</button><button onclick="rotateObj('z', 0.1)">+</button></div></div>
 
             <div class="control-row" style="margin-top:10px;">
-                <button onclick="dropToFloor()" style="flex:1;">⬇️ Floor</button>
-                <button onclick="centerObj()" style="flex:1;">🎯 Center</button>
+                <button onclick="dropToFloor()" style="flex:1;" id="btn_floor">⬇️ Floor</button>
+                <button onclick="centerObj()" style="flex:1;" id="btn_center">🎯 Center</button>
             </div>
-
+            
             <div class="control-row" style="margin-top:10px;">
-                <button onclick="copySelected()" style="flex:1;">📋 Copy</button>
-                <button class="danger" onclick="deleteSelected()" style="flex:1;">🗑️ Delete</button>
+                <button onclick="copySelected()" style="flex:1;" id="btn_copy">📋 Copy</button>
+                <button class="danger" onclick="deleteSelected()" style="flex:1; border: 2px solid #FF3366;" id="btn_del">🗑️ Delete</button>
             </div>
 
-            <div class="section-title">📐 Physics Hub</div>
+            <div class="section-title" id="lbl_phys">📐 Physics Hub</div>
             <div class="info-box">
                 <div id="info-math" style="color:#FF3366; font-weight:bold; margin-bottom:4px;"></div>
                 <div id="info-physics" style="color:#ddd;"></div>
@@ -9643,33 +9651,87 @@ def render_aero_lab():
         </div>
 
         <script>
+            // --- 1. TRANSLATIONS ---
             const trans = {
-                "en": { "add": "➕ Add" },
-                "hi": { "add": "➕ जोड़ें" },
-                "hinglish": { "add": "➕ Add Karo" }
+                "en": { add: "➕ Add", clear: "🗑️ Clear All", mat: "🎨 Material & Color", color: "Color:", move: "↔️ Move Position", rot: "🔄 Rotate Part", floor: "⬇️ Floor", center: "🎯 Center", copy: "📋 Copy", del: "🗑️ Delete", phys: "📐 Physics Hub", scene: "📋 Scene Objects (Select)", cat_fuselage: "Fuselage/Body", cat_wings: "Wings", cat_props: "Propellers", cat_rotors: "Rotors (Heli)", cat_jets: "Jet Engines", cat_gear: "Landing Gear", cat_acc: "Accessories" },
+                "hi": { add: "➕ जोड़ें", clear: "🗑️ सब मिटाएं", mat: "🎨 सामग्री और रंग", color: "रंग:", move: "↔️ स्थान बदलें", rot: "🔄 घुमाएं", floor: "⬇️ ज़मीन पर", center: "🎯 केंद्र", copy: "📋 कॉपी", del: "🗑️ हटाएं", phys: "📐 फिजिक्स हब", scene: "📋 ऑब्जेक्ट लिस्ट (चुनें)", cat_fuselage: "बॉडी", cat_wings: "पंख", cat_props: "प्रोपेलर", cat_rotors: "रोटर", cat_jets: "जेट इंजन", cat_gear: "लैंडिंग गियर", cat_acc: "सहायक उपकरण" },
+                "hinglish": { add: "➕ Add Karo", clear: "🗑️ Sab Clear", mat: "🎨 Material & Color", color: "Rang:", move: "↔️ Move Karo", rot: "🔄 Ghumao", floor: "⬇️ Floor Pe", center: "🎯 Center", copy: "📋 Copy", del: "🗑️ Delete", phys: "📐 Physics", scene: "📋 Parts List (Select)", cat_fuselage: "Body", cat_wings: "Wings", cat_props: "Propeller", cat_rotors: "Rotor", cat_jets: "Jet Engine", cat_gear: "Landing Gear", cat_acc: "Accessories" },
+                "zh": { add: "➕ 添加", clear: "🗑️ 清除全部", mat: "🎨 材料与颜色", color: "颜色:", move: "↔️ 移动", rot: "🔄 旋转", floor: "⬇️ 地面", center: "🎯 居中", copy: "📋 复制", del: "🗑️ 删除", phys: "📐 物理中心", scene: "📋 对象列表 (选择)", cat_fuselage: "机身", cat_wings: "机翼", cat_props: "螺旋桨", cat_rotors: "旋翼", cat_jets: "喷气发动机", cat_gear: "起落架", cat_acc: "配件" },
+                "ja": { add: "➕ 追加", clear: "🗑️ クリア", mat: "🎨 素材と色", color: "色:", move: "↔️ 移動", rot: "🔄 回転", floor: "⬇️ 床", center: "🎯 中央", copy: "📋 コピー", del: "🗑️ 削除", phys: "📐 物理", scene: "📋 オブジェクト一覧", cat_fuselage: "機体", cat_wings: "翼", cat_props: "プロペラ", cat_rotors: "ローター", cat_jets: "ジェット", cat_gear: "着陸装置", cat_acc: "アクセサリー" },
+                "ru": { add: "➕ Добавить", clear: "🗑️ Очистить", mat: "🎨 Материал и цвет", color: "Цвет:", move: "↔️ Переместить", rot: "🔄 Повернуть", floor: "⬇️ Пол", center: "🎯 Центр", copy: "📋 Копия", del: "🗑️ Удалить", phys: "📐 Физика", scene: "📋 Объекты (Выбор)", cat_fuselage: "Фюзеляж", cat_wings: "Крылья", cat_props: "Пропеллер", cat_rotors: "Ротор", cat_jets: "Реактивный", cat_gear: "Шасси", cat_acc: "Аксессуары" },
+                "es": { add: "➕ Añadir", clear: "🗑️ Borrar todo", mat: "🎨 Material", color: "Color:", move: "↔️ Mover", rot: "🔄 Rotar", floor: "⬇️ Suelo", center: "🎯 Centro", copy: "📋 Copiar", del: "🗑️ Borrar", phys: "📐 Física", scene: "📋 Objetos (Seleccionar)", cat_fuselage: "Fuselaje", cat_wings: "Alas", cat_props: "Hélices", cat_rotors: "Rotores", cat_jets: "Motores", cat_gear: "Tren", cat_acc: "Accesorios" },
+                "fr": { add: "➕ Ajouter", clear: "🗑️ Tout effacer", mat: "🎨 Matériau", color: "Couleur:", move: "↔️ Déplacer", rot: "🔄 Tourner", floor: "⬇️ Sol", center: "🎯 Centre", copy: "📋 Copier", del: "🗑️ Supprimer", phys: "📐 Physique", scene: "📋 Objets (Sélection)", cat_fuselage: "Fuselage", cat_wings: "Ailes", cat_props: "Hélices", cat_rotors: "Rotors", cat_jets: "Moteurs", cat_gear: "Train", cat_acc: "Accessoires" },
+                "de": { add: "➕ Hinzufügen", clear: "🗑️ Löschen", mat: "🎨 Material", color: "Farbe:", move: "↔️ Bewegen", rot: "🔄 Drehen", floor: "⬇️ Boden", center: "🎯 Zentrum", copy: "📋 Kopieren", del: "🗑️ Löschen", phys: "📐 Physik", scene: "📋 Objekte (Auswählen)", cat_fuselage: "Rumpf", cat_wings: "Flügel", cat_props: "Propeller", cat_rotors: "Rotoren", cat_jets: "Triebwerke", cat_gear: "Fahrwerk", cat_acc: "Zubehör" },
+                "ta": { add: "➕ சேர்", clear: "🗑️ அழி", mat: "🎨 பொருள்", color: "நிறம்:", move: "↔️ நகர்த்து", rot: "🔄 சுழற்று", floor: "⬇️ தரை", center: "🎯 மையம்", copy: "📋 நகல்", del: "🗑️ நீக்கு", phys: "📐 இயற்பியல்", scene: "📋 பொருட்கள் (தேர்வு)", cat_fuselage: "உடல்", cat_wings: "இறக்கை", cat_props: "ப்ரொபெல்லர்", cat_rotors: "ரோட்டார்", cat_jets: "ஜெட்", cat_gear: "கியர்", cat_acc: "துணை" },
+                "te": { add: "➕ జోడించు", clear: "🗑️ తొలగించు", mat: "🎨 పదార్థం", color: "రంగు:", move: "↔️ కదిలించు", rot: "🔄 తిప్పు", floor: "⬇️ నేల", center: "🎯 కేంద్రం", copy: "📋 కాపీ", del: "🗑️ తొలగించు", phys: "📐 భౌతికం", scene: "📋 వస్తువులు (ఎంచుకోండి)", cat_fuselage: "బాడీ", cat_wings: "రెక్కలు", cat_props: "ప్రొపెల్లర్", cat_rotors: "రోటర్", cat_jets: "జెట్", cat_gear: "గేర్", cat_acc: "ఉపకరణాలు" },
+                "bn": { add: "➕ যোগ", clear: "🗑️ মুছুন", mat: "🎨 উপাদান", color: "রঙ:", move: "↔️ সরান", rot: "🔄 ঘোরান", floor: "⬇️ মাটি", center: "🎯 কেন্দ্র", copy: "📋 কপি", del: "🗑️ মুছুন", phys: "📐 পদার্থ", scene: "📋 বস্তু (নির্বাচন)", cat_fuselage: "বডি", cat_wings: "ডানা", cat_props: "প্রপেলার", cat_rotors: "রোটর", cat_jets: "জেট", cat_gear: "গিয়ার", cat_acc: "আনুষঙ্গিক" },
+                "mr": { add: "➕ जोडा", clear: "🗑️ साफ", mat: "🎨 साहित्य", color: "रंग:", move: "↔️ हलवा", rot: "🔄 फिरवा", floor: "⬇️ जमीन", center: "🎯 मध्य", copy: "📋 कॉपी", del: "🗑️ हटवा", phys: "📐 भौतिक", scene: "📋 ऑब्जेक्ट (निवडा)", cat_fuselage: "बॉडी", cat_wings: "पंख", cat_props: "प्रोपेलर", cat_rotors: "रोटर", cat_jets: "जेट", cat_gear: "गियर", cat_acc: "उपकरणे" }
             };
-            
+
+            let currentLang = 'en';
+
             function changeLanguage() {
-                let lang = document.getElementById("langSelect").value;
-                document.getElementById("btnAdd").innerHTML = trans[lang].add;
+                currentLang = document.getElementById("langSelect").value;
+                const t = trans[currentLang];
+                
+                document.getElementById("btnAdd").innerHTML = t.add;
+                document.getElementById("btnClear").innerHTML = t.clear;
+                document.getElementById("lbl_mat").innerText = t.mat;
+                document.getElementById("lbl_color").innerText = t.color;
+                document.getElementById("lbl_move").innerText = t.move;
+                document.getElementById("lbl_rot").innerText = t.rot;
+                document.getElementById("btn_floor").innerHTML = t.floor;
+                document.getElementById("btn_center").innerHTML = t.center;
+                document.getElementById("btn_copy").innerHTML = t.copy;
+                document.getElementById("btn_del").innerHTML = t.del;
+                document.getElementById("lbl_phys").innerText = t.phys;
+                document.getElementById("lbl_scene").innerText = t.scene;
+
+                const catSelect = document.getElementById("partCategory");
+                const currentVal = catSelect.value;
+                catSelect.innerHTML = `
+                    <option value="fuselage">${t.cat_fuselage}</option>
+                    <option value="wings">${t.cat_wings}</option>
+                    <option value="props">${t.cat_props}</option>
+                    <option value="rotors">${t.cat_rotors}</option>
+                    <option value="jets">${t.cat_jets}</option>
+                    <option value="gear">${t.cat_gear}</option>
+                    <option value="acc">${t.cat_acc}</option>
+                `;
+                catSelect.value = currentVal;
+                populateParts();
             }
 
+            // --- 2. DATABASE ---
             const PARTS_DB = {
+                fuselage: [
+                    { name: "Main Fuselage", type: "cylinder", size: [0.6, 0.8, 8], math: "V = πr²h", physics: "Houses payload. Aerodynamic shape reduces form drag.", svg: "<svg width='80' height='40'><ellipse cx='40' cy='20' rx='35' ry='10' fill='#aaa'/></svg>" },
+                    { name: "Nose Cone", type: "cone", size: [0.8, 2, 32], math: "D = 1/2 ρv²ACd", physics: "Sharp tip cuts air smoothly preventing shockwaves.", svg: "<svg width='80' height='40'><polygon points='40,5 70,35 10,35' fill='#ccc'/></svg>" },
+                    { name: "Glass Cockpit", type: "sphere", size: [1, 1, 1], math: "Fresnel Eq.", physics: "Reflects radar and sunlight, provides visibility.", svg: "<svg width='80' height='40'><path d='M 20 20 A 20 20 0 0 1 60 20 Z' fill='#88ccff'/></svg>" }
+                ],
                 wings: [
-                    { name: "Wing A", type: "box", size: [6, 0.1, 1.2], math: "L = 1/2 p v^2 S C_L", physics: "Generates lift.", svg: "<svg width='80' height='40'><rect x='10' y='15' width='60' height='10' fill='#00FFCC'/></svg>" },
-                    { name: "Wing B", type: "box", size: [5, 0.1, 1.5], math: "L = 1/2 p v^2 S C_L", physics: "Swept wing.", svg: "<svg width='80' height='40'><polygon points='10,25 60,15 70,20 20,30' fill='#00FFCC'/></svg>" }
+                    { name: "Straight Wing", type: "box", size: [8, 0.1, 1.5], math: "L = 1/2 ρv²SCL", physics: "Provides lift. Best for slow speeds.", svg: "<svg width='80' height='40'><rect x='5' y='15' width='70' height='10' fill='#00FFCC'/></svg>" },
+                    { name: "Swept Wing", type: "box", size: [7, 0.1, 2], math: "L = 1/2 ρv²SCL(cosΛ)", physics: "Delays shockwaves at high speeds.", svg: "<svg width='80' height='40'><polygon points='10,25 70,15 75,20 15,30' fill='#00FFCC'/></svg>" },
+                    { name: "Tail Fin", type: "box", size: [0.1, 2, 1.5], math: "F = 1/2 ρv²A", physics: "Provides yaw stability.", svg: "<svg width='80' height='40'><rect x='35' y='5' width='10' height='30' fill='#00FFCC'/></svg>" }
+                ],
+                props: [
+                    { name: "2-Blade Prop", type: "box", size: [0.1, 4, 0.2], math: "T = P/A", physics: "Pushes air backwards for thrust.", svg: "<svg width='80' height='40'><line x1='40' y1='5' x2='40' y2='35' stroke='#FF3366' stroke-width='4'/></svg>" },
+                    { name: "4-Blade Prop", type: "cross", size: [4, 0.1, 0.2], math: "T = P/A", physics: "More blades = more thrust.", svg: "<svg width='80' height='40'><line x1='40' y1='5' x2='40' y2='35' stroke='#FF3366' stroke-width='4'/><line x1='20' y1='20' x2='60' y2='20' stroke='#FF3366' stroke-width='4'/></svg>" }
                 ],
                 rotors: [
-                    { name: "Propeller", type: "box", size: [0.1, 3, 0.1], math: "T = P / A", physics: "Creates thrust.", svg: "<svg width='80' height='40'><line x1='40' y1='5' x2='40' y2='35' stroke='#FF3366' stroke-width='4'/></svg>" }
+                    { name: "Main Rotor Hub", type: "cylinder", size: [0.6, 0.6, 0.8], math: "Torque", physics: "Connects blades to mast.", svg: "<svg width='80' height='40'><circle cx='40' cy='20' r='12' fill='#aaa'/></svg>" },
+                    { name: "Long Rotor Blade", type: "box", size: [0.3, 8, 0.1], math: "L = 1/2 ρv²S", physics: "Creates huge lift at low speeds.", svg: "<svg width='80' height='40'><rect x='10' y='18' width='60' height='4' fill='#00FFCC'/></svg>" }
                 ],
-                engines: [
-                    { name: "Motor", type: "cylinder", size: [0.4, 0.4, 1], math: "P = V * I", physics: "Converts energy.", svg: "<svg width='80' height='40'><circle cx='40' cy='20' r='12' fill='none' stroke='#e9c46a' stroke-width='4'/></svg>" }
-                ],
-                body: [
-                    { name: "Fuselage", type: "cylinder", size: [0.5, 0.8, 6], math: "V = pi * r^2 * h", physics: "Main body.", svg: "<svg width='80' height='40'><ellipse cx='40' cy='20' rx='30' ry='10' fill='#aaaaaa'/></svg>" }
+                jets: [
+                    { name: "Jet Turbine", type: "cylinder", size: [1.2, 1.2, 4], math: "F = m_dot * v_e", physics: "Burns fuel to expel gas.", svg: "<svg width='80' height='40'><rect x='20' y='10' width='40' height='20' fill='#555'/></svg>" },
+                    { name: "Thrust Nozzle", type: "cone", size: [1.2, 2, 4], math: "P = F/A", physics: "Accelerates exhaust gas.", svg: "<svg width='80' height='40'><polygon points='20,5 20,35 60,20' fill='#aaa'/></svg>" }
                 ],
                 gear: [
-                    { name: "Tyre", type: "torus", size: [0.4, 0.1], math: "F = mu * N", physics: "Grip.", svg: "<svg width='80' height='40'><circle cx='40' cy='20' r='15' fill='none' stroke='#555' stroke-width='6'/></svg>" }
+                    { name: "Main Wheel", type: "torus", size: [0.6, 0.2], math: "F = μN", physics: "Friction with ground.", svg: "<svg width='80' height='40'><circle cx='40' cy='20' r='15' fill='none' stroke='#555' stroke-width='8'/></svg>" },
+                    { name: "Landing Strut", type: "cylinder", size: [0.1, 0.1, 2], math: "Hooke's Law", physics: "Absorbs shock.", svg: "<svg width='80' height='40'><rect x='38' y='5' width='4' height='30' fill='#aaa'/></svg>" }
+                ],
+                acc: [
+                    { name: "Nav Light", type: "sphere", size: [0.2, 0.2, 0.2], math: "Photon", physics: "Visibility at night.", svg: "<svg width='80' height='40'><circle cx='40' cy='20' r='5' fill='#ff0'/></svg>" }
                 ]
             };
 
@@ -9681,8 +9743,10 @@ def render_aero_lab():
                 for(let i=1; i<=20; i++) { list.innerHTML += `<option value="${PARTS_DB[cat][0].name}_V${i}">${PARTS_DB[cat][0].name} V${i}</option>`; }
             }
             document.getElementById("partCategory").addEventListener("change", populateParts);
-            populateParts();
 
+            changeLanguage(); 
+
+            // --- 3. THREE.JS SETUP ---
             let scene, camera, renderer, orbitControls, transformControls;
             let selectedObject = null;
             const objects = [];
@@ -9691,7 +9755,7 @@ def render_aero_lab():
             scene.background = new THREE.Color(0x050716);
             
             camera = new THREE.PerspectiveCamera(45, window.innerWidth / (window.innerHeight - 60), 0.1, 1000);
-            camera.position.set(8, 8, 12);
+            camera.position.set(10, 10, 15);
 
             renderer = new THREE.WebGLRenderer({ antialias: true });
             renderer.setSize(window.innerWidth, window.innerHeight - 60);
@@ -9699,7 +9763,7 @@ def render_aero_lab():
 
             const ambientLight = new THREE.AmbientLight(0xffffff, 0.6); scene.add(ambientLight);
             const dirLight = new THREE.DirectionalLight(0xffffff, 0.8); dirLight.position.set(5, 10, 7); scene.add(dirLight);
-            const gridHelper = new THREE.GridHelper(30, 30, 0x00FFCC, 0x11153b); scene.add(gridHelper);
+            const gridHelper = new THREE.GridHelper(40, 40, 0x00FFCC, 0x11153b); scene.add(gridHelper);
 
             orbitControls = new THREE.OrbitControls(camera, renderer.domElement);
             transformControls = new THREE.TransformControls(camera, renderer.domElement);
@@ -9720,17 +9784,15 @@ def render_aero_lab():
             const mouse = new THREE.Vector2();
             const defaultMat = new THREE.MeshStandardMaterial({ color: 0xcccccc, metalness: 0.5, roughness: 0.5 });
 
-            // --- FIX: Single Click Selection ---
             let pointerDownPos = new THREE.Vector2();
 
             renderer.domElement.addEventListener('pointerdown', (e) => {
                 pointerDownPos.set(e.clientX, e.clientY);
             });
 
+            // ⭐ UPDATE: Update list and highlight when clicked in 3D
             renderer.domElement.addEventListener('pointerup', (e) => {
-                // Agar mouse drag hua hai (Orbit control), toh select mat karo
                 if (Math.abs(e.clientX - pointerDownPos.x) > 5 || Math.abs(e.clientY - pointerDownPos.y) > 5) return;
-                // Agar gizmo (arrows) pe click hua hai, toh select mat karo
                 if (transformControls.axis !== null) return;
 
                 const rect = renderer.domElement.getBoundingClientRect();
@@ -9738,19 +9800,58 @@ def render_aero_lab():
                 mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
                 
                 raycaster.setFromCamera(mouse, camera);
-                const intersects = raycaster.intersectObjects(objects);
+                const intersects = raycaster.intersectObjects(objects, true); 
                 
                 if (intersects.length > 0) {
-                    selectedObject = intersects[0].object;
-                    transformControls.attach(selectedObject);
-                    updatePanel(selectedObject);
-                    document.getElementById("transform-panel").style.display = "flex";
+                    let clickedObj = intersects[0].object;
+                    while (clickedObj.parent && clickedObj.parent.type === 'Group' && clickedObj.parent !== scene) {
+                        clickedObj = clickedObj.parent;
+                    }
+                    selectObject(clickedObj);
                 } else {
-                    selectedObject = null;
-                    transformControls.detach();
-                    document.getElementById("transform-panel").style.display = "none";
+                    deselectObject();
                 }
             });
+
+            // ⭐ LIST SELECT LOGIC
+            function selectFromList() {
+                const list = document.getElementById("sceneList");
+                const idx = list.selectedIndex;
+                if(idx >= 0 && objects[idx]) {
+                    selectObject(objects[idx]);
+                }
+            }
+
+            function selectObject(obj) {
+                selectedObject = obj;
+                transformControls.attach(selectedObject);
+                document.getElementById("transform-panel").style.display = "flex";
+                updatePanel(selectedObject);
+                
+                // Highlight in List
+                const list = document.getElementById("sceneList");
+                const idx = objects.indexOf(obj);
+                if(idx >= 0) list.selectedIndex = idx;
+            }
+
+            function deselectObject() {
+                selectedObject = null;
+                transformControls.detach();
+                document.getElementById("transform-panel").style.display = "none";
+                const list = document.getElementById("sceneList");
+                if(list) list.selectedIndex = -1;
+            }
+
+            function updateSceneList() {
+                const list = document.getElementById("sceneList");
+                list.innerHTML = "";
+                objects.forEach((obj, index) => {
+                    const opt = document.createElement("option");
+                    opt.value = index;
+                    opt.text = obj.name + " (#" + (index + 1) + ")";
+                    list.appendChild(opt);
+                });
+            }
 
             function addSelectedPart() {
                 const cat = document.getElementById("partCategory").value;
@@ -9763,47 +9864,88 @@ def render_aero_lab():
                 else if (basePart.type === "sphere") geo = new THREE.SphereGeometry(...basePart.size);
                 else if (basePart.type === "cone") geo = new THREE.ConeGeometry(...basePart.size);
                 else if (basePart.type === "torus") geo = new THREE.TorusGeometry(...basePart.size);
+                else if (basePart.type === "cross") {
+                    geo = new THREE.Group();
+                    const hub = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.2, 0.5, 16), defaultMat);
+                    hub.rotation.x = Math.PI / 2; geo.add(hub);
+                    const blade1 = new THREE.Mesh(new THREE.BoxGeometry(basePart.size[1], 0.1, 0.2), defaultMat);
+                    geo.add(blade1);
+                    const blade2 = blade1.clone(); blade2.rotation.z = Math.PI / 2; geo.add(blade2);
+                }
+                else geo = new THREE.BoxGeometry(1,1,1);
 
                 if(basePart.type === "cylinder" || basePart.type === "cone") geo.rotateX(Math.PI / 2);
 
-                const mesh = new THREE.Mesh(geo, materials.plastic.clone());
-                mesh.name = partName;
+                let mesh;
+                if (basePart.type === "cross") {
+                    mesh = geo; 
+                    mesh.children.forEach(c => c.material = materials.plastic.clone());
+                } else {
+                    mesh = new THREE.Mesh(geo, materials.plastic.clone());
+                }
+
+                mesh.name = partName.split("_V")[0];
                 mesh.userData = basePart; 
                 
-                // Naya part aasman se girega (taaki dikhe ki add hua hai)
-                mesh.position.set((Math.random() - 0.5) * 4, 5, (Math.random() - 0.5) * 4);
+                mesh.position.set((Math.random() - 0.5) * 6, 6, (Math.random() - 0.5) * 6);
                 
                 scene.add(mesh);
                 objects.push(mesh);
+                
+                updateSceneList(); // List update karo
+                selectObject(mesh); // Naya part add hote hi select ho jaye
+            }
+
+            function clearAllParts() {
+                if (objects.length === 0) return;
+                if (confirm("Kya aap sach mein poora design clear karna chahte hain?")) {
+                    for (let i = objects.length - 1; i >= 0; i--) {
+                        scene.remove(objects[i]);
+                    }
+                    objects.length = 0;
+                    deselectObject();
+                    updateSceneList(); // List clear
+                }
             }
 
             function deleteSelected() {
-                if (selectedObject && selectedObject.name !== "Main Body") {
+                if (selectedObject) {
                     scene.remove(selectedObject);
                     const idx = objects.indexOf(selectedObject);
                     if (idx > -1) objects.splice(idx, 1);
-                    transformControls.detach();
-                    selectedObject = null;
-                    document.getElementById("transform-panel").style.display = "none";
+                    deselectObject();
+                    updateSceneList(); // List update
                 }
             }
 
             function copySelected() {
                 if (selectedObject) {
                     const clone = selectedObject.clone();
-                    clone.material = selectedObject.material.clone();
+                    if(clone.children && clone.children.length > 0) {
+                         clone.children.forEach(c => c.material = c.material.clone());
+                    } else {
+                         clone.material = selectedObject.material.clone();
+                    }
                     clone.position.x += 1.5; 
                     scene.add(clone);
                     objects.push(clone);
+                    updateSceneList(); // List update
+                    selectObject(clone); // Copy hote hi select
                 }
             }
 
             function updatePanel(obj) {
-                document.getElementById("panel-title").innerText = obj.name;
-                document.getElementById("info-math").innerHTML = obj.userData.math;
-                document.getElementById("info-physics").innerHTML = obj.userData.physics;
-                document.getElementById("info-diagram").innerHTML = obj.userData.svg;
-                document.getElementById("colorPicker").value = '#' + obj.material.color.getHexString();
+                document.getElementById("panel-title").innerText = "Selected: " + obj.name;
+                if(obj.userData) {
+                    document.getElementById("info-math").innerHTML = obj.userData.math || "";
+                    document.getElementById("info-physics").innerHTML = obj.userData.physics || "";
+                    document.getElementById("info-diagram").innerHTML = obj.userData.svg || "";
+                }
+                if(obj.material && obj.material.color) {
+                    document.getElementById("colorPicker").value = '#' + obj.material.color.getHexString();
+                } else if(obj.children && obj.children.length > 0 && obj.children[0].material) {
+                    document.getElementById("colorPicker").value = '#' + obj.children[0].material.color.getHexString();
+                }
             }
 
             function moveObj(axis, amount) { if (selectedObject) selectedObject.position[axis] += amount; }
@@ -9821,11 +9963,22 @@ def render_aero_lab():
                 const matType = document.getElementById('materialSelect').value;
                 const newMat = materials[matType].clone();
                 newMat.color.set(document.getElementById('colorPicker').value);
-                selectedObject.material = newMat;
+                
+                if(selectedObject.children && selectedObject.children.length > 0) {
+                     selectedObject.children.forEach(c => c.material = newMat.clone());
+                } else {
+                     selectedObject.material = newMat;
+                }
             }
 
             function changeColor(hex) {
-                if (selectedObject) { selectedObject.material.color.set(hex); }
+                if (selectedObject) { 
+                    if(selectedObject.children && selectedObject.children.length > 0) {
+                        selectedObject.children.forEach(c => c.material.color.set(hex));
+                    } else {
+                        selectedObject.material.color.set(hex); 
+                    }
+                }
             }
 
             function toggleTheme() {
@@ -9834,12 +9987,6 @@ def render_aero_lab():
                 scene.background = new THREE.Color(isLight ? 0xf0f4f8 : 0x050716);
                 document.getElementById("themeBtn").innerText = isLight ? "🌙 Dark" : "☀️ Light";
             }
-
-            const mainBody = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.8, 6, 32), defaultMat);
-            mainBody.geometry.rotateX(Math.PI / 2);
-            mainBody.name = "Main Body";
-            mainBody.userData = PARTS_DB.body[0];
-            scene.add(mainBody); objects.push(mainBody);
 
             function animate() {
                 requestAnimationFrame(animate);
