@@ -9474,580 +9474,671 @@ drawKBG();
 
     components.html(HTML, height=950, scrolling=False) 
     
-def render_aero_lab():
+# File: clyxess_aero_design_lab.py
+
+def render_aero_lab(client=None):
+    import json
+    import math
     import streamlit as st
-    import streamlit.components.v1 as components
     import numpy as np
     import plotly.graph_objects as go
-    import time
+    import streamlit.components.v1 as components
 
     st.markdown("""
-    <style>  
-    .cockpit-panel-2050 { border: 2px solid #00FFCC; border-radius: 20px; padding: 20px; background: linear-gradient(135deg, #050716, #11153b); box-shadow: 0 0 25px rgba(0, 255, 204, 0.2); color: white; margin-bottom: 20px; }  
-    .sensor-feed-box { background: #060919; border: 1px solid #FF3366; border-radius: 12px; padding: 12px; color: white; margin-bottom: 10px; }  
-    </style>  
+    <style>
+    .aero-hero {
+        padding: 22px; border-radius: 18px;
+        background: linear-gradient(135deg,#071020,#14254a);
+        border: 1px solid #00ffcc; color: white;
+    }
+    .aero-note {
+        background: #111b30; padding: 12px;
+        border-left: 4px solid #ffb454; border-radius: 8px;
+    }
+    </style>
     """, unsafe_allow_html=True)
 
-    st.write("## 🛩️ Aeronautical 3D CAD & Wind Tunnel Lab")
-    st.markdown("Top bar se **3500+ Real 3D Parts** add karein. Har part ke 50 alag-alag variations hain (V1 to V50)!")
+    st.markdown("""
+    <div class="aero-hero">
+      <h1>✈️ Clyxess AI — Aero Design Studio</h1>
+      <p>Build • Explore • Test • Improve</p>
+      <p>School students ke liye interactive aeronautics learning lab.</p>
+    </div>
+    """, unsafe_allow_html=True)
 
-    if "aero_chat_log" not in st.session_state:
-        st.session_state.aero_chat_log = [
-            {"role": "assistant", "content": "जय जोहार पायलट! मैं आपका Clyxess Aero-AI मेंटर हूँ। मॉडल बनाएं और मुझसे सवाल पूछें!"}
-        ]
+    st.markdown("""
+    <div class="aero-note">
+    <b>Safety:</b> Ye educational concept-design simulator hai.
+    Iske models, lift/drag estimates aur visual assembly ko real aircraft
+    construction ya flight safety ke liye verified nahi maana ja sakta.
+    </div>
+    """, unsafe_allow_html=True)
 
-    three_js_code = """
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <style>
-            :root {
-                --bg-color: #050716; --panel-bg: rgba(17, 21, 59, 0.95); --text-color: #ffffff;
-                --border-color: #00FFCC; --button-bg: #00FFCC; --button-text: #050716;
-            }
-            body.light-mode {
-                --bg-color: #f0f4f8; --panel-bg: rgba(255, 255, 255, 0.95); --text-color: #11153b;
-                --border-color: #0077b6; --button-bg: #0077b6; --button-text: #ffffff;
-            }
-            body { margin: 0; overflow: hidden; background-color: var(--bg-color); font-family: 'Segoe UI', sans-serif; transition: 0.3s; }
-            #canvas-container { width: 100vw; height: calc(100vh - 50px); display: block; }
-            
-            #topbar {
-                height: 50px; background: var(--panel-bg); display: flex; align-items: center; justify-content: space-between;
-                padding: 0 15px; border-bottom: 2px solid var(--border-color); color: var(--text-color);
-                box-shadow: 0 4px 15px rgba(0,0,0,0.3); z-index: 10; position: relative;
-            }
-            .group { display: flex; gap: 8px; align-items: center; }
-            select, button, input[type="color"] {
-                background: var(--bg-color); color: var(--text-color); border: 1px solid var(--border-color);
-                padding: 5px 10px; border-radius: 5px; font-size: 12px; cursor: pointer; outline: none;
-            }
-            button { background: var(--button-bg); color: var(--button-text); font-weight: bold; transition: 0.2s; }
-            button:hover { transform: scale(1.05); }
-            button.danger { background: #FF3366; color: white; border-color: #FF3366; }
-            
-            #transform-panel {
-                position: absolute; top: 60px; right: 10px; width: 230px; background: var(--panel-bg);
-                border: 2px solid var(--border-color); border-radius: 10px; padding: 10px;
-                color: var(--text-color); box-shadow: 0 0 15px rgba(0,0,0,0.6);
-                display: none; flex-direction: column; gap: 5px; z-index: 100;
-                max-height: calc(100vh - 80px); overflow-y: auto;
-            }
-            .panel-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 5px; margin-bottom: 5px; }
-            .panel-header h4 { margin: 0; color: var(--border-color); font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 150px; }
-            .close-btn { background: #FF3366; color: white; border: none; padding: 2px 6px; border-radius: 4px; cursor: pointer; font-size: 10px; font-weight: bold; }
-            
-            .control-row { display: flex; justify-content: space-between; align-items: center; gap: 4px; margin-top: 2px; }
-            .control-row label { font-size: 10px; width: 25px; }
-            .btn-group { display: flex; gap: 2px; flex: 1; }
-            .btn-group button { flex: 1; padding: 2px; font-size: 10px; }
-            
-            .section-title { font-size: 10px; font-weight: bold; color: #aaa; margin-top: 5px; }
-            
-            #sceneList {
-                width: 100%; padding: 3px; border-radius: 5px; background: var(--bg-color);
-                color: var(--text-color); border: 1px solid var(--border-color); outline: none;
-                font-size: 10px; overflow-y: auto;
-            }
-            #sceneList option { padding: 4px; cursor: pointer; }
-            #sceneList option:checked { background-color: var(--border-color); color: var(--button-text); font-weight: bold; }
-        </style>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/TransformControls.js"></script>
-    </head>
-    <body>
-        <div id="topbar">
-            <div class="group">
-                <select id="langSelect" onchange="changeLanguage()">
-                    <option value="en">🇬🇧 EN</option>
-                    <option value="hi">🇮🇳 हिंदी</option>
-                    <option value="hinglish">🇮🇳 Hinglish</option>
-                </select>
-                <button onclick="toggleTheme()" id="themeBtn">☀️ Light</button>
-            </div>
+    tab_build, tab_wind, tab_learn, tab_project = st.tabs([
+        "🧩 3D Design Studio",
+        "🌬️ Wind Tunnel",
+        "📘 Learn Aeronautics",
+        "🏆 Student Project"
+    ])
 
-            <div class="group">
-                <select id="partCategory" style="width: 130px;">
-                    <option value="airframes">Airframes (Body)</option>
-                    <option value="wings">Wings & Airfoils</option>
-                    <option value="rotors">Heli Rotors</option>
-                    <option value="jets">Jet Engines</option>
-                    <option value="props">Propellers</option>
-                    <option value="gear">Landing Gear</option>
-                    <option value="misc">Accessories</option>
-                </select>
-                <select id="partList" style="width: 160px;"></select>
-                <button onclick="addSelectedPart()" id="btnAdd">➕ Add</button>
-                <button class="danger" onclick="clearAllParts()" id="btnClear">🗑️ Clear</button>
-            </div>
-        </div>
+    # ==========================================================
+    # 1. 3D AIRCRAFT DESIGN STUDIO
+    # ==========================================================
+    with tab_build:
+        st.subheader("🛠️ Build your own aircraft concept")
 
-        <div id="canvas-container"></div>
+        starter = st.selectbox(
+            "Choose a starter model",
+            [
+                "Training Airplane",
+                "Twin-Propeller Airplane",
+                "Jet Aircraft Concept",
+                "Helicopter Concept",
+                "Glider",
+                "Flying-Car Concept",
+                "Empty Workshop"
+            ],
+            key="aero_starter"
+        )
 
-        <div id="transform-panel">
-            <div class="panel-header">
-                <h4 id="panel-title">Selected</h4>
-                <button class="close-btn" onclick="deselectObject()">X</button>
-            </div>
-            
-            <div class="section-title">📋 Objects</div>
-            <select id="sceneList" size="2" onchange="selectFromList()"></select>
+        st.caption(
+            "Drag to rotate the view • Scroll to zoom • Select parts to edit. "
+            "Models are visual learning concepts, not flight-ready CAD designs."
+        )
 
-            <div class="section-title">🎨 Material</div>
-            <select id="materialSelect" onchange="changeMaterial()" style="width:100%">
-                <option value="plastic">Plastic</option>
-                <option value="metal">Metal</option>
-                <option value="chrome">Chrome</option>
-                <option value="rubber">Rubber</option>
-                <option value="glass">Glass</option>
-                <option value="gold">Gold</option>
-            </select>
-            <div class="control-row">
-                <label>Color:</label>
-                <input type="color" id="colorPicker" value="#FF3366" onchange="changeColor(this.value)" style="width:100%; height:20px;">
-            </div>
+        three_js_code = r"""
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#050a18;
+font-family:Arial,sans-serif;color:#eef8ff}
+#app{height:720px;position:relative;background:#050a18}
+#toolbar{display:flex;gap:6px;flex-wrap:wrap;padding:9px;
+background:#101a32;border-bottom:1px solid #00ffcc}
+button,select,input{padding:7px;border-radius:6px;border:1px solid #00a994;
+background:#0b1530;color:white;font-size:12px}
+button{background:#00d9b0;color:#06131a;font-weight:bold;cursor:pointer}
+button.red{background:#ff426d;color:white}
+#stage{height:calc(100% - 62px);position:relative}
+#panel{display:none;position:absolute;right:8px;top:8px;width:210px;
+max-height:85%;overflow:auto;background:rgba(8,17,38,.96);
+border:1px solid #00ffcc;border-radius:10px;padding:10px;z-index:5}
+#panel label{display:block;font-size:11px;margin-top:8px;color:#b8cee5}
+#panel input,#panel select{width:95%}
+#hud{position:absolute;left:9px;top:9px;padding:10px;background:#0b1730dd;
+border:1px solid #00ffcc;border-radius:8px;font-size:12px;max-width:175px}
+#hud b{color:#00ffcc}
+@media(max-width:600px){#app{height:760px}#panel{width:165px}#hud{max-width:115px;font-size:10px}}
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/TransformControls.js"></script>
+</head>
+<body>
+<div id="app">
+ <div id="toolbar">
+  <select id="part">
+   <option value="Fuselage">Aircraft fuselage</option>
+   <option value="Wing">Main wings</option>
+   <option value="Tail">Tail assembly</option>
+   <option value="Cockpit">Cockpit canopy</option>
+   <option value="Propeller">Propeller</option>
+   <option value="JetEngine">Jet engine</option>
+   <option value="Rotor">Helicopter rotor</option>
+   <option value="Wheel">Landing wheel</option>
+   <option value="Skid">Helicopter skids</option>
+   <option value="Winglet">Winglet</option>
+   <option value="Battery">Battery/payload pod</option>
+  </select>
+  <button onclick="addPart()">＋ Add part</button>
+  <select id="preset">
+   <option value="trainer">Training airplane</option>
+   <option value="twin">Twin-prop airplane</option>
+   <option value="jet">Jet concept</option>
+   <option value="heli">Helicopter concept</option>
+   <option value="glider">Glider</option>
+   <option value="car">Flying-car concept</option>
+   <option value="empty">Empty workshop</option>
+  </select>
+  <button onclick="buildPreset()">Assemble</button>
+  <button onclick="wireframe()">Wireframe</button>
+  <button onclick="exportScene()">Export JSON</button>
+  <button class="red" onclick="clearScene()">Clear</button>
+ </div>
+ <div id="stage">
+  <div id="hud"><b>CLYXESS 3D WORKSHOP</b><br>
+   Parts: <span id="count">0</span><br>
+   <span id="status">Choose a starter model.</span>
+  </div>
+  <div id="panel">
+   <b id="objectName">Selected part</b>
+   <label>Scene objects</label>
+   <select id="objectList" size="4" onchange="selectFromList()"></select>
+   <label>Color</label><input id="paint" type="color" value="#dce8f5" onchange="changeColor(this.value)">
+   <label>Material</label>
+   <select id="material" onchange="changeMaterial(this.value)">
+    <option value="paint">Painted alloy</option>
+    <option value="metal">Metal</option>
+    <option value="glass">Glass</option>
+    <option value="rubber">Rubber</option>
+    <option value="gold">Gold accent</option>
+   </select>
+   <label>Position X</label><input id="px" type="number" step=".25">
+   <label>Position Y</label><input id="py" type="number" step=".25">
+   <label>Position Z</label><input id="pz" type="number" step=".25">
+   <button onclick="applyPosition()">Apply position</button>
+   <label>Scale</label><input id="scale" type="range" min=".2" max="3" step=".05" value="1" oninput="scaleObject(this.value)">
+   <label>Rotate Y</label><input id="rotation" type="range" min="-180" max="180" value="0" oninput="rotateObject(this.value)">
+   <button onclick="duplicatePart()">Duplicate</button>
+   <button class="red" onclick="deletePart()">Delete</button>
+   <button onclick="deselect()">Close</button>
+  </div>
+ </div>
+</div>
+<script>
+let scene,camera,renderer,orbit,transform,selected=null,objects=[],wire=false;
+const stage=document.getElementById('stage');
+scene=new THREE.Scene();
+scene.background=new THREE.Color(0x050a18);
+camera=new THREE.PerspectiveCamera(45,stage.clientWidth/stage.clientHeight,.1,1000);
+camera.position.set(12,10,15);
+renderer=new THREE.WebGLRenderer({antialias:true,preserveDrawingBuffer:true});
+renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,2));
+renderer.setSize(stage.clientWidth,stage.clientHeight);
+stage.appendChild(renderer.domElement);
+scene.add(new THREE.HemisphereLight(0xddeeff,0x17233c,1.3));
+const light=new THREE.DirectionalLight(0xffffff,1.4);
+light.position.set(7,12,8);scene.add(light);
+const grid=new THREE.GridHelper(40,40,0x00ffcc,0x203454);
+scene.add(grid);
+orbit=new THREE.OrbitControls(camera,renderer.domElement);
+orbit.enableDamping=true;
+transform=new THREE.TransformControls(camera,renderer.domElement);
+transform.addEventListener('dragging-changed',e=>orbit.enabled=!e.value);
+scene.add(transform);
 
-            <div class="section-title">↔️ Move & Size</div>
-            <div class="control-row"><label>X:</label><div class="btn-group"><button onclick="moveObj('x', -0.5)">-</button><button onclick="moveObj('x', 0.5)">+</button></div></div>
-            <div class="control-row"><label>Y:</label><div class="btn-group"><button onclick="moveObj('y', -0.5)">-</button><button onclick="moveObj('y', 0.5)">+</button></div></div>
-            <div class="control-row"><label>Z:</label><div class="btn-group"><button onclick="moveObj('z', -0.5)">-</button><button onclick="moveObj('z', 0.5)">+</button></div></div>
+const mats={
+ paint:new THREE.MeshStandardMaterial({color:0xdce8f5,roughness:.4,metalness:.25}),
+ metal:new THREE.MeshStandardMaterial({color:0x9baab8,roughness:.25,metalness:.8}),
+ glass:new THREE.MeshPhysicalMaterial({color:0x75d9ff,roughness:.1,transparent:true,opacity:.5,side:THREE.DoubleSide}),
+ rubber:new THREE.MeshStandardMaterial({color:0x202632,roughness:.9}),
+ gold:new THREE.MeshStandardMaterial({color:0xffc857,metalness:.7,roughness:.25})
+};
+function mesh(g,m,p=[0,0,0],r=[0,0,0]){
+ let o=new THREE.Mesh(g,m);o.position.set(...p);o.rotation.set(...r);return o;
+}
+function makePart(type){
+ let g=new THREE.Group();
+ if(type==='Fuselage'){
+  let pts=[
+   new THREE.Vector2(0,-4.5),new THREE.Vector2(.16,-4.1),
+   new THREE.Vector2(.35,-3),new THREE.Vector2(.48,-1),
+   new THREE.Vector2(.42,1),new THREE.Vector2(.28,2.5),
+   new THREE.Vector2(.1,3.6),new THREE.Vector2(0,4)
+  ];
+  let body=mesh(new THREE.LatheGeometry(pts,32),mats.paint);
+  body.rotation.x=Math.PI/2;g.add(body);
+ } else if(type==='Wing'){
+  g.add(mesh(new THREE.BoxGeometry(10,.16,1.15),mats.paint,[0,0,.1]));
+  g.add(mesh(new THREE.BoxGeometry(1.3,.13,.8),mats.paint,[-4.8,0,.1],[0,0,-.06]));
+  g.add(mesh(new THREE.BoxGeometry(1.3,.13,.8),mats.paint,[4.8,0,.1],[0,0,.06]));
+ } else if(type==='Tail'){
+  g.add(mesh(new THREE.BoxGeometry(2.5,.12,.65),mats.paint,[0,.1,-3.3]));
+  let fin=mesh(new THREE.BoxGeometry(.12,1.55,.9),mats.paint,[0,.72,-3.55]);
+  fin.rotation.x=-.12;g.add(fin);
+ } else if(type==='Cockpit'){
+  let c=mesh(new THREE.SphereGeometry(1,24,16),mats.glass,[0,.35,2]);
+  c.scale.set(.4,.38,.9);g.add(c);
+ } else if(type==='Propeller'){
+  g.add(mesh(new THREE.SphereGeometry(.2,16,12),mats.gold));
+  for(let i=0;i<3;i++){
+   let blade=mesh(new THREE.BoxGeometry(.18,1.8,.07),mats.metal,[0,.9,0]);
+   blade.rotation.z=.16;
+   let pivot=new THREE.Group();pivot.rotation.z=i*2*Math.PI/3;
+   pivot.add(blade);g.add(pivot);
+  }
+ } else if(type==='JetEngine'){
+  g.add(mesh(new THREE.CylinderGeometry(.5,.62,2.2,32),mats.metal,[0,0,0],[Math.PI/2,0,0]));
+  g.add(mesh(new THREE.TorusGeometry(.48,.08,12,32),mats.gold,[0,0,1]));
+  g.add(mesh(new THREE.CylinderGeometry(.31,.31,2.25,24),mats.rubber,[0,0,0],[Math.PI/2,0,0]));
+ } else if(type==='Rotor'){
+  g.add(mesh(new THREE.CylinderGeometry(.1,.12,.9,16),mats.metal,[0,.4,0]));
+  g.add(mesh(new THREE.SphereGeometry(.22,16,12),mats.gold,[0,.85,0]));
+  for(let i=0;i<4;i++){
+   let blade=mesh(new THREE.BoxGeometry(.2,.07,5),mats.paint,[0,.85,2.5]);
+   blade.rotation.y=i*Math.PI/2;g.add(blade);
+  }
+ } else if(type==='Wheel'){
+  g.add(mesh(new THREE.TorusGeometry(.38,.15,16,32),mats.rubber,[0,0,0],[0,Math.PI/2,0]));
+  g.add(mesh(new THREE.CylinderGeometry(.18,.18,.22,24),mats.metal,[0,0,0],[0,0,Math.PI/2]));
+ } else if(type==='Skid'){
+  for(let x of [-.65,.65]){
+   g.add(mesh(new THREE.CylinderGeometry(.05,.05,3,12),mats.metal,[x,0,0],[Math.PI/2,0,0]));
+   g.add(mesh(new THREE.CylinderGeometry(.04,.04,.7,12),mats.metal,[x,.25,.8]));
+   g.add(mesh(new THREE.CylinderGeometry(.04,.04,.7,12),mats.metal,[x,.25,-.8]));
+  }
+ } else if(type==='Winglet'){
+  g.add(mesh(new THREE.BoxGeometry(.12,1,.8),mats.paint,[0,.5,0]));
+ } else if(type==='Battery'){
+  g.add(mesh(new THREE.CapsuleGeometry(.35,1.2,6,12),mats.gold,[0,0,0],[Math.PI/2,0,0]));
+ }
+ return g;
+}
+function register(type,pos=[0,0,0]){
+ let g=makePart(type);g.name=type+' '+(objects.length+1);
+ g.userData.partType=type;g.position.set(...pos);scene.add(g);objects.push(g);
+ refreshList();selectObject(g);updateHud();return g;
+}
+function addPart(){
+ const type=document.getElementById('part').value;
+ const pos={Fuselage:[0,1,0],Wing:[0,1,0],Tail:[0,1,-3],
+ Cockpit:[0,1,2],Propeller:[0,1,4.4],JetEngine:[1,0,-1],
+ Rotor:[0,2,0],Wheel:[0,-.5,0],Skid:[0,-.5,0],
+ Winglet:[5,1,0],Battery:[0,0,0]};
+ register(type,pos[type]||[0,0,0]);
+ setStatus(type+' added. Move it into position.');
+}
+function buildPreset(){
+ const p=document.getElementById('preset').value;
+ clearScene(false);
+ const add=(t,pos)=>register(t,pos);
+ if(p==='empty'){setStatus('Empty workshop ready. Add parts.');return}
+ if(p==='heli'){
+  add('Fuselage',[0,1,0]);add('Cockpit',[0,1,1.4]);
+  add('Rotor',[0,2.1,0]);add('Tail',[0,1,-2.7]);
+  add('Propeller',[0,1,-4.3]);add('Skid',[0,.1,0]);
+ }else{
+  add('Fuselage',[0,1,0]);add('Wing',[0,1,0]);
+  add('Tail',[0,1,0]);add('Cockpit',[0,1,2]);
+  add('Wheel',[-.7,-.2,1.2]);add('Wheel',[.7,-.2,1.2]);
+  add('Wheel',[0,-.2,-2.6]);
+  if(p==='trainer')add('Propeller',[0,1,4.4]);
+  if(p==='twin'){add('Propeller',[-2,1,1]);add('Propeller',[2,1,1]);}
+  if(p==='jet'){add('JetEngine',[-.65,.9,-1.2]);add('JetEngine',[.65,.9,-1.2]);}
+  if(p==='glider'){add('Winglet',[-5,1,0]);add('Winglet',[5,1,0]);}
+  if(p==='car'){
+   add('Propeller',[-2,1,0]);add('Propeller',[2,1,0]);
+   add('Propeller',[-2,1,-1.5]);add('Propeller',[2,1,-1.5]);
+  }
+ }
+ resetCamera();setStatus('Concept assembled. Adjust parts to explore geometry.');
+}
+function refreshList(){
+ const l=document.getElementById('objectList');l.innerHTML='';
+ objects.forEach((o,i)=>{let op=document.createElement('option');op.value=i;op.text=o.name;l.appendChild(op)});
+}
+function selectFromList(){const i=Number(document.getElementById('objectList').value);if(objects[i])selectObject(objects[i])}
+function selectObject(o){
+ selected=o;transform.attach(o);document.getElementById('panel').style.display='block';
+ document.getElementById('objectName').textContent=o.name;
+ document.getElementById('objectList').value=String(objects.indexOf(o));
+ px.value=o.position.x.toFixed(2);py.value=o.position.y.toFixed(2);pz.value=o.position.z.toFixed(2);
+ scale.value=o.scale.x;rotation.value=Math.round(o.rotation.y*180/Math.PI);
+}
+function deselect(){selected=null;transform.detach();document.getElementById('panel').style.display='none'}
+function applyPosition(){if(selected)selected.position.set(Number(px.value)||0,Number(py.value)||0,Number(pz.value)||0)}
+function scaleObject(v){if(selected)selected.scale.setScalar(Number(v))}
+function rotateObject(v){if(selected)selected.rotation.y=Number(v)*Math.PI/180}
+function changeColor(hex){
+ if(!selected)return;
+ selected.traverse(o=>{if(o.isMesh){o.material=o.material.clone();o.material.color.set(hex)}});
+}
+function changeMaterial(type){
+ if(!selected)return;
+ selected.traverse(o=>{
+  if(o.isMesh){
+   let c=o.material.color?o.material.color.clone():new THREE.Color(0xffffff);
+   o.material=mats[type].clone();o.material.color.copy(c);
+  }
+ });
+}
+function deletePart(){
+ if(!selected)return;scene.remove(selected);objects=objects.filter(o=>o!==selected);
+ deselect();refreshList();updateHud();
+}
+function duplicatePart(){
+ if(!selected)return;let c=selected.clone();c.name=selected.name+' copy';
+ c.position.x+=1.2;scene.add(c);objects.push(c);refreshList();selectObject(c);updateHud();
+}
+function clearScene(confirmClear=true){
+ if(confirmClear&&objects.length&&!confirm('Clear all parts?'))return;
+ objects.forEach(o=>scene.remove(o));objects=[];deselect();refreshList();updateHud();
+}
+function wireframe(){
+ wire=!wire;
+ objects.forEach(g=>g.traverse(o=>{if(o.isMesh)o.material.wireframe=wire}));
+ setStatus(wire?'Wireframe enabled.':'Solid model view.');
+}
+function resetCamera(){camera.position.set(12,10,15);orbit.target.set(0,0,0);orbit.update()}
+function setStatus(s){document.getElementById('status').textContent=s}
+function updateHud(){document.getElementById('count').textContent=objects.length}
+function exportScene(){
+ const data={
+  brand:'Clyxess AI Aero Design Studio',
+  warning:'Educational concept only; not flight-certified.',
+  objects:objects.map(o=>({
+   name:o.name,type:o.userData.partType,
+   position:o.position.toArray(),rotation:o.rotation.toArray().slice(0,3),
+   scale:o.scale.toArray()
+  }))
+ };
+ const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+ const url=URL.createObjectURL(blob);const a=document.createElement('a');
+ a.href=url;a.download='clyxess_aero_project.json';a.click();
+ URL.revokeObjectURL(url);setStatus('Scene transform data exported.');
+}
+function animate(){requestAnimationFrame(animate);orbit.update();renderer.render(scene,camera)}
+animate();
+function resize(){
+ const w=stage.clientWidth,h=stage.clientHeight;
+ camera.aspect=w/h;camera.updateProjectionMatrix();renderer.setSize(w,h);
+}
+window.addEventListener('resize',resize);
+document.getElementById('preset').value='trainer';
+buildPreset();
+</script>
+</body>
+</html>
+"""
+        components.html(three_js_code, height=740, scrolling=False)
 
-            <div class="section-title">🔄 Rotate</div>
-            <div class="control-row"><label>X:</label><div class="btn-group"><button onclick="rotateObj('x', -0.1)">-</button><button onclick="rotateObj('x', 0.1)">+</button></div></div>
-            <div class="control-row"><label>Y:</label><div class="btn-group"><button onclick="rotateObj('y', -0.1)">-</button><button onclick="rotateObj('y', 0.1)">+</button></div></div>
-            <div class="control-row"><label>Z:</label><div class="btn-group"><button onclick="rotateObj('z', -0.1)">-</button><button onclick="rotateObj('z', 0.1)">+</button></div></div>
+    # ==========================================================
+    # 2. WIND TUNNEL: SIMPLIFIED, TRANSPARENT EQUATIONS
+    # ==========================================================
+    with tab_wind:
+        st.subheader("🌬️ Simplified aerodynamic calculator")
+        st.caption(
+            "The calculation uses L = 0.5 × density × speed² × wing area × CL. "
+            "Choose approximate coefficients for learning; they are not measured aircraft data."
+        )
 
-            <div class="control-row" style="margin-top:5px;">
-                <button onclick="copySelected()" style="flex:1;">📋 Copy</button>
-                <button class="danger" onclick="deleteSelected()" style="flex:1;">🗑️ Del</button>
-            </div>
-        </div>
+        c1, c2, c3 = st.columns(3)
+        with c1:
+            speed_kmh = st.slider("Air speed (km/h)", 20, 900, 180, 10)
+        with c2:
+            wing_area = st.slider("Wing area (m²)", 1.0, 80.0, 16.0, 0.5)
+        with c3:
+            density = st.slider("Air density (kg/m³)", 0.7, 1.3, 1.225, 0.025)
 
-        <script>
-            const trans = {
-                "en": { add: "➕ Add", clear: "🗑️ Clear" },
-                "hi": { add: "➕ जोड़ें", clear: "🗑️ मिटाएं" },
-                "hinglish": { add: "➕ Add", clear: "🗑️ Clear" }
-            };
-            
-            function changeLanguage() {
-                let lang = document.getElementById("langSelect").value;
-                document.getElementById("btnAdd").innerHTML = trans[lang].add;
-                document.getElementById("btnClear").innerHTML = trans[lang].clear;
-            }
+        c4, c5, c6 = st.columns(3)
+        with c4:
+            cl = st.slider("Lift coefficient CL", -0.5, 1.8, 0.6, 0.05)
+        with c5:
+            cd = st.slider("Drag coefficient CD", 0.015, 0.25, 0.04, 0.005)
+        with c6:
+            mass_kg = st.slider("Concept mass (kg)", 10, 10000, 1200, 10)
 
-            // ⭐ 500+ BASE PARTS DATABASE ⭐
-            const PARTS_DB = {
-                airframes: ["Cessna Body", "Jet Fighter", "Heli Cabin", "Flying Car", "Twin-Boom", "Glider", "Space Shuttle", "Bomber", "Seaplane", "Drone"],
-                wings: ["Main Wing", "Swept Wing", "Delta Wing", "Tail Stabilizer", "Vertical Fin", "Canard", "Biplane Wing", "Strut Wing", "Flying Wing", "Aileron"],
-                rotors: ["Main Rotor", "Tail Rotor", "Quad Rotor", "Coaxial Rotor", "Tiltrotor", "Prop-Rotor", "Ducted Rotor", "Gyrocopter", "Fenestron", "Tandem Rotor"],
-                jets: ["Turbofan", "Turbojet", "Turboprop", "Ramjet", "Scramjet", "Pulsejet", "Ducted Fan", "Lift Fan", "Afterburner", "Thrust Vector"],
-                props: ["2-Blade", "3-Blade", "4-Blade", "5-Blade", "6-Blade", "8-Blade", "Contra-Rotating", "Scimitar", "Square Tip", "Clipped Tip"],
-                gear: ["Tricycle Gear", "Taildragger", "Main Wheel", "Nose Wheel", "Strut", "Shock Absorber", "Skid", "Float", "Track", "Tundra Tire"],
-                misc: ["Nav Light", "Landing Light", "Antenna", "Pitot Tube", "Fuel Tank", "Cargo Pod", "Radar Dome", "Missile Pylon", "External Store", "Flap"]
-            };
+        speed_ms = speed_kmh / 3.6
+        dynamic_pressure = 0.5 * density * speed_ms ** 2
+        lift_n = dynamic_pressure * wing_area * cl
+        drag_n = dynamic_pressure * wing_area * cd
+        weight_n = mass_kg * 9.81
+        lift_weight_ratio = lift_n / weight_n if weight_n else 0
 
-            // ⭐ DYNAMIC GENERATOR: 10 base * 50 variations = 500 per category! ⭐
-            function populateParts() {
-                const cat = document.getElementById("partCategory").value;
-                const list = document.getElementById("partList");
-                list.innerHTML = "";
-                
-                PARTS_DB[cat].forEach(p => {
-                    for(let i=1; i<=50; i++) {
-                        list.innerHTML += `<option value="${p}_V${i}">${p} (V${i})</option>`;
-                    }
-                });
-            }
-            document.getElementById("partCategory").addEventListener("change", populateParts);
-            populateParts(); 
-            changeLanguage(); 
+        k1, k2, k3 = st.columns(3)
+        k1.metric("Estimated lift", f"{lift_n:,.0f} N")
+        k2.metric("Estimated drag", f"{drag_n:,.0f} N")
+        k3.metric("Lift / weight", f"{lift_weight_ratio:.2f} ×")
 
-            // --- THREE.JS SETUP ---
-            let scene, camera, renderer, orbitControls, transformControls;
-            let selectedObject = null;
-            let objects = []; 
-            let gridHelper;
-
-            scene = new THREE.Scene();
-            scene.background = new THREE.Color(0x050716);
-            
-            camera = new THREE.PerspectiveCamera(45, window.innerWidth / (window.innerHeight - 50), 0.1, 1000);
-            camera.position.set(10, 10, 15);
-
-            renderer = new THREE.WebGLRenderer({ antialias: true });
-            renderer.setSize(window.innerWidth, window.innerHeight - 50);
-            document.getElementById('canvas-container').appendChild(renderer.domElement);
-
-            const ambientLight = new THREE.AmbientLight(0xffffff, 0.7); scene.add(ambientLight);
-            const dirLight = new THREE.DirectionalLight(0xffffff, 0.9); dirLight.position.set(5, 10, 7); scene.add(dirLight);
-            const dirLight2 = new THREE.DirectionalLight(0xffffff, 0.5); dirLight2.position.set(-5, -10, -7); scene.add(dirLight2);
-            
-            gridHelper = new THREE.GridHelper(50, 50, 0x00FFCC, 0x11153b); 
-            scene.add(gridHelper);
-
-            orbitControls = new THREE.OrbitControls(camera, renderer.domElement);
-            transformControls = new THREE.TransformControls(camera, renderer.domElement);
-            transformControls.addEventListener('dragging-changed', function (event) { orbitControls.enabled = !event.value; });
-            scene.add(transformControls);
-
-            const materials = {
-                plastic: new THREE.MeshStandardMaterial({ color: 0xcccccc, roughness: 0.4, metalness: 0.1 }),
-                metal: new THREE.MeshStandardMaterial({ color: 0xaaaaaa, roughness: 0.2, metalness: 0.8 }),
-                chrome: new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.05, metalness: 1.0 }),
-                rubber: new THREE.MeshStandardMaterial({ color: 0x222222, roughness: 0.9, metalness: 0.0 }),
-                glass: new THREE.MeshPhysicalMaterial({ color: 0xaaddff, transmission: 0.9, opacity: 0.6, transparent: true, roughness: 0.05 }),
-                gold: new THREE.MeshStandardMaterial({ color: 0xffd700, roughness: 0.2, metalness: 1.0 })
-            };
-
-            // ⭐ PROCEDURAL 3D GENERATOR ENGINE ⭐
-            function createDetailedPart(baseName, version, mat) {
-                const group = new THREE.Group();
-                
-                // Version scales the part slightly to give uniqueness (V1 to V50)
-                const scaleFactor = 1 + (version * 0.015);
-                
-                if (baseName.includes("Body") || baseName.includes("Fighter") || baseName.includes("Cabin") || baseName.includes("Car") || baseName.includes("Boom") || baseName.includes("Shuttle") || baseName.includes("Bomber") || baseName.includes("Seaplane") || baseName.includes("Drone")) {
-                    // Generate smooth Airframe
-                    const pts = [];
-                    const length = 6 * scaleFactor;
-                    pts.push(new THREE.Vector2(0, -length/2));
-                    pts.push(new THREE.Vector2(0.1, -length/2 + 0.5));
-                    pts.push(new THREE.Vector2(0.5, -length/4));
-                    pts.push(new THREE.Vector2(0.6, 0));
-                    pts.push(new THREE.Vector2(0.5, length/4));
-                    pts.push(new THREE.Vector2(0.3, length/2 - 0.5));
-                    pts.push(new THREE.Vector2(0, length/2));
-                    
-                    const geo = new THREE.LatheGeometry(pts, 32); geo.rotateX(-Math.PI/2);
-                    group.add(new THREE.Mesh(geo, mat));
-                    
-                    // Cockpit
-                    const cockpit = new THREE.Mesh(new THREE.SphereGeometry(0.5, 32, 16, 0, Math.PI*2, 0, Math.PI/2), materials.glass.clone());
-                    cockpit.rotation.x = -Math.PI/2; cockpit.position.set(0, 0.2, length/4); cockpit.scale.set(0.8, 1, 1.5);
-                    group.add(cockpit);
-                }
-                else if (baseName.includes("Wing") || baseName.includes("Fin") || baseName.includes("Stabilizer") || baseName.includes("Canard") || baseName.includes("Aileron") || baseName.includes("Flap")) {
-                    const shape = new THREE.Shape();
-                    const span = 4 * scaleFactor;
-                    shape.moveTo(0, -0.5); shape.quadraticCurveTo(span/2, -0.6, span, -0.1); 
-                    shape.quadraticCurveTo(span+0.2, 0, span, 0.1); shape.quadraticCurveTo(span/2, 0.4, 0, 0.5);
-                    shape.lineTo(0, -0.5);
-                    
-                    const geo = new THREE.ExtrudeGeometry(shape, { depth: 0.1, bevelEnabled: true, bevelSegments: 3, steps: 2, bevelSize: 0.05, bevelThickness: 0.05 });
-                    
-                    if (baseName.includes("Fin") || baseName.includes("Stabilizer")) {
-                        const fin = new THREE.Mesh(geo, mat); fin.rotation.y = -Math.PI/2; fin.position.set(0, 0.5, -2); group.add(fin);
-                    } else {
-                        const w1 = new THREE.Mesh(geo, mat); w1.position.set(-span, 0, 0);
-                        const w2 = w1.clone(); w2.scale.x = -1; w2.position.x = span;
-                        group.add(w1, w2);
-                    }
-                }
-                else if (baseName.includes("Rotor") || baseName.includes("Prop")) {
-                    const isHeli = baseName.includes("Rotor") || baseName.includes("Rotor");
-                    let numBlades = 2;
-                    if (baseName.includes("3")) numBlades = 3;
-                    if (baseName.includes("4")) numBlades = 4;
-                    if (baseName.includes("5")) numBlades = 5;
-                    if (baseName.includes("6")) numBlades = 6;
-                    if (baseName.includes("8")) numBlades = 8;
-                    if (baseName.includes("Quad")) numBlades = 4;
-                    
-                    const hub = new THREE.Mesh(new THREE.SphereGeometry(0.2 * scaleFactor, 16, 16), mat); group.add(hub);
-                    
-                    for(let i=0; i<numBlades; i++) {
-                        const bShape = new THREE.Shape();
-                        const L = isHeli ? (4 * scaleFactor) : (2 * scaleFactor);
-                        bShape.moveTo(0, 0); bShape.quadraticCurveTo(0.2, L/2, 0, L); bShape.quadraticCurveTo(-0.1, L/2, 0, 0);
-                        const bGeo = new THREE.ExtrudeGeometry(bShape, { depth: 0.05, bevelEnabled: false });
-                        const bMesh = new THREE.Mesh(bGeo, mat);
-                        if (!isHeli) bMesh.rotation.y = 0.4; 
-                        
-                        const pivot = new THREE.Group(); pivot.add(bMesh);
-                        pivot.rotation.z = (Math.PI * 2 / numBlades) * i;
-                        group.add(pivot);
-                    }
-                }
-                else if (baseName.includes("Engine") || baseName.includes("Fan") || baseName.includes("Jet")) {
-                    const body = new THREE.Mesh(new THREE.CylinderGeometry(0.6 * scaleFactor, 0.8 * scaleFactor, 3 * scaleFactor, 32), mat); body.rotation.x = Math.PI/2;
-                    const inner = new THREE.Mesh(new THREE.CylinderGeometry(0.5 * scaleFactor, 0.5 * scaleFactor, 3.1 * scaleFactor, 32), materials.rubber); inner.rotation.x = Math.PI/2;
-                    const spinner = new THREE.Mesh(new THREE.ConeGeometry(0.3 * scaleFactor, 1 * scaleFactor, 32), mat); spinner.rotation.x = -Math.PI/2; spinner.position.z = 1.5 * scaleFactor;
-                    group.add(body, inner, spinner);
-                    for(let i=0; i<12; i++) { 
-                        const b = new THREE.Mesh(new THREE.BoxGeometry(0.05, 1.0 * scaleFactor, 0.2), materials.metal); 
-                        b.position.z = 0.2; b.rotation.z = (Math.PI*2/12)*i; group.add(b); 
-                    }
-                }
-                else if (baseName.includes("Gear") || baseName.includes("Wheel") || baseName.includes("Strut") || baseName.includes("Skid") || baseName.includes("Float") || baseName.includes("Tire")) {
-                    if (baseName.includes("Wheel") || baseName.includes("Tire")) {
-                        const wheel = new THREE.Mesh(new THREE.TorusGeometry(0.3 * scaleFactor, 0.15 * scaleFactor, 16, 32), materials.rubber); wheel.rotation.y = Math.PI/2;
-                        group.add(wheel);
-                    } else if (baseName.includes("Skid") || baseName.includes("Float")) {
-                        const skid = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 3 * scaleFactor, 8), mat); skid.rotation.x = Math.PI/2;
-                        group.add(skid);
-                    } else {
-                        const strut = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 1.5 * scaleFactor, 8), mat); group.add(strut);
-                    }
-                }
-                else {
-                    // Accessories
-                    group.add(new THREE.Mesh(new THREE.BoxGeometry(0.5 * scaleFactor, 0.5 * scaleFactor, 0.5 * scaleFactor), mat));
-                }
-
-                return group;
-            }
-
-            const raycaster = new THREE.Raycaster();
-            const mouse = new THREE.Vector2();
-            let pointerDownPos = new THREE.Vector2();
-
-            renderer.domElement.addEventListener('pointerdown', (e) => {
-                pointerDownPos.set(e.clientX, e.clientY);
-            });
-
-            renderer.domElement.addEventListener('pointerup', (e) => {
-                if (Math.abs(e.clientX - pointerDownPos.x) > 5 || Math.abs(e.clientY - pointerDownPos.y) > 5) return;
-                if (transformControls.axis !== null) return;
-
-                const rect = renderer.domElement.getBoundingClientRect();
-                mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
-                mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
-                
-                raycaster.setFromCamera(mouse, camera);
-                const intersects = raycaster.intersectObjects(objects, true); 
-                
-                if (intersects.length > 0) {
-                    let clickedObj = intersects[0].object;
-                    while (clickedObj.parent && clickedObj.parent.type === 'Group' && clickedObj.parent !== scene) {
-                        clickedObj = clickedObj.parent;
-                    }
-                    selectObject(clickedObj);
-                } else {
-                    deselectObject();
-                }
-            });
-
-            function selectFromList() {
-                const list = document.getElementById("sceneList");
-                const idx = list.selectedIndex;
-                if(idx >= 0 && objects[idx]) {
-                    selectObject(objects[idx]);
-                }
-            }
-
-            function selectObject(obj) {
-                if (!obj) return;
-                selectedObject = obj;
-                transformControls.attach(selectedObject);
-                document.getElementById("transform-panel").style.display = "flex";
-                document.getElementById("panel-title").innerText = "Selected: " + obj.name;
-                
-                const list = document.getElementById("sceneList");
-                const idx = objects.indexOf(obj);
-                if(idx >= 0) list.selectedIndex = idx;
-            }
-
-            function deselectObject() {
-                selectedObject = null;
-                transformControls.detach();
-                document.getElementById("transform-panel").style.display = "none";
-                const list = document.getElementById("sceneList");
-                if(list) list.selectedIndex = -1;
-            }
-
-            function updateSceneList() {
-                const list = document.getElementById("sceneList");
-                list.innerHTML = "";
-                objects.forEach((obj, index) => {
-                    const opt = document.createElement("option");
-                    opt.value = index;
-                    opt.text = obj.name + " (#" + (index + 1) + ")";
-                    list.appendChild(opt);
-                });
-            }
-
-            function addSelectedPart() {
-                const partName = document.getElementById("partList").value;
-                if(!partName) return;
-
-                const mat = materials.plastic.clone();
-                // Extract base name and version number
-                const baseName = partName.split("_V")[0];
-                const version = parseInt(partName.split("_V")[1]) || 1;
-                
-                // Generate Dynamic 3D Model
-                let meshGroup = createDetailedPart(baseName, version, mat);
-                
-                meshGroup.name = partName;
-                meshGroup.position.set((Math.random() - 0.5) * 4, 5, (Math.random() - 0.5) * 4);
-                
-                scene.add(meshGroup);
-                objects.push(meshGroup);
-                
-                updateSceneList(); 
-                selectObject(meshGroup); 
-            }
-
-            function clearAllParts() {
-                if (objects.length === 0) return;
-                for (let i = objects.length - 1; i >= 0; i--) {
-                    scene.remove(objects[i]);
-                }
-                objects = []; 
-                deselectObject();
-                updateSceneList(); 
-            }
-
-            function deleteSelected() {
-                if (selectedObject) {
-                    scene.remove(selectedObject);
-                    const idx = objects.indexOf(selectedObject);
-                    if (idx > -1) objects.splice(idx, 1);
-                    deselectObject();
-                    updateSceneList(); 
-                }
-            }
-
-            function copySelected() {
-                if (selectedObject) {
-                    const clone = selectedObject.clone();
-                    clone.position.x += 1.5; 
-                    scene.add(clone);
-                    objects.push(clone);
-                    updateSceneList(); 
-                    selectObject(clone); 
-                }
-            }
-
-            function moveObj(axis, amount) { if (selectedObject) selectedObject.position[axis] += amount; }
-            function rotateObj(axis, amount) { if (selectedObject) selectedObject.rotation[axis] += amount; }
-
-            function changeMaterial() {
-                if (!selectedObject) return;
-                const matType = document.getElementById('materialSelect').value;
-                const newMat = materials[matType].clone();
-                newMat.color.set(document.getElementById('colorPicker').value);
-                
-                selectedObject.traverse((child) => {
-                    if (child.isMesh && child.material !== materials.glass) {
-                        child.material = newMat;
-                    }
-                });
-            }
-
-            function changeColor(hex) {
-                if (selectedObject) { 
-                    selectedObject.traverse((child) => {
-                        if (child.isMesh && child.material !== materials.glass) {
-                            child.material.color.set(hex);
-                        }
-                    });
-                }
-            }
-
-            function toggleTheme() {
-                document.body.classList.toggle('light-mode');
-                const isLight = document.body.classList.contains('light-mode');
-                scene.background = new THREE.Color(isLight ? 0xf0f4f8 : 0x050716);
-                
-                if (isLight) {
-                    gridHelper.material.color.setHex(0x888888); 
-                    gridHelper.material.opacity = 0.5;
-                    gridHelper.material.transparent = true;
-                } else {
-                    gridHelper.material.color.setHex(0x00FFCC); 
-                    gridHelper.material.opacity = 1.0;
-                    gridHelper.material.transparent = false;
-                }
-                
-                document.getElementById("themeBtn").innerText = isLight ? "🌙 Dark" : "☀️ Light";
-            }
-
-            function animate() {
-                requestAnimationFrame(animate);
-                orbitControls.update();
-                renderer.render(scene, camera);
-            }
-            animate();
-
-            window.addEventListener('resize', () => {
-                camera.aspect = window.innerWidth / (window.innerHeight - 50);
-                camera.updateProjectionMatrix();
-                renderer.setSize(window.innerWidth, window.innerHeight - 50);
-            });
-        </script>
-    </body>
-    </html>
-    """
-    
-    components.html(three_js_code, height=650)
-
-    st.divider()
-
-    # ==========================================
-    # 3. PHYSICS ENGINE & CHAT
-    # ==========================================
-    st.write("### 📡 Live Wind Tunnel Physics")
-    col1, col2, col3 = st.columns(3)
-    with col1: distributed_motors = st.slider("⚙️ Motors", 2, 16, 8, step=2)
-    with col2: angle_of_attack = st.slider("📐 Angle of Attack (°)", -10, 45, 12, step=1)
-    with col3: wind_velocity_input = st.slider("💨 Wind Speed (km/h)", 200, 1800, 750, step=50)
-
-    rad_alpha_val = np.radians(angle_of_attack)
-    computed_mass_kg = 1500 + (distributed_motors * 120)
-    calculated_lift_force = int(np.sin(rad_alpha_val) * (wind_velocity_input ** 1.65) * 0.035 * (1 + (distributed_motors / 8)))
-
-    t_col1, t_col2 = st.columns([1, 2])
-    with t_col1:
-        st.markdown(f"""
-        <div class="cockpit-panel-2050" style="padding:15px;">  
-            <p style="margin:0; font-size:13px;"><b>Mass:</b> {computed_mass_kg:,} kg</p>  
-            <p style="margin:0; font-size:13px;"><b>Engines:</b> {distributed_motors} Units</p>  
-        </div>  
-        <div class="sensor-feed-box" style="border-color:#00FFCC;"><small style="color:#FF3366;">🚀 TOTAL LIFT</small><h4 style="margin:0;">{calculated_lift_force:,} N</h4></div>  
-        """, unsafe_allow_html=True)
-
-    with t_col2:
-        lift_weight_ratio = calculated_lift_force / (computed_mass_kg * 9.81)
-        gauge_fig = go.Figure(go.Indicator(
-            mode = "gauge+number", value = lift_weight_ratio, number = {'suffix': "x"},
-            gauge = {'axis': {'range': [0, 2]}, 'bar': {'color': "#00FFCC"}, 'bgcolor': "black"}
+        fig = go.Figure()
+        fig.add_trace(go.Bar(
+            x=["Lift", "Weight", "Drag"],
+            y=[max(0, lift_n), weight_n, max(0, drag_n)],
+            marker_color=["#00c9a7", "#ffb454", "#ff426d"]
         ))
-        gauge_fig.update_layout(height=180, margin=dict(l=10, r=10, t=10, b=10), paper_bgcolor="rgba(0,0,0,0)", font={'color': "white"})
-        st.plotly_chart(gauge_fig, use_container_width=True)
+        fig.update_layout(
+            title="Force comparison (simplified estimate)",
+            yaxis_title="Force (N)",
+            template="plotly_dark",
+            height=380
+        )
+        st.plotly_chart(fig, use_container_width=True)
+
+        st.markdown("#### What the numbers mean")
+        st.write(f"- Air speed: **{speed_ms:.2f} m/s**")
+        st.write(f"- Dynamic pressure: **{dynamic_pressure:,.1f} Pa**")
+        st.write(f"- Lift estimate: **{lift_n:,.1f} N**")
+        st.write(f"- Weight estimate: **{weight_n:,.1f} N**")
+        if lift_weight_ratio >= 1:
+            st.success("In this simplified calculation, lift is at least equal to weight.")
+        else:
+            st.warning("In this simplified calculation, lift is below the selected mass's weight.")
+
+        st.info(
+            "Real aircraft performance also depends on airfoil geometry, Reynolds number, "
+            "stall, propulsive thrust, trim, control surfaces, stability, and many other factors. "
+            "This calculator does not predict safe flight."
+        )
+
+    # ==========================================================
+    # 3. AGE-FRIENDLY AERONAUTICS LESSONS
+    # ==========================================================
+    with tab_learn:
+        st.subheader("📘 Learn aeronautics step by step")
+        age_group = st.selectbox(
+            "Student level",
+            ["Age 5–7", "Age 8–10", "Age 11–13", "Age 14–16", "Age 17+", "University"],
+            key="aero_age"
+        )
+        topic = st.selectbox(
+            "Choose a lesson",
+            [
+                "How an aircraft flies",
+                "Wing and airfoil",
+                "Lift and drag",
+                "Angle of attack and stall",
+                "Propeller vs jet engine",
+                "Helicopter rotor",
+                "Aircraft stability",
+                "Materials and structure",
+                "Design process and safety"
+            ],
+            key="aero_topic"
+        )
+
+        simple_explanations = {
+            "How an aircraft flies": (
+                "Four forces",
+                "An airplane has four important forces: lift upward, weight downward, thrust forward, and drag backward. "
+                "In steady level flight, lift is approximately equal to weight and thrust approximately equals drag.",
+                "Draw the four force arrows on a paper airplane. Change one thing at a time and write down what happens."
+            ),
+            "Wing and airfoil": (
+                "Wing shape matters",
+                "A wing moves through air and creates a pressure distribution. Lift comes from the aerodynamic forces on the wing "
+                "and the change in air momentum. Wing area, shape, speed and angle of attack all matter.",
+                "Compare two paper-wing shapes with the same mass and launch method. Repeat the test several times."
+            ),
+            "Lift and drag": (
+                "Two important forces",
+                "A simplified equation is L = ½ρV²SCL for lift and D = ½ρV²SCD for drag. "
+                "The coefficients depend on the shape and flight conditions; they are not universal constants.",
+                "Change only the speed in the Wind Tunnel tab. Observe how the square-of-speed term changes."
+            ),
+            "Angle of attack and stall": (
+                "More angle is not always better",
+                "Angle of attack is the angle between the wing's chord and the oncoming airflow. Lift often rises with angle at first, "
+                "but excessive angle can cause flow separation and a stall.",
+                "Draw a wing at a small and a large angle. The toy calculator does not predict a real stall speed."
+            ),
+            "Propeller vs jet engine": (
+                "Two ways to produce thrust",
+                "A propeller accelerates a relatively large amount of air by a smaller amount. A jet engine uses an engine cycle and exhaust "
+                "to create thrust. The best engine depends on the aircraft and its operating speed.",
+                "Research why many training airplanes use propellers while many high-speed aircraft use jet engines."
+            ),
+            "Helicopter rotor": (
+                "A rotating wing",
+                "Helicopter rotor blades are airfoils. Their lift depends on blade shape, rotor speed, blade pitch, air density and forward speed. "
+                "Real helicopter control and stability are complex.",
+                "Build a paper helicopter and safely compare different paper-blade lengths."
+            ),
+            "Aircraft stability": (
+                "Balance and control",
+                "Aircraft stability depends on mass distribution, aerodynamic surfaces, control systems and flight conditions. "
+                "A model that looks balanced in 3D is not automatically stable.",
+                "Mark the likely centre of gravity on a paper glider and test small changes safely."
+            ),
+            "Materials and structure": (
+                "Strong and light",
+                "Aircraft materials may include aluminium alloys, titanium, steel and composites. Engineers consider strength, stiffness, "
+                "mass, fatigue, temperature, corrosion and manufacturing.",
+                "With adult supervision, compare how paper and card strips bend under the same small load."
+            ),
+            "Design process and safety": (
+                "Engineering is a cycle",
+                "A professional design process includes requirements, sketches, dimensions, analysis, prototypes, tests, revision, documentation "
+                "and independent review. A rendered model is only one stage.",
+                "Write three requirements for a classroom glider. Make a paper prototype, test it consistently and record improvements."
+            )
+        }
+
+        heading, explanation, activity = simple_explanations[topic]
+        st.markdown(f"### {heading}")
+        if age_group == "Age 5–7":
+            st.write("**Simple explanation:** " + explanation.split(".")[0] + ".")
+        else:
+            st.write(explanation)
+
+        st.markdown("**Try this activity**")
+        st.write(activity)
+
+        quiz_data = {
+            "How an aircraft flies": (
+                "In steady level flight, which force is approximately balanced by lift?",
+                ["Drag", "Weight", "Thrust"], "Weight"
+            ),
+            "Wing and airfoil": (
+                "Which can change a wing's lift?",
+                ["Only paint colour", "Shape, speed and angle of attack", "Only the logo"],
+                "Shape, speed and angle of attack"
+            ),
+            "Lift and drag": (
+                "If speed doubles and other values stay fixed, dynamic pressure becomes…",
+                ["2 times", "4 times", "8 times"], "4 times"
+            ),
+            "Angle of attack and stall": (
+                "Does increasing angle of attack always increase lift?",
+                ["Yes, always", "No; a stall can occur", "Only if painted red"],
+                "No; a stall can occur"
+            ),
+            "Propeller vs jet engine": (
+                "A propeller mainly creates thrust by…",
+                ["Accelerating air", "Changing paint", "Making the wing heavier"],
+                "Accelerating air"
+            ),
+            "Helicopter rotor": (
+                "Rotor blades behave aerodynamically like…",
+                ["Airfoils", "Wheels", "Batteries"], "Airfoils"
+            ),
+            "Aircraft stability": (
+                "Does a good-looking 3D model prove stability?",
+                ["Yes", "No", "Only on a dark background"], "No"
+            ),
+            "Materials and structure": (
+                "What is a key aircraft material trade-off?",
+                ["Strength, mass and durability", "Colour only", "Font size"],
+                "Strength, mass and durability"
+            ),
+            "Design process and safety": (
+                "What does a 3D model alone prove?",
+                ["Flight safety", "Only visual geometry", "Certification"],
+                "Only visual geometry"
+            )
+        }
+
+        question, options, correct = quiz_data[topic]
+        answer = st.radio(question, options, key="aero_quiz_" + topic)
+        if st.button("Check answer", key="aero_check_" + topic):
+            if answer == correct:
+                st.success("Correct! Explain in your own words why the answer is right.")
+            else:
+                st.warning("Not quite. Review the lesson and try again.")
+
+    # ==========================================================
+    # 4. STUDENT PROJECT NOTEBOOK
+    # ==========================================================
+    with tab_project:
+        st.subheader("🏆 Student engineering project")
+
+        mission = st.selectbox(
+            "Choose a project mission",
+            [
+                "Paper glider investigator",
+                "Training airplane concept",
+                "Twin-propeller layout",
+                "Helicopter concept",
+                "Future flying-car concept",
+                "Compare wing designs"
+            ],
+            key="aero_mission"
+        )
+
+        mission_instructions = {
+            "Paper glider investigator":
+                "Make three paper gliders, changing one design feature at a time. "
+                "Do five consistent throws per design and compare the average distance.",
+            "Training airplane concept":
+                "Assemble the fuselage, wing, tail, cockpit and landing gear in the 3D workshop. "
+                "Label each part and explain its purpose.",
+            "Twin-propeller layout":
+                "Create a concept with two propellers. Explain why symmetry and motor placement matter.",
+            "Helicopter concept":
+                "Add a cabin, main rotor, tail rotor and skids. Explain how the rotor generates lift.",
+            "Future flying-car concept":
+                "Design a concept and identify its power source, lifting system, control method, payload and safety challenges.",
+            "Compare wing designs":
+                "Create two wing layouts and compare area and estimated lift. Explain the model's limitations."
+        }
+
+        st.info(mission_instructions[mission])
+
+        student_name = st.text_input("Student/team name (optional)", key="aero_student_name")
+        project_title = st.text_input("Project title", value=mission, key="aero_project_title")
+        design_goal = st.text_area("What problem does your machine solve?", key="aero_design_goal")
+        parts_used = st.text_area("Parts and materials used", key="aero_parts_used")
+        test_notes = st.text_area("Test results and observations", key="aero_test_notes")
+        reflection = st.text_area("What did you learn? What would you improve?", key="aero_reflection")
+
+        project_data = {
+            "brand": "Clyxess AI Aero Design School",
+            "student_or_team": student_name,
+            "project_title": project_title,
+            "mission": mission,
+            "design_goal": design_goal,
+            "parts_and_materials": parts_used,
+            "test_notes": test_notes,
+            "reflection": reflection,
+            "safety_note": "Educational concept only; not a validated aircraft design."
+        }
+
+        st.download_button(
+            "⬇️ Download project notebook (JSON)",
+            data=json.dumps(project_data, ensure_ascii=False, indent=2),
+            file_name="clyxess_aero_student_project.json",
+            mime="application/json",
+            use_container_width=True
+        )
+
+        st.markdown("#### Engineering review checklist")
+        for item in [
+            "I can explain the purpose of each major part.",
+            "I changed one variable at a time during tests.",
+            "I recorded measurements and observations.",
+            "I can describe at least two limitations of the model.",
+            "I understand that a concept model is not a flight-ready aircraft."
+        ]:
+            st.checkbox(item, key="aero_review_" + item)
 
     st.divider()
-    st.write("### 🧠 Clyxess Aero-AI Mentor")
-    for msg in st.session_state.aero_chat_log:
-        with st.chat_message(msg["role"]): st.markdown(msg["content"])
-
-    user_query = st.chat_input("Ask Aero-AI...", key="aero_chat")
-    if user_query:
-        st.session_state.aero_chat_log.append({"role": "user", "content": user_query})
-        with st.chat_message("user"): st.markdown(user_query)
-        
-        with st.chat_message("assistant"):
-            with st.spinner("Calculating aerodynamics..."):
-                try:
-                    res = client.chat.completions.create(
-                        model="openai/gpt-oss-120b",
-                        messages=[{"role": "system", "content": "You are Aero-AI."}, {"role": "user", "content": user_query}],
-                        temperature=0.6
-                    )
-                    reply = res.choices[0].message.content
-                except Exception as e: reply = f"Error: {e}"
-                
-                placeholder = st.empty()
-                typed_text = ""
-                for word in reply.split(" "):
-                    typed_text += word + " "
-                    placeholder.markdown(typed_text + "▌")
-                    time.sleep(0.05)
-                placeholder.markdown(reply)
-                st.session_state.aero_chat_log.append({"role": "assistant", "content": reply})
+    st.caption(
+        "Clyxess AI Aero Design School • Educational learning prototype. "
+        "Real aircraft design requires qualified aerospace engineers, validated analysis, "
+        "physical testing and regulatory approval."
+    )
 
 def render_learn_ai(client):
 
