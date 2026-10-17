@@ -9486,34 +9486,21 @@ def render_aero_lab():
     # ==========================================
     st.markdown("""
     <style>  
-    .cockpit-panel-2050 {  
-        border: 2px solid #00FFCC; border-radius: 20px; padding: 20px;  
-        background: linear-gradient(135deg, #050716, #11153b);  
-        box-shadow: 0 0 25px rgba(0, 255, 204, 0.2); color: white; margin-bottom: 20px;  
-    }  
-    .sensor-feed-box {  
-        background: #060919; border: 1px solid #FF3366; border-radius: 12px;  
-        padding: 12px; color: white; margin-bottom: 10px;  
-    }  
-    .report-card-2050 {  
-        border: 2px dashed #00FFCC; border-radius: 20px; padding: 25px;  
-        background: #050814; color: white;  
-    }  
-    .math-indicator { background-color: #FF3366; color: white; padding: 3px 8px; border-radius: 5px; font-weight: bold; }  
-    .physics-indicator { background-color: #00FFCC; color: #02040c; padding: 3px 8px; border-radius: 5px; font-weight: bold; }  
+    .cockpit-panel-2050 { border: 2px solid #00FFCC; border-radius: 20px; padding: 20px; background: linear-gradient(135deg, #050716, #11153b); box-shadow: 0 0 25px rgba(0, 255, 204, 0.2); color: white; margin-bottom: 20px; }  
+    .sensor-feed-box { background: #060919; border: 1px solid #FF3366; border-radius: 12px; padding: 12px; color: white; margin-bottom: 10px; }  
     </style>  
     """, unsafe_allow_html=True)
 
     st.write("## 🛩️ Aeronautical 3D CAD & Wind Tunnel Lab")
-    st.markdown("Top bar se parts select karein, color change karein aur desing banayein!")
+    st.markdown("Top bar se parts add karein. Kisi part par **ek click** karke uski **Material, Position, Rotation aur Color** change karein!")
 
     if "aero_chat_log" not in st.session_state:
         st.session_state.aero_chat_log = [
-            {"role": "assistant", "content": "जय जोहार पायलट! मैं आपका Clyxess Aero-AI मेंटर हूँ। मुझसे Lift, Drag, Stall के बारे में पूछें!"}
+            {"role": "assistant", "content": "जय जोहार पायलट! मैं आपका Clyxess Aero-AI मेंटर हूँ। मॉडल बनाएं और मुझसे सवाल पूछें!"}
         ]
 
     # ==========================================
-    # 2. REAL 3D CAD DESIGNER (Three.js + Advanced UI)
+    # 2. REAL 3D CAD DESIGNER
     # ==========================================
     
     three_js_code = """
@@ -9521,57 +9508,50 @@ def render_aero_lab():
     <html lang="en">
     <head>
         <meta charset="UTF-8">
-        <title>Aero CAD 2050</title>
         <style>
             :root {
-                --bg-color: #050716;
-                --panel-bg: rgba(17, 21, 59, 0.95);
-                --text-color: #ffffff;
-                --border-color: #00FFCC;
-                --button-bg: #00FFCC;
-                --button-text: #050716;
+                --bg-color: #050716; --panel-bg: rgba(17, 21, 59, 0.95); --text-color: #ffffff;
+                --border-color: #00FFCC; --button-bg: #00FFCC; --button-text: #050716;
             }
             body.light-mode {
-                --bg-color: #f0f4f8;
-                --panel-bg: rgba(255, 255, 255, 0.95);
-                --text-color: #11153b;
-                --border-color: #0077b6;
-                --button-bg: #0077b6;
-                --button-text: #ffffff;
+                --bg-color: #f0f4f8; --panel-bg: rgba(255, 255, 255, 0.95); --text-color: #11153b;
+                --border-color: #0077b6; --button-bg: #0077b6; --button-text: #ffffff;
             }
             body { margin: 0; overflow: hidden; background-color: var(--bg-color); font-family: 'Segoe UI', sans-serif; transition: 0.3s; }
-            #canvas-container { width: 100vw; height: calc(100vh - 70px); display: block; }
+            #canvas-container { width: 100vw; height: calc(100vh - 60px); display: block; }
             
-            /* Compact Top Bar */
+            /* Top Bar */
             #topbar {
-                height: 60px; background: var(--panel-bg); display: flex; align-items: center; justify-content: space-between;
+                height: 50px; background: var(--panel-bg); display: flex; align-items: center; justify-content: space-between;
                 padding: 0 15px; border-bottom: 2px solid var(--border-color); color: var(--text-color);
                 box-shadow: 0 4px 15px rgba(0,0,0,0.3); z-index: 10; position: relative;
             }
             .group { display: flex; gap: 8px; align-items: center; }
-            select, input[type="color"], button {
+            select, button, input[type="color"] {
                 background: var(--bg-color); color: var(--text-color); border: 1px solid var(--border-color);
                 padding: 5px 10px; border-radius: 5px; font-size: 12px; cursor: pointer; outline: none;
             }
             button { background: var(--button-bg); color: var(--button-text); font-weight: bold; transition: 0.2s; }
-            button:hover { transform: scale(1.05); filter: brightness(1.2); }
+            button:hover { transform: scale(1.05); }
             button.danger { background: #FF3366; color: white; border-color: #FF3366; }
-            input[type="color"] { padding: 0; width: 30px; height: 30px; border: none; }
             
-            /* Academic Hub Panel */
-            #academic-panel {
-                position: absolute; bottom: 20px; right: 20px; width: 300px; background: var(--panel-bg);
+            /* Right Side Transform Panel */
+            #transform-panel {
+                position: absolute; top: 70px; right: 20px; width: 280px; background: var(--panel-bg);
                 border: 2px solid var(--border-color); border-radius: 10px; padding: 15px;
                 color: var(--text-color); box-shadow: 0 0 20px rgba(0,0,0,0.5);
-                display: none; flex-direction: column; gap: 10px; transition: 0.3s; z-index: 100;
+                display: none; flex-direction: column; gap: 10px; z-index: 100;
             }
-            #academic-panel h4 { margin: 0; color: var(--border-color); font-size: 15px; }
-            .badge { padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: bold; color: #000; }
-            .badge.physics { background: #00FFCC; }
-            .badge.math { background: #FF3366; color: white; }
-            .desc { font-size: 12px; line-height: 1.4; color: var(--text-color); opacity: 0.9; }
-            .diagram { width: 100%; height: 80px; background: rgba(0,0,0,0.2); border-radius: 5px; display: flex; align-items: center; justify-content: center; margin-top: 5px; }
-            body.light-mode .diagram { background: rgba(0,0,0,0.05); }
+            #transform-panel h4 { margin: 0; color: var(--border-color); font-size: 14px; border-bottom: 1px solid var(--border-color); padding-bottom: 5px; }
+            
+            .control-row { display: flex; justify-content: space-between; align-items: center; gap: 5px; margin-top: 5px; }
+            .control-row label { font-size: 12px; width: 40px; }
+            .btn-group { display: flex; gap: 3px; flex: 1; }
+            .btn-group button { flex: 1; padding: 4px; font-size: 11px; }
+            
+            .section-title { font-size: 11px; font-weight: bold; color: #aaa; margin-top: 10px; }
+            .info-box { background: rgba(0,0,0,0.2); padding: 8px; border-radius: 5px; font-size: 11px; line-height: 1.3; }
+            .diagram { height: 60px; background: rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center; margin-top: 5px; border-radius: 5px;}
         </style>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
@@ -9581,103 +9561,128 @@ def render_aero_lab():
         <div id="topbar">
             <div class="group">
                 <select id="langSelect" onchange="changeLanguage()">
-                    <option value="en">🇬🇧 English</option>
-                    <option value="hi">🇮🇳 Hindi</option>
+                    <option value="en">🇬🇧 EN</option>
+                    <option value="hi">🇮🇳 हिंदी</option>
                     <option value="hinglish">🇮🇳 Hinglish</option>
                 </select>
                 <button onclick="toggleTheme()" id="themeBtn">☀️ Light</button>
             </div>
 
             <div class="group">
-                <select id="partCategory" style="width: 120px;">
+                <select id="partCategory" style="width: 100px;">
                     <option value="wings">Wings</option>
                     <option value="rotors">Rotors</option>
                     <option value="engines">Engines</option>
                     <option value="body">Body</option>
-                    <option value="gear">Gear & Tyres</option>
-                    <option value="accessories">Accessories</option>
+                    <option value="gear">Gear</option>
                 </select>
-                <select id="partList" style="width: 140px;"></select>
+                <select id="partList" style="width: 130px;"></select>
                 <button onclick="addSelectedPart()" id="btnAdd">➕ Add</button>
-            </div>
-
-            <div class="group">
-                <span style="font-size: 12px;" id="lblColor">Paint:</span>
-                <input type="color" id="colorPicker" value="#FF3366" onchange="changeColor(this.value)">
-                <button onclick="copySelected()" id="btnCopy">📋 Copy</button>
-                <button class="danger" onclick="deleteSelected()" id="btnDelete">🗑️ Delete</button>
             </div>
         </div>
 
         <div id="canvas-container"></div>
 
-        <div id="academic-panel">
-            <h4 id="info-title">Select a part to view physics</h4>
-            <div class="diagram" id="info-diagram"></div>
-            <div><span class="badge physics">PHYSICS</span> <span class="desc" id="info-physics"></span></div>
-            <div><span class="badge math">MATH</span> <span class="desc" id="info-math"></span></div>
+        <!-- Transform & Material Panel -->
+        <div id="transform-panel">
+            <h4 id="panel-title">Selected Part</h4>
+            
+            <div class="section-title">🎨 Material & Color</div>
+            <select id="materialSelect" onchange="changeMaterial()" style="width:100%">
+                <option value="plastic">Plastic</option>
+                <option value="metal">Metal</option>
+                <option value="chrome">Chrome (Shiny)</option>
+                <option value="rubber">Rubber</option>
+                <option value="glass">Glass (Transparent)</option>
+                <option value="wood">Wood</option>
+                <option value="gold">Gold</option>
+            </select>
+            <div class="control-row">
+                <label>Color:</label>
+                <input type="color" id="colorPicker" value="#FF3366" onchange="changeColor(this.value)" style="width:100%; height:25px;">
+            </div>
+
+            <div class="section-title">↔️ Move Position</div>
+            <div class="control-row">
+                <label>X:</label><div class="btn-group"><button onclick="moveObj('x', -0.5)">-</button><button onclick="moveObj('x', 0.5)">+</button></div>
+            </div>
+            <div class="control-row">
+                <label>Y:</label><div class="btn-group"><button onclick="moveObj('y', -0.5)">-</button><button onclick="moveObj('y', 0.5)">+</button></div>
+            </div>
+            <div class="control-row">
+                <label>Z:</label><div class="btn-group"><button onclick="moveObj('z', -0.5)">-</button><button onclick="moveObj('z', 0.5)">+</button></div>
+            </div>
+
+            <div class="section-title">🔄 Rotate Part</div>
+            <div class="control-row">
+                <label>X:</label><div class="btn-group"><button onclick="rotateObj('x', -0.1)">-</button><button onclick="rotateObj('x', 0.1)">+</button></div>
+            </div>
+            <div class="control-row">
+                <label>Y:</label><div class="btn-group"><button onclick="rotateObj('y', -0.1)">-</button><button onclick="rotateObj('y', 0.1)">+</button></div>
+            </div>
+            <div class="control-row">
+                <label>Z:</label><div class="btn-group"><button onclick="rotateObj('z', -0.1)">-</button><button onclick="rotateObj('z', 0.1)">+</button></div>
+            </div>
+
+            <div class="control-row" style="margin-top:10px;">
+                <button onclick="dropToFloor()" style="flex:1;">⬇️ Floor</button>
+                <button onclick="centerObj()" style="flex:1;">🎯 Center</button>
+            </div>
+
+            <div class="control-row" style="margin-top:10px;">
+                <button onclick="copySelected()" style="flex:1;">📋 Copy</button>
+                <button class="danger" onclick="deleteSelected()" style="flex:1;">🗑️ Delete</button>
+            </div>
+
+            <div class="section-title">📐 Physics Hub</div>
+            <div class="info-box">
+                <div id="info-math" style="color:#FF3366; font-weight:bold; margin-bottom:4px;"></div>
+                <div id="info-physics" style="color:#ddd;"></div>
+                <div class="diagram" id="info-diagram"></div>
+            </div>
         </div>
 
         <script>
-            // --- 1. TRANSLATIONS ---
             const trans = {
-                "en": { "add": "➕ Add", "copy": "📋 Copy", "delete": "🗑️ Delete", "theme": "☀️ Light" },
-                "hi": { "add": "➕ जोड़ें", "copy": "📋 कॉपी", "delete": "🗑️ हटाएं", "theme": "☀️ लाइट" },
-                "hinglish": { "add": "➕ Add Karo", "copy": "📋 Copy", "delete": "🗑️ Delete", "theme": "☀️ Light Mode" }
+                "en": { "add": "➕ Add" },
+                "hi": { "add": "➕ जोड़ें" },
+                "hinglish": { "add": "➕ Add Karo" }
             };
             
             function changeLanguage() {
                 let lang = document.getElementById("langSelect").value;
                 document.getElementById("btnAdd").innerHTML = trans[lang].add;
-                document.getElementById("btnCopy").innerHTML = trans[lang].copy;
-                document.getElementById("btnDelete").innerHTML = trans[lang].delete;
             }
 
-            // --- 2. DATABASE: 300+ Parts Generator ---
             const PARTS_DB = {
                 wings: [
-                    { name: "Straight Wing", type: "box", size: [6, 0.1, 1.2], math: "L = 1/2 p v^2 S C_L", physics: "Generates lift based on area and angle.", svg: "<svg width='80' height='40'><rect x='10' y='15' width='60' height='10' fill='#00FFCC'/></svg>" },
-                    { name: "Swept Wing", type: "box", size: [5, 0.1, 1.5], math: "L = 1/2 p v^2 S C_L(cos)", physics: "Better at high speeds, delays shockwaves.", svg: "<svg width='80' height='40'><polygon points='10,25 60,15 70,20 20,30' fill='#00FFCC'/></svg>" },
-                    { name: "Delta Wing", type: "cone", size: [2, 4, 4], math: "A = b * h / 2", physics: "Used in fighter jets, great at supersonic speeds.", svg: "<svg width='80' height='40'><polygon points='20,10 60,30 60,10' fill='#00FFCC'/></svg>" }
+                    { name: "Wing A", type: "box", size: [6, 0.1, 1.2], math: "L = 1/2 p v^2 S C_L", physics: "Generates lift.", svg: "<svg width='80' height='40'><rect x='10' y='15' width='60' height='10' fill='#00FFCC'/></svg>" },
+                    { name: "Wing B", type: "box", size: [5, 0.1, 1.5], math: "L = 1/2 p v^2 S C_L", physics: "Swept wing.", svg: "<svg width='80' height='40'><polygon points='10,25 60,15 70,20 20,30' fill='#00FFCC'/></svg>" }
                 ],
                 rotors: [
-                    { name: "2-Blade Propeller", type: "box", size: [0.1, 3, 0.1], math: "T = P / A", physics: "Pushes air downwards to create thrust.", svg: "<svg width='80' height='40'><line x1='40' y1='5' x2='40' y2='35' stroke='#FF3366' stroke-width='4'/></svg>" },
-                    { name: "4-Blade Rotor", type: "box", size: [2, 0.1, 2], math: "T = P / A", physics: "Smoother thrust, less vibration.", svg: "<svg width='80' height='40'><line x1='40' y1='5' x2='40' y2='35' stroke='#FF3366' stroke-width='4'/><line x1='20' y1='20' x2='60' y2='20' stroke='#FF3366' stroke-width='4'/></svg>" }
+                    { name: "Propeller", type: "box", size: [0.1, 3, 0.1], math: "T = P / A", physics: "Creates thrust.", svg: "<svg width='80' height='40'><line x1='40' y1='5' x2='40' y2='35' stroke='#FF3366' stroke-width='4'/></svg>" }
                 ],
                 engines: [
-                    { name: "Electric Motor", type: "cylinder", size: [0.4, 0.4, 1], math: "P = V * I", physics: "Converts electrical energy to mechanical.", svg: "<svg width='80' height='40'><circle cx='40' cy='20' r='12' fill='none' stroke='#e9c46a' stroke-width='4'/></svg>" },
-                    { name: "Jet Turbine", type: "cylinder", size: [0.6, 0.6, 2], math: "F = m_dot * v_e", physics: "Burns fuel to expel gas at high speed.", svg: "<svg width='80' height='40'><rect x='20' y='10' width='40' height='20' fill='#e9c46a'/></svg>" }
+                    { name: "Motor", type: "cylinder", size: [0.4, 0.4, 1], math: "P = V * I", physics: "Converts energy.", svg: "<svg width='80' height='40'><circle cx='40' cy='20' r='12' fill='none' stroke='#e9c46a' stroke-width='4'/></svg>" }
                 ],
                 body: [
-                    { name: "Fuselage", type: "cylinder", size: [0.5, 0.8, 6], math: "V = pi * r^2 * h", physics: "Houses the payload and reduces drag.", svg: "<svg width='80' height='40'><ellipse cx='40' cy='20' rx='30' ry='10' fill='#aaaaaa'/></svg>" },
-                    { name: "Windshield", type: "sphere", size: [1, 1, 1], math: "Drag = 0.5 * p * v^2 * Cd * A", physics: "Smooth glass reduces aerodynamic friction.", svg: "<svg width='80' height='40'><path d='M 20 20 A 20 20 0 0 1 60 20 Z' fill='#88ccff'/></svg>" }
+                    { name: "Fuselage", type: "cylinder", size: [0.5, 0.8, 6], math: "V = pi * r^2 * h", physics: "Main body.", svg: "<svg width='80' height='40'><ellipse cx='40' cy='20' rx='30' ry='10' fill='#aaaaaa'/></svg>" }
                 ],
                 gear: [
-                    { name: "Tyre", type: "torus", size: [0.4, 0.1], math: "F_friction = mu * N", physics: "Provides grip for braking and takeoff.", svg: "<svg width='80' height='40'><circle cx='40' cy='20' r='15' fill='none' stroke='#555' stroke-width='6'/></svg>" },
-                    { name: "Skid", type: "box", size: [0.2, 0.2, 2], math: "F = m * a", physics: "Used in helicopters for landing.", svg: "<svg width='80' height='40'><line x1='20' y1='25' x2='60' y2='25' stroke='#555' stroke-width='6'/></svg>" }
-                ],
-                accessories: [
-                    { name: "Tube Light", type: "box", size: [0.1, 0.1, 1], math: "P = V^2 / R", physics: "Draws electrical power to emit photons.", svg: "<svg width='80' height='40'><rect x='30' y='18' width='20' height='4' fill='#fff'/></svg>" },
-                    { name: "Aero Block", type: "box", size: [1, 1, 1], math: "F_d = 0.5 * p * v^2 * Cd * A", physics: "Generic block for structural testing.", svg: "<svg width='80' height='40'><rect x='25' y='10' width='30' height='20' fill='#aaa'/></svg>" }
+                    { name: "Tyre", type: "torus", size: [0.4, 0.1], math: "F = mu * N", physics: "Grip.", svg: "<svg width='80' height='40'><circle cx='40' cy='20' r='15' fill='none' stroke='#555' stroke-width='6'/></svg>" }
                 ]
             };
 
-            // Auto-fill parts (Simulating 300+ via variations)
             function populateParts() {
                 const cat = document.getElementById("partCategory").value;
                 const list = document.getElementById("partList");
                 list.innerHTML = "";
-                PARTS_DB[cat].forEach(p => {
-                    list.innerHTML += `<option value="${p.name}">${p.name}</option>`;
-                });
-                for(let i=1; i<=50; i++) {
-                    list.innerHTML += `<option value="${PARTS_DB[cat][0].name}_V${i}">${PARTS_DB[cat][0].name} V${i}</option>`;
-                }
+                PARTS_DB[cat].forEach(p => { list.innerHTML += `<option value="${p.name}">${p.name}</option>`; });
+                for(let i=1; i<=20; i++) { list.innerHTML += `<option value="${PARTS_DB[cat][0].name}_V${i}">${PARTS_DB[cat][0].name} V${i}</option>`; }
             }
             document.getElementById("partCategory").addEventListener("change", populateParts);
-            populateParts(); // Initial call
+            populateParts();
 
-            // --- 3. THREE.JS SETUP ---
             let scene, camera, renderer, orbitControls, transformControls;
             let selectedObject = null;
             const objects = [];
@@ -9685,16 +9690,15 @@ def render_aero_lab():
             scene = new THREE.Scene();
             scene.background = new THREE.Color(0x050716);
             
-            camera = new THREE.PerspectiveCamera(45, window.innerWidth / (window.innerHeight - 70), 0.1, 1000);
-            camera.position.set(5, 5, 10);
+            camera = new THREE.PerspectiveCamera(45, window.innerWidth / (window.innerHeight - 60), 0.1, 1000);
+            camera.position.set(8, 8, 12);
 
             renderer = new THREE.WebGLRenderer({ antialias: true });
-            renderer.setSize(window.innerWidth, window.innerHeight - 70);
+            renderer.setSize(window.innerWidth, window.innerHeight - 60);
             document.getElementById('canvas-container').appendChild(renderer.domElement);
 
             const ambientLight = new THREE.AmbientLight(0xffffff, 0.6); scene.add(ambientLight);
             const dirLight = new THREE.DirectionalLight(0xffffff, 0.8); dirLight.position.set(5, 10, 7); scene.add(dirLight);
-            
             const gridHelper = new THREE.GridHelper(30, 30, 0x00FFCC, 0x11153b); scene.add(gridHelper);
 
             orbitControls = new THREE.OrbitControls(camera, renderer.domElement);
@@ -9702,32 +9706,52 @@ def render_aero_lab():
             transformControls.addEventListener('dragging-changed', function (event) { orbitControls.enabled = !event.value; });
             scene.add(transformControls);
 
-            // --- 4. SELECTION LOGIC ---
+            const materials = {
+                plastic: new THREE.MeshStandardMaterial({ color: 0xcccccc, roughness: 0.6, metalness: 0.1 }),
+                metal: new THREE.MeshStandardMaterial({ color: 0xaaaaaa, roughness: 0.2, metalness: 0.8 }),
+                chrome: new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.05, metalness: 1.0 }),
+                rubber: new THREE.MeshStandardMaterial({ color: 0x222222, roughness: 0.9, metalness: 0.0 }),
+                glass: new THREE.MeshPhysicalMaterial({ color: 0xaaddff, transmission: 0.9, opacity: 0.5, transparent: true, roughness: 0.1 }),
+                wood: new THREE.MeshStandardMaterial({ color: 0x8b5a2b, roughness: 0.8, metalness: 0.0 }),
+                gold: new THREE.MeshStandardMaterial({ color: 0xffd700, roughness: 0.2, metalness: 1.0 })
+            };
+
             const raycaster = new THREE.Raycaster();
             const mouse = new THREE.Vector2();
             const defaultMat = new THREE.MeshStandardMaterial({ color: 0xcccccc, metalness: 0.5, roughness: 0.5 });
 
-            window.addEventListener('pointerdown', (event) => {
-                if(event.clientY < 70) return; // Ignore TopBar clicks
+            // --- FIX: Single Click Selection ---
+            let pointerDownPos = new THREE.Vector2();
+
+            renderer.domElement.addEventListener('pointerdown', (e) => {
+                pointerDownPos.set(e.clientX, e.clientY);
+            });
+
+            renderer.domElement.addEventListener('pointerup', (e) => {
+                // Agar mouse drag hua hai (Orbit control), toh select mat karo
+                if (Math.abs(e.clientX - pointerDownPos.x) > 5 || Math.abs(e.clientY - pointerDownPos.y) > 5) return;
+                // Agar gizmo (arrows) pe click hua hai, toh select mat karo
+                if (transformControls.axis !== null) return;
+
+                const rect = renderer.domElement.getBoundingClientRect();
+                mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+                mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
                 
-                mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-                mouse.y = -(event.clientY / (window.innerHeight - 70)) * 2 + 1;
                 raycaster.setFromCamera(mouse, camera);
                 const intersects = raycaster.intersectObjects(objects);
                 
                 if (intersects.length > 0) {
                     selectedObject = intersects[0].object;
                     transformControls.attach(selectedObject);
-                    updateInfoPanel(selectedObject);
-                    document.getElementById("academic-panel").style.display = "flex";
+                    updatePanel(selectedObject);
+                    document.getElementById("transform-panel").style.display = "flex";
                 } else {
                     selectedObject = null;
                     transformControls.detach();
-                    document.getElementById("academic-panel").style.display = "none";
+                    document.getElementById("transform-panel").style.display = "none";
                 }
             });
 
-            // --- 5. UI ACTIONS (ADD, COPY, DELETE) ---
             function addSelectedPart() {
                 const cat = document.getElementById("partCategory").value;
                 const partName = document.getElementById("partList").value;
@@ -9739,14 +9763,15 @@ def render_aero_lab():
                 else if (basePart.type === "sphere") geo = new THREE.SphereGeometry(...basePart.size);
                 else if (basePart.type === "cone") geo = new THREE.ConeGeometry(...basePart.size);
                 else if (basePart.type === "torus") geo = new THREE.TorusGeometry(...basePart.size);
-                else geo = new THREE.BoxGeometry(1,1,1);
 
                 if(basePart.type === "cylinder" || basePart.type === "cone") geo.rotateX(Math.PI / 2);
 
-                const mesh = new THREE.Mesh(geo, defaultMat.clone());
+                const mesh = new THREE.Mesh(geo, materials.plastic.clone());
                 mesh.name = partName;
                 mesh.userData = basePart; 
-                mesh.position.set(0, 0, 0);
+                
+                // Naya part aasman se girega (taaki dikhe ki add hua hai)
+                mesh.position.set((Math.random() - 0.5) * 4, 5, (Math.random() - 0.5) * 4);
                 
                 scene.add(mesh);
                 objects.push(mesh);
@@ -9759,7 +9784,7 @@ def render_aero_lab():
                     if (idx > -1) objects.splice(idx, 1);
                     transformControls.detach();
                     selectedObject = null;
-                    document.getElementById("academic-panel").style.display = "none";
+                    document.getElementById("transform-panel").style.display = "none";
                 }
             }
 
@@ -9773,16 +9798,34 @@ def render_aero_lab():
                 }
             }
 
-            function changeColor(hex) {
-                if (selectedObject) { selectedObject.material.color.set(hex); }
-            }
-
-            // --- 6. ACADEMIC HUB & THEME ---
-            function updateInfoPanel(obj) {
-                document.getElementById("info-title").innerText = obj.name;
+            function updatePanel(obj) {
+                document.getElementById("panel-title").innerText = obj.name;
                 document.getElementById("info-math").innerHTML = obj.userData.math;
                 document.getElementById("info-physics").innerHTML = obj.userData.physics;
                 document.getElementById("info-diagram").innerHTML = obj.userData.svg;
+                document.getElementById("colorPicker").value = '#' + obj.material.color.getHexString();
+            }
+
+            function moveObj(axis, amount) { if (selectedObject) selectedObject.position[axis] += amount; }
+            function rotateObj(axis, amount) { if (selectedObject) selectedObject.rotation[axis] += amount; }
+            function dropToFloor() {
+                if (selectedObject) {
+                    const box = new THREE.Box3().setFromObject(selectedObject);
+                    selectedObject.position.y -= box.min.y;
+                }
+            }
+            function centerObj() { if (selectedObject) selectedObject.position.set(0, 0, 0); }
+
+            function changeMaterial() {
+                if (!selectedObject) return;
+                const matType = document.getElementById('materialSelect').value;
+                const newMat = materials[matType].clone();
+                newMat.color.set(document.getElementById('colorPicker').value);
+                selectedObject.material = newMat;
+            }
+
+            function changeColor(hex) {
+                if (selectedObject) { selectedObject.material.color.set(hex); }
             }
 
             function toggleTheme() {
@@ -9792,7 +9835,6 @@ def render_aero_lab():
                 document.getElementById("themeBtn").innerText = isLight ? "🌙 Dark" : "☀️ Light";
             }
 
-            // Initial Main Body
             const mainBody = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.8, 6, 32), defaultMat);
             mainBody.geometry.rotateX(Math.PI / 2);
             mainBody.name = "Main Body";
@@ -9807,28 +9849,29 @@ def render_aero_lab():
             animate();
 
             window.addEventListener('resize', () => {
-                camera.aspect = window.innerWidth / (window.innerHeight - 70);
+                camera.aspect = window.innerWidth / (window.innerHeight - 60);
                 camera.updateProjectionMatrix();
-                renderer.setSize(window.innerWidth, window.innerHeight - 70);
+                renderer.setSize(window.innerWidth, window.innerHeight - 60);
             });
         </script>
     </body>
     </html>
     """
-    components.html(three_js_code, height=650)
+    
+    components.html(three_js_code, height=480)
 
     st.divider()
 
     # ==========================================
-    # 3. PHYSICS ENGINE & TELEMETRY
+    # 3. PHYSICS ENGINE
     # ==========================================
     st.write("### 📡 Live Wind Tunnel Physics")
     
     col1, col2, col3 = st.columns(3)
     with col1:
-        distributed_motors = st.slider("⚙️ Motors on Aircraft", 2, 16, 8, step=2)
+        distributed_motors = st.slider("⚙️ Motors", 2, 16, 8, step=2)
     with col2:
-        angle_of_attack = st.slider("📐 Wing Angle of Attack (°)", -10, 45, 12, step=1)
+        angle_of_attack = st.slider("📐 Angle of Attack (°)", -10, 45, 12, step=1)
     with col3:
         wind_velocity_input = st.slider("💨 Wind Speed (km/h)", 200, 1800, 750, step=50)
 
@@ -9836,26 +9879,18 @@ def render_aero_lab():
     computed_mass_kg = 1500 + (distributed_motors * 120)
     is_stalled = angle_of_attack > 18
 
-    if is_stalled:
-        calculated_lift_force = int(np.sin(rad_alpha_val) * (wind_velocity_input ** 1.65) * 0.01 * (1 + (distributed_motors / 8)))
-    else:
-        calculated_lift_force = int(np.sin(rad_alpha_val) * (wind_velocity_input ** 1.65) * 0.035 * (1 + (distributed_motors / 8)))
+    calculated_lift_force = int(np.sin(rad_alpha_val) * (wind_velocity_input ** 1.65) * (0.01 if is_stalled else 0.035) * (1 + (distributed_motors / 8)))
 
-    radar_point_drag_force = int(wind_velocity_input * 0.45 * (1 + np.sin(rad_alpha_val)))
-    wing_surface_drag_force = int(wind_velocity_input * 0.65 * (1 + (angle_of_attack / 12)**2))
-    
     if is_stalled:
-        st.error("🚨 **STALL WARNING:** Angle of Attack too high! Airflow is separating. LIFT LOST!")
+        st.error("🚨 **STALL WARNING:** Lift Lost! Lower the angle.")
     
     t_col1, t_col2 = st.columns([1, 2])
     with t_col1:
         st.markdown(f"""
-        <div class="cockpit-panel-2050" style="padding:15px; margin-bottom:10px;">  
+        <div class="cockpit-panel-2050" style="padding:15px;">  
             <p style="margin:0; font-size:13px;"><b>Mass:</b> {computed_mass_kg:,} kg</p>  
             <p style="margin:0; font-size:13px;"><b>Engines:</b> {distributed_motors} Units</p>  
         </div>  
-        <div class="sensor-feed-box"><small style="color:#00FFCC;">📍 NOSE DRAG</small><h4 style="margin:0;">{radar_point_drag_force:,} N</h4></div>  
-        <div class="sensor-feed-box"><small style="color:#00FFCC;">📐 WING DRAG</small><h4 style="margin:0;">{wing_surface_drag_force:,} N</h4></div>  
         <div class="sensor-feed-box" style="border-color:#00FFCC;"><small style="color:#FF3366;">🚀 TOTAL LIFT</small><h4 style="margin:0;">{calculated_lift_force:,} N</h4></div>  
         """, unsafe_allow_html=True)
 
@@ -9863,22 +9898,17 @@ def render_aero_lab():
         lift_weight_ratio = calculated_lift_force / (computed_mass_kg * 9.81)
         gauge_fig = go.Figure(go.Indicator(
             mode = "gauge+number", value = lift_weight_ratio, number = {'suffix': "x"},
-            title = {'text': "Lift / Weight Ratio", 'font': {'color': 'white'}},
             gauge = {
-                'axis': {'range': [0, 2], 'tickwidth': 1, 'tickcolor': "white"},
+                'axis': {'range': [0, 2]},
                 'bar': {'color': "#00FFCC"}, 'bgcolor': "black",
                 'steps': [{'range': [0, 1], 'color': "#FF3366"}, {'range': [1, 2], 'color': "#11163b"}],
-                'threshold': {'line': {'color': "red", 'width': 4}, 'thickness': 0.75, 'value': 1.0}
             }
         ))
-        gauge_fig.update_layout(height=200, margin=dict(l=10, r=10, t=40, b=10), paper_bgcolor="rgba(0,0,0,0)", font={'color': "white"})
+        gauge_fig.update_layout(height=180, margin=dict(l=10, r=10, t=10, b=10), paper_bgcolor="rgba(0,0,0,0)", font={'color': "white"})
         st.plotly_chart(gauge_fig, use_container_width=True)
 
-        if lift_weight_ratio > 1: st.success("✅ FLIGHT READY! Lift > Weight")
-        else: st.warning("⚠️ TOO HEAVY! Need more speed or motors.")
-
     # ==========================================
-    # 4. AI MENTOR CHAT (With Typewriter Effect)
+    # 4. AI MENTOR CHAT
     # ==========================================
     st.divider()
     st.write("### 🧠 Clyxess Aero-AI Mentor")
@@ -9887,7 +9917,7 @@ def render_aero_lab():
         with st.chat_message(msg["role"]):
             st.markdown(msg["content"])
 
-    user_query = st.chat_input("Ask Aero-AI (e.g., 'Why did my plane stall?')", key="aero_chat")
+    user_query = st.chat_input("Ask Aero-AI...", key="aero_chat")
     
     if user_query:
         st.session_state.aero_chat_log.append({"role": "user", "content": user_query})
@@ -9896,7 +9926,7 @@ def render_aero_lab():
         
         with st.chat_message("assistant"):
             with st.spinner("Calculating aerodynamics..."):
-                aero_prompt = f"You are Aero-AI. Aircraft Status -> Motors:{distributed_motors}, Angle:{angle_of_attack}, Speed:{wind_velocity_input}, Lift:{calculated_lift_force}N, Mass:{computed_mass_kg}kg, Stalled:{is_stalled}. Answer simply in user's language."
+                aero_prompt = f"You are Aero-AI. Status -> Motors:{distributed_motors}, Angle:{angle_of_attack}, Speed:{wind_velocity_input}, Lift:{calculated_lift_force}N, Stalled:{is_stalled}."
                 try:
                     res = client.chat.completions.create(
                         model="openai/gpt-oss-120b",
@@ -9907,13 +9937,12 @@ def render_aero_lab():
                 except Exception as e:
                     reply = f"Error: {e}"
                 
-                # ⭐ TYPEWRITER EFFECT (sleep 2 logic applied)
                 placeholder = st.empty()
                 typed_text = ""
                 for word in reply.split(" "):
                     typed_text += word + " "
                     placeholder.markdown(typed_text + "▌")
-                    time.sleep(0.05)  # Thoda slow aur smooth typing effect
+                    time.sleep(0.05)
                 placeholder.markdown(reply)
                 
                 st.session_state.aero_chat_log.append({"role": "assistant", "content": reply})
