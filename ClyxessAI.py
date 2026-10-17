@@ -9474,624 +9474,353 @@ drawKBG();
 
     components.html(HTML, height=950, scrolling=False) 
     
-def render_kids_logic_lab():
-    HTML_TEMPLATE = """
+def render_aero_lab():
+    import streamlit as st
+    import streamlit.components.v1 as components
+    import numpy as np
+    import plotly.graph_objects as go
+    import time
+
+    # ==========================================
+    # 1. COCKPIT STYLING (Clyxess Theme)
+    # ==========================================
+    st.markdown("""
+    <style>  
+    .cockpit-panel-2050 {  
+        border: 2px solid #00FFCC; border-radius: 20px; padding: 20px;  
+        background: linear-gradient(135deg, #050716, #11153b);  
+        box-shadow: 0 0 25px rgba(0, 255, 204, 0.2); color: white; margin-bottom: 20px;  
+    }  
+    .sensor-feed-box {  
+        background: #060919; border: 1px solid #FF3366; border-radius: 12px;  
+        padding: 12px; color: white; margin-bottom: 10px;  
+    }  
+    .report-card-2050 {  
+        border: 2px dashed #00FFCC; border-radius: 20px; padding: 25px;  
+        background: #050814; color: white;  
+    }  
+    .math-indicator { background-color: #FF3366; color: white; padding: 3px 8px; border-radius: 5px; font-weight: bold; }  
+    .physics-indicator { background-color: #00FFCC; color: #02040c; padding: 3px 8px; border-radius: 5px; font-weight: bold; }  
+    </style>  
+    """, unsafe_allow_html=True)
+
+    st.write("## 🛩️ Aeronautical 3D CAD & Wind Tunnel Lab")
+    st.markdown("बच्चों! 3D मॉडल पर क्लिक करें, उसे रोटेट करें, रंग बदलें और साइज़ करें। नीचे दिए गए स्लाइडर्स से हवा की स्पीड और लिफ्ट कंट्रोल करें!")
+
+    if "aero_chat_log" not in st.session_state:
+        st.session_state.aero_chat_log = [
+            {"role": "assistant", "content": "जय जोहार पायलट! मैं आपका Clyxess Aero-AI मेंटर हूँ। 3D मॉडल डिज़ाइन करें और मुझसे Lift, Drag, Stall के बारे में पूछें!"}
+        ]
+
+    # ==========================================
+    # 2. REAL 3D CAD DESIGNER (Three.js)
+    # ==========================================
+    st.write("##### 🎨 Interactive 3D Design Editor (Click parts to select)")
+    
+    # HTML/JS ko clean string format mein rakha hai taaki error na aaye
+    three_js_code = """
     <!DOCTYPE html>
     <html lang="en">
     <head>
         <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Clyxess Global Kids Logic & AI Puzzle Lab</title>
-        <script src="https://cdn.tailwindcss.com"></script>
-        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-        <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+        <style>
+            body { margin: 0; overflow: hidden; background-color: #050716; font-family: 'Segoe UI', sans-serif; }
+            #canvas-container { width: 100%; height: 100%; }
+            #ui-panel {
+                position: absolute; top: 10px; left: 10px;
+                background: rgba(17, 21, 59, 0.9); padding: 15px;
+                border-radius: 10px; border: 1px solid #00FFCC;
+                color: white; display: flex; flex-direction: column; gap: 10px;
+                box-shadow: 0 0 15px rgba(0, 255, 204, 0.3);
+            }
+            button {
+                background: #00FFCC; color: #050716; border: none; padding: 8px 12px;
+                border-radius: 5px; cursor: pointer; font-weight: bold; transition: 0.2s;
+            }
+            button:hover { background: #00ccaa; transform: scale(1.05); }
+            .danger { background: #FF3366; color: white; }
+            .danger:hover { background: #cc0033; }
+            .color-picker { display: flex; align-items: center; gap: 10px; margin-top: 5px; }
+            input[type="color"] { width: 40px; height: 40px; border: none; cursor: pointer; background: none; }
+            .hint { font-size: 12px; color: #aaa; margin-top: 10px; max-width: 200px; line-height: 1.4; }
+        </style>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/TransformControls.js"></script>
     </head>
-    <body class="bg-slate-950 text-slate-100 min-h-screen p-3 md:p-6 font-sans">
-
-        <!-- Header -->
-        <header class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center bg-slate-900 border border-slate-800 p-4 rounded-2xl mb-6 gap-4 shadow-xl">
-            <div class="flex items-center space-x-3">
-                <div class="p-3 bg-emerald-500/10 border border-emerald-500/30 rounded-xl text-emerald-400">
-                    <i class="fa-solid fa-earth-americas text-2xl"></i>
-                </div>
-                <div>
-                    <h1 class="text-xl font-bold text-white tracking-wide">Clyxess <span class="text-emerald-400">Global AI School</span></h1>
-                    <p class="text-xs text-slate-400">Interactive Logic, Engineering & Multi-Language Playground</p>
-                </div>
+    <body>
+        <div id="ui-panel">
+            <h3 style="margin: 0; color: #00FFCC;">🛠️ Design Tools</h3>
+            <button onclick="addWing()">➕ Add Wing</button>
+            <button onclick="addEngine()">➕ Add Engine</button>
+            <button onclick="addTail()">➕ Add Tail</button>
+            <div class="color-picker">
+                <span>Paint:</span>
+                <input type="color" id="colorPicker" value="#FF3366" onchange="changeColor(this.value)">
             </div>
+            <button onclick="copySelected()">📋 Copy Part</button>
+            <button class="danger" onclick="deleteSelected()">🗑️ Delete Part</button>
+            <div class="hint">🖱️ Left Click: Rotate View<br>🎯 Click Part: Select<br>➡️ Drag Arrows: Resize/Move</div>
+        </div>
+        <div id="canvas-container"></div>
 
-            <div class="flex flex-wrap items-center gap-3">
-                <!-- Language Selector -->
-                <div class="flex items-center space-x-2 bg-slate-950 px-3 py-1.5 rounded-xl border border-slate-700">
-                    <i class="fa-solid fa-language text-amber-400 text-sm"></i>
-                    <select id="languageSelect" onchange="changeLanguage()" class="bg-transparent text-amber-400 text-xs font-bold focus:outline-none cursor-pointer">
-                        <option value="en" selected>English (US/UK)</option>
-                        <option value="hi">हिंदी (Hindi)</option>
-                        <option value="bn">বাংলা (Bengali)</option>
-                        <option value="ta">தமிழ் (Tamil)</option>
-                        <option value="te">తెలుగు (Telugu)</option>
-                        <option value="mr">मराठी (Marathi)</option>
-                        <option value="es">Español (Spanish)</option>
-                        <option value="fr">Français (French)</option>
-                    </select>
-</div>
-
-<!-- Class Filter -->
-<select id="ageFilter" onchange="filterGamesByAge()" class="bg-slate-950 text-emerald-400 text-xs font-bold border">
-  <option value="group1">Class 1-2 (5-7 Yrs) - Visual Puzzles</option>
-  <option value="group2">Class 3-5 (8-10 Yrs) - Science &amp; Machines</option>
-  <option value="group3">Class 6-7 (11-13 Yrs) - Advanced Engineering</option>
-</select>
-</div>
-</header>
-        <!-- Main Workspace -->
-        <main class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6">
-            
-            <!-- Left Panel: Puzzle Selection -->
-            <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 space-y-4">
-                <div class="flex justify-between items-center border-b border-slate-800 pb-3">
-                    <h2 id="lblDashboard" class="text-xs font-bold text-slate-300 uppercase tracking-wider"><i class="fa-solid fa-gamepad text-emerald-400 mr-2"></i> Puzzles Dashboard</h2>
-                    <span id="completedBadge" class="bg-emerald-500/10 text-emerald-400 text-xs px-2.5 py-1 rounded-full border border-emerald-500/20 font-bold">Unlocked: 1/15</span>
-                </div>
-
-                <div>
-                    <label id="lblSelectGame" class="text-xs text-slate-400 block mb-1">Select Puzzle Game:</label>
-                    <select id="gameSelectDropdown" onchange="loadSelectedGame()" class="w-full bg-slate-950 text-white text-xs border border-slate-700 rounded-xl p-3 focus:outline-none focus:border-emerald-400 cursor-pointer font-bold"></select>
-                </div>
-
-                <div id="gameListContainer" class="space-y-2 max-h-[360px] overflow-y-auto pr-1"></div>
-            </div>
-
-            <!-- Right Panel: Puzzle Workspace -->
-            <div class="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-3xl p-6 flex flex-col justify-between relative overflow-hidden">
-                <div>
-                    <div class="flex justify-between items-center mb-4 border-b border-slate-800 pb-3">
-                        <div>
-                            <span id="puzzleCategoryTag" class="text-[10px] uppercase font-bold tracking-widest px-2.5 py-0.5 rounded-full bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">Cartoon Puzzle</span>
-                            <h3 id="puzzleTitle" class="text-base font-bold text-white mt-1">Solve The Cute Cat Puzzle</h3>
-                        </div>
-                        <div id="statusIcon" class="text-amber-400 text-xs font-bold bg-amber-500/10 border border-amber-500/20 px-3 py-1 rounded-xl flex items-center gap-1.5">
-                            <i class="fa-solid fa-hourglass-start"></i> In Progress
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 my-4">
-                        <div class="bg-slate-950 border border-slate-800 rounded-2xl p-4">
-                            <h4 id="lblToolbox" class="text-xs font-bold text-slate-400 mb-3 uppercase tracking-wider"><i class="fa-solid fa-toolbox mr-1 text-emerald-400"></i> Available Blocks</h4>
-                            <div id="availableBlocks" class="space-y-2"></div>
-                        </div>
-
-                        <div class="bg-slate-950 border border-emerald-500/30 rounded-2xl p-4">
-                            <h4 id="lblAssembly" class="text-xs font-bold text-emerald-400 mb-3 uppercase tracking-wider"><i class="fa-solid fa-layer-group mr-1"></i> Assembly Sequence</h4>
-                            <div id="assemblyZone" class="space-y-2 min-h-[140px] border-2 border-dashed border-slate-800 rounded-xl p-2 flex flex-col justify-center items-center">
-                                <p class="text-xs text-slate-500 italic">Click blocks to assemble here</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="bg-slate-950 border border-slate-800 rounded-2xl p-4 text-center relative overflow-hidden min-h-[160px] flex flex-col items-center justify-center">
-                        <div id="visualDisplay" class="transition-all duration-500">
-                            <i class="fa-solid fa-puzzle-piece text-5xl text-slate-700 animate-pulse"></i>
-                            <p class="text-xs text-slate-500 mt-2">Arrange blocks correctly & press 'Assemble'</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="flex justify-between items-center mt-6 pt-4 border-t border-slate-800">
-                    <button id="btnClear" onclick="resetCurrentPuzzle()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold rounded-xl transition"><i class="fa-solid fa-rotate-left mr-1"></i> Clear Blocks</button>
-                    <button id="btnAssemble" onclick="checkPuzzleSolution()" class="px-6 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-bold rounded-xl shadow-lg shadow-emerald-500/20 transition flex items-center gap-2 uppercase tracking-wider">
-                        <i class="fa-solid fa-play"></i> Assemble & Run
-                    </button>
-                </div>
-            </div>
-        </main>
-
-        <!-- Toy Counting Section -->
-        <section class="max-w-6xl mx-auto mt-6 bg-slate-900 border border-slate-800 rounded-3xl p-6">
-            <div class="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-slate-800 pb-4 mb-4 gap-4">
-                <div>
-                    <h3 id="toyTitle" class="text-sm font-bold text-white flex items-center gap-2"><span class="text-lg">&#128663;</span> Toy & Fruit Counting (Small Kids)</h3>
-                    <p id="toyDesc" class="text-xs text-slate-400">Count the toys and type the correct number</p>
-                </div>
-                <select id="toyDropdown" onchange="loadToyGame()" class="bg-slate-950 text-amber-400 text-xs font-bold border border-amber-500/30 rounded-xl p-2 focus:outline-none cursor-pointer">
-                    <option value="cars">1. Count the Cars &#128663;</option>
-                    <option value="apples">2. Count the Apples &#127822;</option>
-                    <option value="balls">3. Count the Balls &#9917;</option>
-                </select>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
-                <div class="md:col-span-2 bg-slate-950 border border-slate-800 p-6 rounded-2xl flex items-center justify-center text-4xl">
-                    <div id="toyVisualBox" class="flex flex-wrap items-center justify-center gap-2"></div>
-                </div>
-                <div class="bg-slate-950 border border-slate-800 p-4 rounded-2xl flex flex-col space-y-2">
-                    <input type="number" id="toyAnswerInput" placeholder="Total items?" class="bg-slate-900 text-white font-bold text-center text-sm border border-slate-700 rounded-xl p-2 focus:outline-none">
-                    <button id="btnCheckToy" onclick="verifyToyAnswer()" class="w-full py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-bold rounded-xl transition">Check Answer</button>
-                    <p id="toyResultText" class="text-xs text-center font-bold h-4"></p>
-                </div>
-            </div>
-        </section>
-
-        <!-- Math Wizard Section -->
-        <section class="max-w-6xl mx-auto mt-6 bg-slate-900 border border-slate-800 rounded-3xl p-6">
-            <div class="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-slate-800 pb-4 mb-4 gap-4">
-                <div>
-                    <h3 id="mathWizTitle" class="text-sm font-bold text-white flex items-center gap-2"><span class="text-lg">🧙‍♂️</span> Math Wizard Challenge (Class 1-10)</h3>
-                    <p id="mathWizDesc" class="text-xs text-slate-400">Solve the equation before time runs out!</p>
-                </div>
-                <div class="flex gap-2">
-                    <select id="mathDifficulty" onchange="generateMathQuiz()" class="bg-slate-950 text-emerald-400 text-xs font-bold border border-emerald-500/30 rounded-xl p-2 focus:outline-none cursor-pointer">
-                        <option value="easy">Level 1: Addition & Subtraction (Class 1-3)</option>
-                        <option value="medium">Level 2: Multiplication & Division (Class 4-7)</option>
-                        <option value="hard">Level 3: Algebra & Fractions (Class 8-10)</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
-                <div class="md:col-span-2 bg-slate-950 border border-slate-800 p-6 rounded-2xl flex items-center justify-center text-3xl font-mono text-emerald-400">
-                    <div id="mathWizVisualBox" class="flex items-center space-x-3"></div>
-                </div>
-                <div class="bg-slate-950 border border-slate-800 p-4 rounded-2xl flex flex-col space-y-2">
-                    <input type="text" id="mathWizAnswerInput" placeholder="Your Answer?" class="bg-slate-900 text-white font-bold text-center text-sm border border-slate-700 rounded-xl p-2 focus:outline-none">
-                    <button id="btnCheckMath" onclick="verifyMathWizAnswer()" class="w-full py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-bold rounded-xl transition">Submit</button>
-                    <p id="mathWizResultText" class="text-xs text-center font-bold h-4"></p>
-                </div>
-            </div>
-        </section>
-
-        <!-- JavaScript Engine -->
         <script>
-            // --- Translation Dictionary (UI & Game Titles) ---
-            const translations = {
-                "en": {
-                    dashboard: "Puzzles Dashboard", selectGame: "Select Puzzle Game:", availableBlocks: "Available Blocks",
-                    assemblySeq: "Assembly Sequence", clearBlocks: "Clear Blocks", assembleRun: "Assemble & Run",
-                    toyTitle: "Toy & Fruit Counting", toyDesc: "Count the toys and type the correct number",
-                    mathWizTitle: "Math Wizard Challenge", mathWizDesc: "Solve the equation before time runs out!",
-                    checkAns: "Check Answer", submit: "Submit", totalItems: "Total items?", yourAns: "Your Answer?",
-                    games: {
-                        1: { title: "Solve Cute Cat Puzzle", cat: "Cartoon Puzzle", blocks: ["Fix Ears & Whiskers", "Draw Cat Face", "Attach Tail"], sol: ["Draw Cat Face", "Fix Ears & Whiskers", "Attach Tail"] },
-                        2: { title: "Solve Puppy Dog Puzzle", cat: "Cartoon Puzzle", blocks: ["Attach Bark Sound", "Add Paws", "Fix Puppy Body"], sol: ["Fix Puppy Body", "Add Paws", "Attach Bark Sound"] },
-                        3: { title: "Solve Magic Star Puzzle", cat: "Cartoon Puzzle", blocks: ["Add Neon Glow", "Draw 5 Points", "Sparkle Effect"], sol: ["Draw 5 Points", "Add Neon Glow", "Sparkle Effect"] },
-                        4: { title: "Solve Helicopter Assembly", cat: "Engineering Puzzle", blocks: ["Attach Main Rotor", "Mount Cockpit Glass", "Fix Tail Propeller"], sol: ["Mount Cockpit Glass", "Attach Main Rotor", "Fix Tail Propeller"] },
-                        5: { title: "Solve Racing Car Puzzle", cat: "Engineering Puzzle", blocks: ["Fit 4 Wheels", "Attach Chassis Frame", "Install Engine"], sol: ["Attach Chassis Frame", "Install Engine", "Fit 4 Wheels"] },
-                        6: { title: "Solve Aeroplane Jet Logic", cat: "Engineering Puzzle", blocks: ["Calibrate Jet Turbines", "Attach Wings", "Deploy Landing Gear"], sol: ["Attach Wings", "Calibrate Jet Turbines", "Deploy Landing Gear"] },
-                        7: { title: "Solve Rocket Launch Sequence", cat: "Engineering Puzzle", blocks: ["Ignite Boosters", "Fill Fuel Tanks", "Countdown 3..2..1"], sol: ["Fill Fuel Tanks", "Countdown 3..2..1", "Ignite Boosters"] },
-                        8: { title: "Solve Train Engine Mechanics", cat: "Engineering Puzzle", blocks: ["Connect Electric Pantograph", "Couple Steam Engine", "Signal Green Light"], sol: ["Couple Steam Engine", "Connect Electric Pantograph", "Signal Green Light"] },
-                        9: { title: "Solve Submarine Depth Control", cat: "Engineering Puzzle", blocks: ["Seal Oxygen Valves", "Fill Ballast Tanks", "Sonar Pulse Check"], sol: ["Seal Oxygen Valves", "Fill Ballast Tanks", "Sonar Pulse Check"] },
-                        10: { title: "Solve Windmill Power Generator", cat: "Engineering Puzzle", blocks: ["Connect Turbine Shaft", "Fix 3 Large Blades", "Store Electricity in Battery"], sol: ["Fix 3 Large Blades", "Connect Turbine Shaft", "Store Electricity in Battery"] },
-                        11: { title: "Solve Smart Drone Navigation", cat: "Engineering Puzzle", blocks: ["Calibrate Flight Gyroscope", "Connect 4 Brushless Motors", "Link GPS & Camera"], sol: ["Connect 4 Brushless Motors", "Calibrate Flight Gyroscope", "Link GPS & Camera"] },
-                        12: { title: "Solve Industrial Robot Arm", cat: "Engineering Puzzle", blocks: ["Connect Servo Motors", "Program Hydraulic Gripper", "Calibrate Motion Sensor"], sol: ["Connect Servo Motors", "Calibrate Motion Sensor", "Program Hydraulic Gripper"] },
-                        13: { title: "Solve EV Battery & Motor Setup", cat: "Engineering Puzzle", blocks: ["Connect Lithium Cells", "Attach Regenerative Brakes", "Configure Motor Inverter"], sol: ["Connect Lithium Cells", "Configure Motor Inverter", "Attach Regenerative Brakes"] },
-                        14: { title: "Solve Space Satellite Solar Array", cat: "Engineering Puzzle", blocks: ["Deploy Solar Panels", "Orient Thrusters to Orbit", "Establish Radio Telemetry"], sol: ["Deploy Solar Panels", "Establish Radio Telemetry", "Orient Thrusters to Orbit"] },
-                        15: { title: "Solve Hydraulic Crane Lift", cat: "Engineering Puzzle", blocks: ["Pressurize Fluid Pumps", "Extend Telescopic Boom", "Engage Counterweights"], sol: ["Engage Counterweights", "Pressurize Fluid Pumps", "Extend Telescopic Boom"] }
-                    }
-                },
-                "hi": {
-                    dashboard: "पहेली डैशबोर्ड", selectGame: "पहेली गेम चुनें:", availableBlocks: "उपलब्ध ब्लॉक्स",
-                    assemblySeq: "असेंबली क्रम", clearBlocks: "ब्लॉक्स साफ़ करें", assembleRun: "असेंबल और चलाएं",
-                    toyTitle: "खिलौने और फल गिनना", toyDesc: "खिलौनों को गिनें और सही संख्या लिखें",
-                    mathWizTitle: "गणित जादूगर चुनौती", mathWizDesc: "समीकरण हल करें!",
-                    checkAns: "उत्तर जांचें", submit: "जमा करें", totalItems: "कुल वस्तुएं?", yourAns: "आपका उत्तर?",
-                    games: {
-                        1: { title: "प्यारी बिल्ली की पहेली", cat: "कार्टून पहेली", blocks: ["कान और मूंछें ठीक करें", "बिल्ली का चेहरा बनाएं", "पूंछ जोड़ें"], sol: ["बिल्ली का चेहरा बनाएं", "कान और मूंछें ठीक करें", "पूंछ जोड़ें"] },
-                        2: { title: "पिल्ला कुत्ता पहेली", cat: "कार्टून पहेली", blocks: ["भौंकने की आवाज जोड़ें", "पंजे जोड़ें", "पिल्ला शरीर ठीक करें"], sol: ["पिल्ला शरीर ठीक करें", "पंजे जोड़ें", "भौंकने की आवाज जोड़ें"] },
-                        3: { title: "जादुई सितारा पहेली", cat: "कार्टून पहेली", blocks: ["नियॉन चमक जोड़ें", "5 अंक बनाएं", "स्पार्कल प्रभाव"], sol: ["5 अंक बनाएं", "नियॉन चमक जोड़ें", "स्पार्कल प्रभाव"] },
-                        4: { title: "हेलीकॉप्टर असेंबली", cat: "इंजीनियरिंग पहेली", blocks: ["मुख्य रोटर संलग्न करें", "कॉकपिट ग्लास माउंट करें", "टेल प्रोपेलर ठीक करें"], sol: ["कॉकपिट ग्लास माउंट करें", "मुख्य रोटर संलग्न करें", "टेल प्रोपेलर ठीक करें"] },
-                        5: { title: "रेसिंग कार पहेली", cat: "इंजीनियरिंग पहेली", blocks: ["4 पहिये फिट करें", "चेसिस फ्रेम संलग्न करें", "इंजन स्थापित करें"], sol: ["चेसिस फ्रेम संलग्न करें", "इंजन स्थापित करें", "4 पहिये फिट करें"] },
-                        6: { title: "एयरोप्लेन जेट लॉजिक", cat: "इंजीनियरिंग पहेली", blocks: ["जेट टर्बाइन कैलिब्रेट करें", "पंख संलग्न करें", "लैंडिंग गियर तैनात करें"], sol: ["पंख संलग्न करें", "जेट टर्बाइन कैलिब्रेट करें", "लैंडिंग गियर तैनात करें"] },
-                        7: { title: "रॉकेट लॉन्च अनुक्रम", cat: "इंजीनियरिंग पहेली", blocks: ["बूस्टर प्रज्वलित करें", "ईंधन टैंक भरें", "उलटी गिनती 3..2..1"], sol: ["ईंधन टैंक भरें", "उलटी गिनती 3..2..1", "बूस्टर प्रज्वलित करें"] },
-                        8: { title: "ट्रेन इंजन मैकेनिक्स", cat: "इंजीनियरिंग पहेली", blocks: ["इलेक्ट्रिक पैंटोग्राफ कनेक्ट करें", "स्टीम इंजन कपल करें", "हरी बत्ती का संकेत दें"], sol: ["स्टीम इंजन कपल करें", "इलेक्ट्रिक पैंटोग्राफ कनेक्ट करें", "हरी बत्ती का संकेत दें"] },
-                        9: { title: "पनडुब्बी गहराई नियंत्रण", cat: "इंजीनियरिंग पहेली", blocks: ["ऑक्सीजन वाल्व सील करें", "बैलास्ट टैंक भरें", "सोनार पल्स जांच"], sol: ["ऑक्सीजन वाल्व सील करें", "बैलास्ट टैंक भरें", "सोनार पल्स जांच"] },
-                        10: { title: "पवनचक्की बिजली जनरेटर", cat: "इंजीनियरिंग पहेली", blocks: ["टर्बाइन शाफ्ट कनेक्ट करें", "3 बड़े ब्लेड ठीक करें", "बैटरी में बिजली स्टोर करें"], sol: ["3 बड़े ब्लेड ठीक करें", "टर्बाइन शाफ्ट कनेक्ट करें", "बैटरी में बिजली स्टोर करें"] },
-                        11: { title: "स्मार्ट ड्रोन नेविगेशन", cat: "इंजीनियरिंग पहेली", blocks: ["फ्लाइट जायरोस्कोप कैलिब्रेट करें", "4 ब्रशलेस मोटर्स कनेक्ट करें", "जीपीएस और कैमरा लिंक करें"], sol: ["4 ब्रशलेस मोटर्स कनेक्ट करें", "फ्लाइट जायरोस्कोप कैलिब्रेट करें", "जीपीएस और कैमरा लिंक करें"] },
-                        12: { title: "औद्योगिक रोबोट आर्म", cat: "इंजीनियरिंग पहेली", blocks: ["सर्वो मोटर्स कनेक्ट करें", "हाइड्रोलिक ग्रिपर प्रोग्राम करें", "मोशन सेंसर कैलिब्रेट करें"], sol: ["सर्वो मोटर्स कनेक्ट करें", "मोशन सेंसर कैलिब्रेट करें", "हाइड्रोलिक ग्रिपर प्रोग्राम करें"] },
-                        13: { title: "ईवी बैटरी और मोटर सेटअप", cat: "इंजीनियरिंग पहेली", blocks: ["लिथियम सेल कनेक्ट करें", "रिजनरेटिव ब्रेक्स संलग्न करें", "मोटर इनवर्टर कॉन्फ़िगर करें"], sol: ["लिथियम सेल कनेक्ट करें", "मोटर इनवर्टर कॉन्फ़िगर करें", "रिजनरेटिव ब्रेक्स संलग्न करें"] },
-                        14: { title: "अंतरिक्ष उपग्रह सौर सरणी", cat: "इंजीनियरिंग पहेली", blocks: ["सौर पैनल तैनात करें", "थ्रस्टर्स को कक्षा में उन्मुख करें", "रेडियो टेलीमेट्री स्थापित करें"], sol: ["सौर पैनल तैनात करें", "रेडियो टेलीमेट्री स्थापित करें", "थ्रस्टर्स को कक्षा में उन्मुख करें"] },
-                        15: { title: "हाइड्रोलिक क्रेन लिफ्ट", cat: "इंजीनियरिंग पहेली", blocks: ["फ्लूड पंप प्रेशराइज़ करें", "टेलीस्कोपिक बूम बढ़ाएं", "काउंटरवेट संलग्न करें"], sol: ["काउंटरवेट संलग्न करें", "फ्लूड पंप प्रेशराइज़ करें", "टेलीस्कोपिक बूम बढ़ाएं"] }
-                    }
-                },
-                "bn": {
-                    dashboard: "ধাঁধা ড্যাশবোর্ড", selectGame: "ধাঁধা খেলা নির্বাচন করুন:", availableBlocks: "উপলব্ধ ব্লক",
-                    assemblySeq: "সমাবেশ ক্রম", clearBlocks: "ব্লক সাফ করুন", assembleRun: "একত্রিত করুন এবং চালান",
-                    toyTitle: "খেলনা এবং ফল গণনা", toyDesc: "খেলনা গণনা করুন এবং সঠিক সংখ্যা লিখুন",
-                    mathWizTitle: "গণিত উইজার্ড চ্যালেঞ্জ", mathWizDesc: "সমীকরণ সমাধান করুন!",
-                    checkAns: "উত্তর চেক করুন", submit: "জমা দিন", totalItems: "মোট আইটেম?", yourAns: "আপনার উত্তর?",
-                    games: { 1: { title: "কিউট ক্যাট ধাঁধা সমাধান করুন", cat: "কার্টুন ধাঁধা", blocks: ["কান এবং গোঁফ ঠিক করুন", "বিড়ালের মুখ আঁকুন", "লেজ সংযুক্ত করুন"], sol: ["বিড়ালের মুখ আঁকুন", "কান এবং গোঁফ ঠিক করুন", "লেজ সংযুক্ত করুন"] } }
-                },
-                "ta": {
-                    dashboard: "புதிர் டாஷ்போர்டு", selectGame: "புதிர் விளையாட்டைத் தேர்ந்தெடுக்கவும்:", availableBlocks: "கிடைக்கக்கூடிய தொகுதிகள்",
-                    assemblySeq: "சட்டசபை வரிசை", clearBlocks: "தொகுதிகளை அழிக்கவும்", assembleRun: "சட்டசபை & இயக்கு",
-                    toyTitle: "பொம்மை & பழம் எண்ணுதல்", toyDesc: "பொம்மைகளை எண்ணி சரியான எண்ணை உள்ளிடவும்",
-                    mathWizTitle: "கணித வizard சவால்", mathWizDesc: "சமன்பாட்டை தீர்க்கவும்!",
-                    checkAns: "பதிலை சரிபார்க்கவும்", submit: "சமர்ப்பிக்கவும்", totalItems: "மொத்த பொருட்கள்?", yourAns: "உங்கள் பதில்?",
-                    games: { 1: { title: "அழகான பூனை புதிர்", cat: "கார்ட்டூன் புதிர்", blocks: ["காதுகள் & மீசையை சரிசெய்", "பூனை முகத்தை வரை", "வாலை இணைக்கவும்"], sol: ["பூனை முகத்தை வரை", "காதுகள் & மீசையை சரிசெய்", "வாலை இணைக்கவும்"] } }
-                },
-                "te": {
-                    dashboard: "పజిల్ డాష్‌బోర్డ్", selectGame: "పజిల్ గేమ్‌ను ఎంచుకోండి:", availableBlocks: "అందుబాటులో ఉన్న బ్లాక్‌లు",
-                    assemblySeq: "అసెంబ్లీ సీక్వెన్స్", clearBlocks: "బ్లాక్‌లను క్లియర్ చేయండి", assembleRun: "అసెంబుల్ & రన్",
-                    toyTitle: "బొమ్మలు & పండ్ల లెక్కింపు", toyDesc: "బొమ్మలను లెక్కించి సరైన సంఖ్యను నమోదు చేయండి",
-                    mathWizTitle: "మ్యాథ్ విజార్డ్ ఛాలెంజ్", mathWizDesc: "సమీకరణాన్ని పరిష్కరించండి!",
-                    checkAns: "సమాధానం తనిఖీ చేయండి", submit: "సమర్పించండి", totalItems: "మొత్తం వస్తువులు?", yourAns: "మీ సమాధానం?",
-                    games: { 1: { title: "క్యూట్ క్యాట్ పజిల్", cat: "కార్టూన్ పజిల్", blocks: ["చెవులు & వేస్కర్స్ సరిచేయండి", "పిల్లి ముఖం గీయండి", "తోకను జోడించండి"], sol: ["పిల్లి ముఖం గీయండి", "చెవులు & వేస్కర్స్ సరిచేయండి", "తోకను జోడించండి"] } }
-                },
-                "mr": {
-                    dashboard: "कोडे डॅशबोर्ड", selectGame: "कोडे गेम निवडा:", availableBlocks: "उपलब्ध ब्लॉक्स",
-                    assemblySeq: "असेंबली क्रम", clearBlocks: "ब्लॉक्स साफ करा", assembleRun: "असेंबल आणि चालवा",
-                    toyTitle: "खेळणी आणि फळे मोजणे", toyDesc: "खेळणी मोजा आणि योग्य संख्या लिहा",
-                    mathWizTitle: "गणित विझार्ड चॅलेंज", mathWizDesc: "समीकरण सोडवा!",
-                    checkAns: "उत्तर तपासा", submit: "सबमिट करा", totalItems: "एकूण वस्तू?", yourAns: "तुमचे उत्तर?",
-                    games: { 1: { title: "क्यूट कॅट कोडे", cat: "कार्टून कोडे", blocks: ["कान आणि मिशा दुरुस्त करा", "मांजरीचा चेहरा काढा", "शेपूट जोडा"], sol: ["मांजरीचा चेहरा काढा", "कान आणि मिशा दुरुस्त करा", "शेपूट जोडा"] } }
-                },
-                "es": { dashboard: "Panel de Rompecabezas", selectGame: "Seleccionar Juego:", availableBlocks: "Bloques Disponibles", assemblySeq: "Secuencia de Ensamblaje", clearBlocks: "Limpiar Bloques", assembleRun: "Ensamblar y Ejecutar", toyTitle: "Conteo de Juguetes", toyDesc: "Cuenta los juguetes y escribe el número", mathWizTitle: "Desafío Matemático", mathWizDesc: "¡Resuelve la ecuación!", checkAns: "Verificar", submit: "Enviar", totalItems: "¿Total?", yourAns: "Tu respuesta?", games: {} },
-                "fr": { dashboard: "Tableau de Bord", selectGame: "Choisir le Jeu:", availableBlocks: "Blocs Disponibles", assemblySeq: "Séquence d'Assemblage", clearBlocks: "Effacer les Blocs", assembleRun: "Assembler & Exécuter", toyTitle: "Compter les Jouets", toyDesc: "Comptez les jouets et tapez le nombre", mathWizTitle: "Défi Mathématique", mathWizDesc: "Résolvez l'équation!", checkAns: "Vérifier", submit: "Soumettre", totalItems: "Total?", yourAns: "Votre réponse?", games: {} }
-            };
+            let scene, camera, renderer, orbitControls, transformControls;
+            let selectedObject = null;
+            const objects = [];
 
-            let currentLang = "en";
-            let activeGameId = 1;
-            let selectedSequence = [];
-            let currentMathAnswer = 5;
-            let currentToyAnswer = 0;
-            let currentMathWizAnswer = 0;
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x050716);
+            scene.fog = new THREE.Fog(0x050716, 10, 50);
 
-            const toyEmojis = { cars: "🚗", apples: "🍎", balls: "⚽" };
+            camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.set(5, 5, 10);
 
-            // ============================================================
-            // TRANSLATION HELPERS
-            // ============================================================
-            function t(key, fallback="") {
-                const langData = translations[currentLang] || translations["en"];
-                return langData[key] || translations["en"][key] || fallback;
-            }
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            document.getElementById('canvas-container').appendChild(renderer.domElement);
 
-            function getGameData(id) {
-                const langData = translations[currentLang] || translations["en"];
-                return (langData.games && langData.games[id]) || translations["en"].games[id];
-            }
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+            scene.add(ambientLight);
+            const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+            dirLight.position.set(5, 10, 7);
+            scene.add(dirLight);
 
-            // ============================================================
-            // GAME DATA (IDs only, text comes from translations)
-            // ============================================================
-            const gamesMeta = [
-                { id: 1, group: "group1", icon: "fa-cat text-pink-400", locked: false },
-                { id: 2, group: "group1", icon: "fa-dog text-amber-400", locked: true },
-                { id: 3, group: "group1", icon: "fa-star text-yellow-400", locked: true },
-                { id: 4, group: "group1", icon: "fa-helicopter text-cyan-400", locked: true },
-                { id: 5, group: "group1", icon: "fa-car-side text-emerald-400", locked: true },
-                { id: 6, group: "group2", icon: "fa-plane-departure text-sky-400", locked: true },
-                { id: 7, group: "group2", icon: "fa-rocket text-red-400", locked: true },
-                { id: 8, group: "group2", icon: "fa-train text-indigo-400", locked: true },
-                { id: 9, group: "group2", icon: "fa-ship text-blue-400", locked: true },
-                { id: 10, group: "group2", icon: "fa-wind text-teal-400", locked: true },
-                { id: 11, group: "group3", icon: "fa-paper-plane text-purple-400", locked: true },
-                { id: 12, group: "group3", icon: "fa-robot text-emerald-400", locked: true },
-                { id: 13, group: "group3", icon: "fa-bolt text-yellow-400", locked: true },
-                { id: 14, group: "group3", icon: "fa-satellite text-cyan-400", locked: true },
-                { id: 15, group: "group3", icon: "fa-truck-pickup text-amber-400", locked: true }
-            ];
+            const gridHelper = new THREE.GridHelper(20, 20, 0x00FFCC, 0x11153b);
+            scene.add(gridHelper);
 
-            // ============================================================
-            // INITIALIZATION
-            // ============================================================
-            window.onload = function() {
-                changeLanguage(); // Sets up UI text
-                filterGamesByAge();
-                loadMathPuzzle();
-                loadToyGame();
-                generateMathQuiz();
-            };
+            orbitControls = new THREE.OrbitControls(camera, renderer.domElement);
+            orbitControls.enableDamping = true;
 
-            function changeLanguage() {
-                currentLang = document.getElementById('languageSelect').value;
-                
-                // Update UI Labels
-                document.getElementById('lblDashboard').innerHTML = `<i class="fa-solid fa-gamepad text-emerald-400 mr-2"></i> ${t('dashboard')}`;
-                document.getElementById('lblSelectGame').innerText = t('selectGame');
-                document.getElementById('lblToolbox').innerHTML = `<i class="fa-solid fa-toolbox mr-1 text-emerald-400"></i> ${t('availableBlocks')}`;
-                document.getElementById('lblAssembly').innerHTML = `<i class="fa-solid fa-layer-group mr-1"></i> ${t('assemblySeq')}`;
-                document.getElementById('btnClear').innerHTML = `<i class="fa-solid fa-rotate-left mr-1"></i> ${t('clearBlocks')}`;
-                document.getElementById('btnAssemble').innerHTML = `<i class="fa-solid fa-play"></i> ${t('assembleRun')}`;
-                
-                // Update New Game Titles
-                document.getElementById('toyTitle').innerHTML = `<span class="text-lg">🚗</span> ${t('toyTitle')}`;
-                document.getElementById('toyDesc').innerText = t('toyDesc');
-                document.getElementById('btnCheckToy').innerText = t('checkAns');
-                document.getElementById('toyAnswerInput').placeholder = t('totalItems');
+            transformControls = new THREE.TransformControls(camera, renderer.domElement);
+            transformControls.addEventListener('dragging-changed', function (event) {
+                orbitControls.enabled = !event.value;
+            });
+            scene.add(transformControls);
 
-                document.getElementById('mathWizTitle').innerHTML = `<span class="text-lg">🧙‍♂️</span> ${t('mathWizTitle')}`;
-                document.getElementById('mathWizDesc').innerText = t('mathWizDesc');
-                document.getElementById('btnCheckMath').innerText = t('submit');
-                document.getElementById('mathWizAnswerInput').placeholder = t('yourAns');
+            const raycaster = new THREE.Raycaster();
+            const mouse = new THREE.Vector2();
 
-                // Refresh game list to apply translated titles
-                filterGamesByAge();
-            }
-
-            // ============================================================
-            // PUZZLE LOGIC
-            // ============================================================
-            function filterGamesByAge() {
-                const group = document.getElementById('ageFilter').value;
-                const dropdown = document.getElementById('gameSelectDropdown');
-                const listContainer = document.getElementById('gameListContainer');
-                
-                dropdown.innerHTML = '';
-                listContainer.innerHTML = '';
-
-                const filteredGames = gamesMeta.filter(g => g.group === group);
-
-                filteredGames.forEach(meta => {
-                    const gameData = getGameData(meta.id);
-                    const opt = document.createElement('option');
-                    opt.value = meta.id;
-                    opt.disabled = meta.locked;
-                    opt.innerText = `${meta.locked ? '🔒' : '✅'} ${gameData.title}`;
-                    dropdown.appendChild(opt);
-
-                    const item = document.createElement('div');
-                    item.className = `p-3 rounded-xl border flex justify-between items-center cursor-pointer transition ${meta.id === activeGameId ? 'bg-slate-800 border-emerald-400' : 'bg-slate-950 border-slate-800'}`;
-                    item.onclick = () => { if(!meta.locked) { activeGameId = meta.id; dropdown.value = meta.id; loadSelectedGame(); } };
-                    
-                    item.innerHTML = `
-                        <div class="flex items-center space-x-3">
-                            <i class="fa-solid ${meta.icon} text-base"></i>
-                            <span class="text-xs font-bold ${meta.locked ? 'text-slate-500' : 'text-slate-200'}">${gameData.title}</span>
-                        </div>
-                        ${meta.locked ? '<i class="fa-solid fa-lock text-slate-600 text-xs"></i>' : '<i class="fa-solid fa-circle-check text-emerald-400 text-xs"></i>'}
-                    `;
-                    listContainer.appendChild(item);
-                });
-
-                const firstAvailable = filteredGames.find(g => !g.locked) || filteredGames[0];
-                activeGameId = firstAvailable.id;
-                dropdown.value = activeGameId;
-                loadSelectedGame();
-            }
-
-            function loadSelectedGame() {
-                const dropdownVal = parseInt(document.getElementById('gameSelectDropdown').value);
-                activeGameId = dropdownVal;
-                const meta = gamesMeta.find(g => g.id === activeGameId);
-                const gameData = getGameData(activeGameId);
-
-                document.getElementById('puzzleTitle').innerText = gameData.title;
-                document.getElementById('puzzleCategoryTag').innerText = gameData.cat;
-                
-                document.getElementById('statusIcon').className = "text-amber-400 text-xs font-bold bg-amber-500/10 border border-amber-500/20 px-3 py-1 rounded-xl flex items-center gap-1.5";
-                document.getElementById('statusIcon').innerHTML = '<i class="fa-solid fa-hourglass-start"></i> In Progress';
-
-                resetCurrentPuzzle();
-
-                const blocksContainer = document.getElementById('availableBlocks');
-                blocksContainer.innerHTML = '';
-                
-                let shuffled = [...gameData.blocks].sort(() => 0.5 - Math.random());
-                shuffled.forEach(blockText => {
-                    const b = document.createElement('div');
-                    b.className = "p-2 bg-slate-900 border border-slate-700 hover:border-emerald-400 rounded-xl text-xs font-semibold text-slate-200 cursor-pointer transition flex items-center justify-between";
-                    b.innerHTML = `<span>${blockText}</span> <i class="fa-solid fa-plus text-slate-500 text-[10px]"></i>`;
-                    b.onclick = () => addToAssembly(blockText, b);
-                    blocksContainer.appendChild(b);
-                });
-
-                const solvedCount = gamesMeta.filter(g => !g.locked).length;
-                document.getElementById('completedBadge').innerText = `Unlocked: ${solvedCount}/${gamesMeta.length}`;
-            }
-
-            function addToAssembly(text, element) {
-                if(!selectedSequence.includes(text)) {
-                    selectedSequence.push(text);
-                    element.classList.add('opacity-40', 'pointer-events-none');
-                    renderAssemblyZone();
-                }
-            }
-
-            function renderAssemblyZone() {
-                const zone = document.getElementById('assemblyZone');
-                zone.innerHTML = '';
-                
-                if(selectedSequence.length === 0) {
-                    zone.innerHTML = `<p class="text-xs text-slate-500 italic">${t('selectGame')} ...</p>`;
-                    return;
-                }
-
-                selectedSequence.forEach((text, index) => {
-                    const item = document.createElement('div');
-                    // FIX: Added cursor-pointer, hover effect, and onclick to remove
-                    item.className = "w-full p-2 bg-emerald-500/10 border border-emerald-500/40 rounded-xl text-xs font-bold text-emerald-400 flex justify-between items-center cursor-pointer hover:bg-rose-500/20 hover:border-rose-500 hover:text-rose-400 transition";
-                    item.onclick = () => removeFromAssembly(text);
-                    item.innerHTML = `<span>${index + 1}. ${text}</span> <i class="fa-solid fa-xmark text-[10px]"></i>`;
-                    zone.appendChild(item);
-                });
-            }
-
-            // FIX: New function to remove block
-            function removeFromAssembly(text) {
-                selectedSequence = selectedSequence.filter(t => t !== text);
-                renderAssemblyZone();
-                
-                const blocks = document.getElementById('availableBlocks').children;
-                for(let b of blocks) {
-                    if(b.innerText.includes(text)) {
-                        b.classList.remove('opacity-40', 'pointer-events-none');
-                    }
-                }
-            }
-
-            function resetCurrentPuzzle() {
-                selectedSequence = [];
-                renderAssemblyZone();
-                document.getElementById('visualDisplay').innerHTML = `
-                    <i class="fa-solid fa-puzzle-piece text-5xl text-slate-700 animate-pulse"></i>
-                    <p class="text-xs text-slate-500 mt-2">${t('assembleRun')}</p>
-                `;
-                
-                const blocks = document.getElementById('availableBlocks').children;
-                for(let b of blocks) {
-                    b.classList.remove('opacity-40', 'pointer-events-none');
-                }
-            }
-
-            function checkPuzzleSolution() {
-                const gameData = getGameData(activeGameId);
-                const isCorrect = JSON.stringify(selectedSequence) === JSON.stringify(gameData.sol);
-
-                const display = document.getElementById('visualDisplay');
-                const status = document.getElementById('statusIcon');
-
-                if(isCorrect) {
-                    confetti({ particleCount: 130, spread: 85, origin: { y: 0.6 } });
-                    status.className = "text-emerald-400 text-xs font-bold bg-emerald-500/10 border border-emerald-500/30 px-3 py-1 rounded-xl flex items-center gap-1.5";
-                    status.innerHTML = '<i class="fa-solid fa-circle-check"></i> Puzzle Solved!';
-
-                    const currentIndex = gamesMeta.findIndex(g => g.id === activeGameId);
-                    let nextGameTitle = "";
-                    
-                    if(currentIndex + 1 < gamesMeta.length) {
-                        gamesMeta[currentIndex + 1].locked = false;
-                        nextGameTitle = getGameData(gamesMeta[currentIndex + 1].id).title;
-                    }
-
-                    display.innerHTML = `
-                        <div class="text-emerald-400 animate-bounce">
-                            <i class="fa-solid ${gamesMeta.find(g=>g.id===activeGameId).icon} text-6xl"></i>
-                        </div>
-                        <h4 class="text-base font-bold text-amber-400 mt-2">🎉 Correct!</h4>
-                        <p class="text-xs font-bold text-emerald-400 mt-1">Next: ${nextGameTitle || "All Completed!"}</p>
-                    `;
-
-                    setTimeout(() => { filterGamesByAge(); }, 2200);
+            window.addEventListener('pointerdown', (event) => {
+                if(event.clientY < 250 && event.clientX < 250) return; // Ignore UI clicks
+                mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+                mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+                raycaster.setFromCamera(mouse, camera);
+                const intersects = raycaster.intersectObjects(objects);
+                if (intersects.length > 0) {
+                    selectedObject = intersects[0].object;
+                    transformControls.attach(selectedObject);
                 } else {
-                    status.className = "text-rose-400 text-xs font-bold bg-rose-500/10 border border-rose-500/30 px-3 py-1 rounded-xl flex items-center gap-1.5";
-                    status.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> Wrong Sequence';
+                    selectedObject = null;
+                    transformControls.detach();
+                }
+            });
 
-                    display.innerHTML = `
-                        <i class="fa-solid fa-bug text-5xl text-rose-500"></i>
-                        <p class="text-xs text-rose-400 mt-2 font-bold">Assembly Failed! Try again.</p>
-                    `;
+            const material = new THREE.MeshStandardMaterial({ color: 0xcccccc, metalness: 0.5, roughness: 0.5 });
+            const engineMat = new THREE.MeshStandardMaterial({ color: 0x00FFCC, metalness: 0.8, roughness: 0.2 });
+
+            const bodyGeo = new THREE.CylinderGeometry(0.5, 0.8, 6, 32);
+            bodyGeo.rotateX(Math.PI / 2);
+            const body = new THREE.Mesh(bodyGeo, material);
+            body.name = "Fuselage";
+            addObject(body);
+
+            addWing(); addTail(); addEngine();
+
+            function addObject(obj) { scene.add(obj); objects.push(obj); }
+
+            function addWing() {
+                const wingGeo = new THREE.BoxGeometry(6, 0.1, 1.2);
+                const wing = new THREE.Mesh(wingGeo, material.clone());
+                wing.position.set(0, 0, 0.5); wing.name = "Wing"; addObject(wing);
+            }
+            function addTail() {
+                const tailGeo = new THREE.BoxGeometry(2, 0.1, 0.8);
+                const tail = new THREE.Mesh(tailGeo, material.clone());
+                tail.position.set(0, 0, -2.5); tail.name = "Tail"; addObject(tail);
+                const finGeo = new THREE.BoxGeometry(0.1, 1, 0.8);
+                const fin = new THREE.Mesh(finGeo, material.clone());
+                fin.position.set(0, 0.5, -2.5); fin.name = "Fin"; addObject(fin);
+            }
+            function addEngine() {
+                const engGeo = new THREE.CylinderGeometry(0.3, 0.3, 1.5, 16);
+                engGeo.rotateX(Math.PI / 2);
+                const eng = new THREE.Mesh(engGeo, engineMat.clone());
+                eng.position.set(1.5, -0.2, 0.5); eng.name = "Engine"; addObject(eng);
+            }
+
+            function deleteSelected() {
+                if (selectedObject) {
+                    scene.remove(selectedObject);
+                    const index = objects.indexOf(selectedObject);
+                    if (index > -1) objects.splice(index, 1);
+                    transformControls.detach(); selectedObject = null;
                 }
             }
-
-            // ============================================================
-            // TOY COUNTING LOGIC (NEW)
-            // ============================================================
-            function loadToyGame() {
-                const type = document.getElementById('toyDropdown').value;
-                const box = document.getElementById('toyVisualBox');
-                const emoji = toyEmojis[type];
-                
-                const count = Math.floor(Math.random() * 10) + 1;
-                currentToyAnswer = count;
-                
-                box.innerHTML = emoji.repeat(count);
-                document.getElementById('toyAnswerInput').value = '';
-                document.getElementById('toyResultText').innerText = '';
-            }
-
-            function verifyToyAnswer() {
-                const userAns = parseInt(document.getElementById('toyAnswerInput').value);
-                const res = document.getElementById('toyResultText');
-
-                if(userAns === currentToyAnswer) {
-                    confetti({ particleCount: 40, spread: 40, origin: { y: 0.8 } });
-                    res.className = "text-xs text-center font-bold text-emerald-400";
-                    res.innerText = "🌟 Correct!";
-                    setTimeout(loadToyGame, 1500);
-                } else {
-                    res.className = "text-xs text-center font-bold text-rose-400";
-                    res.innerText = "❌ Count again!";
+            function copySelected() {
+                if (selectedObject) {
+                    const clone = selectedObject.clone();
+                    clone.position.x += 1;
+                    clone.material = selectedObject.material.clone();
+                    addObject(clone);
                 }
             }
-
-            // ============================================================
-            // MATH WIZARD LOGIC (NEW)
-            // ============================================================
-            function generateMathQuiz() {
-                const level = document.getElementById('mathDifficulty').value;
-                const box = document.getElementById('mathWizVisualBox');
-                let questionText = "";
-                let answer = 0;
-
-                if (level === "easy") {
-                    const a = Math.floor(Math.random() * 20) + 1;
-                    const b = Math.floor(Math.random() * 20) + 1;
-                    const isAdd = Math.random() > 0.5;
-                    if (isAdd) { questionText = `${a} + ${b} = ?`; answer = a + b; }
-                    else { questionText = `${Math.max(a,b)} - ${Math.min(a,b)} = ?`; answer = Math.max(a,b) - Math.min(a,b); }
-                } else if (level === "medium") {
-                    const a = Math.floor(Math.random() * 12) + 2;
-                    const b = Math.floor(Math.random() * 12) + 2;
-                    const isMul = Math.random() > 0.5;
-                    if (isMul) { questionText = `${a} × ${b} = ?`; answer = a * b; }
-                    else { questionText = `${a*b} ÷ ${a} = ?`; answer = b; }
-                } else if (level === "hard") {
-                    const a = Math.floor(Math.random() * 5) + 2;
-                    const x = Math.floor(Math.random() * 10) + 1;
-                    const b = Math.floor(Math.random() * 20);
-                    const c = (a * x) + b;
-                    questionText = `${a}x + ${b} = ${c}. Find x.`;
-                    answer = x;
-                }
-
-                box.innerHTML = `<span>${questionText}</span>`;
-                currentMathWizAnswer = answer;
-                document.getElementById('mathWizAnswerInput').value = '';
-                document.getElementById('mathWizResultText').innerText = '';
+            function changeColor(hex) {
+                if (selectedObject) { selectedObject.material.color.set(hex); }
             }
 
-            function verifyMathWizAnswer() {
-                const userAns = parseFloat(document.getElementById('mathWizAnswerInput').value);
-                const res = document.getElementById('mathWizResultText');
-                
-                if (isNaN(userAns)) {
-                    res.className = "text-xs text-center font-bold text-amber-400";
-                    res.innerText = "Please enter a valid number!";
-                    return;
-                }
-
-                if(Math.abs(userAns - currentMathWizAnswer) < 0.01) {
-                    confetti({ particleCount: 60, spread: 60, origin: { y: 0.8 } });
-                    res.className = "text-xs text-center font-bold text-emerald-400";
-                    res.innerText = "🌟 Brilliant!";
-                    setTimeout(generateMathQuiz, 1500);
-                } else {
-                    res.className = "text-xs text-center font-bold text-rose-400";
-                    res.innerText = `❌ Correct ans: ${currentMathWizAnswer}`;
-                }
+            function animate() {
+                requestAnimationFrame(animate);
+                orbitControls.update();
+                renderer.render(scene, camera);
             }
+            animate();
 
-            // --- Math Fruit Logic (Old) ---
-            function loadMathPuzzle() {
-                const val = document.getElementById('mathDropdown').value;
-                const box = document.getElementById('mathVisualBox');
-                document.getElementById('mathAnswerInput').value = '';
-                document.getElementById('mathResultText').innerText = '';
-
-                if(val === 'm1') { currentMathAnswer = 5; box.innerHTML = '<span>🥭🥭🥭</span> <span class="text-amber-400 font-bold">+</span> <span>🥭🥭</span> <span class="text-amber-400 font-bold">=</span> <span>❓</span>'; }
-                else if(val === 'm2') { currentMathAnswer = 3; box.innerHTML = '<span>🥭🥭🥭🥭🥭🥭</span> <span class="text-rose-400 font-bold">-</span> <span>🥭🥭🥭</span> <span class="text-amber-400 font-bold">=</span> <span>❓</span>'; }
-                else if(val === 'm3') { currentMathAnswer = 8; box.innerHTML = '<span>(🥭🥭🥭🥭)</span> <span class="text-amber-400 font-bold">x 2</span> <span class="text-amber-400 font-bold">=</span> <span>❓</span>'; }
-            }
-
-            function verifyMathAnswer() {
-                const userAns = parseInt(document.getElementById('mathAnswerInput').value);
-                const res = document.getElementById('mathResultText');
-
-                if(userAns === currentMathAnswer) {
-                    confetti({ particleCount: 50, spread: 50, origin: { y: 0.8 } });
-                    res.className = "text-xs text-center font-bold text-emerald-400";
-                    res.innerText = "🌟 Correct!";
-                } else {
-                    res.className = "text-xs text-center font-bold text-rose-400";
-                    res.innerText = "❌ Try again!";
-                }
-            }
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
         </script>
     </body>
     </html>
-        """
-    import streamlit.components.v1 as components
-    components.html(HTML_TEMPLATE, height=950, scrolling=False)
+    """
+    components.html(three_js_code, height=500)
+
+    st.divider()
+
+    # ==========================================
+    # 3. PHYSICS ENGINE & TELEMETRY (Pichhla Logic)
+    # ==========================================
+    st.write("### 📡 Live Wind Tunnel Physics")
+    
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        distributed_motors = st.slider("⚙️ Motors on Aircraft", 2, 16, 8, step=2)
+    with col2:
+        angle_of_attack = st.slider("📐 Wing Angle of Attack (°)", -10, 45, 12, step=1)
+    with col3:
+        wind_velocity_input = st.slider("💨 Wind Speed (km/h)", 200, 1800, 750, step=50)
+
+    rad_alpha_val = np.radians(angle_of_attack)
+    computed_mass_kg = 1500 + (distributed_motors * 120)
+    is_stalled = angle_of_attack > 18
+
+    if is_stalled:
+        calculated_lift_force = int(np.sin(rad_alpha_val) * (wind_velocity_input ** 1.65) * 0.01 * (1 + (distributed_motors / 8)))
+    else:
+        calculated_lift_force = int(np.sin(rad_alpha_val) * (wind_velocity_input ** 1.65) * 0.035 * (1 + (distributed_motors / 8)))
+
+    radar_point_drag_force = int(wind_velocity_input * 0.45 * (1 + np.sin(rad_alpha_val)))
+    wing_surface_drag_force = int(wind_velocity_input * 0.65 * (1 + (angle_of_attack / 12)**2))
+    net_aerodynamic_drag = radar_point_drag_force + wing_surface_drag_force
+
+    system_stability_score = max(min(100 - (abs(angle_of_attack - 14) * 2.5) - (computed_mass_kg / 75), 100), 0)
+
+    if is_stalled:
+        st.error("🚨 **STALL WARNING:** Angle of Attack too high! Airflow is separating. LIFT LOST! Lower the angle.")
+    
+    t_col1, t_col2 = st.columns([1, 2])
+    with t_col1:
+        st.markdown(f"""
+        <div class="cockpit-panel-2050" style="padding:15px; margin-bottom:10px;">  
+            <p style="margin:0; font-size:13px;"><b>Mass:</b> {computed_mass_kg:,} kg</p>  
+            <p style="margin:0; font-size:13px;"><b>Engines:</b> {distributed_motors} Units</p>  
+        </div>  
+        <div class="sensor-feed-box"><small style="color:#00FFCC;">📍 NOSE DRAG</small><h4 style="margin:0;">{radar_point_drag_force:,} N</h4></div>  
+        <div class="sensor-feed-box"><small style="color:#00FFCC;">📐 WING DRAG</small><h4 style="margin:0;">{wing_surface_drag_force:,} N</h4></div>  
+        <div class="sensor-feed-box" style="border-color:#00FFCC;"><small style="color:#FF3366;">🚀 TOTAL LIFT</small><h4 style="margin:0;">{calculated_lift_force:,} N</h4></div>  
+        """, unsafe_allow_html=True)
+
+    with t_col2:
+        # Lift vs Weight Gauge
+        lift_weight_ratio = calculated_lift_force / (computed_mass_kg * 9.81)
+        gauge_fig = go.Figure(go.Indicator(
+            mode = "gauge+number", value = lift_weight_ratio, number = {'suffix': "x"},
+            title = {'text': "Lift / Weight Ratio", 'font': {'color': 'white'}},
+            gauge = {
+                'axis': {'range': [0, 2], 'tickwidth': 1, 'tickcolor': "white"},
+                'bar': {'color': "#00FFCC"}, 'bgcolor': "black",
+                'steps': [{'range': [0, 1], 'color': "#FF3366"}, {'range': [1, 2], 'color': "#11163b"}],
+                'threshold': {'line': {'color': "red", 'width': 4}, 'thickness': 0.75, 'value': 1.0}
+            }
+        ))
+        gauge_fig.update_layout(height=200, margin=dict(l=10, r=10, t=40, b=10), paper_bgcolor="rgba(0,0,0,0)", font={'color': "white"})
+        st.plotly_chart(gauge_fig, use_container_width=True)
+
+        if lift_weight_ratio > 1: st.success("✅ FLIGHT READY! Lift > Weight")
+        else: st.warning("⚠️ TOO HEAVY! Need more speed or motors.")
+
+    # ==========================================
+    # 4. ACADEMIC HUB (Anatomy)
+    # ==========================================
+    st.divider()
+    anatomy_database = {
+        "Radar / Nose Cone": {
+            "title": "🎯 Radar & Nose Cone Edge",
+            "physics": "हवा को बिना अशांति के काटता है, जिससे 'Form Drag' कम होता है।",
+            "math": "$D_{Nose} = \\frac{1}{2} \\rho v^2 A C_d \\sin(\\theta)$"
+        },
+        "Main Airfoil Wings": {
+            "title": "📐 Main Wings & Lift Mechanics",
+            "physics": "ऊपरी सतह पर हवा का वेग तेज़ होने से Low Pressure बनता है, जो Lift देता है।",
+            "math": "$L = C_L \\cdot \\frac{1}{2}\\rho v^2 \\cdot S$"
+        },
+        "Distributed Propulsion": {
+            "title": "⚙️ Distributed Electric Propulsion",
+            "physics": "कई मोटर्स मिलकर Boundary Layer को तोड़ते हैं, जिससे ज्यादा लिफ्ट मिलती है।",
+            "math": "$T_{Total} = \\sum_{i=1}^{N} T_i \\cdot \\eta_{aero}$"
+        }
+    }
+    
+    st.write("### 📜 Interactive Academic Hub")
+    inspected_part = st.selectbox("🎯 Select a Component to Inspect:", list(anatomy_database.keys()))
+    part_metrics = anatomy_database[inspected_part]
+
+    st.markdown(f"""
+    <div class="report-card-2050">  
+        <h3 style="color: #00FFCC; margin-top:0;">{part_metrics['title']}</h3>  
+        <div style="display: flex; gap: 20px; margin-top: 15px;">  
+            <div style="flex: 1; background: rgba(255,255,255,0.02); padding: 15px; border-radius: 12px; border-left: 4px solid #00FFCC;">  
+                <h5><span class="physics-indicator">PHYSICS</span> Force Analysis</h5>  
+                <p style="margin-top:10px; font-size:14px; color:#ddd;">{part_metrics['physics']}</p>  
+            </div>  
+            <div style="flex: 1; background: rgba(255,255,255,0.02); padding: 15px; border-radius: 12px; border-left: 4px solid #FF3366;">  
+                <h5><span class="math-indicator">MATH</span> Formula</h5>  
+                <p style="margin-top:10px; font-size:14px; color:#ddd;">{part_metrics['math']}</p>  
+            </div>  
+        </div>  
+    </div>  
+    """, unsafe_allow_html=True)
+
+    # ==========================================
+    # 5. AI MENTOR CHAT
+    # ==========================================
+    st.divider()
+    st.write("### 🧠 Clyxess Aero-AI Mentor")
+    for msg in st.session_state.aero_chat_log:
+        with st.chat_message(msg["role"]):
+            st.markdown(msg["content"])
+
+    user_query = st.chat_input("Ask Aero-AI (e.g., 'Why did my plane stall?')", key="aero_chat")
+    if user_query:
+        st.session_state.aero_chat_log.append({"role": "user", "content": user_query})
+        with st.chat_message("user"): st.markdown(user_query)
+        
+        with st.chat_message("assistant"):
+            with st.spinner("Calculating aerodynamics..."):
+                aero_prompt = f"You are Aero-AI. Aircraft Status -> Motors:{distributed_motors}, Angle:{angle_of_attack}, Speed:{wind_velocity_input}, Lift:{calculated_lift_force}N, Mass:{computed_mass_kg}kg, Stalled:{is_stalled}. Answer simply in user's language."
+                try:
+                    res = client.chat.completions.create(
+                        model="openai/gpt-oss-120b",
+                        messages=[{"role": "system", "content": aero_prompt}, {"role": "user", "content": user_query}],
+                        temperature=0.6
+                    )
+                    reply = res.choices[0].message.content
+                except Exception as e:
+                    reply = f"Error: {e}"
+                st.markdown(reply)
+                st.session_state.aero_chat_log.append({"role": "assistant", "content": reply})
 
 def render_learn_ai(client):
 
