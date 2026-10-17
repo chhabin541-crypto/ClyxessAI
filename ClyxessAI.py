@@ -9474,7 +9474,7 @@ drawKBG();
 
     components.html(HTML, height=950, scrolling=False) 
     
-def render_aero_lab(client):
+def render_aero_lab():
     import streamlit as st
     import streamlit.components.v1 as components
     import numpy as np
