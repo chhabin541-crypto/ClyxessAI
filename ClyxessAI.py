@@ -10782,7 +10782,7 @@ with st.sidebar:
         "🎮 Play & Learn",
         "🎨 Creative AI Image Generator",
         "📷 Vision Lab", 
-        "📚 Kids Logic Lab",
+        "✈️ Aero Lab",
         "🧠 Cyber Security", 
         "🎨 Art Machine Design",  
         "🎭 Peer Roleplay Modes",
@@ -10829,7 +10829,9 @@ if mode == "🎨 Art Machine Design":
 if "Kids Logic Lab" in mode:
     render_kids_logic_lab(); st.stop() 
 if mode == "🧠 Cyber Security":
-    render_cyber_security(); st.stop()       
+    render_cyber_security(); st.stop() 
+if mode == "✈️ Aero Lab":
+    render_aero_lab(); st.stop()
 if mode == "📷 Vision Lab":
     render_vision_lab(); st.stop()
 if mode == "🎭 Peer Roleplay Modes":
