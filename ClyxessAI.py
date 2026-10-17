@@ -9474,7 +9474,7 @@ drawKBG();
 
     components.html(HTML, height=950, scrolling=False) 
     
-def render_aero_lab():
+def render_aero_lab(client):
     import streamlit as st
     import streamlit.components.v1 as components
     import numpy as np
@@ -9488,14 +9488,11 @@ def render_aero_lab():
     <style>  
     .cockpit-panel-2050 { border: 2px solid #00FFCC; border-radius: 20px; padding: 20px; background: linear-gradient(135deg, #050716, #11153b); box-shadow: 0 0 25px rgba(0, 255, 204, 0.2); color: white; margin-bottom: 20px; }  
     .sensor-feed-box { background: #060919; border: 1px solid #FF3366; border-radius: 12px; padding: 12px; color: white; margin-bottom: 10px; }  
-    .report-card-2050 { border: 2px dashed #00FFCC; border-radius: 20px; padding: 25px; background: #050814; color: white; }  
-    .math-indicator { background-color: #FF3366; color: white; padding: 3px 8px; border-radius: 5px; font-weight: bold; }  
-    .physics-indicator { background-color: #00FFCC; color: #02040c; padding: 3px 8px; border-radius: 5px; font-weight: bold; }  
     </style>  
     """, unsafe_allow_html=True)
 
     st.write("## 🛩️ Aeronautical 3D CAD & Wind Tunnel Lab")
-    st.markdown("Top bar se parts add karein. Screen ko clear rakhne ke liye Right Panel ko 'X' se band kar sakte hain!")
+    st.markdown("Top bar se parts add karein. Kisi bhi part par **click** karke uski **Material, Position, Rotation aur Color** change karein!")
 
     if "aero_chat_log" not in st.session_state:
         st.session_state.aero_chat_log = [
@@ -9521,7 +9518,7 @@ def render_aero_lab():
                 --border-color: #0077b6; --button-bg: #0077b6; --button-text: #ffffff;
             }
             body { margin: 0; overflow: hidden; background-color: var(--bg-color); font-family: 'Segoe UI', sans-serif; transition: 0.3s; }
-            #canvas-container { width: 100vw; height: calc(100vh - 60px); display: block; }
+            #canvas-container { width: 100vw; height: calc(100vh - 50px); display: block; }
             
             /* Top Bar */
             #topbar {
@@ -9532,16 +9529,16 @@ def render_aero_lab():
             .group { display: flex; gap: 8px; align-items: center; }
             select, button, input[type="color"] {
                 background: var(--bg-color); color: var(--text-color); border: 1px solid var(--border-color);
-                padding: 4px 8px; border-radius: 5px; font-size: 11px; cursor: pointer; outline: none;
+                padding: 5px 10px; border-radius: 5px; font-size: 12px; cursor: pointer; outline: none;
             }
             button { background: var(--button-bg); color: var(--button-text); font-weight: bold; transition: 0.2s; }
             button:hover { transform: scale(1.05); }
             button.danger { background: #FF3366; color: white; border-color: #FF3366; }
             button.danger:hover { background: #cc0033; }
             
-            /* COMPACT RIGHT SIDE PANEL */
+            /* Right Side Transform Panel (Compact) */
             #transform-panel {
-                position: absolute; top: 60px; right: 10px; width: 220px; background: var(--panel-bg);
+                position: absolute; top: 60px; right: 10px; width: 230px; background: var(--panel-bg);
                 border: 2px solid var(--border-color); border-radius: 10px; padding: 10px;
                 color: var(--text-color); box-shadow: 0 0 15px rgba(0,0,0,0.6);
                 display: none; flex-direction: column; gap: 5px; z-index: 100;
@@ -9568,8 +9565,6 @@ def render_aero_lab():
             }
             #sceneList option { padding: 4px; cursor: pointer; }
             #sceneList option:checked { background-color: var(--border-color); color: var(--button-text); font-weight: bold; }
-            
-            select { font-size: 11px; padding: 3px; }
         </style>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
@@ -9600,7 +9595,7 @@ def render_aero_lab():
         <!-- Compact Transform Panel -->
         <div id="transform-panel">
             <div class="panel-header">
-                <h4 id="panel-title">Select...</h4>
+                <h4 id="panel-title">Selected</h4>
                 <button class="close-btn" onclick="deselectObject()">X</button>
             </div>
             
@@ -9641,14 +9636,21 @@ def render_aero_lab():
                 <button onclick="copySelected()" style="flex:1;" id="btn_copy">📋 Copy</button>
                 <button class="danger" onclick="deleteSelected()" style="flex:1;" id="btn_del">🗑️ Del</button>
             </div>
+
+            <div class="section-title" id="lbl_phys">📐 Physics</div>
+            <div class="info-box">
+                <div id="info-math" style="color:#FF3366; font-weight:bold; margin-bottom:2px;"></div>
+                <div id="info-physics" style="color:#ddd;"></div>
+                <div class="diagram" id="info-diagram"></div>
+            </div>
         </div>
 
         <script>
             const trans = {
-                "en": { add: "➕ Add", clear: "🗑️ Clear", mat: "🎨 Material", color: "Color:", move: "↔️ Move", rot: "🔄 Rotate", floor: "⬇️ Floor", center: "🎯 Center", copy: "📋 Copy", del: "🗑️ Del", scene: "📋 Objects", cat_fuselage: "Fuselage", cat_wings: "Wings", cat_props: "Props", cat_rotors: "Rotors", cat_jets: "Jets", cat_gear: "Gear", cat_acc: "Parts" },
-                "hi": { add: "➕ जोड़ें", clear: "🗑️ मिटाएं", mat: "🎨 सामग्री", color: "रंग:", move: "↔️ स्थान", rot: "🔄 घुमाएं", floor: "⬇️ ज़मीन", center: "🎯 केंद्र", copy: "📋 कॉपी", del: "🗑️ हटाएं", scene: "📋 ऑब्जेक्ट", cat_fuselage: "बॉडी", cat_wings: "पंख", cat_props: "प्रोपेलर", cat_rotors: "रोटर", cat_jets: "जेट", cat_gear: "गियर", cat_acc: "सहायक" },
-                "hinglish": { add: "➕ Add", clear: "🗑️ Clear", mat: "🎨 Material", color: "Rang:", move: "↔️ Move", rot: "🔄 Rotate", floor: "⬇️ Floor", center: "🎯 Center", copy: "📋 Copy", del: "🗑️ Del", scene: "📋 Objects", cat_fuselage: "Body", cat_wings: "Wings", cat_props: "Props", cat_rotors: "Rotors", cat_jets: "Jets", cat_gear: "Gear", cat_acc: "Parts" },
-                "zh": { add: "➕ 添加", clear: "🗑️ 清除", mat: "🎨 材料", color: "颜色:", move: "↔️ 移动", rot: "🔄 旋转", floor: "⬇️ 地面", center: "🎯 居中", copy: "📋 复制", del: "🗑️ 删除", scene: "📋 对象", cat_fuselage: "机身", cat_wings: "机翼", cat_props: "螺旋桨", cat_rotors: "旋翼", cat_jets: "发动机", cat_gear: "起落架", cat_acc: "配件" }
+                "en": { add: "➕ Add", clear: "🗑️ Clear", mat: "🎨 Material", color: "Color:", move: "↔️ Move", rot: "🔄 Rotate", floor: "⬇️ Floor", center: "🎯 Center", copy: "📋 Copy", del: "🗑️ Del", phys: "📐 Physics", scene: "📋 Objects", cat_fuselage: "Fuselage", cat_wings: "Wings", cat_props: "Props", cat_rotors: "Rotors", cat_jets: "Jets", cat_gear: "Gear", cat_acc: "Parts" },
+                "hi": { add: "➕ जोड़ें", clear: "🗑️ मिटाएं", mat: "🎨 सामग्री", color: "रंग:", move: "↔️ स्थान", rot: "🔄 घुमाएं", floor: "⬇️ ज़मीन", center: "🎯 केंद्र", copy: "📋 कॉपी", del: "🗑️ हटाएं", phys: "📐 फिजिक्स", scene: "📋 ऑब्जेक्ट", cat_fuselage: "बॉडी", cat_wings: "पंख", cat_props: "प्रोपेलर", cat_rotors: "रोटर", cat_jets: "जेट", cat_gear: "गियर", cat_acc: "सहायक" },
+                "hinglish": { add: "➕ Add", clear: "🗑️ Clear", mat: "🎨 Material", color: "Rang:", move: "↔️ Move", rot: "🔄 Rotate", floor: "⬇️ Floor", center: "🎯 Center", copy: "📋 Copy", del: "🗑️ Del", phys: "📐 Physics", scene: "📋 Objects", cat_fuselage: "Body", cat_wings: "Wings", cat_props: "Props", cat_rotors: "Rotors", cat_jets: "Jets", cat_gear: "Gear", cat_acc: "Parts" },
+                "zh": { add: "➕ 添加", clear: "🗑️ 清除", mat: "🎨 材料", color: "颜色:", move: "↔️ 移动", rot: "🔄 旋转", floor: "⬇️ 地面", center: "🎯 居中", copy: "📋 复制", del: "🗑️ 删除", phys: "📐 物理", scene: "📋 对象", cat_fuselage: "机身", cat_wings: "机翼", cat_props: "螺旋桨", cat_rotors: "旋翼", cat_jets: "发动机", cat_gear: "起落架", cat_acc: "配件" }
             };
 
             let currentLang = 'en';
@@ -9667,6 +9669,7 @@ def render_aero_lab():
                 document.getElementById("btn_center").innerHTML = t.center;
                 document.getElementById("btn_copy").innerHTML = t.copy;
                 document.getElementById("btn_del").innerHTML = t.del;
+                document.getElementById("lbl_phys").innerText = t.phys;
                 document.getElementById("lbl_scene").innerText = t.scene;
 
                 const catSelect = document.getElementById("partCategory");
@@ -9680,8 +9683,8 @@ def render_aero_lab():
                     <option value="gear">${t.cat_gear}</option>
                     <option value="acc">${t.cat_acc}</option>
                 `;
-                // ⭐ FIX: Agar dropdown khali ho toh default 'fuselage' set karo
-                if(!currentVal || currentVal === "") currentVal = "fuselage";
+                // ⭐ BUG FIX: Default select first option on load
+                if (!currentVal || currentVal === "") { currentVal = "fuselage"; }
                 catSelect.value = currentVal;
                 
                 populateParts();
@@ -9726,7 +9729,6 @@ def render_aero_lab():
             }
             document.getElementById("partCategory").addEventListener("change", populateParts);
 
-            // Initialize on load
             changeLanguage(); 
 
             let scene, camera, renderer, orbitControls, transformControls;
@@ -9737,11 +9739,11 @@ def render_aero_lab():
             scene = new THREE.Scene();
             scene.background = new THREE.Color(0x050716);
             
-            camera = new THREE.PerspectiveCamera(45, window.innerWidth / (window.innerHeight - 60), 0.1, 1000);
+            camera = new THREE.PerspectiveCamera(45, window.innerWidth / (window.innerHeight - 50), 0.1, 1000);
             camera.position.set(10, 10, 15);
 
             renderer = new THREE.WebGLRenderer({ antialias: true });
-            renderer.setSize(window.innerWidth, window.innerHeight - 60);
+            renderer.setSize(window.innerWidth, window.innerHeight - 50);
             document.getElementById('canvas-container').appendChild(renderer.domElement);
 
             const ambientLight = new THREE.AmbientLight(0xffffff, 0.6); scene.add(ambientLight);
@@ -9840,9 +9842,8 @@ def render_aero_lab():
                 const cat = document.getElementById("partCategory").value;
                 const partName = document.getElementById("partList").value;
                 
-                // ⭐ FIX: Check agar list khali hai
                 if(!partName) {
-                    alert("Pehle dropdown se koi part select karo!");
+                    alert("Pehle part select karo!");
                     return;
                 }
 
@@ -9874,7 +9875,7 @@ def render_aero_lab():
                     mesh = new THREE.Mesh(geo, materials.plastic.clone());
                 }
 
-                mesh.name = partName.split("_V")[0];
+                mesh.name = partName;
                 mesh.userData = basePart; 
                 
                 mesh.position.set((Math.random() - 0.5) * 6, 6, (Math.random() - 0.5) * 6);
@@ -9923,9 +9924,11 @@ def render_aero_lab():
             }
 
             function updatePanel(obj) {
-                document.getElementById("panel-title").innerText = "Sel: " + obj.name;
+                document.getElementById("panel-title").innerText = "Selected: " + obj.name;
                 if(obj.userData) {
-                    // Diagram chhota panel mein nahi dikhayenge taaki space bache
+                    document.getElementById("info-math").innerHTML = obj.userData.math || "";
+                    document.getElementById("info-physics").innerHTML = obj.userData.physics || "";
+                    document.getElementById("info-diagram").innerHTML = obj.userData.svg || "";
                 }
                 if(obj.material && obj.material.color) {
                     document.getElementById("colorPicker").value = '#' + obj.material.color.getHexString();
@@ -9993,9 +9996,9 @@ def render_aero_lab():
             animate();
 
             window.addEventListener('resize', () => {
-                camera.aspect = window.innerWidth / (window.innerHeight - 60);
+                camera.aspect = window.innerWidth / (window.innerHeight - 50);
                 camera.updateProjectionMatrix();
-                renderer.setSize(window.innerWidth, window.innerHeight - 60);
+                renderer.setSize(window.innerWidth, window.innerHeight - 50);
             });
         </script>
     </body>
@@ -10007,139 +10010,52 @@ def render_aero_lab():
     st.divider()
 
     # ==========================================
-    # 3. TERA ORIGINAL WIND TUNNEL & TELEMETRY (Restored!)
+    # 3. PHYSICS ENGINE
     # ==========================================
-    st.write("##### 🌀 360° Orbital Wind Tunnel Simulation (Original)")
+    st.write("### 📡 Live Wind Tunnel Physics")
     
-    control_col1, control_col2, control_col3, control_col4 = st.columns(4)
-    with control_col1:
-        airframe_type = st.selectbox("🛸 Structural Airframe", ["NASA X-57 Maxwell", "Tactical Drone", "VTOL Flying Car"])
-    with control_col2:
-        hull_color_input = st.color_picker("🎨 Custom Hull Paint", "#FF3366")
-    with control_col3:
-        distributed_motors = st.slider("⚙️ Distributed Motor Units", 2, 16, 12, step=2)
-    with control_col4:
-        angle_of_attack = st.slider("📐 Wing Angle of Attack (°)", -10, 45, 12, step=1)
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        distributed_motors = st.slider("⚙️ Motors", 2, 16, 8, step=2)
+    with col2:
+        angle_of_attack = st.slider("📐 Angle of Attack (°)", -10, 45, 12, step=1)
+    with col3:
+        wind_velocity_input = st.slider("💨 Wind Speed (km/h)", 200, 1800, 750, step=50)
 
-    wind_velocity_input = st.slider("💨 Wind Tunnel Velocity Grid (km/h)", 200, 1800, 750, step=50)
-
-    # ADVANCED PHYSICS CALCULATION CORE
     rad_alpha_val = np.radians(angle_of_attack)
     computed_mass_kg = 1500 + (distributed_motors * 120)
+    is_stalled = angle_of_attack > 18
 
-    calculated_lift_force = int(np.sin(rad_alpha_val) * (wind_velocity_input ** 1.65) * 0.035 * (1 + (distributed_motors / 8)))
-    radar_point_drag_force = int(wind_velocity_input * 0.45 * (1 + np.sin(rad_alpha_val)))
-    wing_surface_drag_force = int(wind_velocity_input * 0.65 * (1 + (angle_of_attack / 12)**2))
-    net_aerodynamic_drag = radar_point_drag_force + wing_surface_drag_force
+    calculated_lift_force = int(np.sin(rad_alpha_val) * (wind_velocity_input ** 1.65) * (0.01 if is_stalled else 0.035) * (1 + (distributed_motors / 8)))
 
-    system_stability_score = 100 - (abs(angle_of_attack - 14) * 2.5) - (computed_mass_kg / 75)
-    system_stability_score = max(min(system_stability_score, 100), 0)
-
-    # VISUAL VIEWPOT AND TELEMETRY HUD ARRANGEMENT
-    view_col, telemetry_col = st.columns([2, 1])
-
-    with view_col:
-        fig_viewport = go.Figure()  
-        
-        resol_y = 12  
-        tx_grid = np.linspace(-6, 6, 25)  
-        ty_grid = np.linspace(-2.5, 2.5, resol_y)  
-        
-        for yp_val in ty_grid:  
-            flow_bending_curve = (angle_of_attack / 35) * np.exp(-(tx_grid - 0)**2 / 2.2)  
-            tz_grid = yp_val + flow_bending_curve  
-            
-            color_vector = "#FF3366" if net_aerodynamic_drag > 1200 or system_stability_score < 45 else "#00FFCC"  
-            
-            fig_viewport.add_trace(go.Scatter3d(  
-                x=tx_grid, y=np.full_like(tx_grid, yp_val), z=tz_grid,  
-                mode='lines', line=dict(color=color_vector, width=2), showlegend=False  
-            ))  
-            
-        fig_viewport.add_trace(go.Scatter3d(x=[0], y=[0], z=[0], mode='markers+text',  
-            marker=dict(size=28, color=hull_color_input, line=dict(color='white', width=1.5)),  
-            name="Fuselage Core", text=["Main Airframe"], textposition="bottom center"))  
-            
-        fig_viewport.add_trace(go.Scatter3d(x=[1.3], y=[0], z=[0.18], mode='markers+text',  
-            marker=dict(size=14, color='#ffffff', symbol='diamond', line=dict(color=hull_color_input, width=2)),  
-            name="Radar Edge", text=["[Radar Cone]"], textposition="top center"))  
-            
-        wing_span_array = np.linspace(-2.4, 2.4, distributed_motors)  
-        fig_viewport.add_trace(go.Scatter3d(  
-            x=np.zeros(distributed_motors) - 0.5, y=wing_span_array, z=np.zeros(distributed_motors) - 0.1,  
-            mode='markers+text',  
-            marker=dict(size=14, color='#e9c46a', symbol='circle-open', line=dict(color='#00FFCC', width=3)),  
-            name="Distributed Motors", text=[f"M-{i+1}" for i in range(distributed_motors)], textposition="top center"  
-        ))  
-        
-        fig_viewport.update_layout(  
-            scene=dict(xaxis=dict(visible=False), yaxis=dict(visible=False), zaxis=dict(visible=False), bgcolor="#010206",  
-                       camera=dict(eye=dict(x=1.5, y=1.5, z=0.9))),  
-            margin=dict(l=0, r=0, b=0, t=0), height=460, paper_bgcolor="rgba(0,0,0,0)"  
-        )  
-        st.plotly_chart(fig_viewport, use_container_width=True)
-
-    with telemetry_col:
-        st.write("##### 📡 Live Avionics Feeds")
-
-        st.markdown(f"""  
-        <div class="cockpit-panel-2050" style="padding:15px; margin-bottom:10px;">  
-            <p style="margin:0; font-size:13px;"><b>Active Mass:</b> {computed_mass_kg:,} kg</p>  
-            <p style="margin:0; font-size:13px;"><b>Engine Arrays:</b> {distributed_motors} Motors</p>  
-        </div>  
-        <div class="sensor-feed-box"><small style="color:#00FFCC;">📍 NOSE RADAR DRAG</small><h4 style="margin:0;">{radar_point_drag_force:,} N</h4></div>  
-        <div class="sensor-feed-box"><small style="color:#00FFCC;">📐 WING SURFACE DRAG</small><h4 style="margin:0;">{wing_surface_drag_force:,} N</h4></div>  
-        <div class="sensor-feed-box" style="border-color:#00FFCC;"><small style="color:#FF3366;">🚀 NET GENERATED LIFT FORCE</small><h4 style="margin:0;">{calculated_lift_force:,} N</h4></div>  
-        """, unsafe_allow_html=True)  
-        
-        st.write("Stability Balance Grid:")  
-        st.progress(int(system_stability_score) / 100)
-
-    # ==========================================
-    # 4. ANATOMY CARD (Academic Hub)
-    # ==========================================
-    st.divider()
-    st.write("### 📜 Interactive Diagram Breakdown & Academic Hub")
+    if is_stalled:
+        st.error("🚨 **STALL WARNING:** Lift Lost! Lower the angle.")
     
-    anatomy_database = {
-        "Radar / Nose Cone": {
-            "title": "🎯 Radar & Nose Cone Edge",
-            "physics": "यह विमान का सबसे अगला हिस्सा है। इसका तीखा आकार हवा को बिना अशांति के काटता है, जिससे 'Form Drag' कम होता है।",
-            "math": "गणितीय समीकरण: $D_{Nose} = \\frac{1}{2} \\rho v^2 A C_d \\sin(\\theta)$."
-        },
-        "Main Airfoil Wings": {
-            "title": "📐 Main Wings & Lift Mechanics",
-            "physics": "बर्नोली और न्यूटन के नियमानुसार, ऊपरी सतह पर हवा का वेग तेज़ होने से निम्न दाब क्षेत्र बनता है, जो Lift देता है।",
-            "math": "Lift Formula: $L = C_L \\cdot \\frac{1}{2}\\rho v^2 \\cdot S$."
-        },
-        "Distributed Propulsion": {
-            "title": "⚙️ Distributed Electric Propulsion",
-            "physics": "नासा के X-57 विज़न पर आधारित। पंखों के ऊपर कई छोटे मोटर्स लगाने से कम स्पीड पर भी भयंकर लिफ्ट पैदा होती है।",
-            "math": "इंजन समीकरण: $T_{Total} = \\sum_{i=1}^{N} T_i \\cdot \\eta_{aero}$."
-        }
-    }
-    
-    inspected_part = st.selectbox("🎯 Select a Component to Inspect:", list(anatomy_database.keys()))
-    part_metrics = anatomy_database[inspected_part]
-
-    st.markdown(f"""
-    <div class="report-card-2050">  
-        <h3 style="color: #00FFCC; margin-top:0;">{part_metrics['title']}</h3>  
-        <div style="display: flex; gap: 20px; margin-top: 15px;">  
-            <div style="flex: 1; background: rgba(255,255,255,0.02); padding: 15px; border-radius: 12px; border-left: 4px solid #00FFCC;">  
-                <h5><span class="physics-indicator">PHYSICS</span> Force Analysis</h5>  
-                <p style="margin-top:10px; font-size:14px; color:#ddd;">{part_metrics['physics']}</p>  
-            </div>  
-            <div style="flex: 1; background: rgba(255,255,255,0.02); padding: 15px; border-radius: 12px; border-left: 4px solid #FF3366;">  
-                <h5><span class="math-indicator">MATH</span> Framework</h5>  
-                <p style="margin-top:10px; font-size:14px; color:#ddd;">{part_metrics['math']}</p>  
-            </div>  
+    t_col1, t_col2 = st.columns([1, 2])
+    with t_col1:
+        st.markdown(f"""
+        <div class="cockpit-panel-2050" style="padding:15px;">  
+            <p style="margin:0; font-size:13px;"><b>Mass:</b> {computed_mass_kg:,} kg</p>  
+            <p style="margin:0; font-size:13px;"><b>Engines:</b> {distributed_motors} Units</p>  
         </div>  
-    </div>  
-    """, unsafe_allow_html=True)
+        <div class="sensor-feed-box" style="border-color:#00FFCC;"><small style="color:#FF3366;">🚀 TOTAL LIFT</small><h4 style="margin:0;">{calculated_lift_force:,} N</h4></div>  
+        """, unsafe_allow_html=True)
+
+    with t_col2:
+        lift_weight_ratio = calculated_lift_force / (computed_mass_kg * 9.81)
+        gauge_fig = go.Figure(go.Indicator(
+            mode = "gauge+number", value = lift_weight_ratio, number = {'suffix': "x"},
+            gauge = {
+                'axis': {'range': [0, 2]},
+                'bar': {'color': "#00FFCC"}, 'bgcolor': "black",
+                'steps': [{'range': [0, 1], 'color': "#FF3366"}, {'range': [1, 2], 'color': "#11163b"}],
+            }
+        ))
+        gauge_fig.update_layout(height=180, margin=dict(l=10, r=10, t=10, b=10), paper_bgcolor="rgba(0,0,0,0)", font={'color': "white"})
+        st.plotly_chart(gauge_fig, use_container_width=True)
 
     # ==========================================
-    # 5. AI MENTOR CHAT
+    # 4. AI MENTOR CHAT
     # ==========================================
     st.divider()
     st.write("### 🧠 Clyxess Aero-AI Mentor")
@@ -10157,7 +10073,7 @@ def render_aero_lab():
         
         with st.chat_message("assistant"):
             with st.spinner("Calculating aerodynamics..."):
-                aero_prompt = f"You are Aero-AI. Status -> Motors:{distributed_motors}, Angle:{angle_of_attack}, Speed:{wind_velocity_input}, Lift:{calculated_lift_force}N."
+                aero_prompt = f"You are Aero-AI. Status -> Motors:{distributed_motors}, Angle:{angle_of_attack}, Speed:{wind_velocity_input}, Lift:{calculated_lift_force}N, Stalled:{is_stalled}."
                 try:
                     res = client.chat.completions.create(
                         model="openai/gpt-oss-120b",
