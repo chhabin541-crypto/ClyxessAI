@@ -9577,12 +9577,14 @@ def render_aero_lab():
     <style>
     *{box-sizing:border-box}
     body{margin:0;background:#0b1020;color:#eaf0ff;font:13px Arial,sans-serif}
-    #app{display:grid;grid-template-columns:190px minmax(0,1fr) 210px;height:690px;border:1px solid #263550;border-radius:12px;overflow:hidden}
-    .panel{background:#111a2d;padding:12px;overflow:auto}
+    /* Right panel thoda bada kiya taaki saare buttons fit ho sakein */
+    #app{display:grid;grid-template-columns:190px minmax(0,1fr) 230px;height:690px;border:1px solid #263550;border-radius:12px;overflow:hidden}
+    .panel{background:#111a2d;padding:12px;overflow-y:auto}
     .panel h3{font-size:13px;color:#a9c9ff;margin:6px 0 12px}
     button,select,input{width:100%;margin:4px 0;padding:8px;border:1px solid #334768;border-radius:6px;background:#1b2943;color:#fff}
     button{cursor:pointer;text-align:left}
     button:hover{background:#29436b}
+    button:active{background:#385a8c}
     #view{position:relative;min-width:0;background:#0b1020}
     #canvas{position:absolute;inset:0}
     #toolbar{position:absolute;z-index:2;top:10px;left:10px;right:10px;display:flex;gap:5px;flex-wrap:wrap}
@@ -9590,6 +9592,14 @@ def render_aero_lab():
     #status{position:absolute;bottom:10px;left:10px;background:#14213a;padding:8px;border-radius:6px;color:#b8c9e8}
     #objectList button{font-size:12px}
     .small{color:#98aacb;font-size:11px;line-height:1.5}
+    
+    /* ⭐ Naye Precision Control Buttons ka CSS */
+    .control-group { background:#18233a; padding:8px; border-radius:6px; margin-bottom:8px; border:1px solid #2b3d5c;}
+    .control-row { display:flex; gap:5px; margin-bottom:4px;}
+    .control-row button { flex:1; margin:0; padding:4px; font-size:11px; text-align:center; background:#223454; border-color:#385a8c;}
+    .control-row button:hover { background:#385a8c; }
+    .control-row label { width:35px; font-size:11px; line-height:24px; color:#a9c9ff;}
+    
     @media(max-width:750px){#app{grid-template-columns:125px minmax(0,1fr);height:720px}.right{display:none}.panel{padding:7px}#toolbar button{padding:6px}}
     </style>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
@@ -9606,8 +9616,6 @@ def render_aero_lab():
     <button onclick="setMode('translate')">↔ Move</button>
     <button onclick="setMode('rotate')">⟳ Rotate</button>
     <button onclick="setMode('scale')">⤢ Scale</button>
-    <button onclick="duplicateSelected()">▣ Duplicate</button>
-    <button onclick="deleteSelected()">✕ Delete</button>
     <button onclick="undo()">↶ Undo</button>
     <button onclick="redo()">↷ Redo</button>
     <hr>
@@ -9631,9 +9639,11 @@ def render_aero_lab():
     <div id="canvas"></div>
     <div id="status">Ready · Select a part to edit</div>
     </div>
+    
+    <!-- ⭐ RIGHT PANEL WITH FIXED BUTTONS -->
     <div class="panel right">
     <h3>OBJECTS</h3>
-    <div id="objectList"></div>
+    <div id="objectList" style="max-height:120px; overflow-y:auto; margin-bottom:10px;"></div>
     <hr>
     <h3>SELECTED PART</h3>
     <label>Name</label><input id="objName" placeholder="Part name" onchange="changeName(this.value)">
@@ -9645,7 +9655,32 @@ def render_aero_lab():
     <option value="glossy">Glossy</option>
     <option value="wire">Wireframe</option>
     </select>
-    <p class="small">Drag the colored 3D gizmos to edit. Orbit with the mouse; scroll to zoom.</p>
+    
+    <div style="display:flex; gap:5px; margin-top:10px;">
+        <button onclick="duplicateSelected()" style="background:#1e7b3e; border-color:#2ea856;">📋 Copy</button>
+        <button onclick="deleteSelected()" style="background:#8c2a2a; border-color:#b83a3a;">🗑️ Delete</button>
+    </div>
+
+    <!-- ⭐ YAHAN HAI NAYE PRECISION CONTROLS -->
+    <div class="control-group" style="margin-top:15px;">
+        <h4 style="margin:0 0 5px 0; font-size:11px; color:#fff;">↔️ MOVE POSITION</h4>
+        <div class="control-row"><label>X:</label><button onclick="moveSel('x', -0.5)">-</button><button onclick="moveSel('x', 0.5)">+</button></div>
+        <div class="control-row"><label>Y:</label><button onclick="moveSel('y', -0.5)">-</button><button onclick="moveSel('y', 0.5)">+</button></div>
+        <div class="control-row"><label>Z:</label><button onclick="moveSel('z', -0.5)">-</button><button onclick="moveSel('z', 0.5)">+</button></div>
+    </div>
+
+    <div class="control-group">
+        <h4 style="margin:0 0 5px 0; font-size:11px; color:#fff;">🔄 ROTATE ANGLE</h4>
+        <div class="control-row"><label>X:</label><button onclick="rotateSel('x', -0.1)">-</button><button onclick="rotateSel('x', 0.1)">+</button></div>
+        <div class="control-row"><label>Y:</label><button onclick="rotateSel('y', -0.1)">-</button><button onclick="rotateSel('y', 0.1)">+</button></div>
+        <div class="control-row"><label>Z:</label><button onclick="rotateSel('z', -0.1)">-</button><button onclick="rotateSel('z', 0.1)">+</button></div>
+    </div>
+
+    <div class="control-group">
+        <h4 style="margin:0 0 5px 0; font-size:11px; color:#fff;">📐 RESIZE (SCALE)</h4>
+        <div class="control-row"><label>Size:</label><button onclick="scaleSel(-0.1)">-</button><button onclick="scaleSel(0.1)">+</button></div>
+    </div>
+
     </div>
     </div>
     <script>
@@ -9679,143 +9714,86 @@ def render_aero_lab():
      redoStack=[];
     }
     
-    // ⭐ REAL 3D GEOMETRY BUILDER ⭐
     function getPartMesh(type, color, matKind) {
         const group = new THREE.Group();
-        
         const mat = new THREE.MeshStandardMaterial({
-            color: color,
-            metalness: matKind==='metal' ? 0.85 : 0.2,
-            roughness: matKind==='glossy' ? 0.1 : 0.5,
-            wireframe: matKind==='wire'
+            color: color, metalness: matKind==='metal' ? 0.85 : 0.2,
+            roughness: matKind==='glossy' ? 0.1 : 0.5, wireframe: matKind==='wire'
         });
-        
         const rubberMat = new THREE.MeshStandardMaterial({ color: 0x222222, roughness: 0.9 });
         const glassMat = new THREE.MeshPhysicalMaterial({ color: 0xaaddff, transmission: 0.9, opacity: 0.5, transparent: true, roughness: 0.1 });
         const metalMat = new THREE.MeshStandardMaterial({ color: 0xaaaaaa, metalness: 0.9, roughness: 0.2 });
 
         if (type === 'Fuselage') {
             const body = new THREE.Mesh(new THREE.CapsuleGeometry(0.6, 5, 8, 16), mat);
-            body.rotation.z = Math.PI / 2;
-            group.add(body);
+            body.rotation.z = Math.PI / 2; group.add(body);
         } 
         else if (type === 'Wing') {
-            // ⭐ Aerodynamic Airfoil Shape
             const shape = new THREE.Shape();
-            shape.moveTo(0, -0.5);
-            shape.bezierCurveTo(2, -0.8, 5, 0.2, 6, 0); // Top curve
-            shape.bezierCurveTo(5, -0.2, 2, 0.3, 0, 0.5); // Bottom curve
-            const extrudeSettings = { depth: 0.1, bevelEnabled: true, bevelSegments: 2, steps: 1, bevelSize: 0.05, bevelThickness: 0.05 };
-            const geo = new THREE.ExtrudeGeometry(shape, extrudeSettings);
-            const wing = new THREE.Mesh(geo, mat);
-            group.add(wing);
+            shape.moveTo(0, -0.5); shape.bezierCurveTo(2, -0.8, 5, 0.2, 6, 0); shape.bezierCurveTo(5, -0.2, 2, 0.3, 0, 0.5);
+            const geo = new THREE.ExtrudeGeometry(shape, { depth: 0.1, bevelEnabled: true, bevelSegments: 2, steps: 1, bevelSize: 0.05, bevelThickness: 0.05 });
+            group.add(new THREE.Mesh(geo, mat));
         }
         else if (type === 'Tail') {
-            // ⭐ Real Tail Shape
             const shape = new THREE.Shape();
             shape.moveTo(0, 0); shape.lineTo(1, 1.5); shape.lineTo(1.2, 1.5); shape.lineTo(1.2, 0); shape.lineTo(0, 0);
             const geo = new THREE.ExtrudeGeometry(shape, { depth: 0.1, bevelEnabled: true, bevelSize: 0.05 });
-            const fin = new THREE.Mesh(geo, mat);
-            fin.rotation.y = Math.PI / 2;
-            fin.position.set(0, 0.5, 0);
-            
+            const fin = new THREE.Mesh(geo, mat); fin.rotation.y = Math.PI / 2; fin.position.set(0, 0.5, 0);
             const hShape = new THREE.Shape();
             hShape.moveTo(0, -0.4); hShape.lineTo(1.5, -0.2); hShape.lineTo(1.5, 0.2); hShape.lineTo(0, 0.4); hShape.lineTo(0, -0.4);
             const hGeo = new THREE.ExtrudeGeometry(hShape, { depth: 0.1, bevelEnabled: true });
             const hStab = new THREE.Mesh(hGeo, mat);
-            
             group.add(fin, hStab);
         }
         else if (type === 'Cockpit') {
             const glass = new THREE.Mesh(new THREE.SphereGeometry(0.6, 24, 16, 0, Math.PI*2, 0, Math.PI/2), glassMat);
-            glass.scale.set(1, 0.8, 1.8);
-            glass.position.y = 0.2;
-            group.add(glass);
+            glass.scale.set(1, 0.8, 1.8); glass.position.y = 0.2; group.add(glass);
         }
         else if (type === 'Propeller') {
             const hub = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.15, 0.3, 16), metalMat);
-            hub.rotation.x = Math.PI / 2;
-            group.add(hub);
+            hub.rotation.x = Math.PI / 2; group.add(hub);
             for (let i=0; i<2; i++) {
                 const blade = new THREE.Mesh(new THREE.BoxGeometry(0.05, 2, 0.2), mat);
-                blade.position.y = 1; // Offset from center
-                const pivot = new THREE.Group();
-                pivot.add(blade);
+                blade.position.y = 1;
+                const pivot = new THREE.Group(); pivot.add(blade);
                 pivot.rotation.z = (Math.PI * 2 / 2) * i;
                 group.add(pivot);
             }
         }
         else if (type === 'JetEngine') {
-            const body = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.5, 1.5, 24), mat);
-            body.rotation.x = Math.PI / 2;
-            const inner = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.35, 1.6, 24), metalMat);
-            inner.rotation.x = Math.PI / 2;
-            const spinner = new THREE.Mesh(new THREE.ConeGeometry(0.2, 0.5, 24), metalMat);
-            spinner.rotation.x = -Math.PI / 2;
-            spinner.position.z = 0.8;
-            
-            // Fan Blades
+            const body = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.5, 1.5, 24), mat); body.rotation.x = Math.PI / 2;
+            const inner = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.35, 1.6, 24), metalMat); inner.rotation.x = Math.PI / 2;
+            const spinner = new THREE.Mesh(new THREE.ConeGeometry(0.2, 0.5, 24), metalMat); spinner.rotation.x = -Math.PI / 2; spinner.position.z = 0.8;
             const blades = new THREE.Group();
-            for(let i=0; i<10; i++) {
-                const b = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.6, 0.05), metalMat);
-                b.position.y = 0.3;
-                const p = new THREE.Group();
-                p.add(b);
-                p.rotation.z = (Math.PI * 2 / 10) * i;
-                blades.add(p);
-            }
+            for(let i=0; i<10; i++) { const b = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.6, 0.05), metalMat); b.position.y = 0.3; const p = new THREE.Group(); p.add(b); p.rotation.z = (Math.PI * 2 / 10) * i; blades.add(p); }
             blades.position.z = 0.3;
-            
             group.add(body, inner, spinner, blades);
         }
         else if (type === 'Rotor') {
-            const mast = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 0.5, 8), metalMat);
-            mast.position.y = 0.25;
-            const hub = new THREE.Mesh(new THREE.SphereGeometry(0.2, 16, 16), metalMat);
-            hub.position.y = 0.5;
+            const mast = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 0.5, 8), metalMat); mast.position.y = 0.25;
+            const hub = new THREE.Mesh(new THREE.SphereGeometry(0.2, 16, 16), metalMat); hub.position.y = 0.5;
             group.add(mast, hub);
-            
-            for(let i=0; i<4; i++) {
-                const blade = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.05, 3), mat);
-                blade.position.z = 1.5; // Extend outward
-                const pivot = new THREE.Group();
-                pivot.add(blade);
-                pivot.rotation.y = (Math.PI * 2 / 4) * i;
-                pivot.position.y = 0.5;
-                group.add(pivot);
-            }
+            for(let i=0; i<4; i++) { const blade = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.05, 3), mat); blade.position.z = 1.5; const pivot = new THREE.Group(); pivot.add(blade); pivot.rotation.y = (Math.PI * 2 / 4) * i; pivot.position.y = 0.5; group.add(pivot); }
         }
         else if (type === 'Wheel') {
-            const tire = new THREE.Mesh(new THREE.TorusGeometry(0.4, 0.15, 16, 32), rubberMat);
-            tire.rotation.y = Math.PI / 2;
-            const rim = new THREE.Mesh(new THREE.CylinderGeometry(0.25, 0.25, 0.1, 16), metalMat);
-            rim.rotation.z = Math.PI / 2;
+            const tire = new THREE.Mesh(new THREE.TorusGeometry(0.4, 0.15, 16, 32), rubberMat); tire.rotation.y = Math.PI / 2;
+            const rim = new THREE.Mesh(new THREE.CylinderGeometry(0.25, 0.25, 0.1, 16), metalMat); rim.rotation.z = Math.PI / 2;
             group.add(tire, rim);
         }
         else if (type === 'Skid') {
-            const pipe = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 2.5, 8), metalMat);
-            pipe.rotation.x = Math.PI / 2;
-            const s1 = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 0.6, 8), metalMat);
-            s1.position.set(0, 0.3, 0.8);
+            const pipe = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 2.5, 8), metalMat); pipe.rotation.x = Math.PI / 2;
+            const s1 = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 0.6, 8), metalMat); s1.position.set(0, 0.3, 0.8);
             const s2 = s1.clone(); s2.position.z = -0.8;
             group.add(pipe, s1, s2);
         }
-        else if (type === 'Winglet') {
-            const wl = new THREE.Mesh(new THREE.BoxGeometry(0.1, 1, 0.5), mat);
-            group.add(wl);
-        }
-        else if (type === 'Battery') {
-            const b = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.4, 0.6), mat);
-            group.add(b);
-        }
+        else if (type === 'Winglet') { group.add(new THREE.Mesh(new THREE.BoxGeometry(0.1, 1, 0.5), mat)); }
+        else if (type === 'Battery') { group.add(new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.4, 0.6), mat)); }
         else {
-            // Basic Shapes fallback
             if(type==='Sphere') group.add(new THREE.Mesh(new THREE.SphereGeometry(0.5, 32, 32), mat));
             else if(type==='Cylinder') group.add(new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.5, 1, 32), mat));
             else if(type==='Cone') group.add(new THREE.Mesh(new THREE.ConeGeometry(0.5, 1, 32), mat));
             else group.add(new THREE.Mesh(new THREE.BoxGeometry(1,1,1), mat));
         }
-
         return group;
     }
     
@@ -9823,14 +9801,10 @@ def render_aero_lab():
      if(history)pushHistory();
      const color=data?.color||'#2583e8';
      const matKind=data?.material||'standard';
-     
-     // ⭐ Generate real 3D model
      const meshGroup = getPartMesh(type, color, matKind);
-     
      meshGroup.name=data?.name||type;
      meshGroup.userData.partType=type;
      meshGroup.userData.materialKind=matKind;
-     
      if(data){
       meshGroup.position.fromArray(data.pos||[0,0,0]);
       meshGroup.rotation.fromArray(data.rot||[0,0,0]);
@@ -9847,17 +9821,12 @@ def render_aero_lab():
       type:o.userData.partType,name:o.name,
       pos:o.position.toArray(),rot:o.rotation.toArray(),
       scale:o.scale.toArray(),
-      // Extract color from first child material
       color: o.children.length > 0 && o.children[0].material ? '#'+o.children[0].material.color.getHexString() : '#ffffff',
       material:o.userData.materialKind||'standard'
      }));
     }
     
-    function clearScene(){
-     transform.detach();selected=null;
-     objects.forEach(o=>scene.remove(o));objects=[];
-    }
-    
+    function clearScene(){ transform.detach();selected=null; objects.forEach(o=>scene.remove(o));objects=[]; }
     function loadScene(data,history=true){
      if(!Array.isArray(data)||data.length>1000)throw Error('Invalid file');
      if(history)pushHistory();
@@ -9865,25 +9834,19 @@ def render_aero_lab():
      data.forEach(d=>addPart(d.type||'Box',d,false));
      restoring=false;refreshList();status('Loaded '+objects.length+' objects');
     }
-    
     function select(o){
      selected=o;transform.detach();
      if(o){
          transform.attach(o);
          document.getElementById('objName').value=o.name;
-         
-         // Get color from first mesh child
          let colorHex = '#ffffff';
-         if(o.children.length > 0 && o.children[0].material) {
-             colorHex = '#'+o.children[0].material.color.getHexString();
-         }
+         if(o.children.length > 0 && o.children[0].material) { colorHex = '#'+o.children[0].material.color.getHexString(); }
          document.getElementById('objColor').value=colorHex;
          document.getElementById('objMaterial').value=o.userData.materialKind||'standard';
          status('Selected: '+o.name);
      }
      refreshList();
     }
-    
     function refreshList(){
      const list=document.getElementById('objectList');list.innerHTML='';
      objects.forEach((o,i)=>{
@@ -9892,7 +9855,6 @@ def render_aero_lab():
       b.onclick=()=>select(o);list.appendChild(b);
      });
     }
-    
     function setMode(m){transform.setMode(m);status('Tool: '+m);}
     function duplicateSelected(){
      if(!selected)return;
@@ -9906,62 +9868,34 @@ def render_aero_lab():
      select(null);refreshList();status('Part deleted');
     }
     function changeName(v){if(selected){pushHistory();selected.name=v;refreshList();}}
-    function changeColor(v){
-        if(selected){
-            pushHistory();
-            selected.traverse(child => {
-                if(child.isMesh && child.material && !child.material.transparent) {
-                    child.material.color.set(v);
-                }
-            });
-            refreshList();
-        }
-    }
-    function changeMaterial(v){
-        if(selected){
-            pushHistory();
-            selected.userData.materialKind=v;
-            selected.traverse(child => {
-                if(child.isMesh && child.material && !child.material.transparent) {
-                    child.material.metalness = v==='metal' ? 0.85 : 0.2;
-                    child.material.roughness = v==='glossy' ? 0.1 : 0.5;
-                    child.material.wireframe = v==='wire';
-                    child.material.needsUpdate = true;
-                }
-            });
-        }
-    }
+    function changeColor(v){ if(selected){ pushHistory(); selected.traverse(child => { if(child.isMesh && child.material && !child.material.transparent) { child.material.color.set(v); } }); refreshList(); } }
+    function changeMaterial(v){ if(selected){ pushHistory(); selected.userData.materialKind=v; selected.traverse(child => { if(child.isMesh && child.material && !child.material.transparent) { child.material.metalness = v==='metal' ? 0.85 : 0.2; child.material.roughness = v==='glossy' ? 0.1 : 0.5; child.material.wireframe = v==='wire'; child.material.needsUpdate = true; } }); } }
     
+    // ⭐ NAYE FUNCTIONS PRECISION KE LIYE
+    function moveSel(axis, amt) { if(selected) { pushHistory(); selected.position[axis] += amt; } }
+    function rotateSel(axis, amt) { if(selected) { pushHistory(); selected.rotation[axis] += amt; } }
+    function scaleSel(amt) { 
+        if(selected) { 
+            pushHistory(); 
+            const factor = 1 + amt; 
+            selected.scale.multiplyScalar(factor); 
+        } 
+    }
+
     function undo(){if(!undoStack.length)return;redoStack.push(JSON.stringify(serialize()));const d=JSON.parse(undoStack.pop());loadScene(d,false);}
     function redo(){if(!redoStack.length)return;undoStack.push(JSON.stringify(serialize()));const d=JSON.parse(redoStack.pop());loadScene(d,false);}
     
-    function exportJSON(){
-     const blob=new Blob([JSON.stringify({app:'Aero Lab',version:1,objects:serialize()},null,2)],{type:'application/json'});
-     const a=document.createElement('a');a.href=URL.createObjectURL(blob);
-     a.download='aero-project.json';a.click();URL.revokeObjectURL(a.href);
-     status('Project JSON exported');
-    }
-    
-    function importJSON(e){
-     const f=e.target.files[0];if(!f)return;
-     const r=new FileReader();
-     r.onload=()=>{try{const j=JSON.parse(r.result);loadScene(Array.isArray(j)?j:j.objects);}catch(err){status('Import error: '+err.message);}e.target.value='';};
-     r.readAsText(f);
-    }
-    
+    function exportJSON(){ const blob=new Blob([JSON.stringify({app:'Aero Lab',version:1,objects:serialize()},null,2)],{type:'application/json'}); const a=document.createElement('a');a.href=URL.createObjectURL(blob); a.download='aero-project.json';a.click();URL.revokeObjectURL(a.href); status('Project JSON exported'); }
+    function importJSON(e){ const f=e.target.files[0];if(!f)return; const r=new FileReader(); r.onload=()=>{try{const j=JSON.parse(r.result);loadScene(Array.isArray(j)?j:j.objects);}catch(err){status('Import error: '+err.message);}e.target.value='';}; r.readAsText(f); }
     function saveLocal(){localStorage.setItem('aero-project',JSON.stringify(serialize()));status('Saved in this browser');}
     function loadLocal(){try{loadScene(JSON.parse(localStorage.getItem('aero-project')||'[]'));}catch(e){status('No valid browser save found');}}
     function resetScene(){if(!confirm('Reset the current scene?'))return;pushHistory();clearScene();frameAll();refreshList();status('Blank workspace');}
     
     function frameAll(){
      if(!objects.length){camera.position.set(10,8,12);controls.target.set(0,0,0);return;}
-     const box=new THREE.Box3();
-     objects.forEach(o=>box.expandByObject(o));
-     const center=box.getCenter(new THREE.Vector3());
-     const size=box.getSize(new THREE.Vector3());
-     const radius=Math.max(size.x,size.y,size.z,3);
-     controls.target.copy(center);
-     camera.position.copy(center).add(new THREE.Vector3(radius*1.5,radius*1.1,radius*1.5));
+     const box=new THREE.Box3(); objects.forEach(o=>box.expandByObject(o));
+     const center=box.getCenter(new THREE.Vector3()); const size=box.getSize(new THREE.Vector3()); const radius=Math.max(size.x,size.y,size.z,3);
+     controls.target.copy(center); camera.position.copy(center).add(new THREE.Vector3(radius*1.5,radius*1.1,radius*1.5));
      camera.near=0.1;camera.far=Math.max(2000,radius*20);camera.updateProjectionMatrix();
     }
     
@@ -9969,8 +9903,7 @@ def render_aero_lab():
      const t=controls.target.clone(),r=12;
      const positions={front:[0,0,r],rear:[0,0,-r],side:[r,0,0],top:[0,r,0]};
      camera.position.copy(t).add(new THREE.Vector3(...positions[v]));
-     camera.up.set(0,1,0);
-     if(v==='top')camera.up.set(0,0,-1);
+     camera.up.set(0,1,0); if(v==='top')camera.up.set(0,0,-1);
      camera.lookAt(t);controls.update();
     }
     
@@ -9982,12 +9915,8 @@ def render_aero_lab():
      const rect=renderer.domElement.getBoundingClientRect();
      const mouse=new THREE.Vector2((e.clientX-rect.left)/rect.width*2-1,-(e.clientY-rect.top)/rect.height*2+1);
      const ray=new THREE.Raycaster();ray.setFromCamera(mouse,camera);
-     const hits=ray.intersectObjects(objects,true); // recursive hit test for groups
-     if(hits.length){
-         let topObj = hits[0].object;
-         while(topObj.parent && topObj.parent.type === 'Group' && topObj.parent !== scene) { topObj = topObj.parent; }
-         select(topObj);
-     }
+     const hits=ray.intersectObjects(objects,true);
+     if(hits.length){ let topObj = hits[0].object; while(topObj.parent && topObj.parent.type === 'Group' && topObj.parent !== scene) { topObj = topObj.parent; } select(topObj); }
     });
     
     window.addEventListener('keydown',e=>{
@@ -9998,12 +9927,7 @@ def render_aero_lab():
      if(e.key.toLowerCase()==='r')setMode('scale');
     });
     
-    function resize(){
-     const el=document.getElementById('view');
-     const w=el.clientWidth,h=el.clientHeight;
-     if(!w||!h)return;
-     camera.aspect=w/h;camera.updateProjectionMatrix();renderer.setSize(w,h);
-    }
+    function resize(){ const el=document.getElementById('view'); const w=el.clientWidth,h=el.clientHeight; if(!w||!h)return; camera.aspect=w/h;camera.updateProjectionMatrix();renderer.setSize(w,h); }
     window.addEventListener('resize',resize);
     function animate(){requestAnimationFrame(animate);controls.update();renderer.render(scene,camera);}
     resize();animate();
@@ -10019,7 +9943,7 @@ def render_aero_lab():
     st.divider()
     
     # ==========================================
-    # ⭐ 3. AI MENTOR CHAT (Wapas Jod Diya)
+    # ⭐ 3. AI MENTOR CHAT
     # ==========================================
     st.write("### 🧠 Clyxess Aero-AI Mentor")
     
