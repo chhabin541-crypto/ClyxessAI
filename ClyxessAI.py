@@ -9569,7 +9569,7 @@ def render_aero_lab():
     else:
         g1, g2, g3 = st.columns(3)
         with g1:
-            concept = st.selectbox("Concept type", ["Trainer", "Passenger Aircraft", "Drone", "Helicopter", "Fighter Concept"])
+            concept = st.selectbox("Concept type", ["Training", "Passenger Aircraft", "Drone", "Helicopter", "Fighter Concept"])
         with g2:
             wing_size = st.slider("Wing size", 0.5, 2.0, 1.0, 0.1)
         with g3:
