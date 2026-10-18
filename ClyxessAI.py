@@ -9474,7 +9474,7 @@ drawKBG();
 
     components.html(HTML, height=950, scrolling=False) 
     
-def render_aero_lab():
+def render_aero_lab(client):
     import json
     import streamlit as st
     import streamlit.components.v1 as components
@@ -9494,53 +9494,52 @@ def render_aero_lab():
     st.markdown("""
     <div class="hero">
     <h1>✈️ CLYXESS AI AERO LAB</h1>
-    <p>Interactive 3D Aircraft Design Studio · Create · Assemble · Explore</p>
+    <p>Interactive 3D Aircraft Design Studio · Real Aerodynamic Parts</p>
     </div>
     """, unsafe_allow_html=True)
 
     mode = st.radio(
         "CHOOSE YOUR WORKSPACE",
-        ["Ready-made Design", "Build from Parts", "Start from Zero", "Generate Design"],
+        ["Ready-made Design", "Build from Parts", "Start from Zero"],
         horizontal=True,
         label_visibility="visible",
     )
 
+    # ⭐ Real Aerodynamic Presets
     presets = {
-        "Training Aircraft": [
+        "Training Aircraft (Cessna)": [
             {"type":"Fuselage","pos":[0,0,0],"scale":[1,1,1],"color":"#e7edf8"},
-            {"type":"Wing","pos":[0,0,0],"scale":[1,1,1],"color":"#2583e8"},
-            {"type":"Tail","pos":[-3,0,0],"scale":[1,1,1],"color":"#e7edf8"},
-            {"type":"Cockpit","pos":[1,0,0],"scale":[1,1,1],"color":"#36c6dc"},
-            {"type":"Propeller","pos":[3.6,0,0],"scale":[1,1,1],"color":"#f3b63f"},
+            {"type":"Wing","pos":[0,0.2,0],"scale":[1,1,1],"color":"#2583e8"},
+            {"type":"Tail","pos":[-3.5,0,0],"scale":[1,1,1],"color":"#e7edf8"},
+            {"type":"Cockpit","pos":[1.5,0.5,0],"scale":[1,1,1],"color":"#36c6dc"},
+            {"type":"Propeller","pos":[3.5,0,0],"scale":[1,1,1],"color":"#f3b63f"},
+            {"type":"Wheel","pos":[1.2,-1,0],"scale":[1,1,1],"color":"#222222"},
+            {"type":"Wheel","pos":[-1.2,-1,0],"scale":[1,1,1],"color":"#222222"}
         ],
-        "Passenger Aircraft": [
-            {"type":"Fuselage","pos":[0,0,0],"scale":[1.45,1.15,1.15],"color":"#e7edf8"},
-            {"type":"Wing","pos":[0,0,0],"scale":[1.3,1,1],"color":"#2583e8"},
-            {"type":"Tail","pos":[-4,0,0],"scale":[1.1,1,1],"color":"#e7edf8"},
-            {"type":"JetEngine","pos":[0,-0.7,1],"scale":[1,1,1],"color":"#f3b63f"},
-            {"type":"JetEngine","pos":[0,-0.7,-1],"scale":[1,1,1],"color":"#f3b63f"},
-            {"type":"Cockpit","pos":[3,0,0],"scale":[1,1,1],"color":"#36c6dc"},
+        "Passenger Jet (4 Engine)": [
+            {"type":"Fuselage","pos":[0,0,0],"scale":[1.5,1.2,1.2],"color":"#e7edf8"},
+            {"type":"Wing","pos":[-0.5,-0.2,0],"scale":[1.6,1,1],"color":"#2583e8"},
+            {"type":"Tail","pos":[-4.5,0,0],"scale":[1.3,1.5,1.3],"color":"#e7edf8"},
+            {"type":"JetEngine","pos":[0,-1,1.8],"scale":[1,1,1],"color":"#f3b63f"},
+            {"type":"JetEngine","pos":[0,-1,-1.8],"scale":[1,1,1],"color":"#f3b63f"},
+            {"type":"JetEngine","pos":[-2,-1,1.8],"scale":[1,1,1],"color":"#f3b63f"},
+            {"type":"JetEngine","pos":[-2,-1,-1.8],"scale":[1,1,1],"color":"#f3b63f"},
+            {"type":"Cockpit","pos":[3.5,0.5,0],"scale":[1.2,1,1],"color":"#36c6dc"},
         ],
-        "Drone": [
-            {"type":"Fuselage","pos":[0,0,0],"scale":[0.45,0.45,0.45],"color":"#2583e8"},
-            {"type":"Rotor","pos":[1.5,0,1.5],"scale":[1,1,1],"color":"#f3b63f"},
-            {"type":"Rotor","pos":[1.5,0,-1.5],"scale":[1,1,1],"color":"#f3b63f"},
-            {"type":"Rotor","pos":[-1.5,0,1.5],"scale":[1,1,1],"color":"#f3b63f"},
-            {"type":"Rotor","pos":[-1.5,0,-1.5],"scale":[1,1,1],"color":"#f3b63f"},
+        "Fighter Jet (Delta)": [
+            {"type":"Fuselage","pos":[0,0,0],"scale":[1.3,0.8,0.8],"color":"#65758b"},
+            {"type":"Wing","pos":[-1,0,0],"scale":[1,0.8,1.5],"color":"#e7edf8"},
+            {"type":"Tail","pos":[-3.5,0.5,0],"scale":[0.8,1,0.8],"color":"#65758b"},
+            {"type":"JetEngine","pos":[-3.5,0,0],"scale":[1.2,1.2,1.2],"color":"#f3b63f"},
+            {"type":"Cockpit","pos":[2,0.4,0],"scale":[0.9,0.8,0.9],"color":"#36c6dc"},
         ],
         "Helicopter": [
-            {"type":"Fuselage","pos":[0,0,0],"scale":[0.9,0.9,0.9],"color":"#2583e8"},
-            {"type":"Rotor","pos":[0,1.2,0],"scale":[1.7,1,1.7],"color":"#f3b63f"},
-            {"type":"Tail","pos":[-3,0,0],"scale":[1.3,0.5,0.5],"color":"#e7edf8"},
+            {"type":"Fuselage","pos":[0,0,0],"scale":[0.9,1,1],"color":"#2583e8"},
+            {"type":"Rotor","pos":[0,1.5,0],"scale":[1.8,1,1.8],"color":"#f3b63f"},
+            {"type":"Tail","pos":[-3.5,0,0],"scale":[1.5,0.5,0.5],"color":"#e7edf8"},
+            {"type":"Propeller","pos":[-4.5,0.5,0],"scale":[0.4,0.4,0.4],"color":"#f3b63f"}, # Tail Rotor
             {"type":"Skid","pos":[0,-1,0],"scale":[1,1,1],"color":"#b8c4da"},
-        ],
-        "Fighter Concept": [
-            {"type":"Fuselage","pos":[0,0,0],"scale":[1.25,0.7,0.7],"color":"#65758b"},
-            {"type":"Wing","pos":[0,0,0],"scale":[0.7,0.6,0.6],"color":"#e7edf8"},
-            {"type":"Tail","pos":[-2.8,0,0],"scale":[0.8,0.7,0.7],"color":"#65758b"},
-            {"type":"JetEngine","pos":[-2.7,0,0],"scale":[1,1,1],"color":"#f3b63f"},
-            {"type":"Cockpit","pos":[1.5,0,0],"scale":[0.8,0.8,0.8],"color":"#36c6dc"},
-        ],
+        ]
     }
 
     parts = [
@@ -9552,38 +9551,18 @@ def render_aero_lab():
     if mode == "Ready-made Design":
         col1, col2 = st.columns([1, 2])
         with col1:
-            preset = st.selectbox("Choose a starter model", list(presets))
-            st.caption("Starter models are editable visual concepts, not flight-ready aircraft.")
+            preset = st.selectbox("Choose a starter model", list(presets.keys()))
             initial_scene = presets[preset]
         with col2:
-            st.info("Load a starter model, then select, move, rotate, scale, recolor, duplicate or remove individual parts.")
+            st.info("Load a starter model, then select, move, rotate, scale, recolor, duplicate or remove parts.")
 
     elif mode == "Build from Parts":
         initial_scene = []
-        st.caption("Start with an empty assembly and add components in the 3D workspace.")
-
-    elif mode == "Start from Zero":
-        initial_scene = []
-        st.caption("Blank canvas: create an original concept using basic shapes and aircraft components.")
+        st.caption("Start with an empty assembly and add components from the left panel.")
 
     else:
-        g1, g2, g3 = st.columns(3)
-        with g1:
-            # ⭐ YAHAN FIX KIYA HAI: "Trainer" ko "Training Aircraft" kar diya hai
-            concept = st.selectbox("Concept type", ["Training Aircraft", "Passenger Aircraft", "Drone", "Helicopter", "Fighter Concept"])
-        with g2:
-            wing_size = st.slider("Wing size", 0.5, 2.0, 1.0, 0.1)
-        with g3:
-            body_size = st.slider("Body size", 0.5, 2.0, 1.0, 0.1)
-
-        initial_scene = json.loads(json.dumps(presets[concept]))
-        for obj in initial_scene:
-            if obj["type"] == "Wing":
-                obj["scale"][0] *= wing_size
-            elif obj["type"] == "Fuselage":
-                obj["scale"] = [v * body_size for v in obj["scale"]]
-
-        st.caption("Procedural starter generation uses preset geometry and your selected parameters. It is not AI text-to-3D.")
+        initial_scene = []
+        st.caption("Blank canvas: create an original concept using basic shapes.")
 
     st.markdown("### 3D Design Workspace")
 
@@ -9666,7 +9645,7 @@ def render_aero_lab():
     <option value="glossy">Glossy</option>
     <option value="wire">Wireframe</option>
     </select>
-    <p class="small">Drag the colored 3D gizmos to edit along X, Y and Z. Orbit with the mouse; scroll to zoom.</p>
+    <p class="small">Drag the colored 3D gizmos to edit. Orbit with the mouse; scroll to zoom.</p>
     </div>
     </div>
     <script>
@@ -9692,88 +9671,219 @@ def render_aero_lab():
     transform.addEventListener('dragging-changed',e=>controls.enabled=!e.value);
     let objects=[],selected=null,undoStack=[],redoStack=[],restoring=false;
     const status=t=>document.getElementById('status').textContent=t;
+    
     function pushHistory(){
      if(restoring)return;
      undoStack.push(JSON.stringify(serialize()));
      if(undoStack.length>40)undoStack.shift();
      redoStack=[];
     }
-    function geometry(type){
-     switch(type){
-     case 'Fuselage':return new THREE.CapsuleGeometry(0.55,4.8,6,12);
-     case 'Wing':return new THREE.BoxGeometry(1.0,0.16,8);
-     case 'Tail':return new THREE.BoxGeometry(0.65,0.13,2.6);
-     case 'Cockpit':return new THREE.SphereGeometry(0.55,20,12);
-     case 'Propeller':return new THREE.BoxGeometry(0.12,0.12,1.8);
-     case 'JetEngine':return new THREE.CylinderGeometry(0.35,0.5,1.4,20);
-     case 'Rotor':return new THREE.BoxGeometry(0.12,0.08,3);
-     case 'Wheel':return new THREE.TorusGeometry(0.45,0.15,10,24);
-     case 'Skid':return new THREE.BoxGeometry(2,0.1,0.12);
-     case 'Winglet':return new THREE.BoxGeometry(0.15,0.9,0.7);
-     case 'Battery':return new THREE.BoxGeometry(0.8,0.45,0.8);
-     case 'Sphere':return new THREE.SphereGeometry(0.7,24,16);
-     case 'Cylinder':return new THREE.CylinderGeometry(0.6,0.6,1.3,24);
-     case 'Cone':return new THREE.ConeGeometry(0.7,1.5,24);
-     default:return new THREE.BoxGeometry(1,1,1);
-     }
+    
+    // ⭐ REAL 3D GEOMETRY BUILDER ⭐
+    function getPartMesh(type, color, matKind) {
+        const group = new THREE.Group();
+        
+        const mat = new THREE.MeshStandardMaterial({
+            color: color,
+            metalness: matKind==='metal' ? 0.85 : 0.2,
+            roughness: matKind==='glossy' ? 0.1 : 0.5,
+            wireframe: matKind==='wire'
+        });
+        
+        const rubberMat = new THREE.MeshStandardMaterial({ color: 0x222222, roughness: 0.9 });
+        const glassMat = new THREE.MeshPhysicalMaterial({ color: 0xaaddff, transmission: 0.9, opacity: 0.5, transparent: true, roughness: 0.1 });
+        const metalMat = new THREE.MeshStandardMaterial({ color: 0xaaaaaa, metalness: 0.9, roughness: 0.2 });
+
+        if (type === 'Fuselage') {
+            const body = new THREE.Mesh(new THREE.CapsuleGeometry(0.6, 5, 8, 16), mat);
+            body.rotation.z = Math.PI / 2;
+            group.add(body);
+        } 
+        else if (type === 'Wing') {
+            // ⭐ Aerodynamic Airfoil Shape
+            const shape = new THREE.Shape();
+            shape.moveTo(0, -0.5);
+            shape.bezierCurveTo(2, -0.8, 5, 0.2, 6, 0); // Top curve
+            shape.bezierCurveTo(5, -0.2, 2, 0.3, 0, 0.5); // Bottom curve
+            const extrudeSettings = { depth: 0.1, bevelEnabled: true, bevelSegments: 2, steps: 1, bevelSize: 0.05, bevelThickness: 0.05 };
+            const geo = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+            const wing = new THREE.Mesh(geo, mat);
+            group.add(wing);
+        }
+        else if (type === 'Tail') {
+            // ⭐ Real Tail Shape
+            const shape = new THREE.Shape();
+            shape.moveTo(0, 0); shape.lineTo(1, 1.5); shape.lineTo(1.2, 1.5); shape.lineTo(1.2, 0); shape.lineTo(0, 0);
+            const geo = new THREE.ExtrudeGeometry(shape, { depth: 0.1, bevelEnabled: true, bevelSize: 0.05 });
+            const fin = new THREE.Mesh(geo, mat);
+            fin.rotation.y = Math.PI / 2;
+            fin.position.set(0, 0.5, 0);
+            
+            const hShape = new THREE.Shape();
+            hShape.moveTo(0, -0.4); hShape.lineTo(1.5, -0.2); hShape.lineTo(1.5, 0.2); hShape.lineTo(0, 0.4); hShape.lineTo(0, -0.4);
+            const hGeo = new THREE.ExtrudeGeometry(hShape, { depth: 0.1, bevelEnabled: true });
+            const hStab = new THREE.Mesh(hGeo, mat);
+            
+            group.add(fin, hStab);
+        }
+        else if (type === 'Cockpit') {
+            const glass = new THREE.Mesh(new THREE.SphereGeometry(0.6, 24, 16, 0, Math.PI*2, 0, Math.PI/2), glassMat);
+            glass.scale.set(1, 0.8, 1.8);
+            glass.position.y = 0.2;
+            group.add(glass);
+        }
+        else if (type === 'Propeller') {
+            const hub = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.15, 0.3, 16), metalMat);
+            hub.rotation.x = Math.PI / 2;
+            group.add(hub);
+            for (let i=0; i<2; i++) {
+                const blade = new THREE.Mesh(new THREE.BoxGeometry(0.05, 2, 0.2), mat);
+                blade.position.y = 1; // Offset from center
+                const pivot = new THREE.Group();
+                pivot.add(blade);
+                pivot.rotation.z = (Math.PI * 2 / 2) * i;
+                group.add(pivot);
+            }
+        }
+        else if (type === 'JetEngine') {
+            const body = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.5, 1.5, 24), mat);
+            body.rotation.x = Math.PI / 2;
+            const inner = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.35, 1.6, 24), metalMat);
+            inner.rotation.x = Math.PI / 2;
+            const spinner = new THREE.Mesh(new THREE.ConeGeometry(0.2, 0.5, 24), metalMat);
+            spinner.rotation.x = -Math.PI / 2;
+            spinner.position.z = 0.8;
+            
+            // Fan Blades
+            const blades = new THREE.Group();
+            for(let i=0; i<10; i++) {
+                const b = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.6, 0.05), metalMat);
+                b.position.y = 0.3;
+                const p = new THREE.Group();
+                p.add(b);
+                p.rotation.z = (Math.PI * 2 / 10) * i;
+                blades.add(p);
+            }
+            blades.position.z = 0.3;
+            
+            group.add(body, inner, spinner, blades);
+        }
+        else if (type === 'Rotor') {
+            const mast = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 0.5, 8), metalMat);
+            mast.position.y = 0.25;
+            const hub = new THREE.Mesh(new THREE.SphereGeometry(0.2, 16, 16), metalMat);
+            hub.position.y = 0.5;
+            group.add(mast, hub);
+            
+            for(let i=0; i<4; i++) {
+                const blade = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.05, 3), mat);
+                blade.position.z = 1.5; // Extend outward
+                const pivot = new THREE.Group();
+                pivot.add(blade);
+                pivot.rotation.y = (Math.PI * 2 / 4) * i;
+                pivot.position.y = 0.5;
+                group.add(pivot);
+            }
+        }
+        else if (type === 'Wheel') {
+            const tire = new THREE.Mesh(new THREE.TorusGeometry(0.4, 0.15, 16, 32), rubberMat);
+            tire.rotation.y = Math.PI / 2;
+            const rim = new THREE.Mesh(new THREE.CylinderGeometry(0.25, 0.25, 0.1, 16), metalMat);
+            rim.rotation.z = Math.PI / 2;
+            group.add(tire, rim);
+        }
+        else if (type === 'Skid') {
+            const pipe = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 2.5, 8), metalMat);
+            pipe.rotation.x = Math.PI / 2;
+            const s1 = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 0.6, 8), metalMat);
+            s1.position.set(0, 0.3, 0.8);
+            const s2 = s1.clone(); s2.position.z = -0.8;
+            group.add(pipe, s1, s2);
+        }
+        else if (type === 'Winglet') {
+            const wl = new THREE.Mesh(new THREE.BoxGeometry(0.1, 1, 0.5), mat);
+            group.add(wl);
+        }
+        else if (type === 'Battery') {
+            const b = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.4, 0.6), mat);
+            group.add(b);
+        }
+        else {
+            // Basic Shapes fallback
+            if(type==='Sphere') group.add(new THREE.Mesh(new THREE.SphereGeometry(0.5, 32, 32), mat));
+            else if(type==='Cylinder') group.add(new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.5, 1, 32), mat));
+            else if(type==='Cone') group.add(new THREE.Mesh(new THREE.ConeGeometry(0.5, 1, 32), mat));
+            else group.add(new THREE.Mesh(new THREE.BoxGeometry(1,1,1), mat));
+        }
+
+        return group;
     }
-    function material(color,kind='standard'){
-     return new THREE.MeshStandardMaterial({
-     color:color||'#2583e8',
-     metalness:kind==='metal'?0.85:0.15,
-     roughness:kind==='glossy'?0.12:0.55,
-     wireframe:kind==='wire'
-     });
-    }
+    
     function addPart(type,data=null,history=true){
      if(history)pushHistory();
      const color=data?.color||'#2583e8';
-     const mesh=new THREE.Mesh(geometry(type),material(color));
-     mesh.name=data?.name||type;
-     mesh.userData.partType=type;
+     const matKind=data?.material||'standard';
+     
+     // ⭐ Generate real 3D model
+     const meshGroup = getPartMesh(type, color, matKind);
+     
+     meshGroup.name=data?.name||type;
+     meshGroup.userData.partType=type;
+     meshGroup.userData.materialKind=matKind;
+     
      if(data){
-      mesh.position.fromArray(data.pos||[0,0,0]);
-      mesh.rotation.fromArray(data.rot||[0,0,0]);
-      mesh.scale.fromArray(data.scale||[1,1,1]);
-      mesh.userData.materialKind=data.material||'standard';
-      mesh.material=material(color,mesh.userData.materialKind);
+      meshGroup.position.fromArray(data.pos||[0,0,0]);
+      meshGroup.rotation.fromArray(data.rot||[0,0,0]);
+      meshGroup.scale.fromArray(data.scale||[1,1,1]);
      }else{
-      mesh.position.x=(Math.random()-0.5)*2;
-      mesh.position.y=0.5;
-      mesh.position.z=(Math.random()-0.5)*2;
+      meshGroup.position.set((Math.random()-0.5)*4, 2, (Math.random()-0.5)*4);
      }
-     scene.add(mesh);objects.push(mesh);select(mesh);refreshList();
-     return mesh;
+     scene.add(meshGroup);objects.push(meshGroup);select(meshGroup);refreshList();
+     return meshGroup;
     }
+    
     function serialize(){
      return objects.map(o=>({
       type:o.userData.partType,name:o.name,
       pos:o.position.toArray(),rot:o.rotation.toArray(),
       scale:o.scale.toArray(),
-      color:'#'+o.material.color.getHexString(),
+      // Extract color from first child material
+      color: o.children.length > 0 && o.children[0].material ? '#'+o.children[0].material.color.getHexString() : '#ffffff',
       material:o.userData.materialKind||'standard'
      }));
     }
+    
     function clearScene(){
      transform.detach();selected=null;
      objects.forEach(o=>scene.remove(o));objects=[];
     }
+    
     function loadScene(data,history=true){
-     if(!Array.isArray(data)||data.length>1000)throw Error('Invalid or oversized project file');
+     if(!Array.isArray(data)||data.length>1000)throw Error('Invalid file');
      if(history)pushHistory();
      restoring=true;clearScene();
      data.forEach(d=>addPart(d.type||'Box',d,false));
      restoring=false;refreshList();status('Loaded '+objects.length+' objects');
     }
+    
     function select(o){
      selected=o;transform.detach();
-     if(o){transform.attach(o);
-     document.getElementById('objName').value=o.name;
-     document.getElementById('objColor').value='#'+o.material.color.getHexString();
-     document.getElementById('objMaterial').value=o.userData.materialKind||'standard';
-     status('Selected: '+o.name);}
+     if(o){
+         transform.attach(o);
+         document.getElementById('objName').value=o.name;
+         
+         // Get color from first mesh child
+         let colorHex = '#ffffff';
+         if(o.children.length > 0 && o.children[0].material) {
+             colorHex = '#'+o.children[0].material.color.getHexString();
+         }
+         document.getElementById('objColor').value=colorHex;
+         document.getElementById('objMaterial').value=o.userData.materialKind||'standard';
+         status('Selected: '+o.name);
+     }
      refreshList();
     }
+    
     function refreshList(){
      const list=document.getElementById('objectList');list.innerHTML='';
      objects.forEach((o,i)=>{
@@ -9782,6 +9892,7 @@ def render_aero_lab():
       b.onclick=()=>select(o);list.appendChild(b);
      });
     }
+    
     function setMode(m){transform.setMode(m);status('Tool: '+m);}
     function duplicateSelected(){
      if(!selected)return;
@@ -9796,49 +9907,52 @@ def render_aero_lab():
     }
     function changeName(v){if(selected){pushHistory();selected.name=v;refreshList();}}
     function changeColor(v){
-     if(selected){pushHistory();selected.material.color.set(v);refreshList();}
+        if(selected){
+            pushHistory();
+            selected.traverse(child => {
+                if(child.isMesh && child.material && !child.material.transparent) {
+                    child.material.color.set(v);
+                }
+            });
+            refreshList();
+        }
     }
     function changeMaterial(v){
-     if(selected){pushHistory();selected.userData.materialKind=v;
-     selected.material=material('#'+selected.material.color.getHexString(),v);}
+        if(selected){
+            pushHistory();
+            selected.userData.materialKind=v;
+            selected.traverse(child => {
+                if(child.isMesh && child.material && !child.material.transparent) {
+                    child.material.metalness = v==='metal' ? 0.85 : 0.2;
+                    child.material.roughness = v==='glossy' ? 0.1 : 0.5;
+                    child.material.wireframe = v==='wire';
+                    child.material.needsUpdate = true;
+                }
+            });
+        }
     }
-    function undo(){
-     if(!undoStack.length)return;
-     redoStack.push(JSON.stringify(serialize()));
-     const d=JSON.parse(undoStack.pop());loadScene(d,false);
-    }
-    function redo(){
-     if(!redoStack.length)return;
-     undoStack.push(JSON.stringify(serialize()));
-     const d=JSON.parse(redoStack.pop());loadScene(d,false);
-    }
+    
+    function undo(){if(!undoStack.length)return;redoStack.push(JSON.stringify(serialize()));const d=JSON.parse(undoStack.pop());loadScene(d,false);}
+    function redo(){if(!redoStack.length)return;undoStack.push(JSON.stringify(serialize()));const d=JSON.parse(redoStack.pop());loadScene(d,false);}
+    
     function exportJSON(){
-     const blob=new Blob([JSON.stringify({app:'Clyxess Aero Lab',version:1,objects:serialize()},null,2)],{type:'application/json'});
+     const blob=new Blob([JSON.stringify({app:'Aero Lab',version:1,objects:serialize()},null,2)],{type:'application/json'});
      const a=document.createElement('a');a.href=URL.createObjectURL(blob);
-     a.download='clyxess-aero-project.json';a.click();URL.revokeObjectURL(a.href);
+     a.download='aero-project.json';a.click();URL.revokeObjectURL(a.href);
      status('Project JSON exported');
     }
+    
     function importJSON(e){
      const f=e.target.files[0];if(!f)return;
      const r=new FileReader();
-     r.onload=()=>{try{
-      const j=JSON.parse(r.result);loadScene(Array.isArray(j)?j:j.objects);
-     }catch(err){status('Import error: '+err.message);}
-     e.target.value='';
-     };r.readAsText(f);
+     r.onload=()=>{try{const j=JSON.parse(r.result);loadScene(Array.isArray(j)?j:j.objects);}catch(err){status('Import error: '+err.message);}e.target.value='';};
+     r.readAsText(f);
     }
-    function saveLocal(){
-     localStorage.setItem('clyxess-aero-project',JSON.stringify(serialize()));
-     status('Saved in this browser');
-    }
-    function loadLocal(){
-     try{loadScene(JSON.parse(localStorage.getItem('clyxess-aero-project')||'[]'));}
-     catch(e){status('No valid browser save found');}
-    }
-    function resetScene(){
-     if(!confirm('Reset the current scene?'))return;
-     pushHistory();clearScene();frameAll();refreshList();status('Blank workspace');
-    }
+    
+    function saveLocal(){localStorage.setItem('aero-project',JSON.stringify(serialize()));status('Saved in this browser');}
+    function loadLocal(){try{loadScene(JSON.parse(localStorage.getItem('aero-project')||'[]'));}catch(e){status('No valid browser save found');}}
+    function resetScene(){if(!confirm('Reset the current scene?'))return;pushHistory();clearScene();frameAll();refreshList();status('Blank workspace');}
+    
     function frameAll(){
      if(!objects.length){camera.position.set(10,8,12);controls.target.set(0,0,0);return;}
      const box=new THREE.Box3();
@@ -9850,6 +9964,7 @@ def render_aero_lab():
      camera.position.copy(center).add(new THREE.Vector3(radius*1.5,radius*1.1,radius*1.5));
      camera.near=0.1;camera.far=Math.max(2000,radius*20);camera.updateProjectionMatrix();
     }
+    
     function cameraView(v){
      const t=controls.target.clone(),r=12;
      const positions={front:[0,0,r],rear:[0,0,-r],side:[r,0,0],top:[0,r,0]};
@@ -9858,16 +9973,23 @@ def render_aero_lab():
      if(v==='top')camera.up.set(0,0,-1);
      camera.lookAt(t);controls.update();
     }
+    
     const pb=document.getElementById('partButtons');
     PARTS.forEach(p=>{const b=document.createElement('button');b.textContent='+ '+p;b.onclick=()=>addPart(p);pb.appendChild(b);});
+    
     renderer.domElement.addEventListener('pointerdown',e=>{
      if(transform.dragging)return;
      const rect=renderer.domElement.getBoundingClientRect();
      const mouse=new THREE.Vector2((e.clientX-rect.left)/rect.width*2-1,-(e.clientY-rect.top)/rect.height*2+1);
      const ray=new THREE.Raycaster();ray.setFromCamera(mouse,camera);
-     const hits=ray.intersectObjects(objects,false);
-     if(hits.length)select(hits[0].object);
+     const hits=ray.intersectObjects(objects,true); // recursive hit test for groups
+     if(hits.length){
+         let topObj = hits[0].object;
+         while(topObj.parent && topObj.parent.type === 'Group' && topObj.parent !== scene) { topObj = topObj.parent; }
+         select(topObj);
+     }
     });
+    
     window.addEventListener('keydown',e=>{
      if(['INPUT','SELECT'].includes(document.activeElement.tagName))return;
      if(e.key==='Delete'||e.key==='Backspace')deleteSelected();
@@ -9875,6 +9997,7 @@ def render_aero_lab():
      if(e.key.toLowerCase()==='e')setMode('rotate');
      if(e.key.toLowerCase()==='r')setMode('scale');
     });
+    
     function resize(){
      const el=document.getElementById('view');
      const w=el.clientWidth,h=el.clientHeight;
@@ -9896,142 +10019,8 @@ def render_aero_lab():
     st.divider()
     
     # ==========================================
-    # 3. TERA ORIGINAL WIND TUNNEL & TELEMETRY
+    # ⭐ 3. AI MENTOR CHAT (Wapas Jod Diya)
     # ==========================================
-    st.write("### 📡 Live Wind Tunnel Physics")
-    
-    control_col1, control_col2, control_col3, control_col4 = st.columns(4)
-    with control_col1:
-        airframe_type = st.selectbox("🛸 Structural Airframe", ["NASA X-57 Maxwell", "Tactical Drone", "VTOL Flying Car"])
-    with control_col2:
-        hull_color_input = st.color_picker("🎨 Custom Hull Paint", "#FF3366")
-    with control_col3:
-        distributed_motors = st.slider("⚙️ Distributed Motor Units", 2, 16, 12, step=2)
-    with control_col4:
-        angle_of_attack = st.slider("📐 Wing Angle of Attack (°)", -10, 45, 12, step=1)
-
-    wind_velocity_input = st.slider("💨 Wind Tunnel Velocity Grid (km/h)", 200, 1800, 750, step=50)
-
-    import numpy as np
-    import plotly.graph_objects as go
-
-    rad_alpha_val = np.radians(angle_of_attack)
-    computed_mass_kg = 1500 + (distributed_motors * 120)
-
-    calculated_lift_force = int(np.sin(rad_alpha_val) * (wind_velocity_input ** 1.65) * 0.035 * (1 + (distributed_motors / 8)))
-    radar_point_drag_force = int(wind_velocity_input * 0.45 * (1 + np.sin(rad_alpha_val)))
-    wing_surface_drag_force = int(wind_velocity_input * 0.65 * (1 + (angle_of_attack / 12)**2))
-    net_aerodynamic_drag = radar_point_drag_force + wing_surface_drag_force
-
-    system_stability_score = 100 - (abs(angle_of_attack - 14) * 2.5) - (computed_mass_kg / 75)
-    system_stability_score = max(min(system_stability_score, 100), 0)
-
-    view_col, telemetry_col = st.columns([2, 1])
-
-    with view_col:
-        fig_viewport = go.Figure()  
-        
-        resol_y = 12  
-        tx_grid = np.linspace(-6, 6, 25)  
-        ty_grid = np.linspace(-2.5, 2.5, resol_y)  
-        
-        for yp_val in ty_grid:  
-            flow_bending_curve = (angle_of_attack / 35) * np.exp(-(tx_grid - 0)**2 / 2.2)  
-            tz_grid = yp_val + flow_bending_curve  
-            
-            color_vector = "#FF3366" if net_aerodynamic_drag > 1200 or system_stability_score < 45 else "#00FFCC"  
-            
-            fig_viewport.add_trace(go.Scatter3d(  
-                x=tx_grid, y=np.full_like(tx_grid, yp_val), z=tz_grid,  
-                mode='lines', line=dict(color=color_vector, width=2), showlegend=False  
-            ))  
-            
-        fig_viewport.add_trace(go.Scatter3d(x=[0], y=[0], z=[0], mode='markers+text',  
-            marker=dict(size=28, color=hull_color_input, line=dict(color='white', width=1.5)),  
-            name="Fuselage Core", text=["Main Airframe"], textposition="bottom center"))  
-            
-        fig_viewport.add_trace(go.Scatter3d(x=[1.3], y=[0], z=[0.18], mode='markers+text',  
-            marker=dict(size=14, color='#ffffff', symbol='diamond', line=dict(color=hull_color_input, width=2)),  
-            name="Radar Edge", text=["[Radar Cone]"], textposition="top center"))  
-            
-        wing_span_array = np.linspace(-2.4, 2.4, distributed_motors)  
-        fig_viewport.add_trace(go.Scatter3d(  
-            x=np.zeros(distributed_motors) - 0.5, y=wing_span_array, z=np.zeros(distributed_motors) - 0.1,  
-            mode='markers+text',  
-            marker=dict(size=14, color='#e9c46a', symbol='circle-open', line=dict(color='#00FFCC', width=3)),  
-            name="Distributed Motors", text=[f"M-{i+1}" for i in range(distributed_motors)], textposition="top center"  
-        ))  
-        
-        fig_viewport.update_layout(  
-            scene=dict(xaxis=dict(visible=False), yaxis=dict(visible=False), zaxis=dict(visible=False), bgcolor="#010206",  
-                       camera=dict(eye=dict(x=1.5, y=1.5, z=0.9))),  
-            margin=dict(l=0, r=0, b=0, t=0), height=460, paper_bgcolor="rgba(0,0,0,0)"  
-        )  
-        st.plotly_chart(fig_viewport, use_container_width=True)
-
-    with telemetry_col:
-        st.write("##### 📡 Live Avionics Feeds")
-
-        st.markdown(f"""  
-        <div style="padding:15px; margin-bottom:10px; border: 2px solid #00FFCC; border-radius: 20px; background: linear-gradient(135deg, #050716, #11153b); color: white;">  
-            <p style="margin:0; font-size:13px;"><b>Active Mass:</b> {computed_mass_kg:,} kg</p>  
-            <p style="margin:0; font-size:13px;"><b>Engine Arrays:</b> {distributed_motors} Motors</p>  
-        </div>  
-        <div style="background: #060919; border: 1px solid #FF3366; border-radius: 12px; padding: 12px; color: white; margin-bottom: 10px;"><small style="color:#00FFCC;">📍 NOSE RADAR DRAG</small><h4 style="margin:0;">{radar_point_drag_force:,} N</h4></div>  
-        <div style="background: #060919; border: 1px solid #FF3366; border-radius: 12px; padding: 12px; color: white; margin-bottom: 10px;"><small style="color:#00FFCC;">📐 WING SURFACE DRAG</small><h4 style="margin:0;">{wing_surface_drag_force:,} N</h4></div>  
-        <div style="background: #060919; border: 1px solid #00FFCC; border-radius: 12px; padding: 12px; color: white; margin-bottom: 10px;"><small style="color:#FF3366;">🚀 NET GENERATED LIFT FORCE</small><h4 style="margin:0;">{calculated_lift_force:,} N</h4></div>  
-        """, unsafe_allow_html=True)  
-        
-        st.write("Stability Balance Grid:")  
-        st.progress(int(system_stability_score) / 100)
-
-    # ==========================================
-    # 4. ANATOMY CARD (Academic Hub)
-    # ==========================================
-    st.divider()
-    st.write("### 📜 Interactive Diagram Breakdown & Academic Hub")
-    
-    anatomy_database = {
-        "Radar / Nose Cone": {
-            "title": "🎯 Radar & Nose Cone Edge",
-            "physics": "यह विमान का सबसे अगला हिस्सा है। इसका तीखा आकार हवा को बिना अशांति के काटता है, जिससे 'Form Drag' कम होता है।",
-            "math": "गणितीय समीकरण: $D_{Nose} = \\frac{1}{2} \\rho v^2 A C_d \\sin(\\theta)$."
-        },
-        "Main Airfoil Wings": {
-            "title": "📐 Main Wings & Lift Mechanics",
-            "physics": "बर्नोली और न्यूटन के नियमानुसार, ऊपरी सतह पर हवा का वेग तेज़ होने से निम्न दाब क्षेत्र बनता है, जो Lift देता है।",
-            "math": "Lift Formula: $L = C_L \\cdot \\frac{1}{2}\\rho v^2 \\cdot S$."
-        },
-        "Distributed Propulsion": {
-            "title": "⚙️ Distributed Electric Propulsion",
-            "physics": "नासा के X-57 विज़न पर आधारित। पंखों के ऊपर कई छोटे मोटर्स लगाने से कम स्पीड पर भी भयंकर लिफ्ट पैदा होती है।",
-            "math": "इंजन समीकरण: $T_{Total} = \\sum_{i=1}^{N} T_i \\cdot \\eta_{aero}$."
-        }
-    }
-    
-    inspected_part = st.selectbox("🎯 Select a Component to Inspect:", list(anatomy_database.keys()))
-    part_metrics = anatomy_database[inspected_part]
-
-    st.markdown(f"""
-    <div style="border: 2px dashed #00FFCC; border-radius: 20px; padding: 25px; background: #050814; color: white;">  
-        <h3 style="color: #00FFCC; margin-top:0;">{part_metrics['title']}</h3>  
-        <div style="display: flex; gap: 20px; margin-top: 15px;">  
-            <div style="flex: 1; background: rgba(255,255,255,0.02); padding: 15px; border-radius: 12px; border-left: 4px solid #00FFCC;">  
-                <h5><span style="background-color: #00FFCC; color: #02040c; padding: 3px 8px; border-radius: 5px; font-weight: bold;">PHYSICS</span> Force Analysis</h5>  
-                <p style="margin-top:10px; font-size:14px; color:#ddd;">{part_metrics['physics']}</p>  
-            </div>  
-            <div style="flex: 1; background: rgba(255,255,255,0.02); padding: 15px; border-radius: 12px; border-left: 4px solid #FF3366;">  
-                <h5><span style="background-color: #FF3366; color: white; padding: 3px 8px; border-radius: 5px; font-weight: bold;">MATH</span> Framework</h5>  
-                <p style="margin-top:10px; font-size:14px; color:#ddd;">{part_metrics['math']}</p>  
-            </div>  
-        </div>  
-    </div>  
-    """, unsafe_allow_html=True)
-
-    # ==========================================
-    # 5. AI MENTOR CHAT
-    # ==========================================
-    st.divider()
     st.write("### 🧠 Clyxess Aero-AI Mentor")
     
     if "aero_chat_log" not in st.session_state:
@@ -10054,7 +10043,7 @@ def render_aero_lab():
                 try:
                     res = client.chat.completions.create(
                         model="openai/gpt-oss-120b",
-                        messages=[{"role": "system", "content": "You are Aero-AI."}, {"role": "user", "content": user_query}],
+                        messages=[{"role": "system", "content": "You are Aero-AI, a helpful mentor for young aircraft designers."}, {"role": "user", "content": user_query}],
                         temperature=0.6
                     )
                     reply = res.choices[0].message.content
