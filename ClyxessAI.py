@@ -9474,7 +9474,7 @@ drawKBG();
 
     components.html(HTML, height=950, scrolling=False) 
     
-def render_aero_lab():
+def render_aero_lab(client):
     import json
     import streamlit as st
     import streamlit.components.v1 as components
@@ -9569,8 +9569,8 @@ def render_aero_lab():
     else:
         g1, g2, g3 = st.columns(3)
         with g1:
-    # YEH LINE CHANGE KARO (list(presets.keys()) use karo)
-    concept = st.selectbox("Concept type", list(presets.keys()))
+            # ⭐ YAHAN FIX KIYA HAI: "Trainer" ko "Training Aircraft" kar diya hai
+            concept = st.selectbox("Concept type", ["Training Aircraft", "Passenger Aircraft", "Drone", "Helicopter", "Fighter Concept"])
         with g2:
             wing_size = st.slider("Wing size", 0.5, 2.0, 1.0, 0.1)
         with g3:
@@ -9896,7 +9896,7 @@ def render_aero_lab():
     st.divider()
     
     # ==========================================
-    # 3. TERA ORIGINAL WIND TUNNEL & TELEMETRY (Restored!)
+    # 3. TERA ORIGINAL WIND TUNNEL & TELEMETRY
     # ==========================================
     st.write("### 📡 Live Wind Tunnel Physics")
     
@@ -9912,7 +9912,6 @@ def render_aero_lab():
 
     wind_velocity_input = st.slider("💨 Wind Tunnel Velocity Grid (km/h)", 200, 1800, 750, step=50)
 
-    # ADVANCED PHYSICS CALCULATION CORE
     import numpy as np
     import plotly.graph_objects as go
 
@@ -9927,7 +9926,6 @@ def render_aero_lab():
     system_stability_score = 100 - (abs(angle_of_attack - 14) * 2.5) - (computed_mass_kg / 75)
     system_stability_score = max(min(system_stability_score, 100), 0)
 
-    # VISUAL VIEWPOT AND TELEMETRY HUD ARRANGEMENT
     view_col, telemetry_col = st.columns([2, 1])
 
     with view_col:
@@ -9975,13 +9973,13 @@ def render_aero_lab():
         st.write("##### 📡 Live Avionics Feeds")
 
         st.markdown(f"""  
-        <div class="cockpit-panel-2050" style="padding:15px; margin-bottom:10px; border: 2px solid #00FFCC; border-radius: 20px; background: linear-gradient(135deg, #050716, #11153b); color: white;">  
+        <div style="padding:15px; margin-bottom:10px; border: 2px solid #00FFCC; border-radius: 20px; background: linear-gradient(135deg, #050716, #11153b); color: white;">  
             <p style="margin:0; font-size:13px;"><b>Active Mass:</b> {computed_mass_kg:,} kg</p>  
             <p style="margin:0; font-size:13px;"><b>Engine Arrays:</b> {distributed_motors} Motors</p>  
         </div>  
-        <div class="sensor-feed-box" style="background: #060919; border: 1px solid #FF3366; border-radius: 12px; padding: 12px; color: white; margin-bottom: 10px;"><small style="color:#00FFCC;">📍 NOSE RADAR DRAG</small><h4 style="margin:0;">{radar_point_drag_force:,} N</h4></div>  
-        <div class="sensor-feed-box" style="background: #060919; border: 1px solid #FF3366; border-radius: 12px; padding: 12px; color: white; margin-bottom: 10px;"><small style="color:#00FFCC;">📐 WING SURFACE DRAG</small><h4 style="margin:0;">{wing_surface_drag_force:,} N</h4></div>  
-        <div class="sensor-feed-box" style="background: #060919; border: 1px solid #00FFCC; border-radius: 12px; padding: 12px; color: white; margin-bottom: 10px;"><small style="color:#FF3366;">🚀 NET GENERATED LIFT FORCE</small><h4 style="margin:0;">{calculated_lift_force:,} N</h4></div>  
+        <div style="background: #060919; border: 1px solid #FF3366; border-radius: 12px; padding: 12px; color: white; margin-bottom: 10px;"><small style="color:#00FFCC;">📍 NOSE RADAR DRAG</small><h4 style="margin:0;">{radar_point_drag_force:,} N</h4></div>  
+        <div style="background: #060919; border: 1px solid #FF3366; border-radius: 12px; padding: 12px; color: white; margin-bottom: 10px;"><small style="color:#00FFCC;">📐 WING SURFACE DRAG</small><h4 style="margin:0;">{wing_surface_drag_force:,} N</h4></div>  
+        <div style="background: #060919; border: 1px solid #00FFCC; border-radius: 12px; padding: 12px; color: white; margin-bottom: 10px;"><small style="color:#FF3366;">🚀 NET GENERATED LIFT FORCE</small><h4 style="margin:0;">{calculated_lift_force:,} N</h4></div>  
         """, unsafe_allow_html=True)  
         
         st.write("Stability Balance Grid:")  
@@ -10015,15 +10013,15 @@ def render_aero_lab():
     part_metrics = anatomy_database[inspected_part]
 
     st.markdown(f"""
-    <div class="report-card-2050" style="border: 2px dashed #00FFCC; border-radius: 20px; padding: 25px; background: #050814; color: white;">  
+    <div style="border: 2px dashed #00FFCC; border-radius: 20px; padding: 25px; background: #050814; color: white;">  
         <h3 style="color: #00FFCC; margin-top:0;">{part_metrics['title']}</h3>  
         <div style="display: flex; gap: 20px; margin-top: 15px;">  
             <div style="flex: 1; background: rgba(255,255,255,0.02); padding: 15px; border-radius: 12px; border-left: 4px solid #00FFCC;">  
-                <h5><span class="physics-indicator" style="background-color: #00FFCC; color: #02040c; padding: 3px 8px; border-radius: 5px; font-weight: bold;">PHYSICS</span> Force Analysis</h5>  
+                <h5><span style="background-color: #00FFCC; color: #02040c; padding: 3px 8px; border-radius: 5px; font-weight: bold;">PHYSICS</span> Force Analysis</h5>  
                 <p style="margin-top:10px; font-size:14px; color:#ddd;">{part_metrics['physics']}</p>  
             </div>  
             <div style="flex: 1; background: rgba(255,255,255,0.02); padding: 15px; border-radius: 12px; border-left: 4px solid #FF3366;">  
-                <h5><span class="math-indicator" style="background-color: #FF3366; color: white; padding: 3px 8px; border-radius: 5px; font-weight: bold;">MATH</span> Framework</h5>  
+                <h5><span style="background-color: #FF3366; color: white; padding: 3px 8px; border-radius: 5px; font-weight: bold;">MATH</span> Framework</h5>  
                 <p style="margin-top:10px; font-size:14px; color:#ddd;">{part_metrics['math']}</p>  
             </div>  
         </div>  
