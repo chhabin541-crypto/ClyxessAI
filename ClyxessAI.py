@@ -9474,672 +9474,605 @@ drawKBG();
 
     components.html(HTML, height=950, scrolling=False) 
     
-# File: clyxess_aero_design_lab.py
-
-def render_aero_lab(client=None):
+def render_aero_lab():
     import json
-    import math
     import streamlit as st
-    import numpy as np
-    import plotly.graph_objects as go
     import streamlit.components.v1 as components
 
     st.markdown("""
     <style>
-    .aero-hero {
-        padding: 22px; border-radius: 18px;
-        background: linear-gradient(135deg,#071020,#14254a);
-        border: 1px solid #00ffcc; color: white;
-    }
-    .aero-note {
-        background: #111b30; padding: 12px;
-        border-left: 4px solid #ffb454; border-radius: 8px;
-    }
+    .stApp {background:#0b1020;color:#edf2ff}
+    .block-container {padding:1rem 2rem;max-width:1800px}
+    .hero {padding:20px 24px;border:1px solid #293858;border-radius:16px;
+    background:linear-gradient(120deg,#172647,#10182b);margin-bottom:16px}
+    .hero h1 {margin:0;color:#fff;font-size:30px}
+    .hero p {color:#aab9d7;margin:7px 0 0}
+    div[data-testid="stRadio"] label {font-weight:600}
     </style>
     """, unsafe_allow_html=True)
 
     st.markdown("""
-    <div class="aero-hero">
-      <h1>✈️ Clyxess AI — Aero Design Studio</h1>
-      <p>Build • Explore • Test • Improve</p>
-      <p>School students ke liye interactive aeronautics learning lab.</p>
+    <div class="hero">
+    <h1>✈️ CLYXESS AI AERO LAB</h1>
+    <p>Interactive 3D Aircraft Design Studio · Create · Assemble · Explore</p>
     </div>
     """, unsafe_allow_html=True)
 
-    st.markdown("""
-    <div class="aero-note">
-    <b>Safety:</b> Ye educational concept-design simulator hai.
-    Iske models, lift/drag estimates aur visual assembly ko real aircraft
-    construction ya flight safety ke liye verified nahi maana ja sakta.
-    </div>
-    """, unsafe_allow_html=True)
-
-    tab_build, tab_wind, tab_learn, tab_project = st.tabs([
-        "🧩 3D Design Studio",
-        "🌬️ Wind Tunnel",
-        "📘 Learn Aeronautics",
-        "🏆 Student Project"
-    ])
-
-    # ==========================================================
-    # 1. 3D AIRCRAFT DESIGN STUDIO
-    # ==========================================================
-    with tab_build:
-        st.subheader("🛠️ Build your own aircraft concept")
-
-        starter = st.selectbox(
-            "Choose a starter model",
-            [
-                "Training Airplane",
-                "Twin-Propeller Airplane",
-                "Jet Aircraft Concept",
-                "Helicopter Concept",
-                "Glider",
-                "Flying-Car Concept",
-                "Empty Workshop"
-            ],
-            key="aero_starter"
-        )
-
-        st.caption(
-            "Drag to rotate the view • Scroll to zoom • Select parts to edit. "
-            "Models are visual learning concepts, not flight-ready CAD designs."
-        )
-
-        three_js_code = r"""
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<style>
-html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#050a18;
-font-family:Arial,sans-serif;color:#eef8ff}
-#app{height:720px;position:relative;background:#050a18}
-#toolbar{display:flex;gap:6px;flex-wrap:wrap;padding:9px;
-background:#101a32;border-bottom:1px solid #00ffcc}
-button,select,input{padding:7px;border-radius:6px;border:1px solid #00a994;
-background:#0b1530;color:white;font-size:12px}
-button{background:#00d9b0;color:#06131a;font-weight:bold;cursor:pointer}
-button.red{background:#ff426d;color:white}
-#stage{height:calc(100% - 62px);position:relative}
-#panel{display:none;position:absolute;right:8px;top:8px;width:210px;
-max-height:85%;overflow:auto;background:rgba(8,17,38,.96);
-border:1px solid #00ffcc;border-radius:10px;padding:10px;z-index:5}
-#panel label{display:block;font-size:11px;margin-top:8px;color:#b8cee5}
-#panel input,#panel select{width:95%}
-#hud{position:absolute;left:9px;top:9px;padding:10px;background:#0b1730dd;
-border:1px solid #00ffcc;border-radius:8px;font-size:12px;max-width:175px}
-#hud b{color:#00ffcc}
-@media(max-width:600px){#app{height:760px}#panel{width:165px}#hud{max-width:115px;font-size:10px}}
-</style>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/TransformControls.js"></script>
-</head>
-<body>
-<div id="app">
- <div id="toolbar">
-  <select id="part">
-   <option value="Fuselage">Aircraft fuselage</option>
-   <option value="Wing">Main wings</option>
-   <option value="Tail">Tail assembly</option>
-   <option value="Cockpit">Cockpit canopy</option>
-   <option value="Propeller">Propeller</option>
-   <option value="JetEngine">Jet engine</option>
-   <option value="Rotor">Helicopter rotor</option>
-   <option value="Wheel">Landing wheel</option>
-   <option value="Skid">Helicopter skids</option>
-   <option value="Winglet">Winglet</option>
-   <option value="Battery">Battery/payload pod</option>
-  </select>
-  <button onclick="addPart()">＋ Add part</button>
-  <select id="preset">
-   <option value="trainer">Training airplane</option>
-   <option value="twin">Twin-prop airplane</option>
-   <option value="jet">Jet concept</option>
-   <option value="heli">Helicopter concept</option>
-   <option value="glider">Glider</option>
-   <option value="car">Flying-car concept</option>
-   <option value="empty">Empty workshop</option>
-  </select>
-  <button onclick="buildPreset()">Assemble</button>
-  <button onclick="wireframe()">Wireframe</button>
-  <button onclick="exportScene()">Export JSON</button>
-  <button class="red" onclick="clearScene()">Clear</button>
- </div>
- <div id="stage">
-  <div id="hud"><b>CLYXESS 3D WORKSHOP</b><br>
-   Parts: <span id="count">0</span><br>
-   <span id="status">Choose a starter model.</span>
-  </div>
-  <div id="panel">
-   <b id="objectName">Selected part</b>
-   <label>Scene objects</label>
-   <select id="objectList" size="4" onchange="selectFromList()"></select>
-   <label>Color</label><input id="paint" type="color" value="#dce8f5" onchange="changeColor(this.value)">
-   <label>Material</label>
-   <select id="material" onchange="changeMaterial(this.value)">
-    <option value="paint">Painted alloy</option>
-    <option value="metal">Metal</option>
-    <option value="glass">Glass</option>
-    <option value="rubber">Rubber</option>
-    <option value="gold">Gold accent</option>
-   </select>
-   <label>Position X</label><input id="px" type="number" step=".25">
-   <label>Position Y</label><input id="py" type="number" step=".25">
-   <label>Position Z</label><input id="pz" type="number" step=".25">
-   <button onclick="applyPosition()">Apply position</button>
-   <label>Scale</label><input id="scale" type="range" min=".2" max="3" step=".05" value="1" oninput="scaleObject(this.value)">
-   <label>Rotate Y</label><input id="rotation" type="range" min="-180" max="180" value="0" oninput="rotateObject(this.value)">
-   <button onclick="duplicatePart()">Duplicate</button>
-   <button class="red" onclick="deletePart()">Delete</button>
-   <button onclick="deselect()">Close</button>
-  </div>
- </div>
-</div>
-<script>
-let scene,camera,renderer,orbit,transform,selected=null,objects=[],wire=false;
-const stage=document.getElementById('stage');
-scene=new THREE.Scene();
-scene.background=new THREE.Color(0x050a18);
-camera=new THREE.PerspectiveCamera(45,stage.clientWidth/stage.clientHeight,.1,1000);
-camera.position.set(12,10,15);
-renderer=new THREE.WebGLRenderer({antialias:true,preserveDrawingBuffer:true});
-renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,2));
-renderer.setSize(stage.clientWidth,stage.clientHeight);
-stage.appendChild(renderer.domElement);
-scene.add(new THREE.HemisphereLight(0xddeeff,0x17233c,1.3));
-const light=new THREE.DirectionalLight(0xffffff,1.4);
-light.position.set(7,12,8);scene.add(light);
-const grid=new THREE.GridHelper(40,40,0x00ffcc,0x203454);
-scene.add(grid);
-orbit=new THREE.OrbitControls(camera,renderer.domElement);
-orbit.enableDamping=true;
-transform=new THREE.TransformControls(camera,renderer.domElement);
-transform.addEventListener('dragging-changed',e=>orbit.enabled=!e.value);
-scene.add(transform);
-
-const mats={
- paint:new THREE.MeshStandardMaterial({color:0xdce8f5,roughness:.4,metalness:.25}),
- metal:new THREE.MeshStandardMaterial({color:0x9baab8,roughness:.25,metalness:.8}),
- glass:new THREE.MeshPhysicalMaterial({color:0x75d9ff,roughness:.1,transparent:true,opacity:.5,side:THREE.DoubleSide}),
- rubber:new THREE.MeshStandardMaterial({color:0x202632,roughness:.9}),
- gold:new THREE.MeshStandardMaterial({color:0xffc857,metalness:.7,roughness:.25})
-};
-function mesh(g,m,p=[0,0,0],r=[0,0,0]){
- let o=new THREE.Mesh(g,m);o.position.set(...p);o.rotation.set(...r);return o;
-}
-function makePart(type){
- let g=new THREE.Group();
- if(type==='Fuselage'){
-  let pts=[
-   new THREE.Vector2(0,-4.5),new THREE.Vector2(.16,-4.1),
-   new THREE.Vector2(.35,-3),new THREE.Vector2(.48,-1),
-   new THREE.Vector2(.42,1),new THREE.Vector2(.28,2.5),
-   new THREE.Vector2(.1,3.6),new THREE.Vector2(0,4)
-  ];
-  let body=mesh(new THREE.LatheGeometry(pts,32),mats.paint);
-  body.rotation.x=Math.PI/2;g.add(body);
- } else if(type==='Wing'){
-  g.add(mesh(new THREE.BoxGeometry(10,.16,1.15),mats.paint,[0,0,.1]));
-  g.add(mesh(new THREE.BoxGeometry(1.3,.13,.8),mats.paint,[-4.8,0,.1],[0,0,-.06]));
-  g.add(mesh(new THREE.BoxGeometry(1.3,.13,.8),mats.paint,[4.8,0,.1],[0,0,.06]));
- } else if(type==='Tail'){
-  g.add(mesh(new THREE.BoxGeometry(2.5,.12,.65),mats.paint,[0,.1,-3.3]));
-  let fin=mesh(new THREE.BoxGeometry(.12,1.55,.9),mats.paint,[0,.72,-3.55]);
-  fin.rotation.x=-.12;g.add(fin);
- } else if(type==='Cockpit'){
-  let c=mesh(new THREE.SphereGeometry(1,24,16),mats.glass,[0,.35,2]);
-  c.scale.set(.4,.38,.9);g.add(c);
- } else if(type==='Propeller'){
-  g.add(mesh(new THREE.SphereGeometry(.2,16,12),mats.gold));
-  for(let i=0;i<3;i++){
-   let blade=mesh(new THREE.BoxGeometry(.18,1.8,.07),mats.metal,[0,.9,0]);
-   blade.rotation.z=.16;
-   let pivot=new THREE.Group();pivot.rotation.z=i*2*Math.PI/3;
-   pivot.add(blade);g.add(pivot);
-  }
- } else if(type==='JetEngine'){
-  g.add(mesh(new THREE.CylinderGeometry(.5,.62,2.2,32),mats.metal,[0,0,0],[Math.PI/2,0,0]));
-  g.add(mesh(new THREE.TorusGeometry(.48,.08,12,32),mats.gold,[0,0,1]));
-  g.add(mesh(new THREE.CylinderGeometry(.31,.31,2.25,24),mats.rubber,[0,0,0],[Math.PI/2,0,0]));
- } else if(type==='Rotor'){
-  g.add(mesh(new THREE.CylinderGeometry(.1,.12,.9,16),mats.metal,[0,.4,0]));
-  g.add(mesh(new THREE.SphereGeometry(.22,16,12),mats.gold,[0,.85,0]));
-  for(let i=0;i<4;i++){
-   let blade=mesh(new THREE.BoxGeometry(.2,.07,5),mats.paint,[0,.85,2.5]);
-   blade.rotation.y=i*Math.PI/2;g.add(blade);
-  }
- } else if(type==='Wheel'){
-  g.add(mesh(new THREE.TorusGeometry(.38,.15,16,32),mats.rubber,[0,0,0],[0,Math.PI/2,0]));
-  g.add(mesh(new THREE.CylinderGeometry(.18,.18,.22,24),mats.metal,[0,0,0],[0,0,Math.PI/2]));
- } else if(type==='Skid'){
-  for(let x of [-.65,.65]){
-   g.add(mesh(new THREE.CylinderGeometry(.05,.05,3,12),mats.metal,[x,0,0],[Math.PI/2,0,0]));
-   g.add(mesh(new THREE.CylinderGeometry(.04,.04,.7,12),mats.metal,[x,.25,.8]));
-   g.add(mesh(new THREE.CylinderGeometry(.04,.04,.7,12),mats.metal,[x,.25,-.8]));
-  }
- } else if(type==='Winglet'){
-  g.add(mesh(new THREE.BoxGeometry(.12,1,.8),mats.paint,[0,.5,0]));
- } else if(type==='Battery'){
-  g.add(mesh(new THREE.CapsuleGeometry(.35,1.2,6,12),mats.gold,[0,0,0],[Math.PI/2,0,0]));
- }
- return g;
-}
-function register(type,pos=[0,0,0]){
- let g=makePart(type);g.name=type+' '+(objects.length+1);
- g.userData.partType=type;g.position.set(...pos);scene.add(g);objects.push(g);
- refreshList();selectObject(g);updateHud();return g;
-}
-function addPart(){
- const type=document.getElementById('part').value;
- const pos={Fuselage:[0,1,0],Wing:[0,1,0],Tail:[0,1,-3],
- Cockpit:[0,1,2],Propeller:[0,1,4.4],JetEngine:[1,0,-1],
- Rotor:[0,2,0],Wheel:[0,-.5,0],Skid:[0,-.5,0],
- Winglet:[5,1,0],Battery:[0,0,0]};
- register(type,pos[type]||[0,0,0]);
- setStatus(type+' added. Move it into position.');
-}
-function buildPreset(){
- const p=document.getElementById('preset').value;
- clearScene(false);
- const add=(t,pos)=>register(t,pos);
- if(p==='empty'){setStatus('Empty workshop ready. Add parts.');return}
- if(p==='heli'){
-  add('Fuselage',[0,1,0]);add('Cockpit',[0,1,1.4]);
-  add('Rotor',[0,2.1,0]);add('Tail',[0,1,-2.7]);
-  add('Propeller',[0,1,-4.3]);add('Skid',[0,.1,0]);
- }else{
-  add('Fuselage',[0,1,0]);add('Wing',[0,1,0]);
-  add('Tail',[0,1,0]);add('Cockpit',[0,1,2]);
-  add('Wheel',[-.7,-.2,1.2]);add('Wheel',[.7,-.2,1.2]);
-  add('Wheel',[0,-.2,-2.6]);
-  if(p==='trainer')add('Propeller',[0,1,4.4]);
-  if(p==='twin'){add('Propeller',[-2,1,1]);add('Propeller',[2,1,1]);}
-  if(p==='jet'){add('JetEngine',[-.65,.9,-1.2]);add('JetEngine',[.65,.9,-1.2]);}
-  if(p==='glider'){add('Winglet',[-5,1,0]);add('Winglet',[5,1,0]);}
-  if(p==='car'){
-   add('Propeller',[-2,1,0]);add('Propeller',[2,1,0]);
-   add('Propeller',[-2,1,-1.5]);add('Propeller',[2,1,-1.5]);
-  }
- }
- resetCamera();setStatus('Concept assembled. Adjust parts to explore geometry.');
-}
-function refreshList(){
- const l=document.getElementById('objectList');l.innerHTML='';
- objects.forEach((o,i)=>{let op=document.createElement('option');op.value=i;op.text=o.name;l.appendChild(op)});
-}
-function selectFromList(){const i=Number(document.getElementById('objectList').value);if(objects[i])selectObject(objects[i])}
-function selectObject(o){
- selected=o;transform.attach(o);document.getElementById('panel').style.display='block';
- document.getElementById('objectName').textContent=o.name;
- document.getElementById('objectList').value=String(objects.indexOf(o));
- px.value=o.position.x.toFixed(2);py.value=o.position.y.toFixed(2);pz.value=o.position.z.toFixed(2);
- scale.value=o.scale.x;rotation.value=Math.round(o.rotation.y*180/Math.PI);
-}
-function deselect(){selected=null;transform.detach();document.getElementById('panel').style.display='none'}
-function applyPosition(){if(selected)selected.position.set(Number(px.value)||0,Number(py.value)||0,Number(pz.value)||0)}
-function scaleObject(v){if(selected)selected.scale.setScalar(Number(v))}
-function rotateObject(v){if(selected)selected.rotation.y=Number(v)*Math.PI/180}
-function changeColor(hex){
- if(!selected)return;
- selected.traverse(o=>{if(o.isMesh){o.material=o.material.clone();o.material.color.set(hex)}});
-}
-function changeMaterial(type){
- if(!selected)return;
- selected.traverse(o=>{
-  if(o.isMesh){
-   let c=o.material.color?o.material.color.clone():new THREE.Color(0xffffff);
-   o.material=mats[type].clone();o.material.color.copy(c);
-  }
- });
-}
-function deletePart(){
- if(!selected)return;scene.remove(selected);objects=objects.filter(o=>o!==selected);
- deselect();refreshList();updateHud();
-}
-function duplicatePart(){
- if(!selected)return;let c=selected.clone();c.name=selected.name+' copy';
- c.position.x+=1.2;scene.add(c);objects.push(c);refreshList();selectObject(c);updateHud();
-}
-function clearScene(confirmClear=true){
- if(confirmClear&&objects.length&&!confirm('Clear all parts?'))return;
- objects.forEach(o=>scene.remove(o));objects=[];deselect();refreshList();updateHud();
-}
-function wireframe(){
- wire=!wire;
- objects.forEach(g=>g.traverse(o=>{if(o.isMesh)o.material.wireframe=wire}));
- setStatus(wire?'Wireframe enabled.':'Solid model view.');
-}
-function resetCamera(){camera.position.set(12,10,15);orbit.target.set(0,0,0);orbit.update()}
-function setStatus(s){document.getElementById('status').textContent=s}
-function updateHud(){document.getElementById('count').textContent=objects.length}
-function exportScene(){
- const data={
-  brand:'Clyxess AI Aero Design Studio',
-  warning:'Educational concept only; not flight-certified.',
-  objects:objects.map(o=>({
-   name:o.name,type:o.userData.partType,
-   position:o.position.toArray(),rotation:o.rotation.toArray().slice(0,3),
-   scale:o.scale.toArray()
-  }))
- };
- const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
- const url=URL.createObjectURL(blob);const a=document.createElement('a');
- a.href=url;a.download='clyxess_aero_project.json';a.click();
- URL.revokeObjectURL(url);setStatus('Scene transform data exported.');
-}
-function animate(){requestAnimationFrame(animate);orbit.update();renderer.render(scene,camera)}
-animate();
-function resize(){
- const w=stage.clientWidth,h=stage.clientHeight;
- camera.aspect=w/h;camera.updateProjectionMatrix();renderer.setSize(w,h);
-}
-window.addEventListener('resize',resize);
-document.getElementById('preset').value='trainer';
-buildPreset();
-</script>
-</body>
-</html>
-"""
-        components.html(three_js_code, height=740, scrolling=False)
-
-    # ==========================================================
-    # 2. WIND TUNNEL: SIMPLIFIED, TRANSPARENT EQUATIONS
-    # ==========================================================
-    with tab_wind:
-        st.subheader("🌬️ Simplified aerodynamic calculator")
-        st.caption(
-            "The calculation uses L = 0.5 × density × speed² × wing area × CL. "
-            "Choose approximate coefficients for learning; they are not measured aircraft data."
-        )
-
-        c1, c2, c3 = st.columns(3)
-        with c1:
-            speed_kmh = st.slider("Air speed (km/h)", 20, 900, 180, 10)
-        with c2:
-            wing_area = st.slider("Wing area (m²)", 1.0, 80.0, 16.0, 0.5)
-        with c3:
-            density = st.slider("Air density (kg/m³)", 0.7, 1.3, 1.225, 0.025)
-
-        c4, c5, c6 = st.columns(3)
-        with c4:
-            cl = st.slider("Lift coefficient CL", -0.5, 1.8, 0.6, 0.05)
-        with c5:
-            cd = st.slider("Drag coefficient CD", 0.015, 0.25, 0.04, 0.005)
-        with c6:
-            mass_kg = st.slider("Concept mass (kg)", 10, 10000, 1200, 10)
-
-        speed_ms = speed_kmh / 3.6
-        dynamic_pressure = 0.5 * density * speed_ms ** 2
-        lift_n = dynamic_pressure * wing_area * cl
-        drag_n = dynamic_pressure * wing_area * cd
-        weight_n = mass_kg * 9.81
-        lift_weight_ratio = lift_n / weight_n if weight_n else 0
-
-        k1, k2, k3 = st.columns(3)
-        k1.metric("Estimated lift", f"{lift_n:,.0f} N")
-        k2.metric("Estimated drag", f"{drag_n:,.0f} N")
-        k3.metric("Lift / weight", f"{lift_weight_ratio:.2f} ×")
-
-        fig = go.Figure()
-        fig.add_trace(go.Bar(
-            x=["Lift", "Weight", "Drag"],
-            y=[max(0, lift_n), weight_n, max(0, drag_n)],
-            marker_color=["#00c9a7", "#ffb454", "#ff426d"]
-        ))
-        fig.update_layout(
-            title="Force comparison (simplified estimate)",
-            yaxis_title="Force (N)",
-            template="plotly_dark",
-            height=380
-        )
-        st.plotly_chart(fig, use_container_width=True)
-
-        st.markdown("#### What the numbers mean")
-        st.write(f"- Air speed: **{speed_ms:.2f} m/s**")
-        st.write(f"- Dynamic pressure: **{dynamic_pressure:,.1f} Pa**")
-        st.write(f"- Lift estimate: **{lift_n:,.1f} N**")
-        st.write(f"- Weight estimate: **{weight_n:,.1f} N**")
-        if lift_weight_ratio >= 1:
-            st.success("In this simplified calculation, lift is at least equal to weight.")
-        else:
-            st.warning("In this simplified calculation, lift is below the selected mass's weight.")
-
-        st.info(
-            "Real aircraft performance also depends on airfoil geometry, Reynolds number, "
-            "stall, propulsive thrust, trim, control surfaces, stability, and many other factors. "
-            "This calculator does not predict safe flight."
-        )
-
-    # ==========================================================
-    # 3. AGE-FRIENDLY AERONAUTICS LESSONS
-    # ==========================================================
-    with tab_learn:
-        st.subheader("📘 Learn aeronautics step by step")
-        age_group = st.selectbox(
-            "Student level",
-            ["Age 5–7", "Age 8–10", "Age 11–13", "Age 14–16", "Age 17+", "University"],
-            key="aero_age"
-        )
-        topic = st.selectbox(
-            "Choose a lesson",
-            [
-                "How an aircraft flies",
-                "Wing and airfoil",
-                "Lift and drag",
-                "Angle of attack and stall",
-                "Propeller vs jet engine",
-                "Helicopter rotor",
-                "Aircraft stability",
-                "Materials and structure",
-                "Design process and safety"
-            ],
-            key="aero_topic"
-        )
-
-        simple_explanations = {
-            "How an aircraft flies": (
-                "Four forces",
-                "An airplane has four important forces: lift upward, weight downward, thrust forward, and drag backward. "
-                "In steady level flight, lift is approximately equal to weight and thrust approximately equals drag.",
-                "Draw the four force arrows on a paper airplane. Change one thing at a time and write down what happens."
-            ),
-            "Wing and airfoil": (
-                "Wing shape matters",
-                "A wing moves through air and creates a pressure distribution. Lift comes from the aerodynamic forces on the wing "
-                "and the change in air momentum. Wing area, shape, speed and angle of attack all matter.",
-                "Compare two paper-wing shapes with the same mass and launch method. Repeat the test several times."
-            ),
-            "Lift and drag": (
-                "Two important forces",
-                "A simplified equation is L = ½ρV²SCL for lift and D = ½ρV²SCD for drag. "
-                "The coefficients depend on the shape and flight conditions; they are not universal constants.",
-                "Change only the speed in the Wind Tunnel tab. Observe how the square-of-speed term changes."
-            ),
-            "Angle of attack and stall": (
-                "More angle is not always better",
-                "Angle of attack is the angle between the wing's chord and the oncoming airflow. Lift often rises with angle at first, "
-                "but excessive angle can cause flow separation and a stall.",
-                "Draw a wing at a small and a large angle. The toy calculator does not predict a real stall speed."
-            ),
-            "Propeller vs jet engine": (
-                "Two ways to produce thrust",
-                "A propeller accelerates a relatively large amount of air by a smaller amount. A jet engine uses an engine cycle and exhaust "
-                "to create thrust. The best engine depends on the aircraft and its operating speed.",
-                "Research why many training airplanes use propellers while many high-speed aircraft use jet engines."
-            ),
-            "Helicopter rotor": (
-                "A rotating wing",
-                "Helicopter rotor blades are airfoils. Their lift depends on blade shape, rotor speed, blade pitch, air density and forward speed. "
-                "Real helicopter control and stability are complex.",
-                "Build a paper helicopter and safely compare different paper-blade lengths."
-            ),
-            "Aircraft stability": (
-                "Balance and control",
-                "Aircraft stability depends on mass distribution, aerodynamic surfaces, control systems and flight conditions. "
-                "A model that looks balanced in 3D is not automatically stable.",
-                "Mark the likely centre of gravity on a paper glider and test small changes safely."
-            ),
-            "Materials and structure": (
-                "Strong and light",
-                "Aircraft materials may include aluminium alloys, titanium, steel and composites. Engineers consider strength, stiffness, "
-                "mass, fatigue, temperature, corrosion and manufacturing.",
-                "With adult supervision, compare how paper and card strips bend under the same small load."
-            ),
-            "Design process and safety": (
-                "Engineering is a cycle",
-                "A professional design process includes requirements, sketches, dimensions, analysis, prototypes, tests, revision, documentation "
-                "and independent review. A rendered model is only one stage.",
-                "Write three requirements for a classroom glider. Make a paper prototype, test it consistently and record improvements."
-            )
-        }
-
-        heading, explanation, activity = simple_explanations[topic]
-        st.markdown(f"### {heading}")
-        if age_group == "Age 5–7":
-            st.write("**Simple explanation:** " + explanation.split(".")[0] + ".")
-        else:
-            st.write(explanation)
-
-        st.markdown("**Try this activity**")
-        st.write(activity)
-
-        quiz_data = {
-            "How an aircraft flies": (
-                "In steady level flight, which force is approximately balanced by lift?",
-                ["Drag", "Weight", "Thrust"], "Weight"
-            ),
-            "Wing and airfoil": (
-                "Which can change a wing's lift?",
-                ["Only paint colour", "Shape, speed and angle of attack", "Only the logo"],
-                "Shape, speed and angle of attack"
-            ),
-            "Lift and drag": (
-                "If speed doubles and other values stay fixed, dynamic pressure becomes…",
-                ["2 times", "4 times", "8 times"], "4 times"
-            ),
-            "Angle of attack and stall": (
-                "Does increasing angle of attack always increase lift?",
-                ["Yes, always", "No; a stall can occur", "Only if painted red"],
-                "No; a stall can occur"
-            ),
-            "Propeller vs jet engine": (
-                "A propeller mainly creates thrust by…",
-                ["Accelerating air", "Changing paint", "Making the wing heavier"],
-                "Accelerating air"
-            ),
-            "Helicopter rotor": (
-                "Rotor blades behave aerodynamically like…",
-                ["Airfoils", "Wheels", "Batteries"], "Airfoils"
-            ),
-            "Aircraft stability": (
-                "Does a good-looking 3D model prove stability?",
-                ["Yes", "No", "Only on a dark background"], "No"
-            ),
-            "Materials and structure": (
-                "What is a key aircraft material trade-off?",
-                ["Strength, mass and durability", "Colour only", "Font size"],
-                "Strength, mass and durability"
-            ),
-            "Design process and safety": (
-                "What does a 3D model alone prove?",
-                ["Flight safety", "Only visual geometry", "Certification"],
-                "Only visual geometry"
-            )
-        }
-
-        question, options, correct = quiz_data[topic]
-        answer = st.radio(question, options, key="aero_quiz_" + topic)
-        if st.button("Check answer", key="aero_check_" + topic):
-            if answer == correct:
-                st.success("Correct! Explain in your own words why the answer is right.")
-            else:
-                st.warning("Not quite. Review the lesson and try again.")
-
-    # ==========================================================
-    # 4. STUDENT PROJECT NOTEBOOK
-    # ==========================================================
-    with tab_project:
-        st.subheader("🏆 Student engineering project")
-
-        mission = st.selectbox(
-            "Choose a project mission",
-            [
-                "Paper glider investigator",
-                "Training airplane concept",
-                "Twin-propeller layout",
-                "Helicopter concept",
-                "Future flying-car concept",
-                "Compare wing designs"
-            ],
-            key="aero_mission"
-        )
-
-        mission_instructions = {
-            "Paper glider investigator":
-                "Make three paper gliders, changing one design feature at a time. "
-                "Do five consistent throws per design and compare the average distance.",
-            "Training airplane concept":
-                "Assemble the fuselage, wing, tail, cockpit and landing gear in the 3D workshop. "
-                "Label each part and explain its purpose.",
-            "Twin-propeller layout":
-                "Create a concept with two propellers. Explain why symmetry and motor placement matter.",
-            "Helicopter concept":
-                "Add a cabin, main rotor, tail rotor and skids. Explain how the rotor generates lift.",
-            "Future flying-car concept":
-                "Design a concept and identify its power source, lifting system, control method, payload and safety challenges.",
-            "Compare wing designs":
-                "Create two wing layouts and compare area and estimated lift. Explain the model's limitations."
-        }
-
-        st.info(mission_instructions[mission])
-
-        student_name = st.text_input("Student/team name (optional)", key="aero_student_name")
-        project_title = st.text_input("Project title", value=mission, key="aero_project_title")
-        design_goal = st.text_area("What problem does your machine solve?", key="aero_design_goal")
-        parts_used = st.text_area("Parts and materials used", key="aero_parts_used")
-        test_notes = st.text_area("Test results and observations", key="aero_test_notes")
-        reflection = st.text_area("What did you learn? What would you improve?", key="aero_reflection")
-
-        project_data = {
-            "brand": "Clyxess AI Aero Design School",
-            "student_or_team": student_name,
-            "project_title": project_title,
-            "mission": mission,
-            "design_goal": design_goal,
-            "parts_and_materials": parts_used,
-            "test_notes": test_notes,
-            "reflection": reflection,
-            "safety_note": "Educational concept only; not a validated aircraft design."
-        }
-
-        st.download_button(
-            "⬇️ Download project notebook (JSON)",
-            data=json.dumps(project_data, ensure_ascii=False, indent=2),
-            file_name="clyxess_aero_student_project.json",
-            mime="application/json",
-            use_container_width=True
-        )
-
-        st.markdown("#### Engineering review checklist")
-        for item in [
-            "I can explain the purpose of each major part.",
-            "I changed one variable at a time during tests.",
-            "I recorded measurements and observations.",
-            "I can describe at least two limitations of the model.",
-            "I understand that a concept model is not a flight-ready aircraft."
-        ]:
-            st.checkbox(item, key="aero_review_" + item)
-
-    st.divider()
-    st.caption(
-        "Clyxess AI Aero Design School • Educational learning prototype. "
-        "Real aircraft design requires qualified aerospace engineers, validated analysis, "
-        "physical testing and regulatory approval."
+    mode = st.radio(
+        "CHOOSE YOUR WORKSPACE",
+        ["Ready-made Design", "Build from Parts", "Start from Zero", "Generate Design"],
+        horizontal=True,
+        label_visibility="visible",
     )
 
+    presets = {
+        "Training Aircraft": [
+            {"type":"Fuselage","pos":[0,0,0],"scale":[1,1,1],"color":"#e7edf8"},
+            {"type":"Wing","pos":[0,0,0],"scale":[1,1,1],"color":"#2583e8"},
+            {"type":"Tail","pos":[-3,0,0],"scale":[1,1,1],"color":"#e7edf8"},
+            {"type":"Cockpit","pos":[1,0,0],"scale":[1,1,1],"color":"#36c6dc"},
+            {"type":"Propeller","pos":[3.6,0,0],"scale":[1,1,1],"color":"#f3b63f"},
+        ],
+        "Passenger Aircraft": [
+            {"type":"Fuselage","pos":[0,0,0],"scale":[1.45,1.15,1.15],"color":"#e7edf8"},
+            {"type":"Wing","pos":[0,0,0],"scale":[1.3,1,1],"color":"#2583e8"},
+            {"type":"Tail","pos":[-4,0,0],"scale":[1.1,1,1],"color":"#e7edf8"},
+            {"type":"JetEngine","pos":[0,-0.7,1],"scale":[1,1,1],"color":"#f3b63f"},
+            {"type":"JetEngine","pos":[0,-0.7,-1],"scale":[1,1,1],"color":"#f3b63f"},
+            {"type":"Cockpit","pos":[3,0,0],"scale":[1,1,1],"color":"#36c6dc"},
+        ],
+        "Drone": [
+            {"type":"Fuselage","pos":[0,0,0],"scale":[0.45,0.45,0.45],"color":"#2583e8"},
+            {"type":"Rotor","pos":[1.5,0,1.5],"scale":[1,1,1],"color":"#f3b63f"},
+            {"type":"Rotor","pos":[1.5,0,-1.5],"scale":[1,1,1],"color":"#f3b63f"},
+            {"type":"Rotor","pos":[-1.5,0,1.5],"scale":[1,1,1],"color":"#f3b63f"},
+            {"type":"Rotor","pos":[-1.5,0,-1.5],"scale":[1,1,1],"color":"#f3b63f"},
+        ],
+        "Helicopter": [
+            {"type":"Fuselage","pos":[0,0,0],"scale":[0.9,0.9,0.9],"color":"#2583e8"},
+            {"type":"Rotor","pos":[0,1.2,0],"scale":[1.7,1,1.7],"color":"#f3b63f"},
+            {"type":"Tail","pos":[-3,0,0],"scale":[1.3,0.5,0.5],"color":"#e7edf8"},
+            {"type":"Skid","pos":[0,-1,0],"scale":[1,1,1],"color":"#b8c4da"},
+        ],
+        "Fighter Concept": [
+            {"type":"Fuselage","pos":[0,0,0],"scale":[1.25,0.7,0.7],"color":"#65758b"},
+            {"type":"Wing","pos":[0,0,0],"scale":[0.7,0.6,0.6],"color":"#e7edf8"},
+            {"type":"Tail","pos":[-2.8,0,0],"scale":[0.8,0.7,0.7],"color":"#65758b"},
+            {"type":"JetEngine","pos":[-2.7,0,0],"scale":[1,1,1],"color":"#f3b63f"},
+            {"type":"Cockpit","pos":[1.5,0,0],"scale":[0.8,0.8,0.8],"color":"#36c6dc"},
+        ],
+    }
+
+    parts = [
+        "Fuselage", "Wing", "Tail", "Cockpit", "Propeller",
+        "JetEngine", "Rotor", "Wheel", "Skid", "Winglet",
+        "Battery", "Box", "Sphere", "Cylinder", "Cone",
+    ]
+
+    if mode == "Ready-made Design":
+        col1, col2 = st.columns([1, 2])
+        with col1:
+            preset = st.selectbox("Choose a starter model", list(presets))
+            st.caption("Starter models are editable visual concepts, not flight-ready aircraft.")
+            initial_scene = presets[preset]
+        with col2:
+            st.info("Load a starter model, then select, move, rotate, scale, recolor, duplicate or remove individual parts.")
+
+    elif mode == "Build from Parts":
+        initial_scene = []
+        st.caption("Start with an empty assembly and add components in the 3D workspace.")
+
+    elif mode == "Start from Zero":
+        initial_scene = []
+        st.caption("Blank canvas: create an original concept using basic shapes and aircraft components.")
+
+    else:
+        g1, g2, g3 = st.columns(3)
+        with g1:
+            concept = st.selectbox("Concept type", ["Trainer", "Passenger Aircraft", "Drone", "Helicopter", "Fighter Concept"])
+        with g2:
+            wing_size = st.slider("Wing size", 0.5, 2.0, 1.0, 0.1)
+        with g3:
+            body_size = st.slider("Body size", 0.5, 2.0, 1.0, 0.1)
+
+        initial_scene = json.loads(json.dumps(presets[concept]))
+        for obj in initial_scene:
+            if obj["type"] == "Wing":
+                obj["scale"][0] *= wing_size
+            elif obj["type"] == "Fuselage":
+                obj["scale"] = [v * body_size for v in obj["scale"]]
+
+        st.caption("Procedural starter generation uses preset geometry and your selected parameters. It is not AI text-to-3D.")
+
+    st.markdown("### 3D Design Workspace")
+
+    scene_json = json.dumps(initial_scene)
+    part_json = json.dumps(parts)
+
+    html = r"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+    <meta charset="utf-8">
+    <style>
+    *{box-sizing:border-box}
+    body{margin:0;background:#0b1020;color:#eaf0ff;font:13px Arial,sans-serif}
+    #app{display:grid;grid-template-columns:190px minmax(0,1fr) 210px;height:690px;border:1px solid #263550;border-radius:12px;overflow:hidden}
+    .panel{background:#111a2d;padding:12px;overflow:auto}
+    .panel h3{font-size:13px;color:#a9c9ff;margin:6px 0 12px}
+    button,select,input{width:100%;margin:4px 0;padding:8px;border:1px solid #334768;border-radius:6px;background:#1b2943;color:#fff}
+    button{cursor:pointer;text-align:left}
+    button:hover{background:#29436b}
+    #view{position:relative;min-width:0;background:#0b1020}
+    #canvas{position:absolute;inset:0}
+    #toolbar{position:absolute;z-index:2;top:10px;left:10px;right:10px;display:flex;gap:5px;flex-wrap:wrap}
+    #toolbar button{width:auto;padding:7px 10px;margin:0}
+    #status{position:absolute;bottom:10px;left:10px;background:#14213a;padding:8px;border-radius:6px;color:#b8c9e8}
+    #objectList button{font-size:12px}
+    .small{color:#98aacb;font-size:11px;line-height:1.5}
+    @media(max-width:750px){#app{grid-template-columns:125px minmax(0,1fr);height:720px}.right{display:none}.panel{padding:7px}#toolbar button{padding:6px}}
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/TransformControls.js"></script>
+    </head>
+    <body>
+    <div id="app">
+    <div class="panel">
+    <h3>CREATE PART</h3>
+    <div id="partButtons"></div>
+    <hr>
+    <h3>EDIT TOOLS</h3>
+    <button onclick="setMode('translate')">↔ Move</button>
+    <button onclick="setMode('rotate')">⟳ Rotate</button>
+    <button onclick="setMode('scale')">⤢ Scale</button>
+    <button onclick="duplicateSelected()">▣ Duplicate</button>
+    <button onclick="deleteSelected()">✕ Delete</button>
+    <button onclick="undo()">↶ Undo</button>
+    <button onclick="redo()">↷ Redo</button>
+    <hr>
+    <h3>CAMERA</h3>
+    <button onclick="cameraView('front')">Front View</button>
+    <button onclick="cameraView('side')">Side View</button>
+    <button onclick="cameraView('top')">Top View</button>
+    <button onclick="cameraView('rear')">Rear View</button>
+    <button onclick="frameAll()">Frame All</button>
+    <button onclick="grid.visible=!grid.visible">Toggle Grid</button>
+    </div>
+    <div id="view">
+    <div id="toolbar">
+    <button onclick="exportJSON()">Export JSON</button>
+    <button onclick="document.getElementById('importFile').click()">Import JSON</button>
+    <button onclick="saveLocal()">Save in Browser</button>
+    <button onclick="loadLocal()">Load Browser Save</button>
+    <button onclick="resetScene()">Reset Scene</button>
+    <input id="importFile" type="file" accept=".json,application/json" style="display:none" onchange="importJSON(event)">
+    </div>
+    <div id="canvas"></div>
+    <div id="status">Ready · Select a part to edit</div>
+    </div>
+    <div class="panel right">
+    <h3>OBJECTS</h3>
+    <div id="objectList"></div>
+    <hr>
+    <h3>SELECTED PART</h3>
+    <label>Name</label><input id="objName" placeholder="Part name" onchange="changeName(this.value)">
+    <label>Color</label><input id="objColor" type="color" value="#2583e8" onchange="changeColor(this.value)">
+    <label>Material</label>
+    <select id="objMaterial" onchange="changeMaterial(this.value)">
+    <option value="standard">Standard</option>
+    <option value="metal">Metallic</option>
+    <option value="glossy">Glossy</option>
+    <option value="wire">Wireframe</option>
+    </select>
+    <p class="small">Drag the colored 3D gizmos to edit along X, Y and Z. Orbit with the mouse; scroll to zoom.</p>
+    </div>
+    </div>
+    <script>
+    const START = __SCENE__;
+    const PARTS = __PARTS__;
+    const scene=new THREE.Scene();
+    scene.background=new THREE.Color(0x0b1020);
+    const camera=new THREE.PerspectiveCamera(45,1,0.1,2000);
+    camera.position.set(10,8,12);
+    const renderer=new THREE.WebGLRenderer({antialias:true});
+    renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+    renderer.outputEncoding=THREE.sRGBEncoding;
+    document.getElementById('canvas').appendChild(renderer.domElement);
+    const controls=new THREE.OrbitControls(camera,renderer.domElement);
+    controls.enableDamping=true;
+    scene.add(new THREE.HemisphereLight(0xcbdcff,0x263047,1.6));
+    const light=new THREE.DirectionalLight(0xffffff,2);
+    light.position.set(8,12,8);scene.add(light);
+    const grid=new THREE.GridHelper(100,100,0x385078,0x1d2a43);scene.add(grid);
+    const axes=new THREE.AxesHelper(3);scene.add(axes);
+    const transform=new THREE.TransformControls(camera,renderer.domElement);
+    scene.add(transform);
+    transform.addEventListener('dragging-changed',e=>controls.enabled=!e.value);
+    let objects=[],selected=null,undoStack=[],redoStack=[],restoring=false;
+    const status=t=>document.getElementById('status').textContent=t;
+    function pushHistory(){
+     if(restoring)return;
+     undoStack.push(JSON.stringify(serialize()));
+     if(undoStack.length>40)undoStack.shift();
+     redoStack=[];
+    }
+    function geometry(type){
+     switch(type){
+     case 'Fuselage':return new THREE.CapsuleGeometry(0.55,4.8,6,12);
+     case 'Wing':return new THREE.BoxGeometry(1.0,0.16,8);
+     case 'Tail':return new THREE.BoxGeometry(0.65,0.13,2.6);
+     case 'Cockpit':return new THREE.SphereGeometry(0.55,20,12);
+     case 'Propeller':return new THREE.BoxGeometry(0.12,0.12,1.8);
+     case 'JetEngine':return new THREE.CylinderGeometry(0.35,0.5,1.4,20);
+     case 'Rotor':return new THREE.BoxGeometry(0.12,0.08,3);
+     case 'Wheel':return new THREE.TorusGeometry(0.45,0.15,10,24);
+     case 'Skid':return new THREE.BoxGeometry(2,0.1,0.12);
+     case 'Winglet':return new THREE.BoxGeometry(0.15,0.9,0.7);
+     case 'Battery':return new THREE.BoxGeometry(0.8,0.45,0.8);
+     case 'Sphere':return new THREE.SphereGeometry(0.7,24,16);
+     case 'Cylinder':return new THREE.CylinderGeometry(0.6,0.6,1.3,24);
+     case 'Cone':return new THREE.ConeGeometry(0.7,1.5,24);
+     default:return new THREE.BoxGeometry(1,1,1);
+     }
+    }
+    function material(color,kind='standard'){
+     return new THREE.MeshStandardMaterial({
+     color:color||'#2583e8',
+     metalness:kind==='metal'?0.85:0.15,
+     roughness:kind==='glossy'?0.12:0.55,
+     wireframe:kind==='wire'
+     });
+    }
+    function addPart(type,data=null,history=true){
+     if(history)pushHistory();
+     const color=data?.color||'#2583e8';
+     const mesh=new THREE.Mesh(geometry(type),material(color));
+     mesh.name=data?.name||type;
+     mesh.userData.partType=type;
+     if(data){
+      mesh.position.fromArray(data.pos||[0,0,0]);
+      mesh.rotation.fromArray(data.rot||[0,0,0]);
+      mesh.scale.fromArray(data.scale||[1,1,1]);
+      mesh.userData.materialKind=data.material||'standard';
+      mesh.material=material(color,mesh.userData.materialKind);
+     }else{
+      mesh.position.x=(Math.random()-0.5)*2;
+      mesh.position.y=0.5;
+      mesh.position.z=(Math.random()-0.5)*2;
+     }
+     scene.add(mesh);objects.push(mesh);select(mesh);refreshList();
+     return mesh;
+    }
+    function serialize(){
+     return objects.map(o=>({
+      type:o.userData.partType,name:o.name,
+      pos:o.position.toArray(),rot:o.rotation.toArray(),
+      scale:o.scale.toArray(),
+      color:'#'+o.material.color.getHexString(),
+      material:o.userData.materialKind||'standard'
+     }));
+    }
+    function clearScene(){
+     transform.detach();selected=null;
+     objects.forEach(o=>scene.remove(o));objects=[];
+    }
+    function loadScene(data,history=true){
+     if(!Array.isArray(data)||data.length>1000)throw Error('Invalid or oversized project file');
+     if(history)pushHistory();
+     restoring=true;clearScene();
+     data.forEach(d=>addPart(d.type||'Box',d,false));
+     restoring=false;refreshList();status('Loaded '+objects.length+' objects');
+    }
+    function select(o){
+     selected=o;transform.detach();
+     if(o){transform.attach(o);
+     document.getElementById('objName').value=o.name;
+     document.getElementById('objColor').value='#'+o.material.color.getHexString();
+     document.getElementById('objMaterial').value=o.userData.materialKind||'standard';
+     status('Selected: '+o.name);}
+     refreshList();
+    }
+    function refreshList(){
+     const list=document.getElementById('objectList');list.innerHTML='';
+     objects.forEach((o,i)=>{
+      const b=document.createElement('button');
+      b.textContent=(selected===o?'● ':'')+(i+1)+'. '+o.name;
+      b.onclick=()=>select(o);list.appendChild(b);
+     });
+    }
+    function setMode(m){transform.setMode(m);status('Tool: '+m);}
+    function duplicateSelected(){
+     if(!selected)return;
+     const d=serialize()[objects.indexOf(selected)];
+     d.pos=[d.pos[0]+1,d.pos[1],d.pos[2]+1];d.name+=' Copy';
+     addPart(d.type,d);
+    }
+    function deleteSelected(){
+     if(!selected)return;pushHistory();
+     scene.remove(selected);objects=objects.filter(o=>o!==selected);
+     select(null);refreshList();status('Part deleted');
+    }
+    function changeName(v){if(selected){pushHistory();selected.name=v;refreshList();}}
+    function changeColor(v){
+     if(selected){pushHistory();selected.material.color.set(v);refreshList();}
+    }
+    function changeMaterial(v){
+     if(selected){pushHistory();selected.userData.materialKind=v;
+     selected.material=material('#'+selected.material.color.getHexString(),v);}
+    }
+    function undo(){
+     if(!undoStack.length)return;
+     redoStack.push(JSON.stringify(serialize()));
+     const d=JSON.parse(undoStack.pop());loadScene(d,false);
+    }
+    function redo(){
+     if(!redoStack.length)return;
+     undoStack.push(JSON.stringify(serialize()));
+     const d=JSON.parse(redoStack.pop());loadScene(d,false);
+    }
+    function exportJSON(){
+     const blob=new Blob([JSON.stringify({app:'Clyxess Aero Lab',version:1,objects:serialize()},null,2)],{type:'application/json'});
+     const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+     a.download='clyxess-aero-project.json';a.click();URL.revokeObjectURL(a.href);
+     status('Project JSON exported');
+    }
+    function importJSON(e){
+     const f=e.target.files[0];if(!f)return;
+     const r=new FileReader();
+     r.onload=()=>{try{
+      const j=JSON.parse(r.result);loadScene(Array.isArray(j)?j:j.objects);
+     }catch(err){status('Import error: '+err.message);}
+     e.target.value='';
+     };r.readAsText(f);
+    }
+    function saveLocal(){
+     localStorage.setItem('clyxess-aero-project',JSON.stringify(serialize()));
+     status('Saved in this browser');
+    }
+    function loadLocal(){
+     try{loadScene(JSON.parse(localStorage.getItem('clyxess-aero-project')||'[]'));}
+     catch(e){status('No valid browser save found');}
+    }
+    function resetScene(){
+     if(!confirm('Reset the current scene?'))return;
+     pushHistory();clearScene();frameAll();refreshList();status('Blank workspace');
+    }
+    function frameAll(){
+     if(!objects.length){camera.position.set(10,8,12);controls.target.set(0,0,0);return;}
+     const box=new THREE.Box3();
+     objects.forEach(o=>box.expandByObject(o));
+     const center=box.getCenter(new THREE.Vector3());
+     const size=box.getSize(new THREE.Vector3());
+     const radius=Math.max(size.x,size.y,size.z,3);
+     controls.target.copy(center);
+     camera.position.copy(center).add(new THREE.Vector3(radius*1.5,radius*1.1,radius*1.5));
+     camera.near=0.1;camera.far=Math.max(2000,radius*20);camera.updateProjectionMatrix();
+    }
+    function cameraView(v){
+     const t=controls.target.clone(),r=12;
+     const positions={front:[0,0,r],rear:[0,0,-r],side:[r,0,0],top:[0,r,0]};
+     camera.position.copy(t).add(new THREE.Vector3(...positions[v]));
+     camera.up.set(0,1,0);
+     if(v==='top')camera.up.set(0,0,-1);
+     camera.lookAt(t);controls.update();
+    }
+    const pb=document.getElementById('partButtons');
+    PARTS.forEach(p=>{const b=document.createElement('button');b.textContent='+ '+p;b.onclick=()=>addPart(p);pb.appendChild(b);});
+    renderer.domElement.addEventListener('pointerdown',e=>{
+     if(transform.dragging)return;
+     const rect=renderer.domElement.getBoundingClientRect();
+     const mouse=new THREE.Vector2((e.clientX-rect.left)/rect.width*2-1,-(e.clientY-rect.top)/rect.height*2+1);
+     const ray=new THREE.Raycaster();ray.setFromCamera(mouse,camera);
+     const hits=ray.intersectObjects(objects,false);
+     if(hits.length)select(hits[0].object);
+    });
+    window.addEventListener('keydown',e=>{
+     if(['INPUT','SELECT'].includes(document.activeElement.tagName))return;
+     if(e.key==='Delete'||e.key==='Backspace')deleteSelected();
+     if(e.key.toLowerCase()==='w')setMode('translate');
+     if(e.key.toLowerCase()==='e')setMode('rotate');
+     if(e.key.toLowerCase()==='r')setMode('scale');
+    });
+    function resize(){
+     const el=document.getElementById('view');
+     const w=el.clientWidth,h=el.clientHeight;
+     if(!w||!h)return;
+     camera.aspect=w/h;camera.updateProjectionMatrix();renderer.setSize(w,h);
+    }
+    window.addEventListener('resize',resize);
+    function animate(){requestAnimationFrame(animate);controls.update();renderer.render(scene,camera);}
+    resize();animate();
+    START.forEach(d=>addPart(d.type,d,false));refreshList();frameAll();
+    </script>
+    </body>
+    </html>
+    """
+
+    html = html.replace("__SCENE__", scene_json).replace("__PARTS__", part_json)
+    components.html(html, height=705, scrolling=False)
+
+    st.divider()
+    
+    # ==========================================
+    # 3. TERA ORIGINAL WIND TUNNEL & TELEMETRY (Restored!)
+    # ==========================================
+    st.write("### 📡 Live Wind Tunnel Physics")
+    
+    control_col1, control_col2, control_col3, control_col4 = st.columns(4)
+    with control_col1:
+        airframe_type = st.selectbox("🛸 Structural Airframe", ["NASA X-57 Maxwell", "Tactical Drone", "VTOL Flying Car"])
+    with control_col2:
+        hull_color_input = st.color_picker("🎨 Custom Hull Paint", "#FF3366")
+    with control_col3:
+        distributed_motors = st.slider("⚙️ Distributed Motor Units", 2, 16, 12, step=2)
+    with control_col4:
+        angle_of_attack = st.slider("📐 Wing Angle of Attack (°)", -10, 45, 12, step=1)
+
+    wind_velocity_input = st.slider("💨 Wind Tunnel Velocity Grid (km/h)", 200, 1800, 750, step=50)
+
+    # ADVANCED PHYSICS CALCULATION CORE
+    import numpy as np
+    import plotly.graph_objects as go
+
+    rad_alpha_val = np.radians(angle_of_attack)
+    computed_mass_kg = 1500 + (distributed_motors * 120)
+
+    calculated_lift_force = int(np.sin(rad_alpha_val) * (wind_velocity_input ** 1.65) * 0.035 * (1 + (distributed_motors / 8)))
+    radar_point_drag_force = int(wind_velocity_input * 0.45 * (1 + np.sin(rad_alpha_val)))
+    wing_surface_drag_force = int(wind_velocity_input * 0.65 * (1 + (angle_of_attack / 12)**2))
+    net_aerodynamic_drag = radar_point_drag_force + wing_surface_drag_force
+
+    system_stability_score = 100 - (abs(angle_of_attack - 14) * 2.5) - (computed_mass_kg / 75)
+    system_stability_score = max(min(system_stability_score, 100), 0)
+
+    # VISUAL VIEWPOT AND TELEMETRY HUD ARRANGEMENT
+    view_col, telemetry_col = st.columns([2, 1])
+
+    with view_col:
+        fig_viewport = go.Figure()  
+        
+        resol_y = 12  
+        tx_grid = np.linspace(-6, 6, 25)  
+        ty_grid = np.linspace(-2.5, 2.5, resol_y)  
+        
+        for yp_val in ty_grid:  
+            flow_bending_curve = (angle_of_attack / 35) * np.exp(-(tx_grid - 0)**2 / 2.2)  
+            tz_grid = yp_val + flow_bending_curve  
+            
+            color_vector = "#FF3366" if net_aerodynamic_drag > 1200 or system_stability_score < 45 else "#00FFCC"  
+            
+            fig_viewport.add_trace(go.Scatter3d(  
+                x=tx_grid, y=np.full_like(tx_grid, yp_val), z=tz_grid,  
+                mode='lines', line=dict(color=color_vector, width=2), showlegend=False  
+            ))  
+            
+        fig_viewport.add_trace(go.Scatter3d(x=[0], y=[0], z=[0], mode='markers+text',  
+            marker=dict(size=28, color=hull_color_input, line=dict(color='white', width=1.5)),  
+            name="Fuselage Core", text=["Main Airframe"], textposition="bottom center"))  
+            
+        fig_viewport.add_trace(go.Scatter3d(x=[1.3], y=[0], z=[0.18], mode='markers+text',  
+            marker=dict(size=14, color='#ffffff', symbol='diamond', line=dict(color=hull_color_input, width=2)),  
+            name="Radar Edge", text=["[Radar Cone]"], textposition="top center"))  
+            
+        wing_span_array = np.linspace(-2.4, 2.4, distributed_motors)  
+        fig_viewport.add_trace(go.Scatter3d(  
+            x=np.zeros(distributed_motors) - 0.5, y=wing_span_array, z=np.zeros(distributed_motors) - 0.1,  
+            mode='markers+text',  
+            marker=dict(size=14, color='#e9c46a', symbol='circle-open', line=dict(color='#00FFCC', width=3)),  
+            name="Distributed Motors", text=[f"M-{i+1}" for i in range(distributed_motors)], textposition="top center"  
+        ))  
+        
+        fig_viewport.update_layout(  
+            scene=dict(xaxis=dict(visible=False), yaxis=dict(visible=False), zaxis=dict(visible=False), bgcolor="#010206",  
+                       camera=dict(eye=dict(x=1.5, y=1.5, z=0.9))),  
+            margin=dict(l=0, r=0, b=0, t=0), height=460, paper_bgcolor="rgba(0,0,0,0)"  
+        )  
+        st.plotly_chart(fig_viewport, use_container_width=True)
+
+    with telemetry_col:
+        st.write("##### 📡 Live Avionics Feeds")
+
+        st.markdown(f"""  
+        <div class="cockpit-panel-2050" style="padding:15px; margin-bottom:10px; border: 2px solid #00FFCC; border-radius: 20px; background: linear-gradient(135deg, #050716, #11153b); color: white;">  
+            <p style="margin:0; font-size:13px;"><b>Active Mass:</b> {computed_mass_kg:,} kg</p>  
+            <p style="margin:0; font-size:13px;"><b>Engine Arrays:</b> {distributed_motors} Motors</p>  
+        </div>  
+        <div class="sensor-feed-box" style="background: #060919; border: 1px solid #FF3366; border-radius: 12px; padding: 12px; color: white; margin-bottom: 10px;"><small style="color:#00FFCC;">📍 NOSE RADAR DRAG</small><h4 style="margin:0;">{radar_point_drag_force:,} N</h4></div>  
+        <div class="sensor-feed-box" style="background: #060919; border: 1px solid #FF3366; border-radius: 12px; padding: 12px; color: white; margin-bottom: 10px;"><small style="color:#00FFCC;">📐 WING SURFACE DRAG</small><h4 style="margin:0;">{wing_surface_drag_force:,} N</h4></div>  
+        <div class="sensor-feed-box" style="background: #060919; border: 1px solid #00FFCC; border-radius: 12px; padding: 12px; color: white; margin-bottom: 10px;"><small style="color:#FF3366;">🚀 NET GENERATED LIFT FORCE</small><h4 style="margin:0;">{calculated_lift_force:,} N</h4></div>  
+        """, unsafe_allow_html=True)  
+        
+        st.write("Stability Balance Grid:")  
+        st.progress(int(system_stability_score) / 100)
+
+    # ==========================================
+    # 4. ANATOMY CARD (Academic Hub)
+    # ==========================================
+    st.divider()
+    st.write("### 📜 Interactive Diagram Breakdown & Academic Hub")
+    
+    anatomy_database = {
+        "Radar / Nose Cone": {
+            "title": "🎯 Radar & Nose Cone Edge",
+            "physics": "यह विमान का सबसे अगला हिस्सा है। इसका तीखा आकार हवा को बिना अशांति के काटता है, जिससे 'Form Drag' कम होता है।",
+            "math": "गणितीय समीकरण: $D_{Nose} = \\frac{1}{2} \\rho v^2 A C_d \\sin(\\theta)$."
+        },
+        "Main Airfoil Wings": {
+            "title": "📐 Main Wings & Lift Mechanics",
+            "physics": "बर्नोली और न्यूटन के नियमानुसार, ऊपरी सतह पर हवा का वेग तेज़ होने से निम्न दाब क्षेत्र बनता है, जो Lift देता है।",
+            "math": "Lift Formula: $L = C_L \\cdot \\frac{1}{2}\\rho v^2 \\cdot S$."
+        },
+        "Distributed Propulsion": {
+            "title": "⚙️ Distributed Electric Propulsion",
+            "physics": "नासा के X-57 विज़न पर आधारित। पंखों के ऊपर कई छोटे मोटर्स लगाने से कम स्पीड पर भी भयंकर लिफ्ट पैदा होती है।",
+            "math": "इंजन समीकरण: $T_{Total} = \\sum_{i=1}^{N} T_i \\cdot \\eta_{aero}$."
+        }
+    }
+    
+    inspected_part = st.selectbox("🎯 Select a Component to Inspect:", list(anatomy_database.keys()))
+    part_metrics = anatomy_database[inspected_part]
+
+    st.markdown(f"""
+    <div class="report-card-2050" style="border: 2px dashed #00FFCC; border-radius: 20px; padding: 25px; background: #050814; color: white;">  
+        <h3 style="color: #00FFCC; margin-top:0;">{part_metrics['title']}</h3>  
+        <div style="display: flex; gap: 20px; margin-top: 15px;">  
+            <div style="flex: 1; background: rgba(255,255,255,0.02); padding: 15px; border-radius: 12px; border-left: 4px solid #00FFCC;">  
+                <h5><span class="physics-indicator" style="background-color: #00FFCC; color: #02040c; padding: 3px 8px; border-radius: 5px; font-weight: bold;">PHYSICS</span> Force Analysis</h5>  
+                <p style="margin-top:10px; font-size:14px; color:#ddd;">{part_metrics['physics']}</p>  
+            </div>  
+            <div style="flex: 1; background: rgba(255,255,255,0.02); padding: 15px; border-radius: 12px; border-left: 4px solid #FF3366;">  
+                <h5><span class="math-indicator" style="background-color: #FF3366; color: white; padding: 3px 8px; border-radius: 5px; font-weight: bold;">MATH</span> Framework</h5>  
+                <p style="margin-top:10px; font-size:14px; color:#ddd;">{part_metrics['math']}</p>  
+            </div>  
+        </div>  
+    </div>  
+    """, unsafe_allow_html=True)
+
+    # ==========================================
+    # 5. AI MENTOR CHAT
+    # ==========================================
+    st.divider()
+    st.write("### 🧠 Clyxess Aero-AI Mentor")
+    
+    if "aero_chat_log" not in st.session_state:
+        st.session_state.aero_chat_log = [
+            {"role": "assistant", "content": "जय जोहार पायलट! मैं आपका Clyxess Aero-AI मेंटर हूँ। मॉडल बनाएं और मुझसे सवाल पूछें!"}
+        ]
+
+    for msg in st.session_state.aero_chat_log:
+        with st.chat_message(msg["role"]):
+            st.markdown(msg["content"])
+
+    user_query = st.chat_input("Ask Aero-AI...", key="aero_chat")
+    if user_query:
+        st.session_state.aero_chat_log.append({"role": "user", "content": user_query})
+        with st.chat_message("user"):
+            st.markdown(user_query)
+        
+        with st.chat_message("assistant"):
+            with st.spinner("Calculating aerodynamics..."):
+                try:
+                    res = client.chat.completions.create(
+                        model="openai/gpt-oss-120b",
+                        messages=[{"role": "system", "content": "You are Aero-AI."}, {"role": "user", "content": user_query}],
+                        temperature=0.6
+                    )
+                    reply = res.choices[0].message.content
+                except Exception as e:
+                    reply = f"Error: {e}"
+                
+                import time
+                placeholder = st.empty()
+                typed_text = ""
+                for word in reply.split(" "):
+                    typed_text += word + " "
+                    placeholder.markdown(typed_text + "▌")
+                    time.sleep(0.05)
+                placeholder.markdown(reply)
+                
+                st.session_state.aero_chat_log.append({"role": "assistant", "content": reply})
+    
 def render_learn_ai(client):
 
     import streamlit as st
