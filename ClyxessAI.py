@@ -2487,10 +2487,9 @@ def render_login_signup():
 def render_image_generator():
     import streamlit as st
     import urllib.parse
-    from huggingface_hub import InferenceClient
 
     st.title("🎨 AI Educational Diagram Generator")
-    st.write("Machine ka naam likho, hum aapko **High-Quality Diagram** aur uska **AI explanation** denge.")
+    st.write("Machine ka naam likho, hum aapko **Colorful Diagram** aur uska **AI explanation** denge.")
 
     # 🌐 Languages Dropdown
     languages = ["English", "Hindi (हिंदी)", "Hinglish", "Bengali", "Tamil", "Telugu", "Marathi", "Gujarati", "Spanish", "French"]
@@ -2502,49 +2501,22 @@ def render_image_generator():
     
     if st.button("🔍 Generate Diagram", type="primary", use_container_width=True) and prompt.strip():
         
-        # 1. Image Generation Engine
-        with st.spinner("🎨 AI diagram bana raha hai (Hugging Face FLUX Model)..."):
+        # 1. Image Generation (Pollinations.ai - Free & Unlimited)
+        with st.spinner("🎨 AI diagram bana raha hai (Free Engine)..."):
             
-            # Strict prompt taaki AI sirf diagram banaye
-            strict_prompt = f"2D flat vector educational diagram of {prompt}, clear labels, arrows, colorful textbook illustration, white background, no 3d render"
+            # ⭐ SABSE IMPORTANT FIX: Strict Prompt for 2D Flat Diagram
+            # Hum AI ko bol rahe hain ki 3D, photo, ya shading bilkul mat karo.
+            strict_prompt = f"Flat vector infographic, 2D schematic diagram of {prompt}, educational textbook illustration, colorful layout, white background, minimalist vector art, simple geometric shapes, no shading, no 3D, no photo, no realistic."
             
-            image_url = None
-            hf_success = False
+            encoded_prompt = urllib.parse.quote(strict_prompt)
+            # Pollinations Free URL
+            backup_url = f"https://image.pollinations.ai/prompt/{encoded_prompt}?width=800&height=600&nologo=true"
             
-            # Try 1: Hugging Face (FLUX.1-schnell - Best Quality)
             try:
-                hf_token = st.secrets.get("HF_TOKEN", "") 
-                
-                if hf_token:
-                    hf_client = InferenceClient(token=hf_token)
-                    # FLUX model call
-                    image = hf_client.text_to_image(
-                        prompt=strict_prompt,
-                        model="black-forest-labs/FLUX.1-schnell",
-                    )
-                    
-                    # Image display aur download
-                    st.image(image, caption=f"Generated Diagram: {prompt}", use_container_width=True)
-                    
-                    # Download button ke liye bytes mein convert karo
-                    import io
-                    img_byte_arr = io.BytesIO()
-                    image.save(img_byte_arr, format='PNG')
-                    img_byte_arr = img_byte_arr.getvalue()
-                    
-                    st.download_button("⬇️ Save Image", data=img_byte_arr, file_name="diagram.png", mime="image/png")
-                    hf_success = True
-                else:
-                    st.warning("HF_TOKEN nahi mila. Backup use kar rahe hain.")
-            except Exception as e:
-                st.warning(f"Hugging Face error: {e}. Switching to backup...")
-
-            # Try 2: Pollinations (Fallback)
-            if not hf_success:
-                encoded_prompt = urllib.parse.quote(strict_prompt)
-                backup_url = f"https://image.pollinations.ai/prompt/{encoded_prompt}?width=800&height=600&nologo=true"
-                st.image(backup_url, caption=f"Generated Diagram (Backup): {prompt}", use_container_width=True)
+                st.image(backup_url, caption=f"Generated Diagram: {prompt}", use_container_width=True)
                 st.link_button("⬇️ Open Full Image to Download", backup_url)
+            except Exception as e:
+                st.error(f"Image Generation Error: {e}")
             
             # 2. Generate AI Explanation (5-10 lines)
             with st.spinner("🤖 AI 5-10 line ka explanation likh raha hai..."):
