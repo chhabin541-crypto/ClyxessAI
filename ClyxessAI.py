@@ -2484,62 +2484,78 @@ def render_login_signup():
                 st.success("Account created. Confirm email if your Supabase project requires it.")
             except Exception as e: st.error(f"Sign up failed: {e}")
 
-def render_image_generator():
+def render_image_generator(client):
     import streamlit as st
     import base64
+    import urllib.parse
 
-    st.title("🎨 AI Educational Diagram Generator")
-    
+    st.title("🎨 AI Educational Diagram & Explainer")
+
     # 🌐 Languages Dropdown
     languages = ["English", "Hindi (हिंदी)", "Hinglish", "Bengali", "Tamil", "Telugu", "Marathi", "Gujarati", "Spanish", "French"]
     selected_lang = st.selectbox("🌐 Select Explanation Language", languages)
 
-    # Tabs for Generate vs Upload
-    tab1, tab2 = st.tabs(["✨ Generate New Diagram", "📤 Upload Image to Explain"])
+    tab1, tab2 = st.tabs(["✨ Generate Diagram", "📤 Upload Image to Explain"])
 
     # ==========================================
-    # TAB 1: GENERATE NEW DIAGRAM
+    # TAB 1: GENERATE DIAGRAM & EXPLAIN
     # ==========================================
     with tab1:
-        prompt = st.text_area("Describe the machine/concept (e.g., 'Parts of a Car Engine', 'How an Airplane flies')", 
-                              placeholder="Example: Cross-section of a Jet Engine with labels")
+        prompt = st.text_area("Machine/Concept (e.g., 'Car Engine', 'Helicopter Parts')", 
+                              placeholder="Example: Parts of a Car Engine")
         aspect = st.selectbox("📐 Format", ["1:1", "16:9", "9:16"])
         
         if st.button("🎨 Generate Diagram", type="primary", use_container_width=True) and prompt.strip():
-            with st.spinner("🎨 AI is drawing the colorful diagram..."):
+            with st.spinner("🤖 AI is preparing the diagram and explanation..."):
                 
-                # ⭐ STRICT PROMPT: Force AI to make a diagram, not a photo
-                strict_prompt = f"Educational textbook diagram of {prompt}. Colorful, clear labels, arrows pointing to parts, white background, vector illustration style. DO NOT create a realistic photo or abstract art."
+                # 1. STRICT Vector Prompt for Image Generation (But we warn user about text)
+                strict_prompt = f"2D vector infographic, flat design, educational diagram of {prompt}, white background, clean lines, no realistic shading, no abstract art."
                 
-                # Aapka original function call
-                data, source = generate_image_url(strict_prompt, False, "Normal", aspect)
-                
-            st.markdown('<div class="media-card">', unsafe_allow_html=True)
-            st.image(data, width=520, caption="Generated Diagram")
-            st.markdown('</div>', unsafe_allow_html=True)
-            
-            # Download button
-            if isinstance(data, bytes):
-                st.download_button("⬇️ Save Diagram", data=data, file_name="educational_diagram.png", mime="image/png")
-            else:
-                st.link_button("🔗 Open Full Image", data)
-
-            # ⭐ 5-10 Line Explanation Generation
-            with st.spinner("🤖 AI is writing the explanation..."):
-                explain_prompt = f"Explain the '{prompt}' in exactly 5 to 10 lines. Point out its main parts and how it works. Language: {selected_lang}."
                 try:
-                    res = client.chat.completions.create(
-                        model="openai/gpt-oss-120b", # Use your text model here
-                        messages=[{"role": "user", "content": explain_prompt}],
-                        temperature=0.6, max_tokens=400
-                    )
-                    st.success("### 📖 Explanation")
-                    st.markdown(res.choices[0].message.content)
+                    # Image Generation Call (Aapka purana function)
+                    data, source = generate_image_url(strict_prompt, False, "Normal", aspect)
+                    
+                    st.markdown('<div class="media-card">', unsafe_allow_html=True)
+                    st.image(data, width=520, caption="AI Generated Visual (Note: AI struggles with text labels)")
+                    st.markdown('</div>', unsafe_allow_html=True)
+                    
+                    if isinstance(data, bytes):
+                        st.download_button("⬇️ Save Image", data=data, file_name="diagram.png", mime="image/png")
+                    else:
+                        st.link_button("🔗 Open Full Image", data)
+                        
                 except Exception as e:
-                    st.error(f"Explanation Error: {e}")
+                    st.error(f"Image Generation Failed: {e}")
+                
+                # 2. AI Text Explanation + Real Diagram Link
+                with st.spinner("🤖 AI is writing the 5-10 line explanation..."):
+                    search_query = urllib.parse.quote_plus(f"{prompt} diagram for kids")
+                    google_images_link = f"https://www.google.com/search?q={search_query}&tbm=isch"
+                    
+                    explain_prompt = f"""
+                    You are a helpful teacher. Explain '{prompt}' in exactly 5 to 10 lines.
+                    Language: {selected_lang}.
+                    Point out its main parts and how they work together in simple words.
+                    """
+                    
+                    try:
+                        res = client.chat.completions.create(
+                            model="openai/gpt-oss-120b", # Aapka text model
+                            messages=[{"role": "user", "content": explain_prompt}],
+                            temperature=0.6, max_tokens=400
+                        )
+                        st.success("### 📖 Explanation")
+                        st.markdown(res.choices[0].message.content)
+                        
+                        # ⭐ Asli Diagram ka Link (Kyunki AI text nahi bana sakta)
+                        st.info("💡 **Tip:** AI image generators text/labels ko kharab bana dete hain. Ek perfect, labeled diagram dekhne ke liye niche diye gaye link par click karein:")
+                        st.markdown(f"👉 [**Click here to see REAL {prompt} Diagram on Google**]({google_images_link})")
+                        
+                    except Exception as e:
+                        st.error(f"Explanation Error: {e}")
 
     # ==========================================
-    # TAB 2: UPLOAD IMAGE TO EXPLAIN
+    # TAB 2: VISION (UPLOAD & ASK)
     # ==========================================
     with tab2:
         uploaded_file = st.file_uploader("Upload your Diagram (PNG, JPG)", type=["png", "jpg", "jpeg"])
@@ -2547,32 +2563,31 @@ def render_image_generator():
         if uploaded_file is not None:
             st.image(uploaded_file, caption="Your Uploaded Image", width=350)
             
-            # ⭐ AI ko pehle poochho ki user kya janna chahta hai
             user_question = st.text_input("✍️ What do you want to know about this image?", 
-                                          placeholder="Example: Isme kya kya parts hain? / Yeh machine kaise kaam karti hai?")
+                                          placeholder="Example: Isme kya kya parts hain? / Yeh kaise kaam karta hai?")
             
             if st.button("🧠 Explain This Image", type="primary", use_container_width=True):
                 if not user_question.strip():
                     st.warning("Pehle batao ki is image ke baare mein kya janna hai!")
                 else:
-                    with st.spinner("AI image ko padh raha hai aur explain kar raha hai..."):
+                    with st.spinner("AI image ko padh raha hai..."):
                         
-                        # Image ko base64 mein convert karo Vision API ke liye
                         bytes_data = uploaded_file.getvalue()
                         base64_image = base64.b64encode(bytes_data).decode('utf-8')
                         
                         vision_prompt = f"""
                         User uploaded this image and asked: '{user_question}'.
                         Look at the image and answer the user's question clearly.
-                        If there are parts visible, identify them. 
-                        Language: {selected_lang}.
-                        Give a 5-10 line explanation.
+                        Language: {selected_lang}. Give a 5-10 line explanation.
                         """
                         
                         try:
-                            # Vision API Call (Make sure your client supports gpt-4o or similar vision model)
+                            # ⭐ FIXED: gpt-4o ki jagah Groq ka free Vision Model use karein
+                            # Agar aap OpenAI ka paid key use kar rahe hain toh "gpt-4o" likhein
+                            vision_model = "llama-3.2-90b-vision-preview" 
+                            
                             response = client.chat.completions.create(
-                                model="gpt-4o", 
+                                model=vision_model, 
                                 messages=[
                                     {
                                         "role": "user",
@@ -2590,7 +2605,8 @@ def render_image_generator():
                             st.markdown(response.choices[0].message.content)
                             
                         except Exception as e:
-                            st.error(f"Vision API Error: {e}. (Ensure your API key supports image inputs).")
+                            st.error(f"Vision API Error: {e}")
+                            st.info("💡 Agar error aaye, toh check karein ki aapki API key (Groq ya OpenAI) Vision models ko support karti hai ya nahi.")
             
 def render_ai_autonomous_behavior():
     # ============================================================
