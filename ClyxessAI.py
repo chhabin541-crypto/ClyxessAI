@@ -2486,37 +2486,38 @@ def render_login_signup():
 
 def render_image_generator():
     import streamlit as st
-    import base64
     import urllib.parse
+    import base64
 
-    st.title("🎨 AI Educational Diagram & Explainer")
-
+    st.title("🎨 AI Educational Diagram & Vision Lab")
+    
     # 🌐 Languages Dropdown
     languages = ["English", "Hindi (हिंदी)", "Hinglish", "Bengali", "Tamil", "Telugu", "Marathi", "Gujarati", "Spanish", "French"]
     selected_lang = st.selectbox("🌐 Select Explanation Language", languages)
 
-    tab1, tab2 = st.tabs(["✨ Generate Diagram", "📤 Upload Image to Explain"])
+    # Tabs for Generate vs Upload
+    tab1, tab2 = st.tabs(["✨ Generate New Diagram", "📤 Upload Image to Explain"])
 
     # ==========================================
-    # TAB 1: GENERATE DIAGRAM & EXPLAIN
+    # TAB 1: GENERATE NEW DIAGRAM
     # ==========================================
     with tab1:
-        prompt = st.text_area("Machine/Concept (e.g., 'Car Engine', 'Helicopter Parts')", 
-                              placeholder="Example: Parts of a Car Engine")
+        prompt = st.text_area("What machine/concept should I explain?", 
+                              placeholder="Example: Parts of a Flying Car / Helicopter")
         aspect = st.selectbox("📐 Format", ["1:1", "16:9", "9:16"])
         
         if st.button("🎨 Generate Diagram", type="primary", use_container_width=True) and prompt.strip():
-            with st.spinner("🤖 AI is preparing the diagram and explanation..."):
+            with st.spinner("🤖 AI is preparing your diagram and explanation..."):
                 
-                # 1. STRICT Vector Prompt for Image Generation (But we warn user about text)
-                strict_prompt = f"2D vector infographic, flat design, educational diagram of {prompt}, white background, clean lines, no realistic shading, no abstract art."
+                # 1. STRICT 2D Vector Prompt
+                strict_prompt = f"2D flat vector infographic, educational diagram of {prompt}, clean white background, simple colorful shapes, no realistic 3D rendering. DO NOT include text labels."
                 
                 try:
-                    # Image Generation Call (Aapka purana function)
+                    # Image Generation Call (Aapka function)
                     data, source = generate_image_url(strict_prompt, False, "Normal", aspect)
                     
                     st.markdown('<div class="media-card">', unsafe_allow_html=True)
-                    st.image(data, width=520, caption="AI Generated Visual (Note: AI struggles with text labels)")
+                    st.image(data, width=520, caption="Generated Visual Representation")
                     st.markdown('</div>', unsafe_allow_html=True)
                     
                     if isinstance(data, bytes):
@@ -2527,35 +2528,32 @@ def render_image_generator():
                 except Exception as e:
                     st.error(f"Image Generation Failed: {e}")
                 
-                # 2. AI Text Explanation + Real Diagram Link
+                # 2. AI Text Explanation
                 with st.spinner("🤖 AI is writing the 5-10 line explanation..."):
-                    search_query = urllib.parse.quote_plus(f"{prompt} diagram for kids")
+                    
+                    clean_search_query = prompt.replace("explain karo", "").replace("diagram", "").replace("ka", "").replace("ki", "").strip()
+                    search_query = urllib.parse.quote_plus(f"{clean_search_query} diagram for kids")
                     google_images_link = f"https://www.google.com/search?q={search_query}&tbm=isch"
                     
-                    explain_prompt = f"""
-                    You are a helpful teacher. Explain '{prompt}' in exactly 5 to 10 lines.
-                    Language: {selected_lang}.
-                    Point out its main parts and how they work together in simple words.
-                    """
+                    explain_prompt = f"You are a helpful teacher. Explain '{prompt}' in exactly 5 to 10 lines. Language: {selected_lang}."
                     
                     try:
                         res = client.chat.completions.create(
-                            model="openai/gpt-oss-120b", # Aapka text model
+                            model="openai/gpt-oss-120b", # Text model
                             messages=[{"role": "user", "content": explain_prompt}],
                             temperature=0.6, max_tokens=400
                         )
                         st.success("### 📖 Explanation")
                         st.markdown(res.choices[0].message.content)
                         
-                        # ⭐ Asli Diagram ka Link (Kyunki AI text nahi bana sakta)
-                        st.info("💡 **Tip:** AI image generators text/labels ko kharab bana dete hain. Ek perfect, labeled diagram dekhne ke liye niche diye gaye link par click karein:")
-                        st.markdown(f"👉 [**Click here to see REAL {prompt} Diagram on Google**]({google_images_link})")
+                        st.info("💡 **Tip:** AI image generators text/labels ko kharab bana dete hain. Ek perfect, labelled diagram dekhne ke liye niche diye gaye link par click karein:")
+                        st.markdown(f"👉 [**Click here to see REAL {clean_search_query} Diagram on Google Images**]({google_images_link})")
                         
                     except Exception as e:
                         st.error(f"Explanation Error: {e}")
 
     # ==========================================
-    # TAB 2: VISION (UPLOAD & ASK)
+    # TAB 2: VISION (UPLOAD & ASK) - WITH QWEN MODEL
     # ==========================================
     with tab2:
         uploaded_file = st.file_uploader("Upload your Diagram (PNG, JPG)", type=["png", "jpg", "jpeg"])
@@ -2570,24 +2568,17 @@ def render_image_generator():
                 if not user_question.strip():
                     st.warning("Pehle batao ki is image ke baare mein kya janna hai!")
                 else:
-                    with st.spinner("AI image ko padh raha hai..."):
+                    with st.spinner("Qwen Vision AI image ko padh raha hai..."):
                         
                         bytes_data = uploaded_file.getvalue()
                         base64_image = base64.b64encode(bytes_data).decode('utf-8')
                         
-                        vision_prompt = f"""
-                        User uploaded this image and asked: '{user_question}'.
-                        Look at the image and answer the user's question clearly.
-                        Language: {selected_lang}. Give a 5-10 line explanation.
-                        """
+                        vision_prompt = f"User uploaded this image and asked: '{user_question}'. Look at the image and answer clearly in {selected_lang}. Give a 5-10 line explanation."
                         
                         try:
-                            # ⭐ FIXED: gpt-4o ki jagah Groq ka free Vision Model use karein
-                            # Agar aap OpenAI ka paid key use kar rahe hain toh "gpt-4o" likhein
-                            vision_model = "llama-3.2-90b-vision-preview" 
-                            
+                            # ⭐ Yahan Groq ka naya Qwen Vision model use ho raha hai
                             response = client.chat.completions.create(
-                                model=vision_model, 
+                                model="qwen-2.5-vl-72b-instruct", # Ya phir "qwen3-27b" try karein agar yeh na chale
                                 messages=[
                                     {
                                         "role": "user",
@@ -2606,8 +2597,8 @@ def render_image_generator():
                             
                         except Exception as e:
                             st.error(f"Vision API Error: {e}")
-                            st.info("💡 Agar error aaye, toh check karein ki aapki API key (Groq ya OpenAI) Vision models ko support karti hai ya nahi.")
-            
+                            st.info("💡 Agar model name ka error aaye, toh Groq console se Qwen vision model ka exact API name copy karke `model=` mein daal dein.")
+ 
 def render_ai_autonomous_behavior():
     # ============================================================
     # Imports अंदर हैं ताकि कोई conflict न हो
