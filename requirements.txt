@@ -10,4 +10,4 @@ Pillow
 matplotlib 
 numpy
 plotly
-huggingface_hub
+
