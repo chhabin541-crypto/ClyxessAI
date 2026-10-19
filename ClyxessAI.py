@@ -2486,119 +2486,66 @@ def render_login_signup():
 
 def render_image_generator():
     import streamlit as st
-    import urllib.parse
-    import base64
+    from duckduckgo_search import DDGS
 
-    st.title("🎨 AI Educational Diagram & Vision Lab")
-    
+    st.title("🎨 AI Educational Diagram Generator")
+    st.write("Machine ka naam likho, hum aapko **asli labeled diagram** aur uska **AI explanation** denge.")
+
     # 🌐 Languages Dropdown
     languages = ["English", "Hindi (हिंदी)", "Hinglish", "Bengali", "Tamil", "Telugu", "Marathi", "Gujarati", "Spanish", "French"]
     selected_lang = st.selectbox("🌐 Select Explanation Language", languages)
 
-    # Tabs for Generate vs Upload
-    tab1, tab2 = st.tabs(["✨ Generate New Diagram", "📤 Upload Image to Explain"])
-
-    # ==========================================
-    # TAB 1: GENERATE NEW DIAGRAM
-    # ==========================================
-    with tab1:
-        prompt = st.text_area("What machine/concept should I explain?", 
-                              placeholder="Example: Parts of a Flying Car / Helicopter")
-        aspect = st.selectbox("📐 Format", ["1:1", "16:9", "9:16"])
+    # Input Text Area
+    prompt = st.text_area("What machine or concept should I explain?", 
+                          placeholder="Example: Parts of a Helicopter / Car Engine / Flying Car")
+    
+    if st.button("🔍 Generate Diagram", type="primary", use_container_width=True) and prompt.strip():
         
-        if st.button("🎨 Generate Diagram", type="primary", use_container_width=True) and prompt.strip():
-            with st.spinner("🤖 AI is preparing your diagram and explanation..."):
+        # 1. Fetch REAL Diagram from Web (DuckDuckGo Image Search)
+        with st.spinner("🔍 Internet se asli diagram dhoondh raha hu..."):
+            try:
+                # Search query ko clean karo taaki best diagram mile
+                search_query = f"{prompt} diagram labeled parts"
                 
-                # 1. STRICT 2D Vector Prompt
-                strict_prompt = f"2D flat vector infographic, educational diagram of {prompt}, clean white background, simple colorful shapes, no realistic 3D rendering. DO NOT include text labels."
+                # DuckDuckGo Image Search
+                results = DDGS().images(
+                    keywords=search_query,
+                    region="wt-wt",
+                    safesearch="on",
+                    max_results=1
+                )
                 
-                try:
-                    # Image Generation Call (Aapka function)
-                    data, source = generate_image_url(strict_prompt, False, "Normal", aspect)
-                    
-                    st.markdown('<div class="media-card">', unsafe_allow_html=True)
-                    st.image(data, width=520, caption="Generated Visual Representation")
-                    st.markdown('</div>', unsafe_allow_html=True)
-                    
-                    if isinstance(data, bytes):
-                        st.download_button("⬇️ Save Image", data=data, file_name="diagram.png", mime="image/png")
-                    else:
-                        st.link_button("🔗 Open Full Image", data)
-                        
-                except Exception as e:
-                    st.error(f"Image Generation Failed: {e}")
-                
-                # 2. AI Text Explanation
-                with st.spinner("🤖 AI is writing the 5-10 line explanation..."):
-                    
-                    clean_search_query = prompt.replace("explain karo", "").replace("diagram", "").replace("ka", "").replace("ki", "").strip()
-                    search_query = urllib.parse.quote_plus(f"{clean_search_query} diagram for kids")
-                    google_images_link = f"https://www.google.com/search?q={search_query}&tbm=isch"
-                    
-                    explain_prompt = f"You are a helpful teacher. Explain '{prompt}' in exactly 5 to 10 lines. Language: {selected_lang}."
-                    
-                    try:
-                        res = client.chat.completions.create(
-                            model="openai/gpt-oss-120b", # Text model
-                            messages=[{"role": "user", "content": explain_prompt}],
-                            temperature=0.6, max_tokens=400
-                        )
-                        st.success("### 📖 Explanation")
-                        st.markdown(res.choices[0].message.content)
-                        
-                        st.info("💡 **Tip:** AI image generators text/labels ko kharab bana dete hain. Ek perfect, labelled diagram dekhne ke liye niche diye gaye link par click karein:")
-                        st.markdown(f"👉 [**Click here to see REAL {clean_search_query} Diagram on Google Images**]({google_images_link})")
-                        
-                    except Exception as e:
-                        st.error(f"Explanation Error: {e}")
-
-    # ==========================================
-    # TAB 2: VISION (UPLOAD & ASK) - WITH QWEN MODEL
-    # ==========================================
-    with tab2:
-        uploaded_file = st.file_uploader("Upload your Diagram (PNG, JPG)", type=["png", "jpg", "jpeg"])
-        
-        if uploaded_file is not None:
-            st.image(uploaded_file, caption="Your Uploaded Image", width=350)
-            
-            user_question = st.text_input("✍️ What do you want to know about this image?", 
-                                          placeholder="Example: Isme kya kya parts hain? / Yeh kaise kaam karta hai?")
-            
-            if st.button("🧠 Explain This Image", type="primary", use_container_width=True):
-                if not user_question.strip():
-                    st.warning("Pehle batao ki is image ke baare mein kya janna hai!")
+                if results and len(results) > 0:
+                    image_url = results[0].get("image")
+                    st.markdown(f'<div class="media-card"><img src="{image_url}" style="width:100%; border-radius:10px;"></div>', unsafe_allow_html=True)
+                    st.caption(f"📸 Real Diagram: {prompt} (Source: Web)")
                 else:
-                    with st.spinner("Qwen Vision AI image ko padh raha hai..."):
-                        
-                        bytes_data = uploaded_file.getvalue()
-                        base64_image = base64.b64encode(bytes_data).decode('utf-8')
-                        
-                        vision_prompt = f"User uploaded this image and asked: '{user_question}'. Look at the image and answer clearly in {selected_lang}. Give a 5-10 line explanation."
-                        
-                        try:
-                            # ⭐ Yahan Groq ka naya Qwen Vision model use ho raha hai
-                            response = client.chat.completions.create(
-                                model="qwen-2.5-vl-72b-instruct", # Ya phir "qwen3-27b" try karein agar yeh na chale
-                                messages=[
-                                    {
-                                        "role": "user",
-                                        "content": [
-                                            {"type": "text", "text": vision_prompt},
-                                            {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{base64_image}"}}
-                                        ],
-                                    }
-                                ],
-                                max_tokens=600,
-                                temperature=0.5
-                            )
-                            
-                            st.success("### 📖 AI Explanation")
-                            st.markdown(response.choices[0].message.content)
-                            
-                        except Exception as e:
-                            st.error(f"Vision API Error: {e}")
-                            st.info("💡 Agar model name ka error aaye, toh Groq console se Qwen vision model ka exact API name copy karke `model=` mein daal dein.")
- 
+                    st.warning("Koi asli diagram nahi mila. Thoda alag naam try karein.")
+                    image_url = None
+            except Exception as e:
+                st.error(f"Search Error: {e}. (Check if 'duckduckgo-search' is installed).")
+                image_url = None
+
+        # 2. Generate AI Explanation (5-10 lines)
+        with st.spinner("🤖 AI 5-10 line ka explanation likh raha hai..."):
+            
+            explain_prompt = f"""
+            You are a helpful teacher. Explain '{prompt}' in exactly 5 to 10 lines.
+            Language: {selected_lang}.
+            Point out its main parts and how they work together in simple words.
+            """
+            
+            try:
+                res = client.chat.completions.create(
+                    model="openai/gpt-oss-120b", # Aapka text model
+                    messages=[{"role": "user", "content": explain_prompt}],
+                    temperature=0.6, max_tokens=400
+                )
+                st.success("### 📖 Explanation")
+                st.markdown(res.choices[0].message.content)
+                
+            except Exception as e:
+                st.error(f"Explanation Error: {e}")
 def render_ai_autonomous_behavior():
     # ============================================================
     # Imports अंदर हैं ताकि कोई conflict न हो
