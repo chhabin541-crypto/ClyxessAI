@@ -2484,7 +2484,7 @@ def render_login_signup():
                 st.success("Account created. Confirm email if your Supabase project requires it.")
             except Exception as e: st.error(f"Sign up failed: {e}")
 
-def render_image_generator(client):
+def render_image_generator():
     import streamlit as st
     import base64
 
