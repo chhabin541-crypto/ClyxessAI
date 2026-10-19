@@ -2484,21 +2484,113 @@ def render_login_signup():
                 st.success("Account created. Confirm email if your Supabase project requires it.")
             except Exception as e: st.error(f"Sign up failed: {e}")
 
-def render_image_generator():
-    st.title("🎨 Creative AI Image Generator")
-    prompt=st.text_area("Describe exactly what you want",placeholder="Example: Happy Diwali greeting poster with diyas, no people")
-    aspect=st.selectbox("📐 Format",["1:1","16:9","9:16"])
-    if st.button("🎨 Generate Image",type="primary",use_container_width=True) and prompt.strip():
-        with st.spinner("🎨 Creating only the requested subject..."):
-            data,source=generate_image_url(prompt,False,"Normal",aspect)
-        st.markdown('<div class="media-card">',unsafe_allow_html=True)
-        st.image(data,width=520,caption="Generated image")
-        st.markdown('</div>',unsafe_allow_html=True)
-        st.caption("Display is intentionally compact; the source image can remain high resolution.")
-        if isinstance(data,bytes):
-            st.download_button("⬇️ Save Image",data=data,file_name="clyxesschat_image.png",mime="image/png")
-        else:
-            st.link_button("🔗 Open Full Image",data) 
+def render_image_generator(client):
+    import streamlit as st
+    import base64
+
+    st.title("🎨 AI Educational Diagram Generator")
+    
+    # 🌐 Languages Dropdown
+    languages = ["English", "Hindi (हिंदी)", "Hinglish", "Bengali", "Tamil", "Telugu", "Marathi", "Gujarati", "Spanish", "French"]
+    selected_lang = st.selectbox("🌐 Select Explanation Language", languages)
+
+    # Tabs for Generate vs Upload
+    tab1, tab2 = st.tabs(["✨ Generate New Diagram", "📤 Upload Image to Explain"])
+
+    # ==========================================
+    # TAB 1: GENERATE NEW DIAGRAM
+    # ==========================================
+    with tab1:
+        prompt = st.text_area("Describe the machine/concept (e.g., 'Parts of a Car Engine', 'How an Airplane flies')", 
+                              placeholder="Example: Cross-section of a Jet Engine with labels")
+        aspect = st.selectbox("📐 Format", ["1:1", "16:9", "9:16"])
+        
+        if st.button("🎨 Generate Diagram", type="primary", use_container_width=True) and prompt.strip():
+            with st.spinner("🎨 AI is drawing the colorful diagram..."):
+                
+                # ⭐ STRICT PROMPT: Force AI to make a diagram, not a photo
+                strict_prompt = f"Educational textbook diagram of {prompt}. Colorful, clear labels, arrows pointing to parts, white background, vector illustration style. DO NOT create a realistic photo or abstract art."
+                
+                # Aapka original function call
+                data, source = generate_image_url(strict_prompt, False, "Normal", aspect)
+                
+            st.markdown('<div class="media-card">', unsafe_allow_html=True)
+            st.image(data, width=520, caption="Generated Diagram")
+            st.markdown('</div>', unsafe_allow_html=True)
+            
+            # Download button
+            if isinstance(data, bytes):
+                st.download_button("⬇️ Save Diagram", data=data, file_name="educational_diagram.png", mime="image/png")
+            else:
+                st.link_button("🔗 Open Full Image", data)
+
+            # ⭐ 5-10 Line Explanation Generation
+            with st.spinner("🤖 AI is writing the explanation..."):
+                explain_prompt = f"Explain the '{prompt}' in exactly 5 to 10 lines. Point out its main parts and how it works. Language: {selected_lang}."
+                try:
+                    res = client.chat.completions.create(
+                        model="openai/gpt-oss-120b", # Use your text model here
+                        messages=[{"role": "user", "content": explain_prompt}],
+                        temperature=0.6, max_tokens=400
+                    )
+                    st.success("### 📖 Explanation")
+                    st.markdown(res.choices[0].message.content)
+                except Exception as e:
+                    st.error(f"Explanation Error: {e}")
+
+    # ==========================================
+    # TAB 2: UPLOAD IMAGE TO EXPLAIN
+    # ==========================================
+    with tab2:
+        uploaded_file = st.file_uploader("Upload your Diagram (PNG, JPG)", type=["png", "jpg", "jpeg"])
+        
+        if uploaded_file is not None:
+            st.image(uploaded_file, caption="Your Uploaded Image", width=350)
+            
+            # ⭐ AI ko pehle poochho ki user kya janna chahta hai
+            user_question = st.text_input("✍️ What do you want to know about this image?", 
+                                          placeholder="Example: Isme kya kya parts hain? / Yeh machine kaise kaam karti hai?")
+            
+            if st.button("🧠 Explain This Image", type="primary", use_container_width=True):
+                if not user_question.strip():
+                    st.warning("Pehle batao ki is image ke baare mein kya janna hai!")
+                else:
+                    with st.spinner("AI image ko padh raha hai aur explain kar raha hai..."):
+                        
+                        # Image ko base64 mein convert karo Vision API ke liye
+                        bytes_data = uploaded_file.getvalue()
+                        base64_image = base64.b64encode(bytes_data).decode('utf-8')
+                        
+                        vision_prompt = f"""
+                        User uploaded this image and asked: '{user_question}'.
+                        Look at the image and answer the user's question clearly.
+                        If there are parts visible, identify them. 
+                        Language: {selected_lang}.
+                        Give a 5-10 line explanation.
+                        """
+                        
+                        try:
+                            # Vision API Call (Make sure your client supports gpt-4o or similar vision model)
+                            response = client.chat.completions.create(
+                                model="gpt-4o", 
+                                messages=[
+                                    {
+                                        "role": "user",
+                                        "content": [
+                                            {"type": "text", "text": vision_prompt},
+                                            {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{base64_image}"}}
+                                        ],
+                                    }
+                                ],
+                                max_tokens=600,
+                                temperature=0.5
+                            )
+                            
+                            st.success("### 📖 AI Explanation")
+                            st.markdown(response.choices[0].message.content)
+                            
+                        except Exception as e:
+                            st.error(f"Vision API Error: {e}. (Ensure your API key supports image inputs).")
             
 def render_ai_autonomous_behavior():
     # ============================================================
