@@ -2484,14 +2484,13 @@ def render_login_signup():
                 st.success("Account created. Confirm email if your Supabase project requires it.")
             except Exception as e: st.error(f"Sign up failed: {e}")
 
-def render_image_generator():
+def render_image_generator(client):
     import streamlit as st
     import urllib.parse
-    import requests
-    import re
+    from huggingface_hub import InferenceClient
 
     st.title("🎨 AI Educational Diagram Generator")
-    st.write("Machine ka naam likho, hum aapko **asli labeled diagram** aur uska **AI explanation** denge.")
+    st.write("Machine ka naam likho, hum aapko **High-Quality Diagram** aur uska **AI explanation** denge.")
 
     # 🌐 Languages Dropdown
     languages = ["English", "Hindi (हिंदी)", "Hinglish", "Bengali", "Tamil", "Telugu", "Marathi", "Gujarati", "Spanish", "French"]
@@ -2503,41 +2502,49 @@ def render_image_generator():
     
     if st.button("🔍 Generate Diagram", type="primary", use_container_width=True) and prompt.strip():
         
-        # 1. Fetch REAL Diagram (Wikipedia API -> Fallback Pollinations)
-        with st.spinner("🔍 Asli diagram dhoondh raha hu..."):
+        # 1. Image Generation Engine
+        with st.spinner("🎨 AI diagram bana raha hai (Hugging Face FLUX Model)..."):
             
-            # Faltu words hatao (jaise "diagram", "parts", "karo")
-            clean_query = re.sub(r'(diagram|parts|labeled|explain|karo|kaise|kya|hai|ke|ka|ki)', '', prompt, flags=re.IGNORECASE).strip()
-            if not clean_query:
-                clean_query = prompt
-                
+            # Strict prompt taaki AI sirf diagram banaye
+            strict_prompt = f"2D flat vector educational diagram of {prompt}, clear labels, arrows, colorful textbook illustration, white background, no 3d render"
+            
             image_url = None
+            hf_success = False
             
-            # Try 1: Wikipedia API (Sabse saaf aur real diagram)
+            # Try 1: Hugging Face (FLUX.1-schnell - Best Quality)
             try:
-                # Wikipedia ko title case chahiye hota hai
-                wiki_title = clean_query.title().replace(" ", "%20")
-                wiki_api_url = f"https://en.wikipedia.org/w/api.php?action=query&titles={wiki_title}&prop=pageimages&format=json&pithumbsize=800"
+                hf_token = st.secrets.get("HF_TOKEN", "") 
                 
-                headers = {'User-Agent': 'ClyxessAILab/1.0 (educational_purpose)'}
-                res = requests.get(wiki_api_url, headers=headers, timeout=5).json()
-                
-                pages = res.get("query", {}).get("pages", {})
-                for page_id in pages:
-                    if "thumbnail" in pages[page_id]:
-                        image_url = pages[page_id]["thumbnail"]["source"]
-                        break
-            except Exception:
-                pass # Agar Wikipedia fail ho, toh niche wala fallback chalega
-                
-            # Try 2: Pollinations AI (Strict Diagram Prompt)
-            if not image_url:
-                fallback_prompt = f"technical schematic diagram of {clean_query}, black and white line art, labels, engineering drawing, white background"
-                encoded_prompt = urllib.parse.quote(fallback_prompt)
-                image_url = f"https://image.pollinations.ai/prompt/{encoded_prompt}?width=800&height=600&nologo=true"
+                if hf_token:
+                    hf_client = InferenceClient(token=hf_token)
+                    # FLUX model call
+                    image = hf_client.text_to_image(
+                        prompt=strict_prompt,
+                        model="black-forest-labs/FLUX.1-schnell",
+                    )
+                    
+                    # Image display aur download
+                    st.image(image, caption=f"Generated Diagram: {prompt}", use_container_width=True)
+                    
+                    # Download button ke liye bytes mein convert karo
+                    import io
+                    img_byte_arr = io.BytesIO()
+                    image.save(img_byte_arr, format='PNG')
+                    img_byte_arr = img_byte_arr.getvalue()
+                    
+                    st.download_button("⬇️ Save Image", data=img_byte_arr, file_name="diagram.png", mime="image/png")
+                    hf_success = True
+                else:
+                    st.warning("HF_TOKEN nahi mila. Backup use kar rahe hain.")
+            except Exception as e:
+                st.warning(f"Hugging Face error: {e}. Switching to backup...")
 
-            # Display Image
-            st.image(image_url, caption=f"Visual: {prompt}", use_container_width=True)
+            # Try 2: Pollinations (Fallback)
+            if not hf_success:
+                encoded_prompt = urllib.parse.quote(strict_prompt)
+                backup_url = f"https://image.pollinations.ai/prompt/{encoded_prompt}?width=800&height=600&nologo=true"
+                st.image(backup_url, caption=f"Generated Diagram (Backup): {prompt}", use_container_width=True)
+                st.link_button("⬇️ Open Full Image to Download", backup_url)
             
             # 2. Generate AI Explanation (5-10 lines)
             with st.spinner("🤖 AI 5-10 line ka explanation likh raha hai..."):
@@ -2550,7 +2557,7 @@ def render_image_generator():
                 
                 try:
                     res = client.chat.completions.create(
-                        model="openai/gpt-oss-120b", # Aapka text model
+                        model="openai/gpt-oss-120b", # Aapka Groq text model
                         messages=[{"role": "user", "content": explain_prompt}],
                         temperature=0.6, max_tokens=400
                     )
