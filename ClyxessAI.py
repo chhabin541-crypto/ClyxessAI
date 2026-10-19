@@ -2488,8 +2488,8 @@ def render_image_generator():
     import streamlit as st
     import urllib.parse
 
-    st.title("🎨 AI Educational Diagram Generator")
-    st.write("Machine ka naam likho, hum aapko **Colorful Diagram** aur uska **AI explanation** denge.")
+    st.title("🎨 AI Engineering Diagram Lab")
+    st.write("Machine ka naam likho. Left side mein **Line Art Diagram** aur Right side mein **Text Explanation** milega.")
 
     # 🌐 Languages Dropdown
     languages = ["English", "Hindi (हिंदी)", "Hinglish", "Bengali", "Tamil", "Telugu", "Marathi", "Gujarati", "Spanish", "French"]
@@ -2497,48 +2497,60 @@ def render_image_generator():
 
     # Input Text Area
     prompt = st.text_area("What machine or concept should I explain?", 
-                          placeholder="Example: Parts of a Helicopter / Car Engine / Rocket")
+                          placeholder="Example: Car Chassis / Truck Engine / Rocket")
     
-    if st.button("🔍 Generate Diagram", type="primary", use_container_width=True) and prompt.strip():
+    if st.button("🔍 Generate Diagram & Explain", type="primary", use_container_width=True) and prompt.strip():
         
-        # 1. Image Generation (Pollinations.ai - Free & Unlimited)
-        with st.spinner("🎨 AI diagram bana raha hai (Free Engine)..."):
-            
-            # ⭐ SABSE IMPORTANT FIX: Strict Prompt for 2D Flat Diagram
-            # Hum AI ko bol rahe hain ki 3D, photo, ya shading bilkul mat karo.
-            strict_prompt = f"Flat vector infographic, 2D schematic diagram of {prompt}, educational textbook illustration, colorful layout, white background, minimalist vector art, simple geometric shapes, no shading, no 3D, no photo, no realistic."
-            
-            encoded_prompt = urllib.parse.quote(strict_prompt)
-            # Pollinations Free URL
-            backup_url = f"https://image.pollinations.ai/prompt/{encoded_prompt}?width=800&height=600&nologo=true"
-            
-            try:
-                st.image(backup_url, caption=f"Generated Diagram: {prompt}", use_container_width=True)
-                st.link_button("⬇️ Open Full Image to Download", backup_url)
-            except Exception as e:
-                st.error(f"Image Generation Error: {e}")
-            
-            # 2. Generate AI Explanation (5-10 lines)
-            with st.spinner("🤖 AI 5-10 line ka explanation likh raha hai..."):
+        # Hum layout ko 2 columns mein divide kar rahe hain
+        col_img, col_text = st.columns([1.2, 1])
+
+        # ==========================================
+        # LEFT SIDE: LINE ART DIAGRAM
+        # ==========================================
+        with col_img:
+            with st.spinner("🎨 AI line art diagram bana raha hai..."):
                 
+                # ⭐ STRICT PROMPT: AI ko sirf lines banane ko bolo, text bilkul na banaye
+                strict_prompt = f"Black and white line art, technical schematic drawing of {prompt}, engineering blueprint style, clean thin lines, white background, no shading, no 3D, NO TEXT LABELS, minimalist."
+                
+                encoded_prompt = urllib.parse.quote(strict_prompt)
+                backup_url = f"https://image.pollinations.ai/prompt/{encoded_prompt}?width=800&height=600&nologo=true&model=flux"
+                
+                try:
+                    st.image(backup_url, caption=f"Line Art: {prompt}", use_container_width=True)
+                    st.link_button("⬇️ Download Line Art", backup_url, use_container_width=True)
+                except Exception as e:
+                    st.error(f"Image Error: {e}")
+
+        # ==========================================
+        # RIGHT SIDE: PARTS TEXT EXPLANATION
+        # ==========================================
+        with col_text:
+            with st.spinner("🤖 AI parts list bana raha hai..."):
+                
+                # ⭐ PROMPT: AI ko bolo ki woh ek list banaye (Tyre, Engine, etc.)
                 explain_prompt = f"""
-                You are a helpful teacher. Explain '{prompt}' in exactly 5 to 10 lines.
+                You are an engineering teacher. 
+                List the main parts of a '{prompt}' and explain what each part does in 1 line.
+                Format exactly like this:
+                - **Part Name**: Explanation.
+
                 Language: {selected_lang}.
-                Point out its main parts and how they work together in simple words.
+                List 5 to 8 parts. Keep it simple for students.
                 """
                 
                 try:
                     res = client.chat.completions.create(
                         model="openai/gpt-oss-120b", # Aapka Groq text model
                         messages=[{"role": "user", "content": explain_prompt}],
-                        temperature=0.6, max_tokens=400
+                        temperature=0.5, max_tokens=600
                     )
-                    st.success("### 📖 Explanation")
+                    st.success(f"### 📖 Parts of {prompt}")
                     st.markdown(res.choices[0].message.content)
                     
                 except Exception as e:
                     st.error(f"Explanation Error: {e}")
-
+    
 def render_ai_autonomous_behavior():
     # ============================================================
     # Imports अंदर हैं ताकि कोई conflict न हो
