@@ -2486,7 +2486,9 @@ def render_login_signup():
 
 def render_image_generator():
     import streamlit as st
-    from duckduckgo_search import DDGS
+    import urllib.parse
+    import requests
+    import re
 
     st.title("🎨 AI Educational Diagram Generator")
     st.write("Machine ka naam likho, hum aapko **asli labeled diagram** aur uska **AI explanation** denge.")
@@ -2497,55 +2499,67 @@ def render_image_generator():
 
     # Input Text Area
     prompt = st.text_area("What machine or concept should I explain?", 
-                          placeholder="Example: Parts of a Helicopter / Car Engine / Flying Car")
+                          placeholder="Example: Parts of a Helicopter / Car Engine / Rocket")
     
     if st.button("🔍 Generate Diagram", type="primary", use_container_width=True) and prompt.strip():
         
-        # 1. Fetch REAL Diagram from Web (DuckDuckGo Image Search)
-        with st.spinner("🔍 Internet se asli diagram dhoondh raha hu..."):
+        # 1. Fetch REAL Diagram (Wikipedia API -> Fallback Pollinations)
+        with st.spinner("🔍 Asli diagram dhoondh raha hu..."):
+            
+            # Faltu words hatao (jaise "diagram", "parts", "karo")
+            clean_query = re.sub(r'(diagram|parts|labeled|explain|karo|kaise|kya|hai|ke|ka|ki)', '', prompt, flags=re.IGNORECASE).strip()
+            if not clean_query:
+                clean_query = prompt
+                
+            image_url = None
+            
+            # Try 1: Wikipedia API (Sabse saaf aur real diagram)
             try:
-                # Search query ko clean karo taaki best diagram mile
-                search_query = f"{prompt} diagram labeled parts"
+                # Wikipedia ko title case chahiye hota hai
+                wiki_title = clean_query.title().replace(" ", "%20")
+                wiki_api_url = f"https://en.wikipedia.org/w/api.php?action=query&titles={wiki_title}&prop=pageimages&format=json&pithumbsize=800"
                 
-                # DuckDuckGo Image Search
-                results = DDGS().images(
-                    keywords=search_query,
-                    region="wt-wt",
-                    safesearch="on",
-                    max_results=1
-                )
+                headers = {'User-Agent': 'ClyxessAILab/1.0 (educational_purpose)'}
+                res = requests.get(wiki_api_url, headers=headers, timeout=5).json()
                 
-                if results and len(results) > 0:
-                    image_url = results[0].get("image")
-                    st.markdown(f'<div class="media-card"><img src="{image_url}" style="width:100%; border-radius:10px;"></div>', unsafe_allow_html=True)
-                    st.caption(f"📸 Real Diagram: {prompt} (Source: Web)")
-                else:
-                    st.warning("Koi asli diagram nahi mila. Thoda alag naam try karein.")
-                    image_url = None
-            except Exception as e:
-                st.error(f"Search Error: {e}. (Check if 'duckduckgo-search' is installed).")
-                image_url = None
+                pages = res.get("query", {}).get("pages", {})
+                for page_id in pages:
+                    if "thumbnail" in pages[page_id]:
+                        image_url = pages[page_id]["thumbnail"]["source"]
+                        break
+            except Exception:
+                pass # Agar Wikipedia fail ho, toh niche wala fallback chalega
+                
+            # Try 2: Pollinations AI (Strict Diagram Prompt)
+            if not image_url:
+                fallback_prompt = f"technical schematic diagram of {clean_query}, black and white line art, labels, engineering drawing, white background"
+                encoded_prompt = urllib.parse.quote(fallback_prompt)
+                image_url = f"https://image.pollinations.ai/prompt/{encoded_prompt}?width=800&height=600&nologo=true"
 
-        # 2. Generate AI Explanation (5-10 lines)
-        with st.spinner("🤖 AI 5-10 line ka explanation likh raha hai..."):
+            # Display Image
+            st.image(image_url, caption=f"Visual: {prompt}", use_container_width=True)
             
-            explain_prompt = f"""
-            You are a helpful teacher. Explain '{prompt}' in exactly 5 to 10 lines.
-            Language: {selected_lang}.
-            Point out its main parts and how they work together in simple words.
-            """
-            
-            try:
-                res = client.chat.completions.create(
-                    model="openai/gpt-oss-120b", # Aapka text model
-                    messages=[{"role": "user", "content": explain_prompt}],
-                    temperature=0.6, max_tokens=400
-                )
-                st.success("### 📖 Explanation")
-                st.markdown(res.choices[0].message.content)
+            # 2. Generate AI Explanation (5-10 lines)
+            with st.spinner("🤖 AI 5-10 line ka explanation likh raha hai..."):
                 
-            except Exception as e:
-                st.error(f"Explanation Error: {e}")
+                explain_prompt = f"""
+                You are a helpful teacher. Explain '{prompt}' in exactly 5 to 10 lines.
+                Language: {selected_lang}.
+                Point out its main parts and how they work together in simple words.
+                """
+                
+                try:
+                    res = client.chat.completions.create(
+                        model="openai/gpt-oss-120b", # Aapka text model
+                        messages=[{"role": "user", "content": explain_prompt}],
+                        temperature=0.6, max_tokens=400
+                    )
+                    st.success("### 📖 Explanation")
+                    st.markdown(res.choices[0].message.content)
+                    
+                except Exception as e:
+                    st.error(f"Explanation Error: {e}")
+
 def render_ai_autonomous_behavior():
     # ============================================================
     # Imports अंदर हैं ताकि कोई conflict न हो
