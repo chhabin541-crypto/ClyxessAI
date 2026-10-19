@@ -10,3 +10,4 @@ Pillow
 matplotlib 
 numpy
 plotly
+duckduckgo-search
