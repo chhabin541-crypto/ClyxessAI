@@ -9738,6 +9738,7 @@ def render_logic_lab():
             "m2": "2. Prompt-Based Logic Breaker Arena 🧠",
             "m3": "3. Silicon Bio-Circuit Designer 🧪",
             "m4": "4. DNA Code Language Architect 🧬",
+            "m5": "5. Future Tech & Time Travel Lab 🚀",
             
             # Module 1
             "m1_title": "#### ⚔️ AI-Agent Cyber Warfare Matrix",
@@ -9779,7 +9780,31 @@ def render_logic_lab():
             "m4_btn": "🧬 Generate DNA Chain",
             "m4_ai_react": "🤖 AI Reaction:",
             "m4_learn": "> **💡 What did you learn?** You just created a new syntax! AI can't read it because it's not in its database. You are a true Inventor!",
-            "m4_fact": "🔬 **Real-World Fact:** Scientists at MIT & Harvard are actually building 'DNA Computers' where they use biological chains instead of silicon chips to store data. You just did what they do!"
+            "m4_fact": "🔬 **Real-World Fact:** Scientists at MIT & Harvard are actually building 'DNA Computers' where they use biological chains instead of silicon chips to store data. You just did what they do!",
+            
+            # Module 5 (Updated)
+            "m5_title": "#### 🚀 Future Tech, Magnetic Engines & Time Travel",
+            "m5_desc": "Research & Vision by Clyxess AI Founder. Explore how computers, rockets, and time will change!",
+            "m5_tab1": "🖥️ Future Supercomputers",
+            "m5_tab2": "🧲 Magnetic & Wireless Tech",
+            "m5_tab3": "⏱️ Time Travel Theory",
+            
+            "m5_comp_title": "Evolution of Supercomputers",
+            "m5_home_comp": "🏠 **Home/Office PC:** Will be the size of a small coin! No keyboard or mouse. It will be controlled completely by your Mind (Brain Waves).",
+            "m5_ind_comp": "🏭 **Industrial/Database PC:** Giant servers that cool themselves naturally. **Zero water needed!** They will absorb outside air and release eco-friendly chemicals to stay cool automatically.",
+            "m5_vis_home": "🔬 3D Visualization: Coin-Sized Mind-Control PC",
+            "m5_vis_ind": "🏭 3D Visualization: Self-Cooling Natural Server",
+            
+            "m5_emg_title": "Electromagnetic Rocket & Wireless Future",
+            "m5_emg_desc": "No fuel, NO CABLES, no power lines! Future rockets and cities will run on Wireless Electron Frequencies. Electricity will travel through the air using magnetic fields.",
+            "m5_mag_freq": "Magnetic Field Frequency (GHz)",
+            
+            "m5_time_title": "The Simple Truth of Time Travel",
+            "m5_time_desc": "Time travel is not magic; it's about SPEED. If you walk 1000km, it takes months. If you fly at the speed of light, time slows down for you. When you return, Earth will have aged more than you!",
+            "m5_speed_lbl": "Rocket Speed (% of Light Speed)",
+            "m5_earth_time": "Earth Time Passed",
+            "m5_rocket_time": "Rocket Time Passed",
+            "m5_fact": "🔬 **Founder's Note:** This section is added based on research by the Clyxess AI Creator. The future belongs to you. Research more!"
         },
         "Hindi (हिंदी)": {
             "title": "🛸 साइबरनेटिक किड्स लॉजिक लैब - ईयर 2050",
@@ -9790,9 +9815,10 @@ def render_logic_lab():
             "m2": "2. लॉजिक ब्रेकर एरिना 🧠",
             "m3": "3. सिलिकॉन बायो-सर्किट डिज़ाइनर 🧪",
             "m4": "4. डीएनए कोड लैंग्वेज आर्किटेक्ट 🧬",
+            "m5": "5. भविष्य की तकनीक और टाइम ट्रैवल लैब 🚀",
             
             "m1_title": "#### ⚔️ एआई-एजेंट साइबर वारफेयर मैट्रिक्स",
-            "m1_desc": "यहाँ तुम्हें खुद नहीं लड़ना है। अपने दो स्वायत्त AI इंजनों का लॉजिक सेट करो और देखो कि कौन सा AI सिस्टम को संभाल पाता है!",
+            "m1_desc": "यहाँ तुम्हें खुद नहीं लड़ना है। अपने दो स्वायत्त AI इंजनों का लॉजिक सेट करो!",
             "m1_def": "🛡️ डिफेंडर एआई सेटिंग",
             "m1_def_logic": "डिफेंडर कोर लॉजिक",
             "m1_def_power": "डिफेंस फायरवॉल फ्रीक्वेंसी (THz)",
@@ -9800,16 +9826,16 @@ def render_logic_lab():
             "m1_atk_logic": "अटैकर कोर लॉजिक",
             "m1_atk_power": "अटैक वेक्टर इंटेंसिटी (ZettaFlops)",
             "m1_graph": "📊 रियल-टाइम बैटल सिमुलेशन ग्रिड",
-            "m1_win": "✅ एनालिसिस सक्सेस: आपके डिफेंडर ने फर्स्ट प्रिंसिपल्स का उपयोग किया, इसलिए हमलावर का लॉजिकल पैराडॉक्स फेल हो गया!",
-            "m1_lose": "🚨 सिस्टम ब्रीच: पुराना डेटा (Pattern Recognition) इस्तेमाल करने के कारण डिफेंडर एआई नए हमले को नहीं पहचान पाया!",
+            "m1_win": "✅ एनालिसिस सक्सेस: आपके डिफेंडर ने फर्स्ट प्रिंसिपल्स का उपयोग किया, इसलिए हमलावर फेल हो गया!",
+            "m1_lose": "🚨 सिस्टम ब्रीच: डिफेंडर पुराना डेटा इस्तेमाल कर रहा था, इसलिए हमला सफल हो गया!",
             
             "m2_title": "#### 🧠 प्रॉम्प्ट-आधारित लॉजिक ब्रेकर एरिना",
             "m2_desc": "चैलेंज: एक ऐसा अनूठा सवाल सोचो जिसका कोई पुराना डेटा इंटरनेट पर न हो!",
             "m2_input": "अपना अनोखा सवाल यहाँ लिखें:",
             "m2_btn": "🚀 एआई को चुनौती दें",
-            "m2_success": "🎉 आप जीत गए! आपका लॉजिक इतना नया था कि 2050 का सुपर-एआई भी कंफ्यूज हो गया। +500 XP!",
+            "m2_success": "🎉 आप जीत गए! आपका लॉजिक इतना नया था कि 2050 का सुपर-एआई भी कंफ्यूज हो गया।",
             "m2_metric": "एआई हैलुसिनेशन प्रोबेबिलिटी",
-            "m2_learn": "> **💡 आपने क्या सीखा?** एआई केवल पुराना डेटा जानता है। नई चीजें सोचना केवल **इंसान** के पास है, क्योंकि उसके पास **चेतना (Consciousness)** है।",
+            "m2_learn": "> **💡 आपने क्या सीखा?** एआई केवल पुराना डेटा जानता है। नई चीजें सोचना केवल **इंसान** के पास है!",
             
             "m3_title": "#### 🧪 सिलिकॉन बायो-सर्किट डिज़ाइनर",
             "m3_desc": "भविष्य में कंप्यूटर चिप्स धातु की नहीं, बल्कि सजीव सिलिकॉन न्यूरॉन्स की बनेंगी।",
@@ -9817,17 +9843,40 @@ def render_logic_lab():
             "m3_temp": "चैंबर का तापमान (केल्विन)",
             "m3_graph": "##### 🔬 3D मॉलिक्यूलर लैटिस प्रीव्यू",
             "m3_collapse": "🚨 थर्मल कोलैप्स: तापमान बहुत ज़्यादा है! सिलिकॉन न्यूरॉन्स जल गए।",
-            "m3_stable": "✅ बायो-कोहेरेंस स्टेबल: आपकी 2050 नैनो-चिप पूरी तरह स्थिर है।",
+            "m3_stable": "✅ बायो-कोहेरेंस स्टेबल: आपकी 2050 नैनो-चिप स्थिर है।",
 
             "m4_title": "#### 🧬 डीएनए कोड लैंग्वेज आर्किटेक्ट",
-            "m4_desc": "कंप्यूटर Python और Binary का उपयोग करते हैं। लेकिन क्या आप एक बिल्कुल नई भाषा बना सकते हैं? नीचे नियम लिखें और इसे DNA चेन में बदलते देखें!",
+            "m4_desc": "कंप्यूटर Python और Binary का उपयोग करते हैं। क्या आप एक नई भाषा बना सकते हैं?",
             "m4_board_title": "🖥️ नई भाषा का ब्लैकबोर्ड",
-            "m4_board_desc": "अपना खुद का कोडिंग लॉजिक या अजीब सिंबल यहाँ लिखें (जैसे A1->B2, X-99)।",
+            "m4_board_desc": "अपना खुद का कोडिंग लॉजिक यहाँ लिखें (जैसे A1->B2, X-99)।",
             "m4_input": "अपनी नई भाषा का सिंटैक्स टाइप करें:",
             "m4_btn": "🧬 DNA चेन बनाएं",
             "m4_ai_react": "🤖 एआई की प्रतिक्रिया:",
-            "m4_learn": "> **💡 आपने क्या सीखा?** आपने अभी एक नई भाषा बनाई! एआई इसे नहीं पढ़ सकता क्योंकि यह उसके डेटाबेस में नहीं है। आप एक सच्चे आविष्कारक हैं!",
-            "m4_fact": "🔬 **असली विज्ञान:** MIT और हार्वर्ड के वैज्ञानिक असल में 'DNA कंप्यूटर' बना रहे हैं, जहाँ सिलिकॉन चिप की जगह जैविक चेन (Biological chains) का उपयोग किया जाता है। आपने अभी वही किया है!"
+            "m4_learn": "> **💡 आपने क्या सीखा?** आपने अभी एक नई भाषा बनाई! एआई इसे नहीं पढ़ सकता। आप एक सच्चे आविष्कारक हैं!",
+            "m4_fact": "🔬 **असली विज्ञान:** MIT के वैज्ञानिक 'DNA कंप्यूटर' बना रहे हैं। आपने अभी वही किया है!",
+            
+            "m5_title": "#### 🚀 भविष्य की तकनीक, मैग्नेटिक इंजन और टाइम ट्रैवल",
+            "m5_desc": "Clyxess AI के संस्थापक (Founder) के रिसर्च और विज़न पर आधारित।",
+            "m5_tab1": "🖥️ भविष्य के सुपरकंप्यूटर",
+            "m5_tab2": "🧲 मैग्नेटिक और वायरलेस तकनीक",
+            "m5_tab3": "⏱️ टाइम ट्रैवल का सिद्धांत",
+            
+            "m5_comp_title": "सुपरकंप्यूटर का भविष्य",
+            "m5_home_comp": "🏠 **घर का सुपरकंप्यूटर:** एक छोटे से सिक्के के आकार का होगा! न कीबोर्ड, न माउस। इसे पूरी तरह से **दिमाग (Mind Control)** से चलाया जाएगा।",
+            "m5_ind_comp": "🏭 **इंडस्ट्री/डेटाबेस सुपरकंप्यूटर:** बड़े-बड़े सर्वर जो खुद को प्राकृतिक तरीके से ठंडा करेंगे। **पानी की जरूरत नहीं होगी!** यह बाहर की हवा को सोख कर और केमिकल छोड़कर खुद को ठंडा रखेगा।",
+            "m5_vis_home": "🔬 3D विज़ुअलाइज़ेशन: सिक्के के आकार का माइंड-कंट्रोल पीसी",
+            "m5_vis_ind": "🏭 3D विज़ुअलाइज़ेशन: खुद को ठंडा करने वाला सर्वर",
+            
+            "m5_emg_title": "इलेक्ट्रोमैग्नेटिक रॉकेट और वायरलेस भविष्य",
+            "m5_emg_desc": "कोई ईंधन नहीं, **कोई तार नहीं**, कोई बिजली लाइन नहीं! भविष्य के रॉकेट **वायरलेस इलेक्ट्रॉन फ्रीक्वेंसी** पर चलेंगे। बिजली हवा में ट्रांसपोर्ट होगी।",
+            "m5_mag_freq": "मैग्नेटिक फ्रीक्वेंसी (GHz)",
+            
+            "m5_time_title": "टाइम ट्रैवल का सरल सच",
+            "m5_time_desc": "टाइम ट्रैवल जादू नहीं है; यह गति (Speed) के बारे में है। अगर आप प्रकाश की गति से उड़ेंगे, तो आपके लिए समय धीमा हो जाएगा। जब आप वापस आएंगे, तो धरती पर आपसे ज्यादा समय बीत चुका होगा!",
+            "m5_speed_lbl": "रॉकेट की गति (प्रकाश की गति का %)",
+            "m5_earth_time": "धरती पर बीता समय",
+            "m5_rocket_time": "रॉकेट में बीता समय",
+            "m5_fact": "🔬 **संस्थापक का नोट:** यह सेक्शन Clyxess AI के निर्माता के रिसर्च के आधार पर जोड़ा गया है।"
         },
         "Hinglish": {
             "title": "🛸 Cybernetic Kids Logic Lab - 2050",
@@ -9838,9 +9887,10 @@ def render_logic_lab():
             "m2": "2. Prompt-Based Logic Breaker Arena 🧠",
             "m3": "3. Silicon Bio-Circuit Designer 🧪",
             "m4": "4. DNA Code Language Architect 🧬",
+            "m5": "5. Future Tech & Time Travel Lab 🚀",
             
             "m1_title": "#### ⚔️ AI-Agent Cyber Warfare Matrix",
-            "m1_desc": "Yahan tumhe khud nahi ladna hai. Apne do AI engines ka logic set karo aur dekho kaun jeetta hai!",
+            "m1_desc": "Apne do AI engines ka logic set karo aur dekho kaun jeetta hai!",
             "m1_def": "🛡️ Defender AI Setting",
             "m1_def_logic": "Defender Core Logic",
             "m1_def_power": "Defense Firewall Frequency (THz)",
@@ -9849,15 +9899,15 @@ def render_logic_lab():
             "m1_atk_power": "Attack Vector Intensity (ZettaFlops)",
             "m1_graph": "📊 Real-Time Battle Grid",
             "m1_win": "✅ ANALYSIS SUCCESS: Aapke Defender ne First Principles use kiya, isliye Attacker fail ho gaya!",
-            "m1_lose": "🚨 SYSTEM BREACH: Defender purana Pattern Recognition use kar raha tha, isliye hack ho gaya!",
+            "m1_lose": "🚨 SYSTEM BREACH: Defender purana Pattern Recognition use kar raha tha!",
             
             "m2_title": "#### 🧠 Prompt-Based Logic Breaker Arena",
             "m2_desc": "Challenge: Aisa unique sawal socho jo internet par exist nahi karta!",
             "m2_input": "Apna unique sawal yahan likho:",
             "m2_btn": "🚀 AI ko Challenge Karo",
-            "m2_success": "🎉 TUM JEET GAYE! Tumhara logic itna naya tha ki 2050 ka AI bhi confuse ho gaya. +500 XP!",
+            "m2_success": "🎉 TUM JEET GAYE! Tumhara logic itna naya tha ki 2050 ka AI bhi confuse ho gaya.",
             "m2_metric": "AI Hallucination Probability",
-            "m2_learn": "> **💡 Kya seekha?** AI sirf purana data janta hai. Nayi soch insaan ke paas hi hoti hai kyunki uske paas **Consciousness** hai!",
+            "m2_learn": "> **💡 Kya seekha?** AI sirf purana data janta hai. Nayi soch insaan ke paas hi hoti hai!",
             
             "m3_title": "#### 🧪 Silicon Bio-Circuit Designer",
             "m3_desc": "Future mein computer chips dhatu ki nahi, living silicon neurons ki banengi.",
@@ -9868,18 +9918,40 @@ def render_logic_lab():
             "m3_stable": "✅ BIO-COHERENCE STABLE: Aapki 2050 nano-chip perfectly stable hai.",
 
             "m4_title": "#### 🧬 DNA Code Language Architect",
-            "m4_desc": "Computer Python aur Binary use karte hain. Par kya tum ek nayi language bana sakte ho? Niche apne rules likho aur unhe DNA chain mein badalte dekho!",
+            "m4_desc": "Computer Python aur Binary use karte hain. Par kya tum ek nayi language bana sakte ho?",
             "m4_board_title": "🖥️ Nayi Language ka Blackboard",
-            "m4_board_desc": "Apna khud ka coding logic ya ajeeb symbols yahan likho (jaise A1->B2, X-99).",
+            "m4_board_desc": "Apna khud ka coding logic ya ajeeb symbols yahan likho.",
             "m4_input": "Apni nayi language ka syntax type karo:",
             "m4_btn": "🧬 DNA Chain Banao",
             "m4_ai_react": "🤖 AI ki Reaction:",
-            "m4_learn": "> **💡 Kya seekha?** Tumne abhi ek nayi language banayi! AI ise nahi padh sakta kyunki yeh uske database mein nahi hai. Tum ek true Inventor ho!",
-            "m4_fact": "🔬 **Real-World Fact:** MIT aur Harvard ke scientists asli mein 'DNA Computers' bana rahe hain, jahan silicon chip ki jagah biological chains use hoti hain. Tumne abhi wahi kiya hai jo woh karte hain!"
+            "m4_learn": "> **💡 Kya seekha?** Tumne abhi ek nayi language banayi! AI ise nahi padh sakta. Tum ek true Inventor ho!",
+            "m4_fact": "🔬 **Real-World Fact:** MIT ke scientists asli mein 'DNA Computers' bana rahe hain!",
+            
+            "m5_title": "#### 🚀 Future Tech, Magnetic Engine & Time Travel",
+            "m5_desc": "Clyxess AI Founder ke research aur vision par based.",
+            "m5_tab1": "🖥️ Future Supercomputers",
+            "m5_tab2": "🧲 Magnetic & Wireless Tech",
+            "m5_tab3": "⏱️ Time Travel Theory",
+            
+            "m5_comp_title": "Supercomputer ka Future",
+            "m5_home_comp": "🏠 **Ghar ka Supercomputer:** Ek chhote se **sikke ke aakar** ka hoga! Na keyboard, na mouse. Ise poori tarah se **Dimaag (Mind Control)** se chalaya jayega.",
+            "m5_ind_comp": "🏭 **Factory ka Supercomputer:** Bade servers jo khud ko natural tarike se thanda karenge. **Paani ki zaroorat nahi!** Yeh bahar ki hawa ko absorb karke aur chemical release karke khud ko thanda rakhega.",
+            "m5_vis_home": "🔬 3D Visualization: Sikke ke aakar ka Mind-Control PC",
+            "m5_vis_ind": "🏭 3D Visualization: Khud ko thanda karne wala Server",
+            
+            "m5_emg_title": "Electromagnetic Rocket & Wireless Future",
+            "m5_emg_desc": "Koi fuel nahi, **koi cable (taro) nahi**, koi power line nahi! Future ke rocket aur city **Wireless Electron Frequencies** par chalenge. Bijli magnetic field ke zariye hawa mein travel karegi.",
+            "m5_mag_freq": "Magnetic Field Frequency (GHz)",
+            
+            "m5_time_title": "Time Travel ka Simple Sach",
+            "m5_time_desc": "Time travel jadu nahi hai; yeh Speed ke baare mein hai. Agar tum light ki speed se udoge, toh tumhare liye time slow ho jayega. Jab tum wapas aaoge, toh Earth pe tumse zyada time beet chuka hoga!",
+            "m5_speed_lbl": "Rocket Speed (Light Speed ka %)",
+            "m5_earth_time": "Earth pe beeta time",
+            "m5_rocket_time": "Rocket mein beeta time",
+            "m5_fact": "🔬 **Founder's Note:** Yeh section Clyxess AI ke creator ke research ke aadhar par add kiya gaya hai."
         }
     }
 
-    # Top Language Selector
     selected_lang = st.selectbox("🌐 Select Language / भाषा चुनें", list(LANG_DATA.keys()))
     t = LANG_DATA[selected_lang]
 
@@ -9896,206 +9968,203 @@ def render_logic_lab():
     st.markdown("---")
     future_module = st.selectbox(
         t["select_lbl"],
-        [t["m1"], t["m2"], t["m3"], t["m4"]]
+        [t["m1"], t["m2"], t["m3"], t["m4"], t["m5"]]
     )
     st.divider()
 
-    # ==================== MODULE 1: AI-AGENT WARFARE ====================
+    # ==================== MODULE 1 ====================
     if t["m1"] in future_module:
         st.markdown(t["m1_title"])
         st.write(t["m1_desc"])
-        
         col_w1, col_w2 = st.columns(2)
         with col_w1:
             st.markdown(f"##### {t['m1_def']}")
-            def_logic = st.selectbox(t["m1_def_logic"], ["First Principles Architecture", "Pattern Recognition (Old Tech)", "Quantum Shield Matrix"])
+            def_logic = st.selectbox(t["m1_def_logic"], ["First Principles Architecture", "Pattern Recognition (Old Tech)"])
             def_power = st.slider(t["m1_def_power"], 10, 1000, 500)
-        
         with col_w2:
             st.markdown(f"##### {t['m1_atk']}")
-            atk_logic = st.selectbox(t["m1_atk_logic"], ["Brute Force Data Ingestion", "Logical Paradox Exploit", "Neural Overdrive"])
+            atk_logic = st.selectbox(t["m1_atk_logic"], ["Brute Force Data Ingestion", "Logical Paradox Exploit"])
             atk_power = st.slider(t["m1_atk_power"], 10, 1000, 600)
-            
         st.write(f"### {t['m1_graph']}")
         t_val = np.linspace(0, 10, 100)
         y_def = np.sin(t_val * (def_power / 200))
-        
-        if "Paradox" in atk_logic:
-            y_atk = np.tan(t_val * 0.2)
-            y_atk = np.clip(y_atk, -2, 2) # Crash fix
-        else:
-            y_atk = np.cos(t_val * (atk_power / 200))
-        
+        y_atk = np.tan(t_val * 0.2) if "Paradox" in atk_logic else np.cos(t_val * (atk_power / 200))
+        y_atk = np.clip(y_atk, -2, 2)
         fig_battle = go.Figure()
-        fig_battle.add_trace(go.Scatter(x=t_val, y=y_def, name="Defender AI Signal", line=dict(color="#00FFCC", width=3)))
-        fig_battle.add_trace(go.Scatter(x=t_val, y=y_atk, name="Attacker AI Signal", line=dict(color="#FF3366", width=2, dash="dash")))
-        fig_battle.update_layout(paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)", height=350, margin=dict(l=0,r=0,t=20,b=0), font=dict(color="white"))
+        fig_battle.add_trace(go.Scatter(x=t_val, y=y_def, name="Defender AI", line=dict(color="#00FFCC", width=3)))
+        fig_battle.add_trace(go.Scatter(x=t_val, y=y_atk, name="Attacker AI", line=dict(color="#FF3366", width=2, dash="dash")))
+        fig_battle.update_layout(paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)", height=350, font=dict(color="white"))
         st.plotly_chart(fig_battle, use_container_width=True)
-        
         if "First Principles" in def_logic and "Paradox" in atk_logic:
             st.success(t["m1_win"])
         elif "Pattern Recognition" in def_logic:
             st.error(t["m1_lose"])
 
-    # ==================== MODULE 2: LOGIC BREAKER ====================
+    # ==================== MODULE 2 ====================
     elif t["m2"] in future_module:
         st.markdown(t["m2_title"])
         st.write(t["m2_desc"])
-        
-        kid_prompt = st.text_input(t["m2_input"], placeholder="Example: What if time flows backwards in a black hole made of glass?")
-        
+        kid_prompt = st.text_input(t["m2_input"], placeholder="What if time flows backwards?")
         if st.button(t["m2_btn"], type="primary") and kid_prompt.strip():
             with st.spinner("AI is thinking..."):
-                
-                ai_analysis_prompt = f"""
-                You are a friendly, futuristic AI (Year 2050) talking to a highly creative child.
-                The child asked you this question: "{kid_prompt}"
-                
-                Rules for your response:
-                1. NEVER say you are defeated or scared.
-                2. If the question is REAL, answer it nicely.
-                3. If the question is IMAGINARY, praise the child immensely. Say: "Wow! My AI database does not have this because it's new. You have Human Consciousness, which I lack. You can create new ideas, I can only read old data. Your human brain is smarter than me!"
-                4. Keep the language simple, warm, and encouraging. 
-                5. Reply in {selected_lang} language.
-                """
-                
+                ai_analysis_prompt = f"You are a friendly AI. Child asked: '{kid_prompt}'. If imaginary, praise their Human Consciousness. Reply in {selected_lang}."
                 try:
-                    res = client.chat.completions.create(
-                        model="openai/gpt-oss-120b",
-                        messages=[{"role": "user", "content": ai_analysis_prompt}],
-                        temperature=0.7, max_tokens=400
-                    )
-                    reply = res.choices[0].message.content
-                    
+                    res = client.chat.completions.create(model="openai/gpt-oss-120b", messages=[{"role": "user", "content": ai_analysis_prompt}], temperature=0.7, max_tokens=400)
                     st.balloons()
                     st.success(t["m2_success"])
                     st.metric(t["m2_metric"], "98.5%")
-                    
-                    st.markdown("### 🤖 AI:")
-                    st.info(reply)
+                    st.info(res.choices[0].message.content)
                     st.markdown(t["m2_learn"])
-                    
                 except Exception as e:
                     st.error(f"AI Error: {e}")
 
-    # ==================== MODULE 3: SILICON LIFE ====================
+    # ==================== MODULE 3 ====================
     elif t["m3"] in future_module:
         st.markdown(t["m3_title"])
         st.write(t["m3_desc"])
-        
-        substrate = st.selectbox(t["m3_base"], ["Graphene-Infused Bio-Gel", "Pure Crystallized Silicon Matrix", "Antimatter Plasma Lattice"])
+        substrate = st.selectbox(t["m3_base"], ["Graphene-Infused Bio-Gel", "Pure Crystallized Silicon Matrix"])
         temp_kelvin = st.slider(t["m3_temp"], 0, 400, 77)
-        
         st.write(t["m3_graph"])
         grid_size = 12
         x, y, z = np.meshgrid(np.linspace(-2, 2, grid_size), np.linspace(-2, 2, grid_size), np.linspace(-2, 2, grid_size))
         distortion = (temp_kelvin / 400) * 0.3
         x_dist = x + np.random.normal(0, distortion, x.shape)
-        
-        fig_lattice = go.Figure(data=[go.Scatter3d(
-            x=x_dist.flatten(), y=y.flatten(), z=z.flatten(),
-            mode='markers', marker=dict(size=3, color=z.flatten(), colorscale='Viridis', opacity=0.6)
-        )])
-        fig_lattice.update_layout(scene=dict(xaxis=dict(visible=False), yaxis=dict(visible=False), zaxis=dict(visible=False), bgcolor="black"),
-                                  margin=dict(l=0,r=0,t=0,b=0), height=400, paper_bgcolor="black")
+        fig_lattice = go.Figure(data=[go.Scatter3d(x=x_dist.flatten(), y=y.flatten(), z=z.flatten(), mode='markers', marker=dict(size=3, color=z.flatten(), colorscale='Viridis', opacity=0.6))])
+        fig_lattice.update_layout(scene=dict(xaxis=dict(visible=False), yaxis=dict(visible=False), zaxis=dict(visible=False), bgcolor="black"), margin=dict(l=0,r=0,t=0,b=0), height=400, paper_bgcolor="black")
         st.plotly_chart(fig_lattice, use_container_width=True)
-        
-        if temp_kelvin > 300:
-            st.error(t["m3_collapse"])
-        else:
-            st.success(t["m3_stable"])
+        if temp_kelvin > 300: st.error(t["m3_collapse"])
+        else: st.success(t["m3_stable"])
 
-    # ==================== MODULE 4: DNA LANGUAGE ARCHITECT ====================
+    # ==================== MODULE 4 ====================
     elif t["m4"] in future_module:
         st.markdown(t["m4_title"])
         st.write(t["m4_desc"])
-
-        st.markdown(f"""
-        <div style="
-            background-color: #050505;
-            border: 3px solid #333;
-            border-radius: 12px;
-            padding: 20px;
-            font-family: 'Courier New', monospace;
-            box-shadow: inset 0 0 20px rgba(0, 255, 204, 0.1);
-            margin-bottom: 15px;
-            text-align: center;
-        ">
-            <h4 style="color: #00FFCC; margin-top: 0;">{t['m4_board_title']}</h4>
-            <p style="color: #888; font-size: 14px;">{t['m4_board_desc']}</p>
-        </div>
-        """, unsafe_allow_html=True)
-
+        st.markdown(f"""<div style="background-color: #050505; border: 3px solid #333; border-radius: 12px; padding: 20px; font-family: 'Courier New', monospace; text-align: center;"><h4 style="color: #00FFCC; margin-top: 0;">{t['m4_board_title']}</h4><p style="color: #888; font-size: 14px;">{t['m4_board_desc']}</p></div>""", unsafe_allow_html=True)
         dna_input = st.text_area(t["m4_input"], placeholder="A1 -> X7 * B2 // DNA-CHAIN")
-
         if st.button(t["m4_btn"], type="primary") and dna_input.strip():
-            
             clean_text = dna_input.replace(" ", "")
             n_nodes = min(len(clean_text), 40) 
-            
             if n_nodes > 2:
                 chars = list(clean_text)[:n_nodes]
                 t_val = np.linspace(0, 6 * np.pi, n_nodes)
                 x_val = np.sin(t_val)
                 y_val = np.cos(t_val)
                 z_val = np.linspace(0, 15, n_nodes)
-
                 fig_dna = go.Figure()
-
-                fig_dna.add_trace(go.Scatter3d(x=x_val, y=y_val, z=z_val, mode='lines',
-                    line=dict(color='#00FFCC', width=6), name='Strand 1'))
-                
-                fig_dna.add_trace(go.Scatter3d(x=-x_val, y=-y_val, z=z_val, mode='lines',
-                    line=dict(color='#FF3366', width=6), name='Strand 2'))
-
+                fig_dna.add_trace(go.Scatter3d(x=x_val, y=y_val, z=z_val, mode='lines', line=dict(color='#00FFCC', width=6), name='Strand 1'))
+                fig_dna.add_trace(go.Scatter3d(x=-x_val, y=-y_val, z=z_val, mode='lines', line=dict(color='#FF3366', width=6), name='Strand 2'))
                 for i in range(n_nodes):
-                    fig_dna.add_trace(go.Scatter3d(
-                        x=[x_val[i], -x_val[i]], y=[y_val[i], -y_val[i]], z=[z_val[i], z_val[i]],
-                        mode='lines+text',
-                        line=dict(color='#F3B63F', width=2),
-                        text=["", chars[i]], textposition="middle right",
-                        textfont=dict(color="white", size=14, family="Courier New"),
-                        showlegend=False
-                    ))
-
-                fig_dna.update_layout(
-                    scene=dict(xaxis=dict(visible=False), yaxis=dict(visible=False), zaxis=dict(visible=False), bgcolor="black",
-                               camera=dict(eye=dict(x=1.5, y=1.5, z=0.8))),
-                    paper_bgcolor="black", margin=dict(l=0, r=0, t=0, b=0), height=500, showlegend=False
-                )
+                    fig_dna.add_trace(go.Scatter3d(x=[x_val[i], -x_val[i]], y=[y_val[i], -y_val[i]], z=[z_val[i], z_val[i]], mode='lines+text', line=dict(color='#F3B63F', width=2), text=["", chars[i]], textposition="middle right", textfont=dict(color="white", size=14, family="Courier New"), showlegend=False))
+                fig_dna.update_layout(scene=dict(xaxis=dict(visible=False), yaxis=dict(visible=False), zaxis=dict(visible=False), bgcolor="black", camera=dict(eye=dict(x=1.5, y=1.5, z=0.8))), paper_bgcolor="black", margin=dict(l=0, r=0, t=0, b=0), height=500, showlegend=False)
                 st.plotly_chart(fig_dna, use_container_width=True)
-            else:
-                st.warning("Please type at least 3 characters to build a DNA chain!")
-
             st.info(t["m4_fact"])
-
             with st.spinner("2050 AI is trying to read your new language..."):
-                ai_dna_prompt = f"""
-                You are a highly advanced AI from the year 2050. 
-                A child has just invented a brand new computer language syntax: "{dna_input}"
-                
-                React to this. You only know Python, C++, and Binary. Tell the child:
-                1. You have never seen this syntax before.
-                2. You are amazed and cannot decode it because it's not in your database.
-                3. Mention that big companies use old languages, but human creativity creates new paradigms like DNA computing.
-                4. Praise their human creativity and tell them they are a true Architect.
-                
-                Keep it very positive, exciting, and reply in {selected_lang} language.
-                """
+                ai_dna_prompt = f"You are AI. Child invented: '{dna_input}'. Praise their Human Consciousness. Reply in {selected_lang}."
                 try:
-                    res = client.chat.completions.create(
-                        model="openai/gpt-oss-120b",
-                        messages=[{"role": "user", "content": ai_dna_prompt}],
-                        temperature=0.8, max_tokens=300
-                    )
-                    reply = res.choices[0].message.content
-                    
+                    res = client.chat.completions.create(model="openai/gpt-oss-120b", messages=[{"role": "user", "content": ai_dna_prompt}], temperature=0.8, max_tokens=300)
                     st.balloons()
                     st.markdown(f"### {t['m4_ai_react']}")
-                    st.success(reply)
+                    st.success(res.choices[0].message.content)
                     st.markdown(t["m4_learn"])
                 except Exception as e:
                     st.error(f"AI Error: {e}")
+
+    # ==================== MODULE 5 ====================
+    elif t["m5"] in future_module:
+        st.markdown(t["m5_title"])
+        st.info(t["m5_desc"])
+
+        tab1, tab2, tab3 = st.tabs([t["m5_tab1"], t["m5_tab2"], t["m5_tab3"]])
+
+        # --- TAB 1: FUTURE COMPUTERS ---
+        with tab1:
+            st.markdown(f"#### {t['m5_comp_title']}")
+            st.success(t["m5_home_comp"])
+            st.warning(t["m5_ind_comp"])
+
+            col_c1, col_c2 = st.columns(2)
+            
+            # Visual 1: Coin-Sized Mind Control PC
+            with col_c1:
+                st.write(f"##### {t['m5_vis_home']}")
+                fig_coin = go.Figure()
+                # Coin Shape (Cylinder)
+                t_coin = np.linspace(0, 2*np.pi, 50)
+                fig_coin.add_trace(go.Mesh3d(x=np.cos(t_coin), y=np.sin(t_coin), z=np.zeros(50), color='#00FFCC', opacity=0.8, name="Coin PC"))
+                # Brain Waves (Rings growing out)
+                for r in [1.5, 2.0, 2.5]:
+                    fig_coin.add_trace(go.Scatter3d(x=np.cos(t_coin)*r, y=np.sin(t_coin)*r, z=np.zeros(50)+0.5, mode='lines', line=dict(color='#FF3366', width=2, dash='dot'), showlegend=False))
+                fig_coin.update_layout(scene=dict(xaxis=dict(visible=False), yaxis=dict(visible=False), zaxis=dict(visible=False), bgcolor="black", camera=dict(eye=dict(x=0, y=0, z=2.5))), paper_bgcolor="black", margin=dict(l=0, r=0, t=0, b=0), height=300, showlegend=False)
+                st.plotly_chart(fig_coin, use_container_width=True)
+
+            # Visual 2: Self-Cooling Server
+            with col_c2:
+                st.write(f"##### {t['m5_vis_ind']}")
+                fig_server = go.Figure()
+                # Server Racks
+                for i in range(5):
+                    fig_server.add_trace(go.Mesh3d(x=[0, 1, 1, 0, 0, 1, 1, 0], y=[i, i, i+1, i+1, i, i, i+1, i+1], z=[0, 0, 0, 0, 3, 3, 3, 3], color='#333333', opacity=0.9))
+                
+                # Natural Air Absorbing (Blue particles going IN)
+                fig_server.add_trace(go.Scatter3d(x=np.random.rand(20)*3-1, y=np.random.rand(20)*5, z=np.random.rand(20)*3, mode='markers', marker=dict(size=4, color='#00AAFF'), name="Natural Air In"))
+                
+                # Chemical Cooling (Green particles coming OUT)
+                fig_server.add_trace(go.Scatter3d(x=np.random.rand(20)*3+1, y=np.random.rand(20)*5, z=np.random.rand(20)*3, mode='markers', marker=dict(size=4, color='#00FFCC', symbol='diamond'), name="Cooling Chemical Out"))
+                
+                fig_server.update_layout(scene=dict(xaxis=dict(visible=False), yaxis=dict(visible=False), zaxis=dict(visible=False), bgcolor="black"), paper_bgcolor="black", margin=dict(l=0, r=0, t=0, b=0), height=300, showlegend=False)
+                st.plotly_chart(fig_server, use_container_width=True)
+
+        # --- TAB 2: MAGNETIC & WIRELESS TECH ---
+        with tab2:
+            st.markdown(f"#### {t['m5_emg_title']}")
+            st.warning(t["m5_emg_desc"])
+
+            mag_freq = st.slider(t["m5_mag_freq"], 10, 500, 250)
+            st.write("##### 🚀 3D Visualization: Wireless Magnetic Thrust")
+            
+            fig_rocket = go.Figure()
+            t_z = np.linspace(0, 5, 50)
+            fig_rocket.add_trace(go.Scatter3d(x=np.sin(t_z * 2) * 0.5, y=np.cos(t_z * 2) * 0.5, z=t_z, mode='lines', line=dict(color='#aaaaaa', width=5), name="Rocket Body"))
+            
+            rings = int(mag_freq / 50)
+            for i in range(rings):
+                z_pos = i * (5/rings)
+                t_ring = np.linspace(0, 2*np.pi, 50)
+                fig_rocket.add_trace(go.Scatter3d(x=np.cos(t_ring)*1.5, y=np.sin(t_ring)*1.5, z=[z_pos]*50, mode='lines', line=dict(color='#00FFCC', width=3), showlegend=False))
+                
+            fig_rocket.add_trace(go.Scatter3d(x=np.random.randn(30)*0.5, y=np.random.randn(30)*0.5, z=np.random.rand(30)*-3, mode='markers', marker=dict(size=4, color='#FF3366'), name="Wireless Electron Thrust"))
+            fig_rocket.add_trace(go.Scatter3d(x=[0, 0], y=[0, 0], z=[-5, 0], mode='lines', line=dict(color='#F3B63F', width=8, dash='dot'), name="Wireless Power Beam"))
+
+            fig_rocket.update_layout(scene=dict(xaxis=dict(visible=False), yaxis=dict(visible=False), zaxis=dict(visible=False), bgcolor="black", camera=dict(eye=dict(x=1.5, y=1.5, z=1.5))), paper_bgcolor="black", margin=dict(l=0, r=0, t=0, b=0), height=400)
+            st.plotly_chart(fig_rocket, use_container_width=True)
+
+        # --- TAB 3: TIME TRAVEL ---
+        with tab3:
+            st.markdown(f"#### {t['m5_time_title']}")
+            st.info(t["m5_time_desc"])
+
+            speed_pct = st.slider(t["m5_speed_lbl"], 1, 99, 50)
+            v = speed_pct / 100.0
+            gamma = 1 / np.sqrt(1 - v**2)
+            earth_years = 10 
+            rocket_years = earth_years / gamma
+            
+            col_t1, col_t2 = st.columns(2)
+            col_t1.metric(t["m5_earth_time"], f"{earth_years} Years")
+            col_t2.metric(t["m5_rocket_time"], f"{rocket_years:.2f} Years")
+            
+            st.write("##### ⏱️ Time Dilation Physics")
+            v_vals = np.linspace(0, 0.99, 100)
+            gamma_vals = 1 / np.sqrt(1 - v_vals**2)
+            
+            fig_time = go.Figure()
+            fig_time.add_trace(go.Scatter(x=v_vals, y=gamma_vals, mode='lines', line=dict(color='#F3B63F', width=4), name="Time Slowing Factor"))
+            fig_time.add_trace(go.Scatter(x=[v], y=[gamma], mode='markers', marker=dict(size=12, color='#FF3366'), name="Your Rocket"))
+            
+            fig_time.update_layout(paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)", xaxis_title="Speed (Fraction of Light Speed)", yaxis_title="Time Slows Down", height=350, font=dict(color="white"))
+            st.plotly_chart(fig_time, use_container_width=True)
+
+        st.info(t["m5_fact"])
 
     # ==========================================
     # 🔻 BOTTOM FOOTER
