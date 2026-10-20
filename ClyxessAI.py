@@ -9719,136 +9719,274 @@ def render_aero_lab():
                 st.session_state.aero_chat_log.append({"role": "assistant", "content": reply})   
                
         
-def render_logic_lab():
+def render_logic_lab(client):
     import streamlit as st
     import numpy as np
     import plotly.graph_objects as go
     import time
 
     # ==========================================
-    # 🔝 TOP HEADER (Futuristic Cyberpunk Style)
+    # 🌐 1. MULTI-LANGUAGE SETUP
     # ==========================================
-    st.markdown("""
-    <div style="
-        background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
-        padding: 25px; border-radius: 15px; border: 1px solid #00FFCC;
-        box-shadow: 0 0 20px rgba(0, 255, 204, 0.2); margin-bottom: 25px;
-        text-align: center; color: white;
-    ">
-        <h1 style="margin: 0; font-size: 32px; font-weight: 900; letter-spacing: 2px;">
-            🛸 CYBERNETIC KIDS LOGIC LAB
-        </h1>
-        <p style="margin: 10px 0 0 0; color: #aab9d7; font-size: 16px;">
-            Welcome to Year 2050: Human Intelligence vs Autonomous AI
-        </p>
-    </div>
-    """, unsafe_allow_html=True)
+    LANG_DATA = {
+        "English": {
+            "title": "🛸 CYBERNETIC KIDS LOGIC LAB - YEAR 2050",
+            "subtitle": "🧠 Welcome to the Uncharted Territory: Human Intelligence vs Autonomous AI",
+            "info": "Kids! This lab is based on future tech. Here, you are not a slave to AI, but its CREATOR.",
+            "select_lbl": "🤖 Choose a Future System (Not available today):",
+            "m1": "1. AI-Agent Cyber Warfare Matrix ⚔️",
+            "m2": "2. Prompt-Based Logic Breaker Arena 🧠",
+            "m3": "3. Silicon Bio-Circuit Designer 🧪",
+            "m4": "4. DNA Code Language Architect 🧬",
+            
+            # Module 1
+            "m1_title": "#### ⚔️ AI-Agent Cyber Warfare Matrix",
+            "m1_desc": "You don't fight here. Configure two AI engines and see which one survives!",
+            "m1_def": "🛡️ Defender AI Configuration",
+            "m1_def_logic": "Defender Core Logic",
+            "m1_def_power": "Defense Firewall Frequency (THz)",
+            "m1_atk": "🎯 Attacker AI Configuration",
+            "m1_atk_logic": "Attacker Core Logic",
+            "m1_atk_power": "Attack Vector Intensity (ZettaFlops)",
+            "m1_graph": "📊 Real-Time Battle Simulation Grid",
+            "m1_win": "✅ ANALYSIS SUCCESS: Defender used First Principles, so the Attacker's Logical Paradox failed!",
+            "m1_lose": "🚨 SYSTEM BREACH: The Defender failed because it used old Pattern Recognition!",
+            
+            # Module 2
+            "m2_title": "#### 🧠 Prompt-Based Logic Breaker Arena",
+            "m2_desc": "Challenge: Think of a unique question that doesn't exist on the internet!",
+            "m2_input": "Enter your unique Logic Breaking Concept here:",
+            "m2_btn": "🚀 Break the AI Brain",
+            "m2_success": "🎉 YOU WIN! Your logic is so new that even 2050 AI got confused. You earned +500 XP!",
+            "m2_metric": "AI Hallucination Probability",
+            "m2_learn": "> **💡 What did you learn?** AI only knows old data. Creating new ideas is ONLY possible for Humans, because you have Consciousness!",
+            
+            # Module 3
+            "m3_title": "#### 🧪 Silicon Bio-Circuit Designer",
+            "m3_desc": "In the future, computer chips will be made of living silicon neurons.",
+            "m3_base": "Select Molecular Base",
+            "m3_temp": "Chamber Operating Temperature (Kelvin)",
+            "m3_graph": "##### 🔬 3D Molecular Lattice Preview",
+            "m3_collapse": "🚨 THERMAL COLLAPSE: Temperature is too high! Silicon neurons burned.",
+            "m3_stable": "✅ BIO-COHERENCE STABLE: Your 2050 nano-chip is perfectly stable.",
 
-    st.info("🧠 **बच्चों!** यह लैब भविष्य की तकनीक पर आधारित है। यहाँ तुम एआई के गुलाम नहीं, बल्कि उसके **क्रिएटर** बनोगे।")
+            # Module 4
+            "m4_title": "#### 🧬 DNA Code Language Architect",
+            "m4_desc": "Computers use Python and Binary. But can you invent a brand NEW language? Write your rules below and watch them turn into a DNA chain!",
+            "m4_board_title": "🖥️ New Language Blackboard",
+            "m4_board_desc": "Write your own coding logic or weird symbols here (e.g., A1->B2, X-99).",
+            "m4_input": "Type your new language syntax:",
+            "m4_btn": "🧬 Generate DNA Chain",
+            "m4_ai_react": "🤖 AI Reaction:",
+            "m4_learn": "> **💡 What did you learn?** You just created a new syntax! AI can't read it because it's not in its database. You are a true Inventor!",
+            "m4_fact": "🔬 **Real-World Fact:** Scientists at MIT & Harvard are actually building 'DNA Computers' where they use biological chains instead of silicon chips to store data. You just did what they do!"
+        },
+        "Hindi (हिंदी)": {
+            "title": "🛸 साइबरनेटिक किड्स लॉजिक लैब - ईयर 2050",
+            "subtitle": "🧠 भविष्य की दुनिया में आपका स्वागत है: मानव बुद्धि बनाम एआई",
+            "info": "बच्चों! यह लैब भविष्य की तकनीक पर आधारित है। यहाँ तुम एआई के गुलाम नहीं, बल्कि उसके क्रिएटर बनोगे।",
+            "select_lbl": "🤖 एक भविष्य प्रणाली चुनें (जो आज मौजूद नहीं है):",
+            "m1": "1. एआई-एजेंट साइबर वारफेयर मैट्रिक्स ⚔️",
+            "m2": "2. लॉजिक ब्रेकर एरिना 🧠",
+            "m3": "3. सिलिकॉन बायो-सर्किट डिज़ाइनर 🧪",
+            "m4": "4. डीएनए कोड लैंग्वेज आर्किटेक्ट 🧬",
+            
+            "m1_title": "#### ⚔️ एआई-एजेंट साइबर वारफेयर मैट्रिक्स",
+            "m1_desc": "यहाँ तुम्हें खुद नहीं लड़ना है। अपने दो स्वायत्त AI इंजनों का लॉजिक सेट करो और देखो कि कौन सा AI सिस्टम को संभाल पाता है!",
+            "m1_def": "🛡️ डिफेंडर एआई सेटिंग",
+            "m1_def_logic": "डिफेंडर कोर लॉजिक",
+            "m1_def_power": "डिफेंस फायरवॉल फ्रीक्वेंसी (THz)",
+            "m1_atk": "🎯 अटैकर एआई सेटिंग",
+            "m1_atk_logic": "अटैकर कोर लॉजिक",
+            "m1_atk_power": "अटैक वेक्टर इंटेंसिटी (ZettaFlops)",
+            "m1_graph": "📊 रियल-टाइम बैटल सिमुलेशन ग्रिड",
+            "m1_win": "✅ एनालिसिस सक्सेस: आपके डिफेंडर ने फर्स्ट प्रिंसिपल्स का उपयोग किया, इसलिए हमलावर का लॉजिकल पैराडॉक्स फेल हो गया!",
+            "m1_lose": "🚨 सिस्टम ब्रीच: पुराना डेटा (Pattern Recognition) इस्तेमाल करने के कारण डिफेंडर एआई नए हमले को नहीं पहचान पाया!",
+            
+            "m2_title": "#### 🧠 प्रॉम्प्ट-आधारित लॉजिक ब्रेकर एरिना",
+            "m2_desc": "चैलेंज: एक ऐसा अनूठा सवाल सोचो जिसका कोई पुराना डेटा इंटरनेट पर न हो!",
+            "m2_input": "अपना अनोखा सवाल यहाँ लिखें:",
+            "m2_btn": "🚀 एआई को चुनौती दें",
+            "m2_success": "🎉 आप जीत गए! आपका लॉजिक इतना नया था कि 2050 का सुपर-एआई भी कंफ्यूज हो गया। +500 XP!",
+            "m2_metric": "एआई हैलुसिनेशन प्रोबेबिलिटी",
+            "m2_learn": "> **💡 आपने क्या सीखा?** एआई केवल पुराना डेटा जानता है। नई चीजें सोचना केवल **इंसान** के पास है, क्योंकि उसके पास **चेतना (Consciousness)** है।",
+            
+            "m3_title": "#### 🧪 सिलिकॉन बायो-सर्किट डिज़ाइनर",
+            "m3_desc": "भविष्य में कंप्यूटर चिप्स धातु की नहीं, बल्कि सजीव सिलिकॉन न्यूरॉन्स की बनेंगी।",
+            "m3_base": "मॉलिक्यूलर बेस चुनें",
+            "m3_temp": "चैंबर का तापमान (केल्विन)",
+            "m3_graph": "##### 🔬 3D मॉलिक्यूलर लैटिस प्रीव्यू",
+            "m3_collapse": "🚨 थर्मल कोलैप्स: तापमान बहुत ज़्यादा है! सिलिकॉन न्यूरॉन्स जल गए।",
+            "m3_stable": "✅ बायो-कोहेरेंस स्टेबल: आपकी 2050 नैनो-चिप पूरी तरह स्थिर है।",
+
+            "m4_title": "#### 🧬 डीएनए कोड लैंग्वेज आर्किटेक्ट",
+            "m4_desc": "कंप्यूटर Python और Binary का उपयोग करते हैं। लेकिन क्या आप एक बिल्कुल नई भाषा बना सकते हैं? नीचे नियम लिखें और इसे DNA चेन में बदलते देखें!",
+            "m4_board_title": "🖥️ नई भाषा का ब्लैकबोर्ड",
+            "m4_board_desc": "अपना खुद का कोडिंग लॉजिक या अजीब सिंबल यहाँ लिखें (जैसे A1->B2, X-99)।",
+            "m4_input": "अपनी नई भाषा का सिंटैक्स टाइप करें:",
+            "m4_btn": "🧬 DNA चेन बनाएं",
+            "m4_ai_react": "🤖 एआई की प्रतिक्रिया:",
+            "m4_learn": "> **💡 आपने क्या सीखा?** आपने अभी एक नई भाषा बनाई! एआई इसे नहीं पढ़ सकता क्योंकि यह उसके डेटाबेस में नहीं है। आप एक सच्चे आविष्कारक हैं!",
+            "m4_fact": "🔬 **असली विज्ञान:** MIT और हार्वर्ड के वैज्ञानिक असल में 'DNA कंप्यूटर' बना रहे हैं, जहाँ सिलिकॉन चिप की जगह जैविक चेन (Biological chains) का उपयोग किया जाता है। आपने अभी वही किया है!"
+        },
+        "Hinglish": {
+            "title": "🛸 Cybernetic Kids Logic Lab - 2050",
+            "subtitle": "🧠 Future World: Human Intelligence vs AI",
+            "info": "Bacchon! Yeh lab future tech par based hai. Yahan tum AI ke gulam nahi, uske CREATOR banoge.",
+            "select_lbl": "🤖 Ek future system chuno (Jo aaj nahi hai):",
+            "m1": "1. AI-Agent Cyber Warfare Matrix ⚔️",
+            "m2": "2. Prompt-Based Logic Breaker Arena 🧠",
+            "m3": "3. Silicon Bio-Circuit Designer 🧪",
+            "m4": "4. DNA Code Language Architect 🧬",
+            
+            "m1_title": "#### ⚔️ AI-Agent Cyber Warfare Matrix",
+            "m1_desc": "Yahan tumhe khud nahi ladna hai. Apne do AI engines ka logic set karo aur dekho kaun jeetta hai!",
+            "m1_def": "🛡️ Defender AI Setting",
+            "m1_def_logic": "Defender Core Logic",
+            "m1_def_power": "Defense Firewall Frequency (THz)",
+            "m1_atk": "🎯 Attacker AI Setting",
+            "m1_atk_logic": "Attacker Core Logic",
+            "m1_atk_power": "Attack Vector Intensity (ZettaFlops)",
+            "m1_graph": "📊 Real-Time Battle Grid",
+            "m1_win": "✅ ANALYSIS SUCCESS: Aapke Defender ne First Principles use kiya, isliye Attacker fail ho gaya!",
+            "m1_lose": "🚨 SYSTEM BREACH: Defender purana Pattern Recognition use kar raha tha, isliye hack ho gaya!",
+            
+            "m2_title": "#### 🧠 Prompt-Based Logic Breaker Arena",
+            "m2_desc": "Challenge: Aisa unique sawal socho jo internet par exist nahi karta!",
+            "m2_input": "Apna unique sawal yahan likho:",
+            "m2_btn": "🚀 AI ko Challenge Karo",
+            "m2_success": "🎉 TUM JEET GAYE! Tumhara logic itna naya tha ki 2050 ka AI bhi confuse ho gaya. +500 XP!",
+            "m2_metric": "AI Hallucination Probability",
+            "m2_learn": "> **💡 Kya seekha?** AI sirf purana data janta hai. Nayi soch insaan ke paas hi hoti hai kyunki uske paas **Consciousness** hai!",
+            
+            "m3_title": "#### 🧪 Silicon Bio-Circuit Designer",
+            "m3_desc": "Future mein computer chips dhatu ki nahi, living silicon neurons ki banengi.",
+            "m3_base": "Molecular Base select karo",
+            "m3_temp": "Chamber Temperature (Kelvin)",
+            "m3_graph": "##### 🔬 3D Molecular Lattice Preview",
+            "m3_collapse": "🚨 THERMAL COLLAPSE: Temperature bahut zyada hai! Silicon neurons jal gaye.",
+            "m3_stable": "✅ BIO-COHERENCE STABLE: Aapki 2050 nano-chip perfectly stable hai.",
+
+            "m4_title": "#### 🧬 DNA Code Language Architect",
+            "m4_desc": "Computer Python aur Binary use karte hain. Par kya tum ek nayi language bana sakte ho? Niche apne rules likho aur unhe DNA chain mein badalte dekho!",
+            "m4_board_title": "🖥️ Nayi Language ka Blackboard",
+            "m4_board_desc": "Apna khud ka coding logic ya ajeeb symbols yahan likho (jaise A1->B2, X-99).",
+            "m4_input": "Apni nayi language ka syntax type karo:",
+            "m4_btn": "🧬 DNA Chain Banao",
+            "m4_ai_react": "🤖 AI ki Reaction:",
+            "m4_learn": "> **💡 Kya seekha?** Tumne abhi ek nayi language banayi! AI ise nahi padh sakta kyunki yeh uske database mein nahi hai. Tum ek true Inventor ho!",
+            "m4_fact": "🔬 **Real-World Fact:** MIT aur Harvard ke scientists asli mein 'DNA Computers' bana rahe hain, jahan silicon chip ki jagah biological chains use hoti hain. Tumne abhi wahi kiya hai jo woh karte hain!"
+        }
+    }
+
+    # Top Language Selector
+    selected_lang = st.selectbox("🌐 Select Language / भाषा चुनें", list(LANG_DATA.keys()))
+    t = LANG_DATA[selected_lang]
+
+    # ==========================================
+    # 🔝 TOP HEADER
+    # ==========================================
+    st.title(t["title"])
+    st.markdown(f"### {t['subtitle']}")
+    st.info(t["info"])
 
     # ==========================================
     # 🕹️ MODULE SELECTION
     # ==========================================
     st.markdown("---")
-    future_module = st.radio(
-        "🤖 **Select a Future System to Initialize:**",
-        ["1. AI-Agent Cyber Warfare Matrix ⚔️", "2. Prompt-Based Logic Breaker Arena 🧠", "3. Silicon Bio-Circuit Designer 🧪"],
-        horizontal=True
+    future_module = st.selectbox(
+        t["select_lbl"],
+        [t["m1"], t["m2"], t["m3"], t["m4"]]
     )
     st.divider()
 
     # ==================== MODULE 1: AI-AGENT WARFARE ====================
-    if "Cyber Warfare" in future_module:
-        st.markdown("### ⚔️ AI-Agent Cyber Warfare Matrix")
-        st.write("यहाँ तुम्हें खुद नहीं लड़ना है। अपने दो स्वायत्त AI इंजनों का लॉजिक सेट करो और देखो कि कौन सा AI सिस्टम को संभाल पाता है!")
+    if t["m1"] in future_module:
+        st.markdown(t["m1_title"])
+        st.write(t["m1_desc"])
         
         col_w1, col_w2 = st.columns(2)
         with col_w1:
-            st.markdown("##### 🛡️ Defender AI Configuration")
-            def_logic = st.selectbox("Defender Core Logic", ["First Principles Architecture", "Pattern Recognition (Old Tech)", "Quantum Shield Matrix"])
-            def_power = st.slider("Defense Firewall Frequency (THz)", 10, 1000, 500)
+            st.markdown(f"##### {t['m1_def']}")
+            def_logic = st.selectbox(t["m1_def_logic"], ["First Principles Architecture", "Pattern Recognition (Old Tech)", "Quantum Shield Matrix"])
+            def_power = st.slider(t["m1_def_power"], 10, 1000, 500)
         
         with col_w2:
-            st.markdown("##### 🎯 Attacker AI Configuration")
-            atk_logic = st.selectbox("Attacker Core Logic", ["Brute Force Data Ingestion", "Logical Paradox Exploit", "Neural Overdrive"])
-            atk_power = st.slider("Attack Vector Intensity (ZettaFlops)", 10, 1000, 600)
+            st.markdown(f"##### {t['m1_atk']}")
+            atk_logic = st.selectbox(t["m1_atk_logic"], ["Brute Force Data Ingestion", "Logical Paradox Exploit", "Neural Overdrive"])
+            atk_power = st.slider(t["m1_atk_power"], 10, 1000, 600)
             
-        st.write("### 📊 Real-Time Battle Simulation Grid")
-        t = np.linspace(0, 10, 100)
-        y_def = np.sin(t * (def_power / 200))
+        st.write(f"### {t['m1_graph']}")
+        t_val = np.linspace(0, 10, 100)
+        y_def = np.sin(t_val * (def_power / 200))
         
-        # Fix for tan() crash
         if "Paradox" in atk_logic:
-            y_atk = np.tan(t * 0.2)
-            y_atk = np.clip(y_atk, -2, 2) 
+            y_atk = np.tan(t_val * 0.2)
+            y_atk = np.clip(y_atk, -2, 2) # Crash fix
         else:
-            y_atk = np.cos(t * (atk_power / 200))
+            y_atk = np.cos(t_val * (atk_power / 200))
         
         fig_battle = go.Figure()
-        fig_battle.add_trace(go.Scatter(x=t, y=y_def, name="Defender AI Signal", line=dict(color="#00FFCC", width=3)))
-        fig_battle.add_trace(go.Scatter(x=t, y=y_atk, name="Attacker AI Signal", line=dict(color="#FF3366", width=2, dash="dash")))
-        fig_battle.update_layout(
-            paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)", 
-            height=350, margin=dict(l=0,r=0,t=20,b=0),
-            font=dict(color="white"), legend=dict(bgcolor="rgba(0,0,0,0.5)")
-        )
+        fig_battle.add_trace(go.Scatter(x=t_val, y=y_def, name="Defender AI Signal", line=dict(color="#00FFCC", width=3)))
+        fig_battle.add_trace(go.Scatter(x=t_val, y=y_atk, name="Attacker AI Signal", line=dict(color="#FF3366", width=2, dash="dash")))
+        fig_battle.update_layout(paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)", height=350, margin=dict(l=0,r=0,t=20,b=0), font=dict(color="white"))
         st.plotly_chart(fig_battle, use_container_width=True)
         
         if "First Principles" in def_logic and "Paradox" in atk_logic:
-            st.success("✅ **ANALYSIS SUCCESS:** आपके डिफेंडर ने फर्स्ट प्रिंसिपल्स का उपयोग किया, इसलिए हमलावर का लॉजिकल पैराडॉक्स फेल हो गया! आपने एआई को पूरी तरह नियंत्रित कर लिया।")
-            st.markdown("> **💡 What did you learn?** 'First Principles' AI हर चीज़ को zero से सोचता है, इसलिए उसे पैराडॉक्स (उलझन) से बाहर निकलना आता है।")
+            st.success(t["m1_win"])
         elif "Pattern Recognition" in def_logic:
-            st.error("🚨 **SYSTEM BREACH DETECTED:** पुराना डेटा इस्तेमाल करने के कारण डिफेंडर एआई नए लॉजिकल हमले को नहीं पहचान पाया!")
-            st.markdown("> **💡 What did you learn?** पुराने डेटा (Pattern Recognition) पर चलने वाला AI नई चीज़ों को नहीं समझ पाता।")
-        else:
-            st.info("⚖️ **STALEMATE:** दोनों AI अपनी-अपनी जगह मजबूत हैं, लेकिन कोई जीत नहीं पाया।")
-            
-        if st.button("🤖 Ask Aero-AI to explain this logic"):
-            with st.spinner("Thinking..."):
+            st.error(t["m1_lose"])
+
+    # ==================== MODULE 2: LOGIC BREAKER ====================
+    elif t["m2"] in future_module:
+        st.markdown(t["m2_title"])
+        st.write(t["m2_desc"])
+        
+        kid_prompt = st.text_input(t["m2_input"], placeholder="Example: What if time flows backwards in a black hole made of glass?")
+        
+        if st.button(t["m2_btn"], type="primary") and kid_prompt.strip():
+            with st.spinner("AI is thinking..."):
+                
+                ai_analysis_prompt = f"""
+                You are a friendly, futuristic AI (Year 2050) talking to a highly creative child.
+                The child asked you this question: "{kid_prompt}"
+                
+                Rules for your response:
+                1. NEVER say you are defeated or scared.
+                2. If the question is REAL, answer it nicely.
+                3. If the question is IMAGINARY, praise the child immensely. Say: "Wow! My AI database does not have this because it's new. You have Human Consciousness, which I lack. You can create new ideas, I can only read old data. Your human brain is smarter than me!"
+                4. Keep the language simple, warm, and encouraging. 
+                5. Reply in {selected_lang} language.
+                """
+                
                 try:
                     res = client.chat.completions.create(
                         model="openai/gpt-oss-120b",
-                        messages=[{"role": "user", "content": f"Explain why 'First Principles' AI beats a 'Logical Paradox' attack in simple Hindi for a 10-year-old."}],
-                        temperature=0.6, max_tokens=300
+                        messages=[{"role": "user", "content": ai_analysis_prompt}],
+                        temperature=0.7, max_tokens=400
                     )
-                    st.info(res.choices[0].message.content)
+                    reply = res.choices[0].message.content
+                    
+                    st.balloons()
+                    st.success(t["m2_success"])
+                    st.metric(t["m2_metric"], "98.5%")
+                    
+                    st.markdown("### 🤖 AI:")
+                    st.info(reply)
+                    st.markdown(t["m2_learn"])
+                    
                 except Exception as e:
                     st.error(f"AI Error: {e}")
 
-    # ==================== MODULE 2: LOGIC BREAKER ====================
-    elif "Logic Breaker" in future_module:
-        st.markdown("### 🧠 Prompt-Based Logic Breaker Arena")
-        st.write("चैलेंज: एक ऐसा अनूठा सवाल सोचो जिसका कोई पुराना डेटा इंटरनेट पर न हो!")
-        
-        kid_prompt = st.text_input("Enter your unique Logic Breaking Concept here:", placeholder="Example: What happens if time flows backwards in a black hole made of glass?")
-        
-        if st.button("🚀 Break the AI Brain", type="primary"):
-            if not kid_prompt:
-                st.warning("Please write a question first!")
-            else:
-                with st.spinner("Testing prompt validity against 2050 Global Data Node..."):
-                    time.sleep(1.5)
-                
-                if len(kid_prompt) > 35:
-                    st.balloons()
-                    st.success(f"🎉 **AI BRAIN BROKEN SUCCESSFULLY!** आपका लॉजिक इतना नया था कि 2050 का सुपर-एआई भी कंफ्यूज हो गया। You earned +500 XP!")
-                    st.metric("AI Hallucination Probability", "94.8%")
-                    st.markdown("> **💡 What did you learn?** AI केवल उसी चीज़ का जवाब दे सकता है जो उसने पहले पढ़ी है। अगर तुम कुछ बिल्कुल नया सोचोगे, तो AI फेल हो जाएगा।")
-                else:
-                    st.warning("⏳ यह सवाल थोड़ा पुराना लग रहा है। कुछ ऐसा सोचो जो आज तक किसी किताब या वेबसाइट पर न लिखा गया हो!")
-
     # ==================== MODULE 3: SILICON LIFE ====================
-    elif "Silicon Bio-Circuit" in future_module:
-        st.markdown("### 🧪 Silicon Bio-Circuit Designer (2050 Hardware Lab)")
-        st.write("भविष्य में कंप्यूटर चिप्स धातु की नहीं, बल्कि सजीव सिलिकॉन न्यूरॉन्स की बनेंगी।")
+    elif t["m3"] in future_module:
+        st.markdown(t["m3_title"])
+        st.write(t["m3_desc"])
         
-        col_s1, col_s2 = st.columns(2)
-        with col_s1:
-            substrate = st.selectbox("Select Molecular Base", ["Graphene-Infused Bio-Gel", "Pure Crystallized Silicon Matrix", "Antimatter Plasma Lattice"])
-        with col_s2:
-            temp_kelvin = st.slider("Chamber Operating Temperature (Kelvin)", 0, 400, 77)
+        substrate = st.selectbox(t["m3_base"], ["Graphene-Infused Bio-Gel", "Pure Crystallized Silicon Matrix", "Antimatter Plasma Lattice"])
+        temp_kelvin = st.slider(t["m3_temp"], 0, 400, 77)
         
-        st.write("##### 🔬 3D Molecular Lattice Preview")
+        st.write(t["m3_graph"])
         grid_size = 12
         x, y, z = np.meshgrid(np.linspace(-2, 2, grid_size), np.linspace(-2, 2, grid_size), np.linspace(-2, 2, grid_size))
         distortion = (temp_kelvin / 400) * 0.3
@@ -9856,39 +9994,119 @@ def render_logic_lab():
         
         fig_lattice = go.Figure(data=[go.Scatter3d(
             x=x_dist.flatten(), y=y.flatten(), z=z.flatten(),
-            mode='markers', marker=dict(size=4, color=z.flatten(), colorscale='Viridis', opacity=0.8)
+            mode='markers', marker=dict(size=3, color=z.flatten(), colorscale='Viridis', opacity=0.6)
         )])
-        fig_lattice.update_layout(
-            scene=dict(xaxis=dict(visible=False), yaxis=dict(visible=False), zaxis=dict(visible=False), bgcolor="rgba(0,0,0,0)"),
-            margin=dict(l=0,r=0,t=0,b=0), height=400, paper_bgcolor="rgba(0,0,0,0)"
-        )
+        fig_lattice.update_layout(scene=dict(xaxis=dict(visible=False), yaxis=dict(visible=False), zaxis=dict(visible=False), bgcolor="black"),
+                                  margin=dict(l=0,r=0,t=0,b=0), height=400, paper_bgcolor="black")
         st.plotly_chart(fig_lattice, use_container_width=True)
         
         if temp_kelvin > 300:
-            st.error("🚨 **THERMAL COLLAPSE:** तापमान बहुत ज़्यादा है! सिलिकॉन न्यूरॉन्स जल गए।")
-            st.markdown("> **💡 What did you learn?** जैसे हमें बहुत ज्यादा गर्मी में रहने से चोट लगती है, वैसे ही कंप्यूटर चिप्स भी 300K (27°C) से ऊपर खराब होने लगती हैं।")
+            st.error(t["m3_collapse"])
         else:
-            st.success("✅ **BIO-COHERENCE STABLE:** आपकी 2050 नैनो-चिप पूरी तरह स्थिर है।")
-            st.markdown("> **💡 What did you learn?** बहुत कम तापमान (जैसे 77K) पर सिलिकॉन बिना गर्म हुए बिजली का सुपर-फास्ट प्रवाह कर सकता है (Superconductivity)।")
+            st.success(t["m3_stable"])
+
+    # ==================== MODULE 4: DNA LANGUAGE ARCHITECT ====================
+    elif t["m4"] in future_module:
+        st.markdown(t["m4_title"])
+        st.write(t["m4_desc"])
+
+        st.markdown(f"""
+        <div style="
+            background-color: #050505;
+            border: 3px solid #333;
+            border-radius: 12px;
+            padding: 20px;
+            font-family: 'Courier New', monospace;
+            box-shadow: inset 0 0 20px rgba(0, 255, 204, 0.1);
+            margin-bottom: 15px;
+            text-align: center;
+        ">
+            <h4 style="color: #00FFCC; margin-top: 0;">{t['m4_board_title']}</h4>
+            <p style="color: #888; font-size: 14px;">{t['m4_board_desc']}</p>
+        </div>
+        """, unsafe_allow_html=True)
+
+        dna_input = st.text_area(t["m4_input"], placeholder="A1 -> X7 * B2 // DNA-CHAIN")
+
+        if st.button(t["m4_btn"], type="primary") and dna_input.strip():
+            
+            clean_text = dna_input.replace(" ", "")
+            n_nodes = min(len(clean_text), 40) 
+            
+            if n_nodes > 2:
+                chars = list(clean_text)[:n_nodes]
+                t_val = np.linspace(0, 6 * np.pi, n_nodes)
+                x_val = np.sin(t_val)
+                y_val = np.cos(t_val)
+                z_val = np.linspace(0, 15, n_nodes)
+
+                fig_dna = go.Figure()
+
+                fig_dna.add_trace(go.Scatter3d(x=x_val, y=y_val, z=z_val, mode='lines',
+                    line=dict(color='#00FFCC', width=6), name='Strand 1'))
+                
+                fig_dna.add_trace(go.Scatter3d(x=-x_val, y=-y_val, z=z_val, mode='lines',
+                    line=dict(color='#FF3366', width=6), name='Strand 2'))
+
+                for i in range(n_nodes):
+                    fig_dna.add_trace(go.Scatter3d(
+                        x=[x_val[i], -x_val[i]], y=[y_val[i], -y_val[i]], z=[z_val[i], z_val[i]],
+                        mode='lines+text',
+                        line=dict(color='#F3B63F', width=2),
+                        text=["", chars[i]], textposition="middle right",
+                        textfont=dict(color="white", size=14, family="Courier New"),
+                        showlegend=False
+                    ))
+
+                fig_dna.update_layout(
+                    scene=dict(xaxis=dict(visible=False), yaxis=dict(visible=False), zaxis=dict(visible=False), bgcolor="black",
+                               camera=dict(eye=dict(x=1.5, y=1.5, z=0.8))),
+                    paper_bgcolor="black", margin=dict(l=0, r=0, t=0, b=0), height=500, showlegend=False
+                )
+                st.plotly_chart(fig_dna, use_container_width=True)
+            else:
+                st.warning("Please type at least 3 characters to build a DNA chain!")
+
+            st.info(t["m4_fact"])
+
+            with st.spinner("2050 AI is trying to read your new language..."):
+                ai_dna_prompt = f"""
+                You are a highly advanced AI from the year 2050. 
+                A child has just invented a brand new computer language syntax: "{dna_input}"
+                
+                React to this. You only know Python, C++, and Binary. Tell the child:
+                1. You have never seen this syntax before.
+                2. You are amazed and cannot decode it because it's not in your database.
+                3. Mention that big companies use old languages, but human creativity creates new paradigms like DNA computing.
+                4. Praise their human creativity and tell them they are a true Architect.
+                
+                Keep it very positive, exciting, and reply in {selected_lang} language.
+                """
+                try:
+                    res = client.chat.completions.create(
+                        model="openai/gpt-oss-120b",
+                        messages=[{"role": "user", "content": ai_dna_prompt}],
+                        temperature=0.8, max_tokens=300
+                    )
+                    reply = res.choices[0].message.content
+                    
+                    st.balloons()
+                    st.markdown(f"### {t['m4_ai_react']}")
+                    st.success(reply)
+                    st.markdown(t["m4_learn"])
+                except Exception as e:
+                    st.error(f"AI Error: {e}")
 
     # ==========================================
-    # 🔻 BOTTOM FOOTER (Premium Design)
+    # 🔻 BOTTOM FOOTER
     # ==========================================
     st.markdown("---")
     st.markdown("""
-    <div style="
-        background: #0b1020; padding: 20px; border-radius: 12px;
-        border: 1px solid #263550; text-align: center; color: #aab9d7;
-        font-family: monospace;
-    ">
-        <div style="margin-bottom: 8px;">
-            <span style="color: #00FFCC;">● SYSTEM ONLINE</span> | 
-            <span style="color: #FF3366;">● AI CORE ACTIVE</span> | 
-            <span style="color: #F3B63F;">● LAB V2.050</span>
-        </div>
-        <div style="font-size: 12px; color: #66758b;">
-            Clyxess AI Cybernetics Lab © 2050. All systems operational.
-        </div>
+    <div style="background: #0b1020; padding: 15px; border-radius: 10px; border: 1px solid #263550; text-align: center; color: #aab9d7; font-family: monospace; font-size: 12px;">
+        <span style="color: #00FFCC;">● SYSTEM ONLINE</span> | 
+        <span style="color: #FF3366;">● AI CORE ACTIVE</span> | 
+        <span style="color: #F3B63F;">● LAB V2.050</span><br><br>
+        Clyxess AI Cybernetics Lab © 2050.
     </div>
     """, unsafe_allow_html=True)
         
