@@ -9716,8 +9716,181 @@ def render_aero_lab():
                     time.sleep(0.05)
                 placeholder.markdown(reply)
                 
-                st.session_state.aero_chat_log.append({"role": "assistant", "content": reply})
-    
+                st.session_state.aero_chat_log.append({"role": "assistant", "content": reply}) 
+        
+def render_logic_lab(client):
+    import streamlit as st
+    import numpy as np
+    import plotly.graph_objects as go
+    import time
+
+    # ==========================================
+    # 🔝 TOP HEADER (Futuristic Cyberpunk Style)
+    # ==========================================
+    st.markdown("""
+    <div style="
+        background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+        padding: 25px; border-radius: 15px; border: 1px solid #00FFCC;
+        box-shadow: 0 0 20px rgba(0, 255, 204, 0.2); margin-bottom: 25px;
+        text-align: center; color: white;
+    ">
+        <h1 style="margin: 0; font-size: 32px; font-weight: 900; letter-spacing: 2px;">
+            🛸 CYBERNETIC KIDS LOGIC LAB
+        </h1>
+        <p style="margin: 10px 0 0 0; color: #aab9d7; font-size: 16px;">
+            Welcome to Year 2050: Human Intelligence vs Autonomous AI
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
+
+    st.info("🧠 **बच्चों!** यह लैब भविष्य की तकनीक पर आधारित है। यहाँ तुम एआई के गुलाम नहीं, बल्कि उसके **क्रिएटर** बनोगे।")
+
+    # ==========================================
+    # 🕹️ MODULE SELECTION
+    # ==========================================
+    st.markdown("---")
+    future_module = st.radio(
+        "🤖 **Select a Future System to Initialize:**",
+        ["1. AI-Agent Cyber Warfare Matrix ⚔️", "2. Prompt-Based Logic Breaker Arena 🧠", "3. Silicon Bio-Circuit Designer 🧪"],
+        horizontal=True
+    )
+    st.divider()
+
+    # ==================== MODULE 1: AI-AGENT WARFARE ====================
+    if "Cyber Warfare" in future_module:
+        st.markdown("### ⚔️ AI-Agent Cyber Warfare Matrix")
+        st.write("यहाँ तुम्हें खुद नहीं लड़ना है। अपने दो स्वायत्त AI इंजनों का लॉजिक सेट करो और देखो कि कौन सा AI सिस्टम को संभाल पाता है!")
+        
+        col_w1, col_w2 = st.columns(2)
+        with col_w1:
+            st.markdown("##### 🛡️ Defender AI Configuration")
+            def_logic = st.selectbox("Defender Core Logic", ["First Principles Architecture", "Pattern Recognition (Old Tech)", "Quantum Shield Matrix"])
+            def_power = st.slider("Defense Firewall Frequency (THz)", 10, 1000, 500)
+        
+        with col_w2:
+            st.markdown("##### 🎯 Attacker AI Configuration")
+            atk_logic = st.selectbox("Attacker Core Logic", ["Brute Force Data Ingestion", "Logical Paradox Exploit", "Neural Overdrive"])
+            atk_power = st.slider("Attack Vector Intensity (ZettaFlops)", 10, 1000, 600)
+            
+        st.write("### 📊 Real-Time Battle Simulation Grid")
+        t = np.linspace(0, 10, 100)
+        y_def = np.sin(t * (def_power / 200))
+        
+        # Fix for tan() crash
+        if "Paradox" in atk_logic:
+            y_atk = np.tan(t * 0.2)
+            y_atk = np.clip(y_atk, -2, 2) 
+        else:
+            y_atk = np.cos(t * (atk_power / 200))
+        
+        fig_battle = go.Figure()
+        fig_battle.add_trace(go.Scatter(x=t, y=y_def, name="Defender AI Signal", line=dict(color="#00FFCC", width=3)))
+        fig_battle.add_trace(go.Scatter(x=t, y=y_atk, name="Attacker AI Signal", line=dict(color="#FF3366", width=2, dash="dash")))
+        fig_battle.update_layout(
+            paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)", 
+            height=350, margin=dict(l=0,r=0,t=20,b=0),
+            font=dict(color="white"), legend=dict(bgcolor="rgba(0,0,0,0.5)")
+        )
+        st.plotly_chart(fig_battle, use_container_width=True)
+        
+        if "First Principles" in def_logic and "Paradox" in atk_logic:
+            st.success("✅ **ANALYSIS SUCCESS:** आपके डिफेंडर ने फर्स्ट प्रिंसिपल्स का उपयोग किया, इसलिए हमलावर का लॉजिकल पैराडॉक्स फेल हो गया! आपने एआई को पूरी तरह नियंत्रित कर लिया।")
+            st.markdown("> **💡 What did you learn?** 'First Principles' AI हर चीज़ को zero से सोचता है, इसलिए उसे पैराडॉक्स (उलझन) से बाहर निकलना आता है।")
+        elif "Pattern Recognition" in def_logic:
+            st.error("🚨 **SYSTEM BREACH DETECTED:** पुराना डेटा इस्तेमाल करने के कारण डिफेंडर एआई नए लॉजिकल हमले को नहीं पहचान पाया!")
+            st.markdown("> **💡 What did you learn?** पुराने डेटा (Pattern Recognition) पर चलने वाला AI नई चीज़ों को नहीं समझ पाता।")
+        else:
+            st.info("⚖️ **STALEMATE:** दोनों AI अपनी-अपनी जगह मजबूत हैं, लेकिन कोई जीत नहीं पाया।")
+            
+        if st.button("🤖 Ask Aero-AI to explain this logic"):
+            with st.spinner("Thinking..."):
+                try:
+                    res = client.chat.completions.create(
+                        model="openai/gpt-oss-120b",
+                        messages=[{"role": "user", "content": f"Explain why 'First Principles' AI beats a 'Logical Paradox' attack in simple Hindi for a 10-year-old."}],
+                        temperature=0.6, max_tokens=300
+                    )
+                    st.info(res.choices[0].message.content)
+                except Exception as e:
+                    st.error(f"AI Error: {e}")
+
+    # ==================== MODULE 2: LOGIC BREAKER ====================
+    elif "Logic Breaker" in future_module:
+        st.markdown("### 🧠 Prompt-Based Logic Breaker Arena")
+        st.write("चैलेंज: एक ऐसा अनूठा सवाल सोचो जिसका कोई पुराना डेटा इंटरनेट पर न हो!")
+        
+        kid_prompt = st.text_input("Enter your unique Logic Breaking Concept here:", placeholder="Example: What happens if time flows backwards in a black hole made of glass?")
+        
+        if st.button("🚀 Break the AI Brain", type="primary"):
+            if not kid_prompt:
+                st.warning("Please write a question first!")
+            else:
+                with st.spinner("Testing prompt validity against 2050 Global Data Node..."):
+                    time.sleep(1.5)
+                
+                if len(kid_prompt) > 35:
+                    st.balloons()
+                    st.success(f"🎉 **AI BRAIN BROKEN SUCCESSFULLY!** आपका लॉजिक इतना नया था कि 2050 का सुपर-एआई भी कंफ्यूज हो गया। You earned +500 XP!")
+                    st.metric("AI Hallucination Probability", "94.8%")
+                    st.markdown("> **💡 What did you learn?** AI केवल उसी चीज़ का जवाब दे सकता है जो उसने पहले पढ़ी है। अगर तुम कुछ बिल्कुल नया सोचोगे, तो AI फेल हो जाएगा।")
+                else:
+                    st.warning("⏳ यह सवाल थोड़ा पुराना लग रहा है। कुछ ऐसा सोचो जो आज तक किसी किताब या वेबसाइट पर न लिखा गया हो!")
+
+    # ==================== MODULE 3: SILICON LIFE ====================
+    elif "Silicon Bio-Circuit" in future_module:
+        st.markdown("### 🧪 Silicon Bio-Circuit Designer (2050 Hardware Lab)")
+        st.write("भविष्य में कंप्यूटर चिप्स धातु की नहीं, बल्कि सजीव सिलिकॉन न्यूरॉन्स की बनेंगी।")
+        
+        col_s1, col_s2 = st.columns(2)
+        with col_s1:
+            substrate = st.selectbox("Select Molecular Base", ["Graphene-Infused Bio-Gel", "Pure Crystallized Silicon Matrix", "Antimatter Plasma Lattice"])
+        with col_s2:
+            temp_kelvin = st.slider("Chamber Operating Temperature (Kelvin)", 0, 400, 77)
+        
+        st.write("##### 🔬 3D Molecular Lattice Preview")
+        grid_size = 12
+        x, y, z = np.meshgrid(np.linspace(-2, 2, grid_size), np.linspace(-2, 2, grid_size), np.linspace(-2, 2, grid_size))
+        distortion = (temp_kelvin / 400) * 0.3
+        x_dist = x + np.random.normal(0, distortion, x.shape)
+        
+        fig_lattice = go.Figure(data=[go.Scatter3d(
+            x=x_dist.flatten(), y=y.flatten(), z=z.flatten(),
+            mode='markers', marker=dict(size=4, color=z.flatten(), colorscale='Viridis', opacity=0.8)
+        )])
+        fig_lattice.update_layout(
+            scene=dict(xaxis=dict(visible=False), yaxis=dict(visible=False), zaxis=dict(visible=False), bgcolor="rgba(0,0,0,0)"),
+            margin=dict(l=0,r=0,t=0,b=0), height=400, paper_bgcolor="rgba(0,0,0,0)"
+        )
+        st.plotly_chart(fig_lattice, use_container_width=True)
+        
+        if temp_kelvin > 300:
+            st.error("🚨 **THERMAL COLLAPSE:** तापमान बहुत ज़्यादा है! सिलिकॉन न्यूरॉन्स जल गए।")
+            st.markdown("> **💡 What did you learn?** जैसे हमें बहुत ज्यादा गर्मी में रहने से चोट लगती है, वैसे ही कंप्यूटर चिप्स भी 300K (27°C) से ऊपर खराब होने लगती हैं।")
+        else:
+            st.success("✅ **BIO-COHERENCE STABLE:** आपकी 2050 नैनो-चिप पूरी तरह स्थिर है।")
+            st.markdown("> **💡 What did you learn?** बहुत कम तापमान (जैसे 77K) पर सिलिकॉन बिना गर्म हुए बिजली का सुपर-फास्ट प्रवाह कर सकता है (Superconductivity)।")
+
+    # ==========================================
+    # 🔻 BOTTOM FOOTER (Premium Design)
+    # ==========================================
+    st.markdown("---")
+    st.markdown("""
+    <div style="
+        background: #0b1020; padding: 20px; border-radius: 12px;
+        border: 1px solid #263550; text-align: center; color: #aab9d7;
+        font-family: monospace;
+    ">
+        <div style="margin-bottom: 8px;">
+            <span style="color: #00FFCC;">● SYSTEM ONLINE</span> | 
+            <span style="color: #FF3366;">● AI CORE ACTIVE</span> | 
+            <span style="color: #F3B63F;">● LAB V2.050</span>
+        </div>
+        <div style="font-size: 12px; color: #66758b;">
+            Clyxess AI Cybernetics Lab © 2050. All systems operational.
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+        
 def render_learn_ai(client):
 
     import streamlit as st
