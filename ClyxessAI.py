@@ -9716,7 +9716,10 @@ def render_aero_lab():
                     time.sleep(0.05)
                 placeholder.markdown(reply)
                 
-                st.session_state.aero_chat_log.append({"role": "assistant", "content": reply}) 
+                st.session_state.aero_chat_log.append({"role": "assistant", "content": reply})   
+        
+st.write("DEBUG: Logic Lab Load Ho Raha Hai...") # Agar yeh screen par nahi dikha, toh routing fail hai.
+render_logic_lab(client)        
         
 def render_logic_lab():
     import streamlit as st
