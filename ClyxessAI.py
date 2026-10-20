@@ -9718,7 +9718,7 @@ def render_aero_lab():
                 
                 st.session_state.aero_chat_log.append({"role": "assistant", "content": reply}) 
         
-def render_logic_lab(client):
+def render_logic_lab():
     import streamlit as st
     import numpy as np
     import plotly.graph_objects as go
