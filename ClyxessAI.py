@@ -9717,9 +9717,7 @@ def render_aero_lab():
                 placeholder.markdown(reply)
                 
                 st.session_state.aero_chat_log.append({"role": "assistant", "content": reply})   
-        
-st.write("DEBUG: Logic Lab Load Ho Raha Hai...") # Agar yeh screen par nahi dikha, toh routing fail hai.
-render_logic_lab(client)        
+               
         
 def render_logic_lab():
     import streamlit as st
@@ -10628,8 +10626,8 @@ if mode == "🎨 Creative AI Image Generator":
     render_image_generator(); st.stop() 
 if mode == "🎨 Art Machine Design":
     render_art_machinedesign(); st.stop()       
-if "Kids Logic Lab" in mode:
-    render_logic_lab(); st.stop() 
+if mode == "💡 Logic Lab":
+    render_logic_lab(); st.stop()
 if mode == "🧠 Cyber Security":
     render_cyber_security(); st.stop() 
 if mode == "✈️ Aero Lab":
