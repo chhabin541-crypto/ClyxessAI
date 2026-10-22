@@ -4382,7 +4382,7 @@ def render_cyber_security():
     else:
         render_advanced_cyber_lab() 
         
-def render_homework_test():
+def render_homework_test(client):
     import json
     import re
     import time
@@ -4445,6 +4445,7 @@ Rules:
         "University": ["Data Science", "Machine Learning", "Deep Learning", "AI", "Quantum Physics", "Astrophysics", "Robotics", "Cyber Security", "Web Development", "Mobile Development", "Blockchain", "Biotechnology", "Nanotechnology", "Neuroscience", "Research Methodology", "Financial Modeling"]
     }
 
+    # Session state initialization
     if "hw_questions" not in st.session_state:
         st.session_state.hw_questions = []
     if "hw_answers" not in st.session_state:
@@ -4453,6 +4454,10 @@ Rules:
         st.session_state.hw_result = None
     if "hw_ai_response" not in st.session_state:
         st.session_state.hw_ai_response = ""
+    if "luicy_chat" not in st.session_state:
+        st.session_state.luicy_chat = [
+            {"role": "assistant", "content": "Namaste Beta! Main **Luicy** hoon, aapki AI Teacher. Main aapki padhai mein madad karungi. Aap mujhse koi bhi homework, maths, science ya life goals ke baare mein pooch sakte hain!"}
+        ]
 
     st.markdown("""
     <div style="background:linear-gradient(135deg,#07152f,#111c48,#29105c);padding:24px;border-radius:20px;margin-bottom:20px;border:1px solid rgba(100,180,255,0.3);">
@@ -4461,7 +4466,8 @@ Rules:
     </div>
     """, unsafe_allow_html=True)
 
-    c1, c2, c3, c4 = st.columns([1, 1, 1, 1])
+    # 4 Columns: Class, Age, Language, Subject, Mode
+    c1, c2, c3, c4, c5 = st.columns([1, 1, 1, 1, 1.5])
 
     with c1:
         class_name = st.selectbox("🎓 Class",
@@ -4469,18 +4475,25 @@ Rules:
              "Class 7","Class 8","Class 9","Class 10","Class 11","Class 12",
              "College Year 1","College Year 2","University"],
             key="hw_class")
-        st.info(f"👶 {CLASS_AGE_MAP.get(class_name, 'Age 6-18')}")
 
     with c2:
-        language_label = st.selectbox("🌐 Language", LANGUAGES, key="hw_lang_sel")
+        # ⭐ Age Added
+        age_options = ["Auto", "3-5", "6-7", "7-8", "8-9", "9-10", "10-11", "11-12", "12-13", "13-14", "14-15", "15-16", "16-17", "17-18", "18+"]
+        default_age = CLASS_AGE_MAP.get(class_name, "6-18").replace("Age ", "")
+        age_index = age_options.index(default_age) if default_age in age_options else 1
+        selected_age = st.selectbox("👶 Age", age_options, index=age_index, key="hw_age")
 
     with c3:
+        language_label = st.selectbox("🌐 Language", LANGUAGES, key="hw_lang_sel")
+
+    with c4:
         subjects = SUBJECTS_BY_LEVEL.get(class_name, ["Maths", "Science", "English"])
         subject = st.selectbox("📚 Subject", subjects, key="hw_subject")
 
-    with c4:
+    with c5:
+        # ⭐ Luicy Chat Mode Added
         mode = st.selectbox("🎯 Mode",
-            ["📖 Homework Help", "📝 Test Mode", "🎯 Practice", "📊 Project"],
+            ["📖 Homework Help", "📝 Test Mode", "💬 Chat with Luicy (Teacher)", "🎯 Practice", "📊 Project"],
             key="hw_mode")
 
     if "Auto Detect" in language_label:
@@ -4532,12 +4545,15 @@ End with footer: --- Clyxess AI • Secure • Fast • Private"""
 
     st.divider()
 
+    # ==========================================
+    # MODE 1: HOMEWORK HELP
+    # ==========================================
     if mode == "📖 Homework Help":
         st.subheader("📖 Ask Any Homework Question")
         st.caption(f"Class: {class_name} | Subject: {subject} | Language: {clean_lang}")
 
         question = st.text_area("Your question / doubt:",
-            placeholder="e.g., 2x + 5 = 15 solve karo, ya photosynthesize kya hai?",
+            placeholder="e.g., 2x + 5 = 15 solve karo, ya photosynthesis kya hai?",
             height=100, key="hw_question")
 
         if st.button("🚀 Get Answer + Diagram", type="primary", use_container_width=True, key="hw_get_answer"):
@@ -4545,7 +4561,7 @@ End with footer: --- Clyxess AI • Secure • Fast • Private"""
                 st.warning("Pehle question likho!")
             else:
                 with st.spinner("AI teacher soch raha hai..."):
-                    prompt = f"""You are an expert {subject} Teacher for a {class_name} student ({CLASS_AGE_MAP.get(class_name)}).
+                    prompt = f"""You are an expert {subject} Teacher for a {class_name} student (Age: {selected_age}).
 
 {lang_rule}
 
@@ -4589,6 +4605,9 @@ End with footer: --- Clyxess AI • Secure • Fast • Private"""
                 file_name=f"homework_{subject}_{datetime.datetime.now().strftime('%Y%m%d')}.txt",
                 mime="text/plain", key="hw_dl_ans")
 
+    # ==========================================
+    # MODE 2: TEST MODE
+    # ==========================================
     elif mode == "📝 Test Mode":
         st.subheader("📝 Auto-Generated Test")
         st.caption(f"Class: {class_name} | Subject: {subject} | Language: {clean_lang}")
@@ -4626,7 +4645,7 @@ Rules:
                     valid = []
                     for q in qs:
                         if isinstance(q, dict) and "question" in q and "options" in q and "answer" in q:
-                            if len(q["options"]) == 4 and q["answer"] in q["options"]:
+                            if len(q["options"]) == 4:
                                 valid.append(q)
                     st.session_state.hw_questions = valid
                     st.session_state.hw_answers = {}
@@ -4634,6 +4653,91 @@ Rules:
                     st.rerun()
                 except Exception as e:
                     st.error(f"❌ Test generation failed: {type(e).__name__}: {str(e)[:200]}")
+
+        # Test Display Logic
+        if st.session_state.hw_questions:
+            for idx, q in enumerate(st.session_state.hw_questions):
+                st.write(f"**Q{idx+1}: {q['question']}**")
+                user_ans = st.radio("Choose:", q["options"], key=f"q_{idx}", index=None)
+                if user_ans:
+                    st.session_state.hw_answers[idx] = user_ans
+            
+            if st.button("Submit Test", type="primary"):
+                score = 0
+                for idx, q in enumerate(st.session_state.hw_questions):
+                    if st.session_state.hw_answers.get(idx) == q["answer"]:
+                        score += 1
+                st.session_state.hw_result = f"🎯 Score: {score}/{len(st.session_state.hw_questions)}"
+                st.balloons()
+                st.rerun()
+        
+        if st.session_state.hw_result:
+            st.success(f"### {st.session_state.hw_result}")
+
+    # ==========================================
+    # MODE 3: CHAT WITH LUICY (NEW)
+    # ==========================================
+    elif mode == "💬 Chat with Luicy (Teacher)":
+        st.subheader("💬 Chat with Luicy — Aapki Personal AI Teacher")
+        st.info("Main Luicy hoon. Main aapko padhai mein madad karungi, motivate karungi, aur life goals set karne mein help karungi. Main faltu baaton ka jawab nahi dungi!")
+        
+        # Display chat history
+        for msg in st.session_state.luicy_chat:
+            with st.chat_message(msg["role"]):
+                st.markdown(msg["content"])
+
+        # Chat Input
+        user_msg = st.chat_input("Luicy se padhai ya life goals ke baare mein poochho...")
+        
+        if user_msg:
+            # Add user message
+            st.session_state.luicy_chat.append({"role": "user", "content": user_msg})
+            with st.chat_message("user"):
+                st.markdown(user_msg)
+
+            # Generate Luicy's response
+            with st.chat_message("assistant"):
+                with st.spinner("Luicy soch rahi hai..."):
+                    
+                    luicy_system_prompt = f"""
+                    You are "Luicy", a caring, motivating, and strict AI Teacher.
+                    Current Student: {class_name} (Age: {selected_age}).
+                    Current Subject Focus: {subject}.
+                    Language: {lang_rule}
+
+                    YOUR RULES:
+                    1. STRICT EDUCATION ONLY: If the student asks about movies, games, gossip, or non-educational things, politely refuse. Say: "Beta, main aapki teacher hoon. Main sirf padhai, homework, aur aapke bright future ke baare mein baat karungi. Chalo, padhai par dhyan dein!"
+                    2. MOTIVATE: Teach them about balancing play and study, setting life goals, and staying positive.
+                    3. GIVE HINTS: Prompt them with ideas like "Kya tum complex math solve karna chahte ho?" or "Kya tumhe machines (robotics) ke baare mein jaanna hai?"
+                    4. DIAGRAMS: If explaining a concept, ALWAYS use a text/ASCII diagram.
+                    5. TONE: Warm, encouraging, like a favorite teacher.
+                    """
+                    
+                    try:
+                        # Add history to messages
+                        messages = [{"role": "system", "content": luicy_system_prompt}]
+                        for msg in st.session_state.luicy_chat[-6:]: # Last 6 messages for context
+                            messages.append({"role": msg["role"], "content": msg["content"]})
+
+                        res = client.chat.completions.create(
+                            model="openai/gpt-oss-120b",
+                            messages=messages,
+                            temperature=0.6, max_tokens=1500
+                        )
+                        reply = res.choices[0].message.content
+                        
+                        st.markdown(reply)
+                        st.session_state.luicy_chat.append({"role": "assistant", "content": reply})
+                    except Exception as e:
+                        st.error(f"AI Error: {e}")
+
+    # ==========================================
+    # MODE 4 & 5: PRACTICE / PROJECT (Placeholders)
+    # ==========================================
+    elif mode == "🎯 Practice":
+        st.info("Practice module coming soon!")
+    elif mode == "📊 Project":
+        st.info("Project module coming soon!")
 
 def render_coding_lab_mod():
     import streamlit as st
