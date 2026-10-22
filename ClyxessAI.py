@@ -3706,6 +3706,7 @@ def render_cyber_security():
     import secrets
     import sqlite3
     import threading
+    import re
     from dataclasses import dataclass, asdict
     from collections import defaultdict, deque
     from typing import Any, Dict, List, Optional
@@ -3800,34 +3801,47 @@ def render_cyber_security():
     st.divider()
 
     # ============================================================
-    # SECTION 1: KIDS CYBER SAFETY ZONE (HTML/JS Dashboard)
+    # SECTION 1: KIDS CYBER SAFETY ZONE
     # ============================================================
-    if t["sec_kids"] in section:
+    if section == t["sec_kids"]:
         
-        # --- Password Strength Checker for Kids (Streamlit) ---
+        # --- 1. Password Strength Checker for Kids ---
         st.markdown(f"### {t['pwd_title']}")
         st.write(t['pwd_desc'])
         
         kid_pwd = st.text_input("Type a password to test:", type="password", key="kid_pwd")
         if kid_pwd:
             length = len(kid_pwd)
-            if length < 6:
-                st.error("🚨 Bahut Kamzor! Hacker isko 1 second mein tod dega.")
-            elif length < 10:
-                st.warning("⚠️ Thoda Theek Hai. Par aur lamba karo (12+ letters).")
+            only_numbers = kid_pwd.isdigit()
+            
+            # Fixed Logic: Even if length is 10, if it's only numbers, it's weak!
+            if length < 6 or only_numbers:
+                st.error("🚨 Bahut Kamzor! Hacker isko 1 second mein tod dega. (Sirf numbers mat dalo!)")
+            elif length < 10 or (not any(c.isupper() for c in kid_pwd) and not any(not c.isalnum() for c in kid_pwd)):
+                st.warning("⚠️ Thoda Theek Hai. Par capital letters aur special symbols (@, #) add karo.")
             else:
                 st.success("✅ Bahut Badhiya! Yeh ek Strong Password hai.")
 
         st.divider()
         
-        # --- Fake Link Awareness for Kids ---
+        # --- 2. Interactive Fake Link & SMS Awareness ---
         st.markdown(f"### {t['awareness_title']}")
-        with st.expander("🌐 Click to Check Fake Link (Flipkart/Amazon)"):
-            st.write("Kya yeh link real hai?")
-            st.code("www.flipkart-bumper-sale.xyz")
-            if st.button("Check Link", key="kid_link_check"):
-                st.error("❌ **FAKE LINK!** Asli Flipkart ka URL 'flipkart.com' hota hai. '.xyz' matlab hacker ka website. Kabhi mat kholo!")
-                st.info("💡 **Awareness:** Hamesha URL ke spelling check karo aur HTTPS dekho.")
+        
+        col1, col2 = st.columns([2, 1])
+        with col1:
+            kid_link = st.text_input("🌐 Koi bhi Link ya SMS yahan type karo (Test karne ke liye):", key="kid_link_input")
+            if kid_link:
+                link_lower = kid_link.lower()
+                # Logic to check fake link
+                if ".xyz" in link_lower or "bit.ly" in link_lower or "free" in link_lower or "gift" in link_lower or "offer" in link_lower:
+                    st.error("❌ **FAKE / SCAM ALERT!** Isme hacker wale words hain. Ise kabhi mat kholo!")
+                elif "amazon.in" in link_lower or "flipkart.com" in link_lower or "google.com" in link_lower:
+                    st.success("✅ **SAFE LINK!** Yeh asli website lag rahi hai. Par hamesha HTTPS check karo.")
+                else:
+                    st.warning("⚠️ **Suspicious.** Is link par bina soche click mat karo.")
+        
+        with col2:
+            st.info("💡 **Try karne ke liye:**\n\n`www.flipkart.com`\n\n`www.amazon-free-gift.xyz`\n\n`bit.ly/win-iphone`")
 
         st.divider()
 
@@ -4142,11 +4156,15 @@ def render_cyber_security():
                 }
 
                 function updateStats() {
-                    const speed = (totalDistance / (totalTime || 1)).toFixed(2);
+                    let currentTime = totalTime;
+                    if (isDrawing) {
+                        currentTime = Date.now() - startTime;
+                    }
+                    const speed = (totalDistance / (currentTime || 1)).toFixed(2);
                     document.getElementById('statSpeed').innerText = speed + " px/ms";
                     document.getElementById('statAngle').innerText = angleChanges;
                     document.getElementById('statPoints').innerText = strokePoints;
-                    document.getElementById('statTime').innerText = totalTime + "ms";
+                    document.getElementById('statTime').innerText = currentTime + "ms";
                     document.getElementById('statDist').innerText = totalDistance.toFixed(1) + "px";
                     
                     let geo = "-";
@@ -4190,14 +4208,14 @@ def render_cyber_security():
                     let sh = 0;
                     for (let i = 0; i < shapeData.length; i++) {
                         sh = ((sh << 5) - sh) + shapeData.charCodeAt(i);
-                        sh = sh & sh;
+                        sh = sh | 0;
                     }
                     const speed = (totalDistance / (totalTime || 1)).toFixed(2);
                     const behaviorStr = `SPD:${speed}|ANG:${angleChanges}|PTS:${strokePoints}|TIME:${totalTime}|DIST:${totalDistance.toFixed(1)}`;
                     let bh = 0;
                     for (let i = 0; i < behaviorStr.length; i++) {
                         bh = ((bh << 5) - bh) + behaviorStr.charCodeAt(i);
-                        bh = bh & bh;
+                        bh = bh | 0;
                     }
                     const finalHash = "BM-" + Math.abs(sh).toString(16).toUpperCase().substring(0,8) + "-" + Math.abs(bh).toString(16).toUpperCase().substring(0,6);
                     
@@ -4357,6 +4375,7 @@ def render_cyber_security():
                 has_upper = any(c.isupper() for c in pwd)
                 has_digit = any(c.isdigit() for c in pwd)
                 has_special = any(not c.isalnum() for c in pwd)
+                only_numbers = pwd.isdigit()
                 
                 score = 0
                 if length >= 8: score += 1
@@ -4364,6 +4383,10 @@ def render_cyber_security():
                 if has_upper: score += 1
                 if has_digit: score += 1
                 if has_special: score += 1
+                
+                # Fixed logic
+                if only_numbers:
+                    score = 1
                 
                 if score <= 2:
                     st.error("🚨 **Weak Password!** Hacker isko seconds mein tod dega.")
@@ -4375,7 +4398,7 @@ def render_cyber_security():
                     st.success("✅ **Strong Password!** Hacker isko todne mein saal lag jayenge.")
                     st.progress(100)
 
-        # --- TAB 2: AWARENESS (FAKE LINK & SMS) ---
+        # --- TAB 2: AWARENESS (INTERACTIVE LINK & SMS) ---
         with tab2:
             st.markdown(f"### {t['awareness_title']}")
             st.write(t['awareness_desc'])
@@ -4383,21 +4406,28 @@ def render_cyber_security():
             col1, col2 = st.columns(2)
             
             with col1:
-                st.markdown("#### 🌐 Fake Link Checker")
-                st.code("www.amazon-bumper-offer.xyz")
-                if st.button("Check Amazon Link", key="senior_amz"):
-                    st.error("❌ **FAKE LINK!** Asli Amazon ka URL 'amazon.in' ya 'amazon.com' hota hai. '.xyz' domain hackers use karte hain.")
+                st.markdown("#### 🌐 Link Phishing Detector (Type/Paste URL)")
+                student_link = st.text_input("Paste any link here...", placeholder="e.g., www.flipkart-offer.xyz")
+                if student_link:
+                    link_lower = student_link.lower()
+                    if ".xyz" in link_lower or ".top" in link_lower or "bit.ly" in link_lower or "tinyurl" in link_lower or "-offer" in link_lower or "gift" in link_lower:
+                        st.error("❌ **FAKE LINK!** This URL uses suspicious domains or scam keywords. Do not open it.")
+                    elif "amazon.in" in link_lower or "flipkart.com" in link_lower or "google.com" in link_lower:
+                        st.success("✅ **SAFE LINK!** This looks like a legitimate, trusted domain.")
+                    else:
+                        st.warning("⚠️ **Unknown Link.** Verify the spelling of the website before clicking.")
                 
-                st.code("https://www.flipkart.com/big-billion-days")
-                if st.button("Check Flipkart Link", key="senior_fk"):
-                    st.success("✅ **REAL LINK!** 'flipkart.com' asli domain hai aur HTTPS bhi laga hua hai.")
-
             with col2:
-                st.markdown("#### 💬 Fake SMS Checker")
-                st.info("**SMS:** 'Dear user, your electricity will be disconnected tonight. Update KYC: bit.ly/xyz123'")
-                if st.button("Analyze SMS", key="senior_sms"):
-                    st.error("🚨 **SCAM!** Electricity board kabhi personal link (bit.ly) nahi bhejta. Yeh ek phishing attempt hai.")
-                    st.info("💡 **Tip:** SMS mein aaye kisi bhi unknown link par click mat karo.")
+                st.markdown("#### 💬 SMS Phishing Analyzer (Paste SMS text)")
+                student_sms = st.text_area("Paste any SMS here to analyze...", placeholder="e.g., Dear user, your electricity will be disconnected. Update KYC: bit.ly/xyz123", height=150)
+                if student_sms:
+                    sms_lower = student_sms.lower()
+                    keywords = ["urgent", "kyc", "blocked", "disconnect", "lottery", "win", "click here", "otp", "bit.ly"]
+                    found = [kw for kw in keywords if kw in sms_lower]
+                    if found:
+                        st.error(f"🚨 **SCAM SMS DETECTED!** Contains suspicious words: {', '.join(found)}. Never click links in such messages.")
+                    else:
+                        st.info("ℹ️ No obvious scam keywords found. But still, never share OTPs or passwords via SMS.")
 
         # --- TAB 3: FIREWALL SIM ---
         with tab3:
@@ -4453,15 +4483,16 @@ def render_cyber_security():
             user_q = st.chat_input("Ask advanced cyber query...")
             if user_q:
                 st.session_state.cyber_chat.append({"role": "user", "content": user_q})
-                with st.chat_message("user"): st.markdown(user_q)
+                with st.chat_message("user"): 
+                    st.markdown(user_q)
                 
                 with st.chat_message("assistant"):
                     with st.spinner("Mentor is thinking..."):
                         prompt = f"You are an Ethical Hacking Mentor. Answer this university-level query: {user_q}. Use technical jargon but explain clearly."
                         try:
                             res = client.chat.completions.create(
-                                model="openai/gpt-oss-120b",
-                                messages=[{"role": "system", "content": prompt}] + st.session_state.cyber_chat[-4:],
+                                model="openai/gpt-oss-120b", 
+                                messages=[{"role": "system", "content": prompt}] + st.session_state.cyber_chat,
                                 temperature=0.6, max_tokens=1000
                             )
                             reply = res.choices[0].message.content
