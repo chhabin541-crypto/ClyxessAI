@@ -5056,32 +5056,32 @@ Rules:
             st.success(f"### {st.session_state.hw_result}")
 
     # ==========================================
-    # MODE 3: CHAT WITH LUICY (NEW)
+    # MODE 3: CHAT WITH LUMIE (NEW)
     # ==========================================
-    elif mode == "💬 Chat with Luicy (Teacher)":
-        st.subheader("💬 Chat with Luicy — Aapki Personal AI Teacher")
-        st.info("Main Luicy hoon. Main aapko padhai mein madad karungi, motivate karungi, aur life goals set karne mein help karungi. Main faltu baaton ka jawab nahi dungi!")
+    elif mode == "💬 Chat with Lumie (Teacher)":
+        st.subheader("💬 Chat with Lumie — Aapki Personal AI Teacher")
+        st.info("Main Lumie hoon. Main aapko padhai mein madad karungi, motivate karungi, aur life goals set karne mein help karungi. Main faltu baaton ka jawab nahi dungi!")
         
         # Display chat history
-        for msg in st.session_state.luicy_chat:
+        for msg in st.session_state.lumie_chat:
             with st.chat_message(msg["role"]):
                 st.markdown(msg["content"])
 
         # Chat Input
-        user_msg = st.chat_input("Luicy se padhai ya life goals ke baare mein poochho...")
+        user_msg = st.chat_input("Lumie se padhai ya life goals ke baare mein poochho...")
         
         if user_msg:
             # Add user message
-            st.session_state.luicy_chat.append({"role": "user", "content": user_msg})
+            st.session_state.lumie_chat.append({"role": "user", "content": user_msg})
             with st.chat_message("user"):
                 st.markdown(user_msg)
 
-            # Generate Luicy's response
+            # Generate Lumie's response
             with st.chat_message("assistant"):
-                with st.spinner("Luicy soch rahi hai..."):
+                with st.spinner("Lumie soch rahi hai..."):
                     
                     luicy_system_prompt = f"""
-                    You are "Luicy", a caring, motivating, and strict AI Teacher.
+                    You are "Lumie", a caring, motivating, and strict AI Teacher.
                     Current Student: {class_name} (Age: {selected_age}).
                     Current Subject Focus: {subject}.
                     Language: {lang_rule}
@@ -5096,7 +5096,7 @@ Rules:
                     
                     try:
                         # Add history to messages
-                        messages = [{"role": "system", "content": luicy_system_prompt}]
+                        messages = [{"role": "system", "content": lumie_system_prompt}]
                         for msg in st.session_state.luicy_chat[-6:]: # Last 6 messages for context
                             messages.append({"role": msg["role"], "content": msg["content"]})
 
@@ -5108,7 +5108,7 @@ Rules:
                         reply = res.choices[0].message.content
                         
                         st.markdown(reply)
-                        st.session_state.luicy_chat.append({"role": "assistant", "content": reply})
+                        st.session_state.lumie_chat.append({"role": "assistant", "content": reply})
                     except Exception as e:
                         st.error(f"AI Error: {e}")
 
