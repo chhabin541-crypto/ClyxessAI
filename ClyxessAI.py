@@ -3698,7 +3698,7 @@ def render_learn_language():
     import streamlit.components.v1 as components
 
     # ==========================================
-    # 🎨 1. CSS STYLING (Round Mic + Dark Theme)
+    # 🎨 1. CSS STYLING (Force Round Mic + Dark Theme)
     # ==========================================
     st.markdown("""
     <style>
@@ -3790,7 +3790,6 @@ def render_learn_language():
     # ==========================================
     # 💾 3. SESSION STATE
     # ==========================================
-    # Reset chat if language or difficulty changes
     if ("luicy_chat" not in st.session_state or 
         st.session_state.get("current_target") != target_lang or 
         st.session_state.get("current_mother") != my_lang or
@@ -3856,7 +3855,6 @@ def render_learn_language():
     # ==========================================
     # 💡 6. DYNAMIC HINT BOX
     # ==========================================
-    # Hints change based on the selected difficulty
     if difficulty == "easy":
         hint_text = "• Try bolo: <b>'Apple kaise bolte hain?'</b><br>• Try bolo: <b>'Mujhe Cat sikao'</b>"
     elif difficulty == "medium":
@@ -3872,31 +3870,27 @@ def render_learn_language():
     """, unsafe_allow_html=True)
 
     # ==========================================
-# 🎤 7. INPUT AREA (Force Round Mic + Text)
-# ==========================================
-st.write("<p style='text-align:center; font-weight:bold; color:#ff3b6e;'>🎤 Mic dabao aur bolo</p>", unsafe_allow_html=True)
+    # 🎤 7. INPUT AREA (Groq Fix + Force Round Mic)
+    # ==========================================
+    st.write("<p style='text-align:center; font-weight:bold; color:#ff3b6e;'>🎤 Mic dabao aur bolo</p>", unsafe_allow_html=True)
+    
+    audio_value = st.audio_input("Record", label_visibility="collapsed")
+    
+    user_prompt = None
 
-audio_value = st.audio_input("Record", label_visibility="collapsed")
-
-user_prompt = None
-
-if audio_value:
-    with st.spinner("Luicy sun rahi hai... 🎧"):
-        try:
-            # Yahan Groq ke available model ka naam daal diya hai
-            transcript = client.audio.transcriptions.create(
-                model="whisper-large-v3-turbo", # 👈 Yahan change kiya hai
-                file=("audio.wav", audio_value.getvalue())
-            )
-            user_prompt = transcript.text
-        except Exception as e:
-            st.warning("⚠️ Mic sun nahi paa raha. Kripya niche type karke bhejo!")
-            # st.error(f"Error: {e}") 
-
-# Text Input
-text_prompt = st.chat_input("Ya yahan type karke bhejo...")
-if text_prompt:
-    user_prompt = text_prompt
+    if audio_value:
+        with st.spinner("Luicy sun rahi hai... 🎧"):
+            try:
+                # 👇 Groq API ka model yahan use kiya hai
+                transcript = client.audio.transcriptions.create(
+                    model="whisper-large-v3-turbo", 
+                    file=("audio.wav", audio_value.getvalue())
+                )
+                user_prompt = transcript.text
+            except Exception as e:
+                st.warning("⚠️ Mic sun nahi paa raha. Kripya niche type karke bhejo!")
+                # Error ka pura detail dekhna ho toh niche wali line uncomment kar dena
+                # st.error(f"Error: {e}")
 
     # Text Input
     text_prompt = st.chat_input("Ya yahan type karke bhejo...")
@@ -3916,7 +3910,7 @@ if text_prompt:
             with st.spinner("Luicy soch rahi hai... 🧠"):
                 try:
                     response = client.chat.completions.create(
-                        model="openai/gpt-oss-120b", 
+                        model="openai/gpt-oss-120b", # Agar text model bhi Groq ka hai toh yeh theek hai
                         messages=[{"role": "system", "content": SYSTEM_PROMPT}] + st.session_state.luicy_chat[-6:],
                         temperature=0.7, max_tokens=300
                     )
@@ -3925,7 +3919,7 @@ if text_prompt:
                     st.session_state.luicy_chat.append({"role": "assistant", "content": reply})
                     st.rerun()
                 except Exception as e:
-                    st.error(f"Network Error: {e}")     
+                    st.error(f"Network Error: {e}")    
 
 def render_cyber_security():
     # ==========================================
