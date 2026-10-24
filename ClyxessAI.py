@@ -3872,24 +3872,31 @@ def render_learn_language():
     """, unsafe_allow_html=True)
 
     # ==========================================
-    # 🎤 7. INPUT AREA (Force Round Mic + Text)
-    # ==========================================
-    st.write("<p style='text-align:center; font-weight:bold; color:#ff3b6e;'>🎤 Mic dabao aur bolo</p>", unsafe_allow_html=True)
-    
-    audio_value = st.audio_input("Record", label_visibility="collapsed")
-    
-    user_prompt = None
+# 🎤 7. INPUT AREA (Force Round Mic + Text)
+# ==========================================
+st.write("<p style='text-align:center; font-weight:bold; color:#ff3b6e;'>🎤 Mic dabao aur bolo</p>", unsafe_allow_html=True)
 
-    if audio_value:
-        with st.spinner("Luicy sun rahi hai... 🎧"):
-            try:
-                transcript = client.audio.transcriptions.create(
-                    model="whisper-1", 
-                    file=("audio.wav", audio_value.getvalue())
-                )
-                user_prompt = transcript.text
-            except Exception as e:
-                st.error(f"Mic error: {e}. Kripya type karke bhejein.")
+audio_value = st.audio_input("Record", label_visibility="collapsed")
+
+user_prompt = None
+
+if audio_value:
+    with st.spinner("Luicy sun rahi hai... 🎧"):
+        try:
+            # Yahan Groq ke available model ka naam daal diya hai
+            transcript = client.audio.transcriptions.create(
+                model="whisper-large-v3-turbo", # 👈 Yahan change kiya hai
+                file=("audio.wav", audio_value.getvalue())
+            )
+            user_prompt = transcript.text
+        except Exception as e:
+            st.warning("⚠️ Mic sun nahi paa raha. Kripya niche type karke bhejo!")
+            # st.error(f"Error: {e}") 
+
+# Text Input
+text_prompt = st.chat_input("Ya yahan type karke bhejo...")
+if text_prompt:
+    user_prompt = text_prompt
 
     # Text Input
     text_prompt = st.chat_input("Ya yahan type karke bhejo...")
