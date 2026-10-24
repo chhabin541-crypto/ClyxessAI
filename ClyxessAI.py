@@ -11094,7 +11094,7 @@ with st.sidebar:
     mode = st.radio("Select Mode", [
         "Normal Chat",
         "Creative Lab (School Mode)", 
-        "🈳 World Language Lab",
+        "🈳 Learn Language ",
         "🎮 Play & Learn",
         "🎨 Creative AI Image Generator",
         "📷 Vision Lab", 
@@ -11142,7 +11142,9 @@ if mode == "👨‍👩‍👦 Parent Dashboard":
 if mode == "🎨 Creative AI Image Generator":
     render_image_generator(); st.stop() 
 if mode == "🎨 Art Machine Design":
-    render_art_machinedesign(); st.stop()       
+    render_art_machinedesign(); st.stop() 
+if mode == "🈳 Learn Language":
+    render_learn_language(); st.stop() 
 if mode == "💡 Logic Lab":
     render_logic_lab(); st.stop()
 if mode == "🧠 Cyber Security":
