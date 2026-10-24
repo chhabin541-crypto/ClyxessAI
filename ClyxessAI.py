@@ -3722,34 +3722,37 @@ def render_learn_language():
             margin-bottom: 15px; margin-top: 10px;
         }
 
-        /* 🎤 ROUND MIC BUTTON STYLING (Jugaad) */
-        /* Yeh Streamlit ke default mic ko Round aur Pink banayega */
+        /* 🎤 FORCING ROUND MIC */
         div[data-testid="stAudioInput"] {
             display: flex;
             justify-content: center;
             margin-top: 10px;
         }
+        div[data-testid="stAudioInput"] > div {
+            background-color: transparent !important;
+            border: none !important;
+            padding: 0 !important;
+            min-height: auto !important;
+        }
         div[data-testid="stAudioInput"] button {
-            width: 80px !important;
-            height: 80px !important;
+            width: 70px !important;
+            height: 70px !important;
             border-radius: 50% !important;
             background-color: #ff3b6e !important;
-            color: white !important;
             border: none !important;
-            box-shadow: 0 4px 15px rgba(255, 59, 110, 0.5) !important;
-            transition: all 0.2s !important;
+            box-shadow: 0 4px 15px rgba(255, 59, 110, 0.4) !important;
+            transition: transform 0.2s !important;
         }
         div[data-testid="stAudioInput"] button:hover {
+            transform: scale(1.1) !important;
             background-color: #e63561 !important;
-            transform: scale(1.05);
         }
         div[data-testid="stAudioInput"] button svg {
             fill: white !important;
-            width: 35px !important;
-            height: 35px !important;
+            width: 30px !important;
+            height: 30px !important;
         }
-        /* Record hone ke baad jo chota sa audio player aata hai usko hide karne ke liye */
-        div[data-testid="stAudioInput"] > div > div {
+        div[data-testid="stAudioInput"] span {
             display: none !important;
         }
     </style>
@@ -3760,50 +3763,70 @@ def render_learn_language():
     # ==========================================
     MOTHER_TONGUES = {
         "hi-IN": "🇮🇳 Hindi", "en-US": "🇺🇸 English", "bn-IN": "🇮🇳 Bengali",
-        "mr-IN": "🇮🇳 Marathi", "or-IN": "🇮🇳 Odia", "ta-IN": "🇮🇳 Tamil",
-        "te-IN": "🇮🇳 Telugu", "ml-IN": "🇮🇳 Malayalam", "kn-IN": "🇮🇳 Kannada",
-        "bgc-IN": "🇮🇳 Haryanvi", "raj-IN": "🇮🇳 Rajasthani", "gu-IN": "🇮🇳 Gujarati", "pa-IN": "🇮🇳 Punjabi"
+        "mr-IN": "🇮🇳 Marathi", "ta-IN": "🇮🇳 Tamil", "te-IN": "🇮🇳 Telugu",
+        "gu-IN": "🇮🇳 Gujarati", "pa-IN": "🇮🇳 Punjabi"
     }
     TARGET_LANGUAGES = {
         "en-US": "🇺🇸 English", "zh-CN": "🇨🇳 Chinese", "ja-JP": "🇯🇵 Japanese",
         "es-ES": "🇪🇸 Spanish", "ru-RU": "🇷🇺 Russian", "fr-FR": "🇫🇷 French"
     }
+    DIFFICULTY_LEVELS = {
+        "easy": "🌱 Easy (Basic Words)",
+        "medium": "🚀 Medium (Daily Talk)",
+        "hard": "🔥 Hard (Advanced Words)"
+    }
 
     st.markdown('<div class="lang-card"><h3 style="margin:0; color:white;">🌍 Clyxess Language Lab</h3></div>', unsafe_allow_html=True)
     
-    col1, col2 = st.columns(2)
+    # 3 Columns for Selection
+    col1, col2, col3 = st.columns(3)
     with col1:
-        my_lang = st.selectbox("Main kaunsi bhasha bolta hu?", list(MOTHER_TONGUES.keys()), format_func=lambda x: MOTHER_TONGUES[x])
+        my_lang = st.selectbox("Main bolta hu:", list(MOTHER_TONGUES.keys()), format_func=lambda x: MOTHER_TONGUES[x])
     with col2:
-        target_lang = st.selectbox("Mujhe kaunsi seekhni hai?", list(TARGET_LANGUAGES.keys()), format_func=lambda x: TARGET_LANGUAGES[x])
+        target_lang = st.selectbox("Mujhe seekhni hai:", list(TARGET_LANGUAGES.keys()), format_func=lambda x: TARGET_LANGUAGES[x])
+    with col3:
+        difficulty = st.selectbox("Level chuno:", list(DIFFICULTY_LEVELS.keys()), format_func=lambda x: DIFFICULTY_LEVELS[x])
 
     # ==========================================
     # 💾 3. SESSION STATE
     # ==========================================
-    if "luicy_chat" not in st.session_state or st.session_state.get("current_target") != target_lang or st.session_state.get("current_mother") != my_lang:
+    # Reset chat if language or difficulty changes
+    if ("luicy_chat" not in st.session_state or 
+        st.session_state.get("current_target") != target_lang or 
+        st.session_state.get("current_mother") != my_lang or
+        st.session_state.get("current_diff") != difficulty):
+        
         st.session_state.current_target = target_lang
         st.session_state.current_mother = my_lang
+        st.session_state.current_diff = difficulty
+        
         st.session_state.luicy_chat = [
-            {"role": "assistant", "content": f"Namaste! 👋 Main Luicy hoon. Chalo {TARGET_LANGUAGES[target_lang]} seekhein! Aap niche wale bade gol (round) mic ko dabakar bolo."}
+            {"role": "assistant", "content": f"Namaste! 👋 Main Luicy hoon. Aapne **{DIFFICULTY_LEVELS[difficulty]}** chuna hai. Chalo {TARGET_LANGUAGES[target_lang]} seekhein! Aap mujhse kuch bhi pooch sakte ho."}
         ]
 
     # ==========================================
-    # 🎭 4. LUICY'S PROMPT (With Hint System)
+    # 🎭 4. LUICY'S HIGH-FI PROMPT (Level-Based)
     # ==========================================
     SYSTEM_PROMPT = f"""
     You are Luicy, an AI Language Teacher created by Clyxess AI, NeuroClyx Technology.
-    You are teaching {TARGET_LANGUAGES[target_lang]} to a 5-10 year old child whose native language is {MOTHER_TONGUES[my_lang]}.
+    You are teaching {TARGET_LANGUAGES[target_lang]} to a child (age 5-10) whose native language is {MOTHER_TONGUES[my_lang]}.
     
-    CRITICAL RULES:
-    1. When teaching a word, format it:
-       **{TARGET_LANGUAGES[target_lang]}:** [Word]
-       **{MOTHER_TONGUES[my_lang]} Pronunciation:** [Pronunciation]
-       **{MOTHER_TONGUES[my_lang]} Meaning:** [Meaning]
-    2. If asked "Who made you?", answer: "I am Clyxess AI, created by NeuroClyx Technology."
-    3. Use expressions (*smiles*, *claps*) and emojis. Keep it short.
-    4. HINT SYSTEM: Always end your response with 2-4 lines of hints in {MOTHER_TONGUES[my_lang]}. 
-       Tell the child exactly what they can ask or say next.
-       Example: "💡 Try bolo: 'Mujhe paani sikhao' ya 'How are you?'"
+    CURRENT DIFFICULTY LEVEL: {DIFFICULTY_LEVELS[difficulty]}
+    
+    HOW TO TEACH BASED ON LEVEL:
+    - If 'Easy': Teach 3-4 letter simple words (e.g., Cat, Dog, Sun, Ball, Apple).
+    - If 'Medium': Teach daily conversation words (e.g., School, Friend, Happy, Hungry, Play).
+    - If 'Hard': Teach advanced words (e.g., Adventure, Beautiful, Knowledge, Brave, Amazing).
+    
+    YOUR BRAIN & TEACHING LOGIC:
+    1. If the child asks for a specific word (e.g., "Heart"), teach that word regardless of level, but keep the explanation simple.
+    2. TEACHING FORMAT (Strictly follow this):
+       **{TARGET_LANGUAGES[target_lang]}:** [The Word]
+       **{MOTHER_TONGUES[my_lang]} Pronunciation:** [How to say it]
+       **{MOTHER_TONGUES[my_lang]} Meaning:** [What it means]
+    3. CONVERSATIONAL STYLE: Reply excitedly like a human teacher in {MOTHER_TONGUES[my_lang]} (*claps*, *smiles*), then teach the word.
+    4. IDENTITY: If asked who made you, strictly say: "I am Clyxess AI, created by NeuroClyx Technology."
+    5. HINT SYSTEM: End your message with 2-3 lines of hints in {MOTHER_TONGUES[my_lang]} telling the child what to ask next based on the current level.
     """
 
     # ==========================================
@@ -3831,29 +3854,34 @@ def render_learn_language():
                 components.html(tts_js, height=0)
 
     # ==========================================
-    # 💡 6. UI HINT BOX
+    # 💡 6. DYNAMIC HINT BOX
     # ==========================================
-    st.markdown("""
+    # Hints change based on the selected difficulty
+    if difficulty == "easy":
+        hint_text = "• Try bolo: <b>'Apple kaise bolte hain?'</b><br>• Try bolo: <b>'Mujhe Cat sikao'</b>"
+    elif difficulty == "medium":
+        hint_text = "• Try bolo: <b>'School ko English me kya bolte hain?'</b><br>• Try bolo: <b>'Mujhe Happy sikao'</b>"
+    else:
+        hint_text = "• Try bolo: <b>'Adventure ko Chinese me kya bolte hain?'</b><br>• Try bolo: <b>'Mujhe koi hard word sikao'</b>"
+
+    st.markdown(f"""
     <div class="hint-box">
-        <b>💡 Quick Hints:</b><br>
-        • Try bolo: <b>"Hello sikhao"</b> (To learn Hello)<br>
-        • Try bolo: <b>"Mujhe ghar jana hai"</b> (To learn Go Home)<br>
-        • Type karo: <b>"What is your name?"</b>
+        <b>💡 Quick Hints (For {DIFFICULTY_LEVELS[difficulty]}):</b><br>
+        {hint_text}
     </div>
     """, unsafe_allow_html=True)
 
     # ==========================================
-    # 🎤 7. INPUT AREA (Round Mic + Text)
+    # 🎤 7. INPUT AREA (Force Round Mic + Text)
     # ==========================================
     st.write("<p style='text-align:center; font-weight:bold; color:#ff3b6e;'>🎤 Mic dabao aur bolo</p>", unsafe_allow_html=True)
     
-    # Yeh raha woh mic jo CSS se Round ban gaya hai
     audio_value = st.audio_input("Record", label_visibility="collapsed")
     
     user_prompt = None
 
     if audio_value:
-        with st.spinner("Aapki aawaz sun rahi hu... 🎧"):
+        with st.spinner("Luicy sun rahi hai... 🎧"):
             try:
                 transcript = client.audio.transcriptions.create(
                     model="whisper-1", 
@@ -3869,7 +3897,7 @@ def render_learn_language():
         user_prompt = text_prompt
 
     # ==========================================
-    # 🧠 8. AI LOGIC
+    # 🧠 8. AI LOGIC (Smart Response)
     # ==========================================
     if user_prompt:
         st.session_state.luicy_chat.append({"role": "user", "content": user_prompt})
