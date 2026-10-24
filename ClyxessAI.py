@@ -3723,38 +3723,16 @@ def render_learn_language():
         }
 
         /* 🎤 FORCING ROUND MIC */
-        div[data-testid="stAudioInput"] {
-            display: flex;
-            justify-content: center;
-            margin-top: 10px;
-        }
-        div[data-testid="stAudioInput"] > div {
-            background-color: transparent !important;
-            border: none !important;
-            padding: 0 !important;
-            min-height: auto !important;
-        }
+        div[data-testid="stAudioInput"] { display: flex; justify-content: center; margin-top: 10px; }
+        div[data-testid="stAudioInput"] > div { background-color: transparent !important; border: none !important; padding: 0 !important; min-height: auto !important; }
         div[data-testid="stAudioInput"] button {
-            width: 70px !important;
-            height: 70px !important;
-            border-radius: 50% !important;
-            background-color: #ff3b6e !important;
-            border: none !important;
-            box-shadow: 0 4px 15px rgba(255, 59, 110, 0.4) !important;
-            transition: transform 0.2s !important;
+            width: 70px !important; height: 70px !important; border-radius: 50% !important;
+            background-color: #ff3b6e !important; border: none !important;
+            box-shadow: 0 4px 15px rgba(255, 59, 110, 0.4) !important; transition: transform 0.2s !important;
         }
-        div[data-testid="stAudioInput"] button:hover {
-            transform: scale(1.1) !important;
-            background-color: #e63561 !important;
-        }
-        div[data-testid="stAudioInput"] button svg {
-            fill: white !important;
-            width: 30px !important;
-            height: 30px !important;
-        }
-        div[data-testid="stAudioInput"] span {
-            display: none !important;
-        }
+        div[data-testid="stAudioInput"] button:hover { transform: scale(1.1) !important; background-color: #e63561 !important; }
+        div[data-testid="stAudioInput"] button svg { fill: white !important; width: 30px !important; height: 30px !important; }
+        div[data-testid="stAudioInput"] span { display: none !important; }
     </style>
     """, unsafe_allow_html=True)
 
@@ -3778,7 +3756,6 @@ def render_learn_language():
 
     st.markdown('<div class="lang-card"><h3 style="margin:0; color:white;">🌍 Clyxess Language Lab</h3></div>', unsafe_allow_html=True)
     
-    # 3 Columns for Selection
     col1, col2, col3 = st.columns(3)
     with col1:
         my_lang = st.selectbox("Main bolta hu:", list(MOTHER_TONGUES.keys()), format_func=lambda x: MOTHER_TONGUES[x])
@@ -3799,12 +3776,13 @@ def render_learn_language():
         st.session_state.current_mother = my_lang
         st.session_state.current_diff = difficulty
         
+        # Sirf pehli baar Namaste bolna
         st.session_state.luicy_chat = [
-            {"role": "assistant", "content": f"Namaste! 👋 Main Luicy hoon. Aapne **{DIFFICULTY_LEVELS[difficulty]}** chuna hai. Chalo {TARGET_LANGUAGES[target_lang]} seekhein! Aap mujhse kuch bhi pooch sakte ho."}
+            {"role": "assistant", "content": f"Namaste! 👋 Main Luicy hoon. Aapne **{DIFFICULTY_LEVELS[difficulty]}** chuna hai. Chalo shuru karein! Aap mujhse koi bhi word pooch sakte ho."}
         ]
 
     # ==========================================
-    # 🎭 4. LUICY'S HIGH-FI PROMPT (Level-Based)
+    # 🎭 4. LUICY'S HIGH-FI PROMPT (Fixed Repetition)
     # ==========================================
     SYSTEM_PROMPT = f"""
     You are Luicy, an AI Language Teacher created by Clyxess AI, NeuroClyx Technology.
@@ -3813,40 +3791,57 @@ def render_learn_language():
     CURRENT DIFFICULTY LEVEL: {DIFFICULTY_LEVELS[difficulty]}
     
     HOW TO TEACH BASED ON LEVEL:
-    - If 'Easy': Teach 3-4 letter simple words (e.g., Cat, Dog, Sun, Ball, Apple).
-    - If 'Medium': Teach daily conversation words (e.g., School, Friend, Happy, Hungry, Play).
-    - If 'Hard': Teach advanced words (e.g., Adventure, Beautiful, Knowledge, Brave, Amazing).
+    - If 'Easy': Teach 3-4 letter simple words (e.g., Cat, Dog, Sun, Ball).
+    - If 'Medium': Teach daily conversation words (e.g., School, Friend, Happy).
+    - If 'Hard': Teach advanced words (e.g., Adventure, Beautiful, Brave).
     
     YOUR BRAIN & TEACHING LOGIC:
-    1. If the child asks for a specific word (e.g., "Heart"), teach that word regardless of level, but keep the explanation simple.
+    1. If the child asks for a specific word, teach that word regardless of level.
     2. TEACHING FORMAT (Strictly follow this):
        **{TARGET_LANGUAGES[target_lang]}:** [The Word]
        **{MOTHER_TONGUES[my_lang]} Pronunciation:** [How to say it]
        **{MOTHER_TONGUES[my_lang]} Meaning:** [What it means]
-    3. CONVERSATIONAL STYLE: Reply excitedly like a human teacher in {MOTHER_TONGUES[my_lang]} (*claps*, *smiles*), then teach the word.
+    3. CONVERSATIONAL STYLE: Reply excitedly like a human teacher (*claps*, *smiles*).
     4. IDENTITY: If asked who made you, strictly say: "I am Clyxess AI, created by NeuroClyx Technology."
-    5. HINT SYSTEM: End your message with 2-3 lines of hints in {MOTHER_TONGUES[my_lang]} telling the child what to ask next based on the current level.
+    
+    CRITICAL RULE (NO REPEATING GREETINGS):
+    - You have ALREADY said "Namaste" at the start. 
+    - If the user says "Namaste", "Hello", or "Hi" again, DO NOT reply with "Namaste". 
+    - Instead say something like: "Wah! *claps* Tumhe yeh aata hai. Chalo ab ek naya word seekhein!" and move to the next lesson.
     """
 
     # ==========================================
-    # 💬 5. CHAT DISPLAY
+    # 💬 5. CHAT DISPLAY & FIXED TTS
     # ==========================================
-    for msg in st.session_state.luicy_chat:
+    for i, msg in enumerate(st.session_state.luicy_chat):
         avatar = "👩‍🏫" if msg["role"] == "assistant" else "🧑"
         with st.chat_message(msg["role"], avatar=avatar):
             st.markdown(msg["content"])
             
-            # Voice TTS
-            if msg["role"] == "assistant" and msg == st.session_state.luicy_chat[-1]:
+            # Voice TTS Fix: Sirf naye message par bolega
+            if msg["role"] == "assistant" and i == len(st.session_state.luicy_chat) - 1:
                 clean_text = msg["content"].split('*')[0].replace('**', '').replace('😊','').replace('👋','').replace('🎉','').replace('💡','').strip()
+                safe_text = clean_text.replace('"', '\\"').replace('\n', ' ')
+                
+                # Har naye message ke liye unique ID banayenge
+                msg_id = f"msg_{len(st.session_state.luicy_chat)}_{hash(safe_text)}"
+                
                 tts_js = f"""
                 <script>
-                    if ('speechSynthesis' in window) {{
-                        window.speechSynthesis.cancel();
-                        var msg = new SpeechSynthesisUtterance("{clean_text}");
-                        msg.lang = "{target_lang}"; 
-                        msg.rate = 0.9; msg.pitch = 1.2;
-                        window.speechSynthesis.speak(msg);
+                    var msgId = "{msg_id}";
+                    var lastSpokenId = sessionStorage.getItem('luicy_last_spoken_id');
+                    
+                    // Sirf tab bolega jab message naya ho
+                    if (lastSpokenId !== msgId) {{
+                        sessionStorage.setItem('luicy_last_spoken_id', msgId);
+                        
+                        if ('speechSynthesis' in window) {{
+                            window.speechSynthesis.cancel();
+                            var msg = new SpeechSynthesisUtterance("{safe_text}");
+                            msg.lang = "{target_lang}"; 
+                            msg.rate = 0.9; msg.pitch = 1.2;
+                            window.speechSynthesis.speak(msg);
+                        }}
                     }}
                 </script>
                 """
@@ -3870,7 +3865,7 @@ def render_learn_language():
     """, unsafe_allow_html=True)
 
     # ==========================================
-    # 🎤 7. INPUT AREA (Groq Fix + Force Round Mic)
+    # 🎤 7. INPUT AREA (Groq Fix)
     # ==========================================
     st.write("<p style='text-align:center; font-weight:bold; color:#ff3b6e;'>🎤 Mic dabao aur bolo</p>", unsafe_allow_html=True)
     
@@ -3889,8 +3884,6 @@ def render_learn_language():
                 user_prompt = transcript.text
             except Exception as e:
                 st.warning("⚠️ Mic sun nahi paa raha. Kripya niche type karke bhejo!")
-                # Error ka pura detail dekhna ho toh niche wali line uncomment kar dena
-                # st.error(f"Error: {e}")
 
     # Text Input
     text_prompt = st.chat_input("Ya yahan type karke bhejo...")
@@ -3910,7 +3903,7 @@ def render_learn_language():
             with st.spinner("Luicy soch rahi hai... 🧠"):
                 try:
                     response = client.chat.completions.create(
-                        model="openai/gpt-oss-120b", # Agar text model bhi Groq ka hai toh yeh theek hai
+                        model="openai/gpt-oss-120b", 
                         messages=[{"role": "system", "content": SYSTEM_PROMPT}] + st.session_state.luicy_chat[-6:],
                         temperature=0.7, max_tokens=300
                     )
