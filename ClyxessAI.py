@@ -4874,7 +4874,7 @@ Rules:
     with c5:
         # ⭐ Luicy Chat Mode Added
         mode = st.selectbox("🎯 Mode",
-            ["📖 Homework Help", "📝 Test Mode", "💬 Chat with Luicy (Teacher)", "🎯 Practice", "📊 Project"],
+            ["📖 Homework Help", "📝 Test Mode", "💬 Chat with Lumie (Teacher)", "🎯 Practice", "📊 Project"],
             key="hw_mode")
 
     if "Auto Detect" in language_label:
