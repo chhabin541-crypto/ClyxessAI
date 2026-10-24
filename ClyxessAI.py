@@ -3698,79 +3698,96 @@ def render_learn_language ():
     import streamlit.components.v1 as components
 
     # ==========================================
-    # 🎨 1. CSS STYLING (Exact HTML Look)
+    # 🎨 1. CSS STYLING (Dark Theme & Purple Chat)
     # ==========================================
     st.markdown("""
     <style>
-        /* Main Background */
         .stApp { background-color: #0f0f12 !important; }
         header {visibility: hidden;} footer {visibility: hidden;}
-        
-        /* Cards Look */
-        .lang-card {
-            background-color: #1e1e24; border-radius: 18px; padding: 15px;
-            margin-bottom: 15px; border: 1px solid #333; color: white;
-        }
+        .lang-card { background-color: #1e1e24; border-radius: 18px; padding: 15px; margin-bottom: 15px; border: 1px solid #333; color: white; }
         
         /* Chat Bubbles */
         .stChatMessage { border-radius: 16px; padding: 12px 15px; margin-bottom: 10px; }
-        
-        /* User Bubble (Purple) */
         [data-testid="stChatMessage"]:has(div[aria-label="chat avatar"]:contains("🧑")) {
-            background-color: #7c5cff !important; color: white !important;
-            border-bottom-right-radius: 4px; border: none !important;
+            background-color: #7c5cff !important; color: white !important; border-bottom-right-radius: 4px; border: none !important;
         }
-        
-        /* AI Bubble (Dark Grey) */
         [data-testid="stChatMessage"]:has(div[aria-label="chat avatar"]:contains("👩‍🏫")) {
-            background-color: #2a2a33 !important; color: white !important;
-            border: 1px solid #444 !important; border-bottom-left-radius: 4px;
+            background-color: #2a2a33 !important; color: white !important; border: 1px solid #444 !important; border-bottom-left-radius: 4px;
         }
         
-        /* Input Area */
-        .stChatInput { padding-bottom: 20px; }
-        .stChatInput textarea {
-            background-color: #2a2a33 !important; color: white !important;
-            border-radius: 20px !important; border: 1px solid #7c5cff !important;
-        }
+        /* Audio Input Styling */
+        .stAudioInput { margin-bottom: -10px; }
     </style>
     """, unsafe_allow_html=True)
 
     # ==========================================
-    # 🌐 2. HEADER & LANGUAGE SELECTION
+    # 🌐 2. LANGUAGE DICTIONARY (All Indian + Foreign)
     # ==========================================
+    MOTHER_TONGUES = {
+        "hi-IN": "🇮🇳 Hindi",
+        "en-US": "🇺🇸 English",
+        "bn-IN": "🇮🇳 Bengali",
+        "mr-IN": "🇮🇳 Marathi",
+        "or-IN": "🇮🇳 Odia",
+        "ta-IN": "🇮🇳 Tamil",
+        "te-IN": "🇮🇳 Telugu",
+        "ml-IN": "🇮🇳 Malayalam",
+        "kn-IN": "🇮🇳 Kannada",
+        "bgc-IN": "🇮🇳 Haryanvi",
+        "raj-IN": "🇮🇳 Rajasthani",
+        "gu-IN": "🇮🇳 Gujarati",
+        "pa-IN": "🇮🇳 Punjabi"
+    }
+
+    TARGET_LANGUAGES = {
+        "en-US": "🇺🇸 English",
+        "zh-CN": "🇨🇳 Chinese",
+        "ja-JP": "🇯🇵 Japanese",
+        "es-ES": "🇪🇸 Spanish",
+        "ru-RU": "🇷🇺 Russian",
+        "fr-FR": "🇫🇷 French"
+    }
+
     st.markdown('<div class="lang-card"><h3 style="margin:0; color:white;">🌍 Clyxess Language Lab</h3></div>', unsafe_allow_html=True)
     
     col1, col2 = st.columns(2)
     with col1:
-        my_lang = st.selectbox("Main kaunsi bhasha bolta hu?", ["hi-IN", "en-US"], format_func=lambda x: "🇮🇳 Hindi" if x=="hi-IN" else "🇺🇸 English")
+        my_lang = st.selectbox("Main kaunsi bhasha bolta hu? (My Mother Tongue)", list(MOTHER_TONGUES.keys()), format_func=lambda x: MOTHER_TONGUES[x])
     with col2:
-        target_lang = st.selectbox("Mujhe kaunsi seekhni hai?", ["en-US", "zh-CN", "ja-JP", "es-ES"], format_func=lambda x: {"en-US":"🇺🇸 English", "zh-CN":"🇨🇳 Chinese", "ja-JP":"🇯🇵 Japanese", "es-ES":"🇪🇸 Spanish"}[x])
-
-    lang_names = {"en-US": "English", "hi-IN": "Hindi", "zh-CN": "Chinese", "ja-JP": "Japanese", "es-ES": "Spanish"}
+        target_lang = st.selectbox("Mujhe kaunsi seekhni hai? (Learn Language)", list(TARGET_LANGUAGES.keys()), format_func=lambda x: TARGET_LANGUAGES[x])
 
     # ==========================================
     # 💾 3. SESSION STATE
     # ==========================================
-    if "luicy_chat" not in st.session_state or st.session_state.get("current_target") != target_lang:
+    if "luicy_chat" not in st.session_state or st.session_state.get("current_target") != target_lang or st.session_state.get("current_mother") != my_lang:
         st.session_state.current_target = target_lang
+        st.session_state.current_mother = my_lang
         st.session_state.luicy_chat = [
-            {"role": "assistant", "content": f"Namaste! 👋 Main Luicy hoon, aapki AI Language Teacher. Chalo {lang_names[target_lang]} seekhein! Mujhse kuch bhi poocho."}
+            {"role": "assistant", "content": f"Namaste! 👋 Main Luicy hoon. Chalo {TARGET_LANGUAGES[target_lang]} seekhein! Aap niche mic dabakar bolo ya type karo."}
         ]
 
     # ==========================================
-    # 🎭 4. LUICY'S PROMPT (NeuroClyx Identity)
+    # 🎭 4. LUICY'S PROMPT (Dynamic Local Language Explanation)
     # ==========================================
     SYSTEM_PROMPT = f"""
     You are Luicy, an AI Language Teacher created by Clyxess AI, NeuroClyx Technology.
     Target Audience: 5-10 year old kids.
-    You are teaching {lang_names[target_lang]} to a child whose native language is {lang_names[my_lang]}.
+    You are teaching {TARGET_LANGUAGES[target_lang]} to a child whose native language is {MOTHER_TONGUES[my_lang]}.
     
-    Rules:
-    1. If asked "Who made you?", strictly answer: "I am Clyxess AI, created by NeuroClyx Technology."
-    2. Teach basic survival language (Hello, Ghar jana, Khana, Thank you).
-    3. Use human expressions (*smiles*, *claps*, *winks*) and emojis.
-    4. Keep answers very short. Ask a fun question back.
+    CRITICAL RULES FOR TEACHING:
+    1. When teaching a new word, you MUST format it like this:
+       **{TARGET_LANGUAGES[target_lang]}:** [Word in target language]
+       **{MOTHER_TONGUES[my_lang]} Pronunciation:** [How to say it in native script/letters]
+       **{MOTHER_TONGUES[my_lang]} Meaning:** [What it means in native language]
+    
+    2. Example: If teaching "Hello" in Chinese to a Hindi speaker:
+       **Chinese:** 你好 (nǐ hǎo)
+       **Hindi Pronunciation:** नी हाओ
+       **Hindi Meaning:** नमस्ते
+    
+    3. If asked "Who made you?", strictly answer: "I am Clyxess AI, created by NeuroClyx Technology."
+    4. Use expressions (*smiles*, *claps*) and emojis. Keep it short and fun.
+    5. Talk to the child in their mother tongue ({MOTHER_TONGUES[my_lang]}) to explain things, and use {TARGET_LANGUAGES[target_lang]} for the lesson.
     """
 
     # ==========================================
@@ -3781,7 +3798,7 @@ def render_learn_language ():
         with st.chat_message(msg["role"], avatar=avatar):
             st.markdown(msg["content"])
             
-            # Voice TTS (Aawaz)
+            # Voice TTS (Luicy's Reply Audio)
             if msg["role"] == "assistant" and msg == st.session_state.luicy_chat[-1]:
                 clean_text = msg["content"].split('*')[0].replace('**', '').replace('😊','').replace('👋','').replace('🎉','').strip()
                 tts_js = f"""
@@ -3789,7 +3806,7 @@ def render_learn_language ():
                     if ('speechSynthesis' in window) {{
                         window.speechSynthesis.cancel();
                         var msg = new SpeechSynthesisUtterance("{clean_text}");
-                        msg.lang = "{target_lang}";
+                        msg.lang = "{target_lang}"; 
                         msg.rate = 0.9; msg.pitch = 1.2;
                         window.speechSynthesis.speak(msg);
                     }}
@@ -3798,20 +3815,49 @@ def render_learn_language ():
                 components.html(tts_js, height=0)
 
     # ==========================================
-    # 🎤 6. INPUT & AI LOGIC
+    # 🎤 6. INPUT AREA (Mic + Text)
     # ==========================================
-    if prompt := st.chat_input("Mic dabao (mobile pe) ya yahan type karo..."):
-        st.session_state.luicy_chat.append({"role": "user", "content": prompt})
+    st.write("---")
+    
+    # Mic Input
+    st.write("🎤 **Mic dabakar bolo (Ya type karne ke liye niche likho):**")
+    audio_value = st.audio_input("Record your voice", label_visibility="collapsed")
+    
+    user_prompt = None
+
+    if audio_value:
+        with st.spinner("Aapki aawaz sun rahi hu... 🎧"):
+            try:
+                # Use Whisper to convert speech to text
+                transcript = client.audio.transcriptions.create(
+                    model="whisper-1", 
+                    file=("audio.wav", audio_value.getvalue())
+                )
+                user_prompt = transcript.text
+            except Exception as e:
+                st.error(f"Mic error: {e}. Kripya type karke bhejein.")
+
+    # Text Input
+    text_prompt = st.chat_input("Yahan type karke bhejo...")
+    if text_prompt:
+        user_prompt = text_prompt
+
+    # ==========================================
+    # 🧠 7. AI LOGIC (Process User Input)
+    # ==========================================
+    if user_prompt:
+        st.session_state.luicy_chat.append({"role": "user", "content": user_prompt})
+        
         with st.chat_message("user", avatar="🧑"):
-            st.markdown(prompt)
+            st.markdown(user_prompt)
 
         with st.chat_message("assistant", avatar="👩‍🏫"):
             with st.spinner("Luicy soch rahi hai... 🧠"):
                 try:
                     response = client.chat.completions.create(
-                        model="openai/gpt-oss-120b",
-                        messages=[{"role": "system", "content": SYSTEM_PROMPT}] + st.session_state.luicy_chat[-5:],
-                        temperature=0.7, max_tokens=200
+                        model="openai/gpt-oss-120b", 
+                        messages=[{"role": "system", "content": SYSTEM_PROMPT}] + st.session_state.luicy_chat[-6:],
+                        temperature=0.7, max_tokens=250
                     )
                     reply = response.choices[0].message.content
                     st.markdown(reply)
