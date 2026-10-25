@@ -2710,7 +2710,8 @@ def main_app():
     # ==========================================
     st.write("Welcome to Clyxess AI School Dashboard!")
     # render_homework_test(client)
-    # render_language_lab(client)
+    # render_language_lab(client) 
+    
 
 def render_image_generator():
     import streamlit as st
@@ -11004,7 +11005,6 @@ with st.sidebar:
         "🔢 Math Lab",  
         "💸 Learn Finance", 
         "📱 Data Science and Machine Learning", 
-        "💰 Pricing", 
         "🔐 Login / Sign Up"
     ])
     st.markdown("---")
@@ -11019,8 +11019,6 @@ with st.sidebar:
 # ---- routes: one unique screen per feature ----
 if mode == "🔐 Login / Sign Up":
     render_login_signup(); st.stop() 
-if mode == "💰 Prising":
-    render_pricing(); st.stop()
 if mode == "📱 Data Science and Machine Learning":
     render_datascienceand_machinelearning(); st.stop() 
 if mode == "💸 Learn Finance":
