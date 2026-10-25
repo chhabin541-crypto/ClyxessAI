@@ -2646,9 +2646,24 @@ def render_payment_gateway():
         if st.button("Buy Enterprise ₹1499", key="buy_ent"):
             launch_razorpay(1499, st.session_state.get("user_email", ""))
 
-    # Testing ke liye button
-    st.write("---")
-    if st.button("✅ [Testing] Payment Completed, Unlock App", type="primary"):
+   # 👇 NAYA TESTING LOGIC (3 Plans simulate karne ke liye)
+st.write("---")
+st.write("🛠️ **Testing Panel (Developer Only)**")
+
+col_t1, col_t2, col_t3 = st.columns(3)
+with col_t1:
+    if st.button("Simulate ₹799 Payment"):
+        st.session_state.user_plan = "starter"
+        st.session_state.is_paid = True
+        st.rerun()
+with col_t2:
+    if st.button("Simulate ₹949 Payment"):
+        st.session_state.user_plan = "pro"
+        st.session_state.is_paid = True
+        st.rerun()
+with col_t3:
+    if st.button("Simulate ₹1499 Payment"):
+        st.session_state.user_plan = "enterprise"
         st.session_state.is_paid = True
         st.rerun()
 
