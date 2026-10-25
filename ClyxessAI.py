@@ -2510,7 +2510,7 @@ def render_login_signup():
     st.markdown("""
     <div style="text-align: center; margin-bottom: 30px;">
         <h1 style="color: white; font-size: 32px;">ClyxessChat <span style="color:#00ffff;">AI</span></h1>
-        <p style="color: #a1a1aa;">Build Smarter with ClyxessChat AI</p>
+        <p style="color: #a1a1aa;">Learn Smarter with Clyxess AI School</p>
     </div>
     """, unsafe_allow_html=True)
 
@@ -2666,7 +2666,7 @@ def launch_razorpay(amount):
             "key": "{RAZORPAY_KEY_ID}",
             "amount": "{amount * 100}", 
             "currency": "INR",
-            "name": "ClyxessChat AI",
+            "name": "Clyxess AI",
             "description": "Premium Subscription",
             "handler": function (response){{
                 alert("Payment Successful! ID: " + response.razorpay_payment_id);
