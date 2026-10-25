@@ -2515,7 +2515,7 @@ def render_login_signup():
     """, unsafe_allow_html=True)
 
     # OAuth Buttons
-    if st.button("🔴 Continue with Google", use_container_width=True):
+    if st.button(" Continue with Google", use_container_width=True):
         try:
             r = supabase.auth.sign_in_with_oauth({"provider": "google", "options": {"redirect_to": st.secrets.get("SUPABASE_REDIRECT_URL", "")}})
             if getattr(r, "url", None): 
@@ -2523,7 +2523,7 @@ def render_login_signup():
         except Exception as e: 
             st.error(f"Google login failed: {e}")
 
-    if st.button("🍎 Continue with Apple", use_container_width=True):
+    if st.button(" Continue with Apple", use_container_width=True):
         st.info("Apple login coming soon!")
 
     st.markdown('<div class="divider">─────── OR ───────</div>', unsafe_allow_html=True)
