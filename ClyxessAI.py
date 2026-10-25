@@ -2491,16 +2491,9 @@ def render_login_signup():
         }
         
         /* Tabs Styling */
-        .stTabs [data-baseweb="tab-list"] {
-            gap: 20px;
-        }
-        .stTabs [data-baseweb="tab"] {
-            color: #a1a1aa;
-        }
-        .stTabs [aria-selected="true"] {
-            color: #00ffff !important;
-            border-bottom-color: #00ffff !important;
-        }
+        .stTabs [data-baseweb="tab-list"] { gap: 20px; }
+        .stTabs [data-baseweb="tab"] { color: #a1a1aa; }
+        .stTabs [aria-selected="true"] { color: #00ffff !important; border-bottom-color: #00ffff !important; }
         
         .divider { text-align: center; margin: 20px 0; color: #444; font-size: 14px; }
     </style>
@@ -2509,13 +2502,13 @@ def render_login_signup():
     # Header
     st.markdown("""
     <div style="text-align: center; margin-bottom: 30px;">
-        <h1 style="color: white; font-size: 32px;">Clyxess<span style="color:#00ffff;">AI</span></h1>
-        <p style="color: #a1a1aa;">Learn Smarter with Clyxess AI School</p>
+        <h1 style="color: white; font-size: 32px;">ClyxessChat <span style="color:#00ffff;">AI</span></h1>
+        <p style="color: #a1a1aa;">Build Smarter with ClyxessChat AI</p>
     </div>
     """, unsafe_allow_html=True)
 
     # OAuth Buttons
-    if st.button(" Continue with Google", use_container_width=True):
+    if st.button("🔴 Continue with Google", use_container_width=True):
         try:
             r = supabase.auth.sign_in_with_oauth({"provider": "google", "options": {"redirect_to": st.secrets.get("SUPABASE_REDIRECT_URL", "")}})
             if getattr(r, "url", None): 
@@ -2523,7 +2516,7 @@ def render_login_signup():
         except Exception as e: 
             st.error(f"Google login failed: {e}")
 
-    if st.button(" Continue with Apple", use_container_width=True):
+    if st.button("🍎 Continue with Apple", use_container_width=True):
         st.info("Apple login coming soon!")
 
     st.markdown('<div class="divider">─────── OR ───────</div>', unsafe_allow_html=True)
@@ -2544,7 +2537,7 @@ def render_login_signup():
                 st.session_state.user_email = email
                 st.session_state.logged_in = True
                 
-                # 👇 1 Din ka free trial set karo (agar pehle se nahi hai)
+                # 👇 1 Din ka free trial set karo
                 if "trial_start" not in st.session_state:
                     st.session_state.trial_start = datetime.datetime.now()
                     
@@ -2563,7 +2556,6 @@ def render_login_signup():
         
         if st.button("Create Account ➔", key="btn_signup"):
             try:
-                # Supabase mein naya user create karo
                 supabase.auth.sign_up({
                     "email": email, 
                     "password": password, 
@@ -2574,6 +2566,7 @@ def render_login_signup():
                 st.error(f"Sign up failed: {e}")
 
     st.markdown('<div style="text-align: center; margin-top: 20px; color: #444; font-size: 12px;">🔒 Secure. Private. Trusted. By continuing, you agree to Terms of Service.</div>', unsafe_allow_html=True)
+
 
 # ==========================================
 # 💳 PAYMENT GATEWAY FUNCTION
@@ -2619,7 +2612,7 @@ def render_payment_gateway():
         </div>
         """, unsafe_allow_html=True)
         if st.button("Buy Starter ₹799", key="buy_starter"):
-            launch_razorpay(799)
+            launch_razorpay(799, st.session_state.get("user_email", ""))
 
     with c2:
         st.markdown("""
@@ -2635,7 +2628,7 @@ def render_payment_gateway():
         </div>
         """, unsafe_allow_html=True)
         if st.button("Buy PRO ₹949", key="buy_pro", type="primary"):
-            launch_razorpay(949)
+            launch_razorpay(949, st.session_state.get("user_email", ""))
 
     with c3:
         st.markdown("""
@@ -2651,12 +2644,19 @@ def render_payment_gateway():
         </div>
         """, unsafe_allow_html=True)
         if st.button("Buy Enterprise ₹1499", key="buy_ent"):
-            launch_razorpay(1499)
+            launch_razorpay(1499, st.session_state.get("user_email", ""))
 
-def launch_razorpay(amount):
+    # Testing ke liye button
+    st.write("---")
+    if st.button("✅ [Testing] Payment Completed, Unlock App", type="primary"):
+        st.session_state.is_paid = True
+        st.rerun()
+
+
+def launch_razorpay(amount, user_email):
     import streamlit.components.v1 as components
     
-    # 🔴 RAZORPAY TEST MODE KEY (Baad mein isko apni real key se replace karna)
+    # 🔴 RAZORPAY TEST MODE KEY
     RAZORPAY_KEY_ID = "rzp_test_YourTestKeyHere" 
     
     razorpay_html = f"""
@@ -2666,8 +2666,9 @@ def launch_razorpay(amount):
             "key": "{RAZORPAY_KEY_ID}",
             "amount": "{amount * 100}", 
             "currency": "INR",
-            "name": "Clyxess AI",
+            "name": "ClyxessChat AI",
             "description": "Premium Subscription",
+            "prefill": {{ "email": "{user_email}" }},
             "handler": function (response){{
                 alert("Payment Successful! ID: " + response.razorpay_payment_id);
             }},
@@ -2679,10 +2680,12 @@ def launch_razorpay(amount):
     """
     components.html(razorpay_html, height=0)
 
+
 # ==========================================
-# 🚀 MAIN APP LOGIC (Jahan se sab control hoga)
+# 🚀 MAIN APP LOGIC (Gatekeeper)
 # ==========================================
 def main_app():
+    # 🛠️ Imports Yahan Bhi (Function ke andar)
     import streamlit as st
     import datetime
 
@@ -2692,7 +2695,7 @@ def main_app():
         return # Login page pe hi rukega
 
     # 2. Login hai, toh 1 Din ka trial check karo
-    if "trial_start" in st.session_state:
+    if "trial_start" in st.session_state and not st.session_state.get("is_paid", False):
         time_passed = datetime.datetime.now() - st.session_state.trial_start
         
         # Agar 24 ghante (1 din) se zyada ho gaye
@@ -2702,15 +2705,22 @@ def main_app():
             return # App aage nahi khulegi, payment pe ruk jayegi
 
     # 3. Free Trial Active ya Paid User
-    st.sidebar.success("✅ Free Trial Active (1 Day)")
+    st.sidebar.success(f"✅ Welcome {st.session_state.get('user_email', 'User')}")
+    if not st.session_state.get("is_paid", False):
+        st.sidebar.warning("⏳ Free Trial Active (1 Day)")
+    
+    if st.sidebar.button("🚪 Logout"):
+        st.session_state.logged_in = False
+        st.session_state.trial_start = None
+        st.session_state.is_paid = False
+        st.rerun()
     
     # ==========================================
     # YAHAN AAPKA PURANA SAARA CODE AAYEGA 
-    # (Jaise: render_homework_test(), render_language_lab() etc.)
     # ==========================================
     st.write("Welcome to Clyxess AI School Dashboard!")
     # render_homework_test(client)
-    # render_language_lab(client) 
+    # render_language_lab(client)
     
 
 def render_image_generator():
