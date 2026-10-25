@@ -2509,7 +2509,7 @@ def render_login_signup():
     # Header
     st.markdown("""
     <div style="text-align: center; margin-bottom: 30px;">
-        <h1 style="color: white; font-size: 32px;">ClyxessChat <span style="color:#00ffff;">AI</span></h1>
+        <h1 style="color: white; font-size: 32px;">Clyxess<span style="color:#00ffff;">AI</span></h1>
         <p style="color: #a1a1aa;">Learn Smarter with Clyxess AI School</p>
     </div>
     """, unsafe_allow_html=True)
