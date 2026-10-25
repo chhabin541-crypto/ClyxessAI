@@ -11003,7 +11003,8 @@ with st.sidebar:
         "🚀 Physics Lab",  
         "🔢 Math Lab",  
         "💸 Learn Finance", 
-        "📱 Data Science and Machine Learning",  
+        "📱 Data Science and Machine Learning", 
+        "💰 Pricing", 
         "🔐 Login / Sign Up"
     ])
     st.markdown("---")
@@ -11018,6 +11019,8 @@ with st.sidebar:
 # ---- routes: one unique screen per feature ----
 if mode == "🔐 Login / Sign Up":
     render_login_signup(); st.stop() 
+if mode == "💰 Prising":
+    render_pricing(); st.stop()
 if mode == "📱 Data Science and Machine Learning":
     render_datascienceand_machinelearning(); st.stop() 
 if mode == "💸 Learn Finance":
