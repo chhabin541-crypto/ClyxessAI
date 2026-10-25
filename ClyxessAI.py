@@ -2442,280 +2442,47 @@ def load_latest_chat_cloud():
         pass
 
 def render_login_signup():
-    # 🛠️ Saare Imports Yahan (Function ke andar)
-    import streamlit as st
-    import streamlit.components.v1 as components
-    import datetime
-    
-    # Note: Aapka 'supabase' client bahar initialize hua hoga, 
-    # isliye use yahan assume kiya gaya hai ki wo available hai.
-
+    st.title("🔐 Login / Sign Up")
     if not supabase:
         st.warning("Add SUPABASE_URL and SUPABASE_KEY to Streamlit secrets.")
         return
-
-    # 🎨 Custom CSS for Dark/Neon Theme (Screenshot Style)
-    st.markdown("""
-    <style>
-        .stApp { background-color: #050505; color: white; }
-        header {visibility: hidden;} footer {visibility: hidden;}
-        
-        /* Input Fields Styling */
-        .stTextInput input {
-            background-color: #0d0d12 !important;
-            color: #00ffff !important;
-            border: 1px solid #1a1a24 !important;
-            border-radius: 10px !important;
-            padding: 12px !important;
-        }
-        .stTextInput input:focus {
-            border-color: #00ffff !important;
-            box-shadow: 0 0 10px rgba(0, 255, 255, 0.2) !important;
-        }
-        
-        /* Buttons */
-        .stButton button {
-            width: 100% !important;
-            background-color: #0d0d12 !important;
-            color: white !important;
-            border: 1px solid #00ffff !important;
-            border-radius: 10px !important;
-            padding: 10px !important;
-            font-weight: bold !important;
-            transition: 0.3s !important;
-        }
-        .stButton button:hover {
-            background-color: #00ffff !important;
-            color: black !important;
-            box-shadow: 0 0 15px rgba(0, 255, 255, 0.4) !important;
-        }
-        
-        /* Tabs Styling */
-        .stTabs [data-baseweb="tab-list"] { gap: 20px; }
-        .stTabs [data-baseweb="tab"] { color: #a1a1aa; }
-        .stTabs [aria-selected="true"] { color: #00ffff !important; border-bottom-color: #00ffff !important; }
-        
-        .divider { text-align: center; margin: 20px 0; color: #444; font-size: 14px; }
-    </style>
-    """, unsafe_allow_html=True)
-
-    # Header
-    st.markdown("""
-    <div style="text-align: center; margin-bottom: 30px;">
-        <h1 style="color: white; font-size: 32px;">Clyxess<span style="color:#00ffff;">AI</span></h1>
-        <p style="color: #a1a1aa;">Learn Smarter with Clyxess AI School</p>
-    </div>
-    """, unsafe_allow_html=True)
-
-    # OAuth Buttons
-    if st.button(" Continue with Google", use_container_width=True):
-        try:
-            r = supabase.auth.sign_in_with_oauth({"provider": "google", "options": {"redirect_to": st.secrets.get("SUPABASE_REDIRECT_URL", "")}})
-            if getattr(r, "url", None): 
-                st.link_button("Click here to authenticate", r.url, use_container_width=True)
-        except Exception as e: 
-            st.error(f"Google login failed: {e}")
-
-    if st.button(" Continue with Apple", use_container_width=True):
-        st.info("Apple login coming soon!")
-
-    st.markdown('<div class="divider">─────── OR ───────</div>', unsafe_allow_html=True)
-
-    # Email/Password Tabs
-    tab1, tab2 = st.tabs(["Log In", "Sign Up"])
-    
-    # ==========================
-    # TAB 1: LOG IN
-    # ==========================
-    with tab1:
-        email = st.text_input("Email", key="login_email", placeholder="Enter your email")
-        password = st.text_input("Password", type="password", key="login_password", placeholder="Enter password")
-        
-        if st.button("Continue with Email ➔", key="btn_login", type="primary"):
+    st.markdown("### ⚡ Quick Login")
+    c1,c2=st.columns(2)
+    with c1:
+        if st.button("🔵 Continue with Google",use_container_width=True):
             try:
-                r = supabase.auth.sign_in_with_password({"email": email, "password": password})
-                st.session_state.user_email = email
-                st.session_state.logged_in = True
-                
-                # 👇 1 Din ka free trial set karo
-                if "trial_start" not in st.session_state:
-                    st.session_state.trial_start = datetime.datetime.now()
-                    
+                r=supabase.auth.sign_in_with_oauth({"provider":"google","options":{"redirect_to":st.secrets.get("SUPABASE_REDIRECT_URL","")}})
+                if getattr(r,"url",None): st.link_button("Continue to Google",r.url,use_container_width=True)
+            except Exception as e: st.error(f"Google login failed: {e}")
+    with c2:
+        if st.button("🔷 Continue with Facebook",use_container_width=True):
+            try:
+                r=supabase.auth.sign_in_with_oauth({"provider":"facebook","options":{"redirect_to":st.secrets.get("SUPABASE_REDIRECT_URL","")}})
+                if getattr(r,"url",None): st.link_button("Continue to Facebook",r.url,use_container_width=True)
+            except Exception as e: st.error(f"Facebook login failed: {e}")
+    st.caption("Google/Facebook providers must be enabled in Supabase Authentication settings.")
+
+    tab1,tab2=st.tabs(["Log In","Sign Up"])
+    with tab1:
+        email=st.text_input("Email",key="login_email")
+        password=st.text_input("Password",type="password",key="login_password")
+        if st.button("Log In",type="primary"):
+            try:
+                r=supabase.auth.sign_in_with_password({"email":email,"password":password})
+                st.session_state.user_email=email
+                load_latest_chat_cloud()
                 st.success("Logged in successfully.")
                 st.rerun()
-            except Exception as e: 
-                st.error(f"Login failed: {e}")
-            
-    # ==========================
-    # TAB 2: SIGN UP
-    # ==========================
+            except Exception as e: st.error(f"Login failed: {e}")
     with tab2:
-        name = st.text_input("Name", key="signup_name", placeholder="Your Name")
-        email = st.text_input("Email", key="signup_email", placeholder="Enter your email")
-        password = st.text_input("Password", type="password", key="signup_password", placeholder="Create password")
-        
-        if st.button("Create Account ➔", key="btn_signup"):
+        name=st.text_input("Name",key="signup_name")
+        email=st.text_input("Email",key="signup_email")
+        password=st.text_input("Password",type="password",key="signup_password")
+        if st.button("Create Account"):
             try:
-                supabase.auth.sign_up({
-                    "email": email, 
-                    "password": password, 
-                    "options": {"data": {"name": name}}
-                })
-                st.success("✅ Account created! Ab aap Log In tab se login kar sakte hain.")
-            except Exception as e: 
-                st.error(f"Sign up failed: {e}")
-
-    st.markdown('<div style="text-align: center; margin-top: 20px; color: #444; font-size: 12px;">🔒 Secure. Private. Trusted. By continuing, you agree to Terms of Service.</div>', unsafe_allow_html=True)
-
-
-# ==========================================
-# 💳 PAYMENT GATEWAY FUNCTION
-# ==========================================
-def render_payment_gateway():
-    import streamlit as st
-    import streamlit.components.v1 as components
-
-    st.markdown("""
-    <style>
-        .pricing-header { text-align: center; color: white; margin-bottom: 20px; }
-        .pricing-card {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid #222;
-            border-radius: 20px;
-            padding: 25px;
-            color: white;
-            transition: 0.3s;
-            text-align: center;
-        }
-        .pricing-card.pro {
-            background: linear-gradient(180deg, rgba(0, 255, 255, 0.1) 0%, rgba(0,0,0,0) 100%);
-            border: 2px solid #00ffff;
-        }
-        .price { font-size: 36px; font-weight: bold; color: #00ffff; margin: 10px 0; }
-        .stButton button { width: 100% !important; background: #00ffff !important; color: black !important; font-weight: bold !important; }
-    </style>
-    """, unsafe_allow_html=True)
-
-    st.markdown("<div class='pricing-header'><h2>Upgrade to Premium</h2><p>Aapka free trial khatam ho gaya hai. Kripya plan chunein.</p></div>", unsafe_allow_html=True)
-
-    c1, c2, c3 = st.columns(3)
-    with c1:
-        st.markdown("""
-        <div class="pricing-card">
-            <h3>Starter</h3>
-            <div class="price">₹799 <span style="font-size:14px;color:#888;">/mo</span></div>
-            <p>Perfect for beginners</p>
-            <ul style="text-align:left; font-size:14px; color:#aaa;">
-                <li>✔ 100 Chats / month</li>
-                <li>✔ Basic AI tools</li>
-            </ul>
-        </div>
-        """, unsafe_allow_html=True)
-        if st.button("Buy Starter ₹799", key="buy_starter"):
-            launch_razorpay(799, st.session_state.get("user_email", ""))
-
-    with c2:
-        st.markdown("""
-        <div class="pricing-card pro">
-            <h3 style="color:#00ffff;">PRO</h3>
-            <div class="price">₹949 <span style="font-size:14px;color:#888;">/mo</span></div>
-            <p>For growing students</p>
-            <ul style="text-align:left; font-size:14px; color:#aaa;">
-                <li>✔ Unlimited Chats</li>
-                <li>✔ Faster response</li>
-                <li>✔ Advanced features</li>
-            </ul>
-        </div>
-        """, unsafe_allow_html=True)
-        if st.button("Buy PRO ₹949", key="buy_pro", type="primary"):
-            launch_razorpay(949, st.session_state.get("user_email", ""))
-
-    with c3:
-        st.markdown("""
-        <div class="pricing-card">
-            <h3>Enterprise</h3>
-            <div class="price">₹1499 <span style="font-size:14px;color:#888;">/mo</span></div>
-            <p>For institutions</p>
-            <ul style="text-align:left; font-size:14px; color:#aaa;">
-                <li>✔ All PRO features</li>
-                <li>✔ Priority Support</li>
-                <li>✔ Custom solutions</li>
-            </ul>
-        </div>
-        """, unsafe_allow_html=True)
-        if st.button("Buy Enterprise ₹1499", key="buy_ent"):
-            launch_razorpay(1499, st.session_state.get("user_email", ""))
-
-
-def launch_razorpay(amount, user_email):
-    import streamlit.components.v1 as components
-    
-    # 🔴 RAZORPAY TEST MODE KEY
-    RAZORPAY_KEY_ID = "rzp_test_YourTestKeyHere" 
-    
-    razorpay_html = f"""
-    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-    <script>
-        var options = {{
-            "key": "{RAZORPAY_KEY_ID}",
-            "amount": "{amount * 100}", 
-            "currency": "INR",
-            "name": "ClyxessChat AI",
-            "description": "Premium Subscription",
-            "prefill": {{ "email": "{user_email}" }},
-            "handler": function (response){{
-                alert("Payment Successful! ID: " + response.razorpay_payment_id);
-            }},
-            "theme": {{ "color": "#00ffff" }}
-        }};
-        var rzp1 = new Razorpay(options);
-        rzp1.open();
-    </script>
-    """
-    components.html(razorpay_html, height=0)
-
-
-# ==========================================
-# 🚀 MAIN APP LOGIC (Gatekeeper)
-# ==========================================
-def main_app():
-    # 🛠️ Imports Yahan Bhi (Function ke andar)
-    import streamlit as st
-    import datetime
-
-    # 1. Check karo user login hai ya nahi
-    if "logged_in" not in st.session_state or not st.session_state.logged_in:
-        render_login_signup()
-        return # Login page pe hi rukega
-
-    # 2. Login hai, toh 1 Din ka trial check karo
-    if "trial_start" in st.session_state and not st.session_state.get("is_paid", False):
-        time_passed = datetime.datetime.now() - st.session_state.trial_start
-        
-        # Agar 24 ghante (1 din) se zyada ho gaye
-        if time_passed.days >= 1:
-            st.error("⏳ Aapka 1-Din ka free trial khatam ho gaya hai!")
-            render_payment_gateway()
-            return # App aage nahi khulegi, payment pe ruk jayegi
-
-    # 3. Free Trial Active ya Paid User
-    st.sidebar.success(f"✅ Welcome {st.session_state.get('user_email', 'User')}")
-    if not st.session_state.get("is_paid", False):
-        st.sidebar.warning("⏳ Free Trial Active (1 Day)")
-    
-    if st.sidebar.button("🚪 Logout"):
-        st.session_state.logged_in = False
-        st.session_state.trial_start = None
-        st.session_state.is_paid = False
-        st.rerun()
-    
-    # ==========================================
-    # YAHAN AAPKA PURANA SAARA CODE AAYEGA 
-    # ==========================================
-    st.write("Welcome to Clyxess AI School Dashboard!")
-    # render_homework_test(client)
-    # render_language_lab(client)
-    
+                supabase.auth.sign_up({"email":email,"password":password,"options":{"data":{"name":name}}})
+                st.success("Account created. Confirm email if your Supabase project requires it.")
+            except Exception as e: st.error(f"Sign up failed: {e}")
 
 def render_image_generator():
     import streamlit as st
@@ -11008,7 +10775,7 @@ with st.sidebar:
         "🚀 Physics Lab",  
         "🔢 Math Lab",  
         "💸 Learn Finance", 
-        "📱 Data Science and Machine Learning", 
+        "📱 Data Science and Machine Learning",  
         "🔐 Login / Sign Up"
     ])
     st.markdown("---")
