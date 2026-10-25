@@ -2502,13 +2502,13 @@ def render_login_signup():
     # Header
     st.markdown("""
     <div style="text-align: center; margin-bottom: 30px;">
-        <h1 style="color: white; font-size: 32px;">ClyxessChat <span style="color:#00ffff;">AI</span></h1>
-        <p style="color: #a1a1aa;">Build Smarter with ClyxessChat AI</p>
+        <h1 style="color: white; font-size: 32px;">Clyxess<span style="color:#00ffff;">AI</span></h1>
+        <p style="color: #a1a1aa;">Learn Smarter with Clyxess AI</p>
     </div>
     """, unsafe_allow_html=True)
 
     # OAuth Buttons
-    if st.button("🔴 Continue with Google", use_container_width=True):
+    if st.button(" Continue with Google", use_container_width=True):
         try:
             r = supabase.auth.sign_in_with_oauth({"provider": "google", "options": {"redirect_to": st.secrets.get("SUPABASE_REDIRECT_URL", "")}})
             if getattr(r, "url", None): 
@@ -2516,7 +2516,7 @@ def render_login_signup():
         except Exception as e: 
             st.error(f"Google login failed: {e}")
 
-    if st.button("🍎 Continue with Apple", use_container_width=True):
+    if st.button(" Continue with Apple", use_container_width=True):
         st.info("Apple login coming soon!")
 
     st.markdown('<div class="divider">─────── OR ───────</div>', unsafe_allow_html=True)
