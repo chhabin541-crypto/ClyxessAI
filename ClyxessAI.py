@@ -2442,64 +2442,39 @@ def load_latest_chat_cloud():
         pass
 
 def render_login_signup():
-    # 🛠️ Imports (Function ke andar)
+    # 🛠️ Imports
     import streamlit as st
     import streamlit.components.v1 as components
     import datetime
+    import urllib.parse
 
     if not supabase:
         st.warning("Add SUPABASE_URL and SUPABASE_KEY to Streamlit secrets.")
         st.stop()
 
-    # 🎨 PREMIUM CSS (Screenshot Jaisa Design)
+    # 🎨 PREMIUM CSS
     st.markdown("""
     <style>
-        /* Main Background & Hide Defaults */
         .stApp { background-color: #050814 !important; }
         header {visibility: hidden;} footer {visibility: hidden;}
-        
-        /* Center the login box */
-        .block-container { 
-            max-width: 420px !important; 
-            padding-top: 4rem !important; 
-        }
-
-        /* Input Fields */
+        .block-container { max-width: 420px !important; padding-top: 3rem !important; }
         .stTextInput input {
-            background-color: #0b0e17 !important;
-            color: white !important;
-            border: 1px solid #1c2538 !important;
-            border-radius: 10px !important;
-            padding: 12px !important;
+            background-color: #0b0e17 !important; color: white !important;
+            border: 1px solid #1c2538 !important; border-radius: 10px !important; padding: 12px !important;
         }
-        .stTextInput input:focus {
-            border-color: #3b82f6 !important;
-            box-shadow: 0 0 0 1px #3b82f6 !important;
-        }
-        
-        /* Divider */
+        .stTextInput input:focus { border-color: #3b82f6 !important; box-shadow: 0 0 0 1px #3b82f6 !important; }
         .divider { display: flex; align-items: center; text-align: center; color: #4b5563; margin: 20px 0; font-size: 13px; font-weight: bold; }
         .divider::before, .divider::after { content: ''; flex: 1; border-bottom: 1px solid #1c2538; }
-        .divider::before { margin-right: 15px; }
-        .divider::after { margin-left: 15px; }
-
-        /* Log In / Sign Up Submit Button (Gradient) */
+        .divider::before { margin-right: 15px; } .divider::after { margin-left: 15px; }
         div[data-testid="stButton"]:has(div:contains("Log In")) button,
         div[data-testid="stButton"]:has(div:contains("Create Account")) button {
             background: linear-gradient(90deg, #3b82f6 0%, #8b5cf6 100%) !important;
-            color: white !important;
-            border: none !important;
-            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4) !important;
-            padding: 10px !important;
-            border-radius: 10px !important;
-            font-weight: 600 !important;
+            color: white !important; border: none !important; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4) !important;
+            padding: 10px !important; border-radius: 10px !important; font-weight: 600 !important;
         }
-        
-        /* Custom Social Buttons */
         .social-btn {
             display: flex; align-items: center; justify-content: center;
-            width: 100%; padding: 10px; border-radius: 10px;
-            font-weight: 600; font-size: 14px; text-decoration: none;
+            width: 100%; padding: 10px; border-radius: 10px; font-weight: 600; font-size: 14px; text-decoration: none;
             margin-bottom: 10px; transition: 0.3s;
         }
         .social-btn img { width: 20px; height: 20px; margin-right: 10px; }
@@ -2510,7 +2485,7 @@ def render_login_signup():
     </style>
     """, unsafe_allow_html=True)
 
-    # 🪄 Jugaad: Google/FB Login ke baad URL se token nikalne ke liye
+    # 🪄 URL Token Catcher
     components.html("""
         <script>
             var hash = window.location.hash;
@@ -2526,11 +2501,12 @@ def render_login_signup():
         </script>
     """, height=0)
 
-    # Agar URL mein token aaya hai, toh login karwao
     if "access_token" in st.query_params:
         try:
-            supabase.auth.set_session(st.query_params["access_token"], st.query_params["refresh_token"])
-            st.session_state.user_email = supabase.auth.get_user().user.email
+            access_token = urllib.parse.unquote(st.query_params["access_token"])
+            refresh_token = urllib.parse.unquote(st.query_params["refresh_token"])
+            supabase.auth.set_session(access_token, refresh_token)
+            st.session_state.user_email = supabase.auth.get_user(access_token).user.email
             st.session_state.logged_in = True
             st.session_state.trial_start = datetime.datetime.now()
             st.session_state.is_paid = False
@@ -2540,49 +2516,38 @@ def render_login_signup():
             st.error(f"Auth Error: {e}")
 
     # ==========================================
-    # 🛑 1. AGAR USER LOGIN NAHI HAI
+    # 🛑 1. LOGIN / SIGNUP UI
     # ==========================================
     if "logged_in" not in st.session_state or not st.session_state.logged_in:
         
-        # Header
         st.markdown("""
         <div style="text-align: center; margin-bottom: 30px;">
-            <h1 style="color: white; font-size: 34px; font-weight: 800; margin-bottom: 5px;">
-                Clyxess <span style="color: #3b82f6;">AI</span>
-            </h1>
-            <p style="color: #9ca3af; font-size: 14px;">
-                Learn future with Clyxess AI school
-            </p>
+            <h1 style="color: white; font-size: 34px; font-weight: 800; margin-bottom: 5px;">Clyxess <span style="color: #3b82f6;">AI</span></h1>
+            <p style="color: #9ca3af; font-size: 14px;">Learn future with Clyxess AI school</p>
         </div>
         """, unsafe_allow_html=True)
         
-        # OAuth URLs Generate Karo
+        # Social Logins
         google_url, fb_url = "", ""
         try:
             r_google = supabase.auth.sign_in_with_oauth({"provider": "google", "options": {"redirect_to": st.secrets.get("SUPABASE_REDIRECT_URL", "")}})
             google_url = r_google.url
-        except Exception as e:
-            st.error(f"Google config error: {e}")
+        except Exception: pass
 
         try:
             r_fb = supabase.auth.sign_in_with_oauth({"provider": "facebook", "options": {"redirect_to": st.secrets.get("SUPABASE_REDIRECT_URL", "")}})
             fb_url = r_fb.url
-        except Exception as e:
-            st.error(f"Facebook config error: {e}")
+        except Exception: pass
 
-        # Custom HTML Buttons with Logos
         st.markdown(f"""
             <a href="{google_url}" target="_self" class="social-btn google-btn">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="G">
-                Continue with Google
+                <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="G"> Continue with Google
             </a>
             <a href="{fb_url}" target="_self" class="social-btn facebook-btn">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/b/b9/2023_Facebook_icon.svg" alt="F">
-                Continue with Facebook
+                <img src="https://upload.wikimedia.org/wikipedia/commons/b/b9/2023_Facebook_icon.svg" alt="F"> Continue with Facebook
             </a>
         """, unsafe_allow_html=True)
 
-        # Divider
         st.markdown('<div class="divider">OR</div>', unsafe_allow_html=True)
 
         tab1,tab2=st.tabs(["Log In","Sign Up"])
@@ -2597,84 +2562,72 @@ def render_login_signup():
                     r=supabase.auth.sign_in_with_password({"email":email,"password":password})
                     st.session_state.user_email=email
                     st.session_state.logged_in = True
-                    
-                    # 👇 24 Ghante ka Trial Start
                     st.session_state.trial_start = datetime.datetime.now()
                     st.session_state.is_paid = False
-                    
-                    try:
-                        load_latest_chat_cloud()
-                    except:
-                        pass
-                        
-                    st.success("Logged in successfully.")
                     st.rerun()
                 except Exception as e: st.error(f"Login failed: {e}")
-                
+            
+            # 👇 FORGOT PASSWORD OPTION YAHAN HAI 👇
+            with st.expander("Forgot Password?"):
+                reset_email = st.text_input("Enter your registered email", key="reset_email")
+                if st.button("Send Reset Link", use_container_width=True):
+                    try:
+                        supabase.auth.reset_password_for_email(reset_email, options={"redirect_to": st.secrets.get("SUPABASE_REDIRECT_URL", "")})
+                        st.success("✅ Password reset link sent to your email!")
+                    except Exception as e:
+                        st.error(f"Error: {e}")
+
         # --- SIGN UP TAB ---
         with tab2:
             name=st.text_input("Name",key="signup_name", placeholder="Your Name", label_visibility="collapsed")
             email=st.text_input("Email",key="signup_email", placeholder="Enter your email", label_visibility="collapsed")
-            password=st.text_input("Password",type="password",key="signup_password", placeholder="Create password", label_visibility="collapsed")
+            password=st.text_input("Password",type="password",key="signup_password", placeholder="Create password (e.g., Test@123)", label_visibility="collapsed")
             
             if st.button("Create Account ➔", use_container_width=True):
                 try:
                     supabase.auth.sign_up({"email":email,"password":password,"options":{"data":{"name":name}}})
-                    st.success("Account created. Confirm email if your Supabase project requires it.")
+                    st.success("✅ Account created. Please Log In.")
                 except Exception as e: st.error(f"Sign up failed: {e}")
                 
-        st.stop() # 🛑 Yahan ruk jayega. Dashboard nahi khulega.
+        st.stop() # 🛑 Login ke bina aage nahi jayega
 
     # ==========================================
-    # 🛑 2. AGAR USER LOGIN HAI PAR 24H TRIAL KHATAM
+    # 🛑 2. TRIAL CHECK & PREMIUM LOCK (₹1499 ONLY)
     # ==========================================
     if not st.session_state.get("is_paid", False):
         if "trial_start" in st.session_state:
             time_passed = datetime.datetime.now() - st.session_state.trial_start
-            if time_passed.total_seconds() >= 86400: # 86400 seconds = 24 hours
+            if time_passed.total_seconds() >= 86400: # 24 Hours
                 
-                st.error("⏳ Aapka 24 Ghante ka Free Trial khatam ho gaya hai! App use karne ke liye plan kharidein.")
+                st.error("⏳ Aapka 24 Ghante ka Free Trial khatam ho gaya hai! Aage use karne ke liye Premium kharidein.")
                 st.markdown("<h2 style='text-align: center; color:white;'>Upgrade to Premium</h2>", unsafe_allow_html=True)
                 
-                c1, c2 = st.columns(2)
-                with c1:
+                # Sirf 1 Plan (₹1499) Center mein
+                col1, col2, col3 = st.columns([1, 2, 1])
+                with col2:
                     st.markdown("""
-                    <div style="background:rgba(255,255,255,0.05); padding:20px; border-radius:10px; text-align:center; border:1px solid #333;">
-                        <h3 style="color:white;">PRO Plan</h3>
-                        <h1 style="color:#3b82f6;">₹949</h1>
+                    <div style="background:rgba(139,92,246,0.1); border:2px solid #8b5cf6; padding:30px; border-radius:15px; text-align:center;">
+                        <h3 style="color:#8b5cf6;">Premium Plan</h3>
+                        <h1 style="color:#8b5cf6; font-size: 40px;">₹1499 <span style="font-size:14px; color:#aaa;">/month</span></h1>
+                        <p style="color:#9ca3af;">100% Full Access to all modules</p>
                     </div>
                     """, unsafe_allow_html=True)
-                    if st.button("Buy PRO ₹949", key="buy_949", use_container_width=True):
-                        launch_razorpay(949, st.session_state.get("user_email", ""))
-
-                with c2:
-                    st.markdown("""
-                    <div style="background:rgba(139,92,246,0.1); border:1px solid #8b5cf6; padding:20px; border-radius:10px; text-align:center;">
-                        <h3 style="color:#8b5cf6;">ELITE Plan</h3>
-                        <h1 style="color:#8b5cf6;">₹1449</h1>
-                    </div>
-                    """, unsafe_allow_html=True)
-                    if st.button("Buy ELITE ₹1449", key="buy_1449", use_container_width=True):
-                        launch_razorpay(1449, st.session_state.get("user_email", ""))
+                    if st.button("Buy Premium ₹1499", key="buy_1499", use_container_width=True, type="primary"):
+                        launch_razorpay(1499, st.session_state.get("user_email", ""))
 
                 # 🛠️ Testing Panel
                 st.write("---")
                 st.write("🛠️ **Testing Panel (Dev Only)**")
-                col_t1, col_t2 = st.columns(2)
-                if col_t1.button("Simulate ₹949 Payment"):
-                    st.session_state.user_plan = "pro"
-                    st.session_state.is_paid = True
-                    st.rerun()
-                if col_t2.button("Simulate ₹1449 Payment"):
-                    st.session_state.user_plan = "elite"
+                if st.button("Simulate ₹1499 Payment (Unlock App)"):
+                    st.session_state.user_plan = "premium"
                     st.session_state.is_paid = True
                     st.rerun()
                     
-                st.stop() # 🛑 Yahan ruk jayega.
+                st.stop() # 🛑 Payment ke bina aage nahi jayega
 
 
 # ==========================================
-# 💳 Razorpay Function (Isko bhi iske theek niche paste kar dena)
+# 💳 Razorpay Function (Isko iske theek niche rakho)
 # ==========================================
 def launch_razorpay(amount, user_email):
     import streamlit.components.v1 as components
@@ -2691,7 +2644,7 @@ def launch_razorpay(amount, user_email):
             "description": "Premium Subscription",
             "prefill": {{ "email": "{user_email}" }},
             "handler": function (response){{ alert("Payment Successful! ID: " + response.razorpay_payment_id); }},
-            "theme": {{ "color": "#3b82f6" }}
+            "theme": {{ "color": "#8b5cf6" }}
         }};
         var rzp1 = new Razorpay(options);
         rzp1.open();
