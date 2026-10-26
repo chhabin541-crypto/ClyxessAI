@@ -2765,7 +2765,571 @@ def render_image_generator():
                     
                 except Exception as e:
                     st.error(f"Explanation Error: {e}")
-    
+def render_coding_lab_mod():
+    import streamlit.components.v1 as components
+    import socket
+
+    def get_best_lan_ip():
+        candidates = []
+        try:
+            hostname = socket.gethostname()
+            for info in socket.getaddrinfo(hostname, None):
+                ip = info[4][0]
+                if ':' not in ip and not ip.startswith('127.'):
+                    candidates.append(ip)
+        except Exception:
+            pass
+        try:
+            s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            s.connect(("8.8.8.8", 80))
+            candidates.append(s.getsockname()[0])
+            s.close()
+        except Exception:
+            pass
+        candidates = list(set(candidates))
+        for ip in candidates:
+            if ip.startswith('192.168.'):
+                return ip, candidates
+        for ip in candidates:
+            if ip.startswith('172.'):
+                parts = ip.split('.')
+                if len(parts) >= 2 and 16 <= int(parts[1]) <= 31:
+                    return ip, candidates
+        for ip in candidates:
+            if ip.startswith('10.'):
+                return ip, candidates
+        return (candidates[0] if candidates else 'localhost'), candidates
+
+    detected_ip, all_ips = get_best_lan_ip()
+
+    with st.expander("⚙️ Network Settings (QR ke liye)", expanded=False):
+        st.caption(f"🔍 Detected: {', '.join(all_ips) if all_ips else 'none'}")
+        user_ip = st.text_input("Laptop ka LAN IP", value=detected_ip)
+        user_port = st.number_input("Port", value=8501, min_value=1000, max_value=9999)
+
+    base_url = f"http://{user_ip}:{user_port}"
+
+    html_code = r'''<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clyxess Kids Coding Lab</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lz-string@1.5.0/libs/lz-string.min.js"></script>
+<style>
+:root{--bg:#08080a;--panel:#121215;--panel2:#18181b;--border:#27272a;--text:#fff;--muted:#71717a;--muted2:#a1a1aa;--accent:#6366f1;--success:#22c55e;--warn:#f59e0b}
+body.light{--bg:#f4f4f7;--panel:#ffffff;--panel2:#f9f9fb;--border:#e4e4e7;--text:#111113;--muted:#71717a;--muted2:#52525b;--accent:#4f46e5}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI',sans-serif;height:100vh;display:flex;flex-direction:column;overflow:hidden;transition:0.3s}
+.top{background:var(--panel);padding:8px 12px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--border);flex-wrap:wrap}
+.logo{font-weight:900;font-size:14px;color:var(--text)}
+.beta{background:#3f3aff;color:#fff;font-size:8px;padding:2px 6px;border-radius:10px;margin-left:4px}
+.sel{background:var(--panel2);color:var(--text);border:1px solid var(--border);padding:6px 10px;border-radius:20px;font-size:11px;cursor:pointer}
+.btn{background:var(--panel2);border:1px solid var(--border);color:var(--text);padding:6px 10px;border-radius:9px;font-size:11px;cursor:pointer;transition:0.2s}
+.btn:hover{border-color:var(--accent);background:var(--accent);color:#fff}
+.btn-icon{background:var(--panel2);border:1px solid var(--border);color:var(--text);width:32px;height:32px;border-radius:50%;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.btn-icon:hover{border-color:var(--accent)}
+.main{display:flex;flex:1;overflow:hidden}
+.left{width:140px;background:var(--panel);border-right:1px solid var(--border);overflow:auto;padding:8px;flex-shrink:0}
+.tt{font-size:9px;color:var(--muted);text-transform:uppercase;margin:10px 0 5px;font-weight:700;letter-spacing:0.5px}
+.age{padding:7px 9px;border-radius:8px;font-size:11px;cursor:pointer;color:var(--muted2);margin-bottom:2px;display:flex;justify-content:space-between;align-items:center;transition:0.15s}
+.age:hover{background:var(--panel2);color:var(--text)}
+.age.active{background:var(--accent);color:#fff;font-weight:700}
+.age.cls{font-size:9px;opacity:0.8;font-weight:600}
+.lang{padding:6px 9px;border-radius:6px;font-size:10px;cursor:pointer;color:var(--muted2);margin-bottom:2px}
+.lang:hover{background:var(--panel2);color:var(--text)}
+.lang.active{background:var(--panel2);color:var(--text);border-left:3px solid var(--accent);font-weight:700}
+.tip-box{margin-top:10px;background:var(--accent);padding:10px;border-radius:10px;font-size:10px;line-height:1.4;color:#fff}
+.center{flex:1;background:var(--panel2);display:flex;flex-direction:column;min-width:0}
+.tabs{display:flex;background:var(--panel);border-bottom:1px solid var(--border)}
+.tab{padding:8px 14px;font-size:11px;color:var(--muted);cursor:pointer;transition:0.2s}
+.tab.active{color:var(--text);background:var(--panel2);border-top:2px solid var(--accent)}
+.editorWrap{flex:1;position:relative;display:flex;flex-direction:column;min-height:0}
+.editor{flex:1;background:var(--panel2);color:var(--text);border:none;padding:14px;font-family:Consolas,monospace;font-size:13px;line-height:1.7;resize:none;outline:none;display:none;min-height:0}
+.editor.active{display:block}
+.toolrow{display:flex;flex-wrap:wrap;gap:4px;padding:6px 8px;background:var(--panel);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.chip{background:var(--panel2);border:1px solid var(--border);color:var(--text);padding:3px 8px;border-radius:6px;font-size:10px;cursor:pointer;font-family:Consolas,monospace}
+.chip:hover{border-color:var(--accent);background:var(--accent);color:#fff}
+.status{padding:5px 10px;background:var(--bg);font-size:10px;color:var(--muted);display:flex;justify-content:space-between}
+.right{width:220px;background:var(--panel);display:flex;flex-direction:column;border-left:1px solid var(--border);flex-shrink:0}
+.rhead{padding:7px 10px;background:var(--panel2);border-bottom:1px solid var(--border);display:flex;justify-content:space-between;font-size:10px}
+.rwrap{flex:1;padding:8px;overflow-y:auto;overflow-x:hidden;background:linear-gradient(135deg,#2a2a35,#1e1e24);display:flex;justify-content:center;align-items:flex-start}
+body.light.rwrap{background:linear-gradient(135deg,#e5e7eb,#d1d5db)}
+.mobileFrame{width:200px;height:400px;background:#000;border-radius:24px;padding:5px;box-shadow:0 15px 40px rgba(0,0,0,0.6);border:2px solid #333;margin:0 auto;flex-shrink:0}
+.mobileFrame.notch{width:60px;height:10px;background:#000;border-radius:20px;margin:0 auto 3px;position:relative;z-index:2}
+#prev{width:100%;height:100%;border:none;background:#fff;border-radius:18px;display:block;overflow:auto}
+#qrBox{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:9999;justify-content:center;align-items:center}
+#qrBox.modal{background:var(--panel);padding:18px;border-radius:16px;text-align:center;width:90%;max-width:360px;border:1px solid var(--border)}
+#qrBox h4{color:var(--text);margin-bottom:10px;font-size:14px}
+#qrCanvas{background:#fff;padding:8px;border-radius:10px;display:inline-block;min-height:200px;min-width:200px}
+.linkRow{display:flex;gap:6px;margin-top:10px;align-items:center}
+#linkInput{flex:1;background:var(--bg);border:1px solid var(--border);color:var(--success);padding:8px;border-radius:6px;font-size:10px;font-family:monospace}
+.smallCopy{background:var(--accent);color:#fff;border:none;padding:8px 12px;border-radius:6px;font-size:10px;cursor:pointer;font-weight:700;white-space:nowrap}
+.smallCopy:hover{background:#4f46e5}
+#qrHint{font-size:10px;color:var(--muted2);margin-top:8px;line-height:1.5;text-align:left;word-break:break-all}
+.modalBtns{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
+.modalBtns button{flex:1;min-width:80px;padding:9px;border-radius:8px;border:none;cursor:pointer;font-weight:700;font-size:11px}
+#robot{position:fixed;bottom:16px;right:16px;width:54px;height:54px;background:linear-gradient(135deg,#6366f1,#8b5cf6);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;cursor:pointer;z-index:9000;box-shadow:0 8px 24px rgba(99,102,241,0.5);animation:bounce 2s infinite}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+#robotChat{display:none;position:fixed;bottom:80px;right:16px;width:290px;background:var(--panel);border:2px solid var(--accent);border-radius:16px;padding:12px;z-index:9001;box-shadow:0 12px 40px rgba(0,0,0,0.5);max-height:380px;overflow:auto}
+#robotChat h4{color:var(--accent);margin-bottom:8px;font-size:12px;display:flex;justify-content:space-between;align-items:center}
+#robotMsg{color:var(--text);font-size:11px;line-height:1.5;background:var(--panel2);padding:10px;border-radius:10px;border-left:3px solid var(--accent)}
+#robotMsg.tip{display:block;margin-bottom:6px;padding-left:6px;border-left:2px solid var(--success)}
+#robotMsg.err{display:block;margin-bottom:6px;padding-left:6px;border-left:2px solid #ef4444;color:#f87171}
+#emojiPanel{display:none;position:fixed;background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:8px;z-index:10000;max-width:280px;box-shadow:0 10px 30px rgba(0,0,0,0.5)}
+#emojiPanel span{font-size:20px;cursor:pointer;padding:3px;display:inline-block;border-radius:4px}
+#emojiPanel span:hover{background:var(--accent)}
+#learnPanel{display:none;position:fixed;inset:0;background:var(--bg);z-index:9500;overflow-y:auto;padding:20px}
+#learnPanel.open{display:block}
+.learnHead{display:flex;justify-content:space-between;align-items:center;max-width:1100px;margin:0 auto 20px;padding:12px 16px;background:var(--panel);border-radius:12px;border:1px solid var(--border)}
+.learnHead h2{margin:0;font-size:18px;color:var(--text)}
+.learnGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;max-width:1100px;margin:0 auto}
+.learnCard{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:14px;transition:0.2s}
+.learnCard:hover{border-color:var(--accent);transform:translateY(-2px)}
+.learnCard h3{color:var(--accent);font-size:14px;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.learnPreview{background:#fff;border-radius:10px;padding:12px;min-height:80px;margin-bottom:10px;color:#111;font-size:13px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:6px;overflow:hidden}
+.learnCode{background:#0a0a0f;color:#a5f3fc;font-family:Consolas,monospace;font-size:11px;padding:10px;border-radius:8px;white-space:pre-wrap;word-break:break-all;max-height:140px;overflow:auto;line-height:1.5;position:relative}
+.learnCode.copyBtn{position:absolute;top:6px;right:6px;background:#6366f1;color:#fff;border:none;padding:3px 8px;border-radius:5px;font-size:9px;cursor:pointer;font-family:Arial}
+.learnCode.copyBtn:hover{background:#4f46e5}
+.learnTip{font-size:11px;color:var(--muted2);margin-top:8px;line-height:1.4}
+body.light.learnCode{background:#1e293b;color:#67e8f9}
+</style>
+</head>
+<body>
+<div class="top">
+<div class="logo">🚀 Clyxess Kids Coding Lab <span class="beta">BETA</span></div>
+<select class="sel" id="ageSelect" onchange="changeAgeBySelect()"></select>
+<select class="sel" id="langSelect" onchange="changeLang()"></select>
+<select class="sel" id="readySelect" onchange="loadReady()">
+<option>📦 Readymade</option>
+<option value="r1">1. My First Page</option>
+<option value="r2">2. My Colour Game</option>
+<option value="r3">3. My Mini Shop</option>
+</select>
+<button class="btn" style="background:#8b5cf6;border-color:#8b5cf6;color:#fff" onclick="openLearn()">📚 Learn</button>
+<button class="btn" onclick="blankPage()">🧹 Blank</button>
+<button class="btn" onclick="downloadCode()">⬇ Download</button>
+<button class="btn" onclick="copyAllCode()">📋 Copy</button>
+<button class="btn" style="border-color:#f59e0b;color:#fbbf24" onclick="openQR()">📱 QR</button>
+<button class="btn-icon" onclick="toggleTheme()" id="themeBtn">🌙</button>
+</div>
+
+<div class="main">
+<div class="left">
+<div class="tt">🎂 Age / Class</div><div id="ageList"></div>
+<div class="tt">💻 Language</div><div id="langList"></div>
+<div class="tip-box"><b id="tipTitle">Tip:</b><br><span id="tipText">Welcome!</span></div>
+</div>
+
+<div class="center">
+<div class="tabs">
+<div class="tab active" onclick="switchTab('html',this)">📄 index.html</div>
+<div class="tab" onclick="switchTab('css',this)">🎨 style.css</div>
+<div class="tab" onclick="switchTab('js',this)">⚡ script.js</div>
+</div>
+<div class="editorWrap">
+<textarea class="editor active" id="editorHTML" placeholder="HTML yahan likho..."></textarea>
+<textarea class="editor" id="editorCSS" placeholder="CSS yahan likho..."></textarea>
+<textarea class="editor" id="editorJS" placeholder="JavaScript yahan likho..."></textarea>
+</div>
+<div class="toolrow">
+<span class="chip" onclick="insertTag('h1')">&lt;h1&gt;</span>
+<span class="chip" onclick="insertTag('p')">&lt;p&gt;</span>
+<span class="chip" onclick="insertTag('div')">&lt;div&gt;</span>
+<span class="chip" onclick="insertTag('img')">&lt;img&gt;</span>
+<span class="chip" onclick="insertTag('button')">&lt;button&gt;</span>
+<span class="chip" onclick="insertTag('a')">&lt;a&gt;</span>
+<span class="chip" onclick="insertTag('ul')">&lt;ul&gt;</span>
+<span class="chip" onclick="insertTag('br')">&lt;br&gt;</span>
+<span class="chip" onclick="openEmojiPicker(event)">😊 Emoji</span>
+</div>
+<div class="status"><span>✅ Auto-save + Auto-Run ON</span><span id="status">Ready</span></div>
+</div>
+
+<div class="right">
+<div class="rhead"><span>👁 Live Preview</span><span style="color:var(--success)">● Live</span></div>
+<div class="rwrap">
+<div class="mobileFrame">
+<div class="notch"></div>
+<iframe id="prev" scrolling="yes"></iframe>
+</div>
+</div>
+</div>
+</div>
+
+<div id="learnPanel">
+<div class="learnHead">
+<h2>📚 Learn Coding — Ek Ek Cheez Seekho!</h2>
+<button class="btn" style="background:#ef4444;border-color:#ef4444;color:#fff" onclick="closeLearn()">✕ Close</button>
+</div>
+<div class="learnGrid" id="learnGrid"></div>
+</div>
+
+<div id="qrBox"><div class="modal">
+<h4>📱 Mobile me dekho (QR Scan)</h4>
+<div id="qrCanvas"></div>
+<div class="linkRow">
+<input id="linkInput" readonly placeholder="Link yahan ayega...">
+<button class="smallCopy" onclick="copyLink()">📋 Copy</button>
+</div>
+<div id="qrHint"></div>
+<div class="modalBtns">
+<button onclick="newQR()" style="background:#f59e0b;color:#fff">🔄 New QR</button>
+<button onclick="closeQR()" style="background:var(--panel2);color:var(--text);border:1px solid var(--border)">✕ Close</button>
+</div>
+</div></div>
+
+<div id="emojiPanel"></div>
+<div id="robot" onclick="toggleRobot()">🤖</div>
+<div id="robotChat">
+<h4>Coding Help <span onclick="toggleRobot()" style="cursor:pointer">✕</span></h4>
+<div id="robotMsg">Namaste! Code likho, main check karta hoon! 😊</div>
+</div>
+
+<script>
+const CLS_MAP={"5 Years":"Class 1","6 Years":"Class 1","7 Years":"Class 2","8 Years":"Class 3","9 Years":"Class 4","10 Years":"Class 5","11-12 Years":"Class 6-7","13-14 Years":"Class 8-9","15-16 Years":"Class 10","17-18 Years":"Class 11-12","18+ Years":"College"};
+const LEARN_CARDS = [
+  {title:"📝 Heading (H1)", preview:`<h1 style="font-size:28px;color:#dc2626;margin:0">Hello Duniya!</h1>`, code:`<h1>Hello Duniya!</h1>`, tip:"Bada title ke liye <h1> use karo."},
+  {title:"📄 Paragraph", preview:`<p style="margin:0;color:#333">Main 5 saal ka hu aur mujhe coding pasand hai!</p>`, code:`<p>Yahan apni baat likho...</p>`, tip:"Text ke liye <p> use karo."},
+  {title:"🎨 Color", preview:`<span style="color:#2563eb;font-weight:bold">Mera favourite color BLUE hai</span>`, code:`<p style="color:blue">Mera favourite color BLUE hai</p>`, tip:"blue ki jagah red, green try karo!"},
+  {title:"🔘 Button", preview:`<button style="padding:10px 20px;background:#f59e0b;color:#fff;border:none;border-radius:10px;font-weight:bold">Mujhe Dabao!</button>`, code:`<button>Mujhe Dabao!</button>`, tip:"Button ke liye <button> use karo."},
+  {title:"🖼️ Image", preview:`<img src="https://cdn-icons-png.flaticon.com/512/616/616408.png" width="70">`, code:`<img src="IMAGE-LINK" width="100">`, tip:"Image ke liye <img> use karo."},
+  {title:"🔗 Link", preview:`<a href="#" style="color:#6366f1;text-decoration:underline">Click Karo</a>`, code:`<a href="https://google.com">Google</a>`, tip:"Link ke liye <a href='...'> use karo."},
+  {title:"📋 List", preview:`<ul style="margin:0;padding-left:20px;color:#333"><li>Class 1 - Drawing</li><li>Class 2 - Coding</li></ul>`, code:`<ul>\n <li>Class 1 - Drawing</li>\n <li>Class 2 - Coding</li>\n</ul>`, tip:"List ke liye <ul> aur <li> use karo."},
+  {title:"📊 Slider", preview:`<input type="range" min="0" max="100" value="50" style="width:150px">`, code:`<input type="range" min="0" max="100">`, tip:"Slider ke liye input type='range' likho."},
+  {title:"✍️ Input Box", preview:`<input type="text" placeholder="Naam..." style="padding:8px;border-radius:6px;border:1px solid #ccc">`, code:`<input type="text" placeholder="Naam likho...">`, tip:"Input ke liye input type='text' use karo."},
+  {title:"🎯 Alert", preview:`<button onclick="alert('Wah! 🌟')" style="padding:8px 16px;background:#22c55e;color:#fff;border:none;border-radius:8px">Click Karo</button>`, code:`<button onclick="alert('Wah!')">Click Karo</button>`, tip:"onclick='alert(...)' se click pe popup aata hai."},
+  {title:"🖍️ Background Color", preview:`<div style="background:#fef9c3;padding:15px;border-radius:10px;color:#333;width:100%;text-align:center">Rangila Box!</div>`, code:`<div style="background:#fef9c3;padding:15px">Rangila Box!</div>`, tip:"background: color se box rangila hota hai."},
+  {title:"⬛ Box Border", preview:`<div style="border:3px solid #dc2626;padding:12px;border-radius:10px;color:#333;width:100%;text-align:center">Mera Box</div>`, code:`<div style="border:3px solid red;padding:12px">Mera Box</div>`, tip:"border: 3px solid red se border aata hai."},
+  {title:"🎬 Emoji", preview:`<div style="font-size:30px">😀 🚀 ❤️ 🌟 🎉</div>`, code:`😀 🚀 ❤️ 🌟 🎉`, tip:"Emoji seedha code me likho!"},
+  {title:"🖼️ Circle Image", preview:`<img src="https://cdn-icons-png.flaticon.com/512/616/616408.png" width="70" style="border-radius:50%">`, code:`<img src="LINK" style="border-radius:50%">`, tip:"border-radius:50% se gol image banti hai."},
+  {title:"📐 Center Text", preview:`<div style="text-align:center;color:#333">Yeh Center Me Hai</div>`, code:`<div style="text-align:center">Yeh Center Me Hai</div>`, tip:"text-align:center se text center aata hai."},
+  {title:"🎮 Score Game", preview:`<div style="text-align:center"><p style="margin:0;color:#333">Score: <b id="demoScore">0</b></p><button onclick="document.getElementById('demoScore').innerText++" style="padding:6px 12px;background:#f59e0b;color:#fff;border:none;border-radius:6px">+1</button></div>`, code:`<p>Score: <span id="s">0</span></p>\n<button onclick="document.getElementById('s').innerText++">+1</button>`, tip:"Click pe score badhao!"},
+  {title:"🌈 Gradient", preview:`<div style="background:linear-gradient(135deg,#667eea,#764ba2);padding:15px;color:#fff;border-radius:10px;width:100%;text-align:center">Gradient!</div>`, code:`<div style="background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;padding:15px">Gradient!</div>`, tip:"2 rang mix karne ke liye gradient use karo."},
+  {title:"💬 Flex Box", preview:`<div style="display:flex;gap:8px"><div style="background:#333;color:#fff;padding:8px;border-radius:8px">Side</div><div style="background:#eee;color:#333;padding:8px;border-radius:8px;flex:1">Main</div></div>`, code:`<div style="display:flex">\n <div>Side</div>\n <div>Main</div>\n</div>`, tip:"display:flex se side-by-side boxes bante hain."}
+];
+
+const ageTemplates={
+"5 Years":{html:`<h1>👋 Hello! Mera Naam Aman Hai</h1>\n<p>Main 5 saal ka hu!</p>\n<h2 style="color:blue">Mera favourite color BLUE hai</h2>\n<button onclick="alert('Wah! 🌟')">Mujhe Dabao!</button>`,css:`body{text-align:center;padding:30px;background:#fef9c3;font-family:Comic Sans MS;margin:0}\nh1{background:#fff;padding:15px;border-radius:15px}\nbutton{padding:15px 30px;background:orange;color:#fff;border:none;border-radius:20px;font-size:16px}`,js:`// Sirf click karo!`,tipTitle:"5 Years Tip:",tipText:"Apna naam likho. Blue ko RED karo!"},
+"6 Years":{html:`<h1>🔤 ABCD</h1>\n<div class="box">A for Apple 🍎</div>\n<div class="box">B for Ball ⚽</div>\n<button onclick="this.innerText='Shabash! 🌟'">Click Karo</button>`,css:`body{text-align:center;padding:20px;background:#dcfce7;margin:0}\n.box{background:#fff;margin:10px;padding:15px;border-radius:15px;font-size:20px}\nbutton{padding:10px 20px;background:#6366f1;color:#fff;border:none;border-radius:10px}`,js:`// Kuch nahi`,tipTitle:"6 Years Tip:",tipText:"Apna fruit likho!"},
+"7 Years":{html:`<h1>🎨 Colour Game</h1>\n<p>Rang pe click karo!</p>\n<div class="row">\n<div onclick="document.body.style.background='lightcoral'" class="c" style="background:red"></div>\n<div onclick="document.body.style.background='lightblue'" class="c" style="background:blue"></div>\n<div onclick="document.body.style.background='lightgreen'" class="c" style="background:green"></div>\n</div>`,css:`body{text-align:center;padding:30px;transition:0.5s;margin:0}\n.row{display:flex;gap:10px;justify-content:center}\n.c{width:60px;height:60px;border-radius:15px;cursor:pointer}`,js:`// Rang click karo!`,tipTitle:"7 Years Tip:",tipText:"Apne colors add karo!"},
+"8 Years":{html:`<h1>🐶 My Pet Dog</h1>\n<img src="https://cdn-icons-png.flaticon.com/512/616/616408.png" width="100">\n<p>Naam Tommy hai!</p>\n<button onclick="alert('Bhow Bhow! 🐶')">Bulao</button>`,css:`body{text-align:center;padding:20px;background:#ffedd5;margin:0}\nbutton{padding:10px 20px;background:#f59e0b;color:#fff;border:none;border-radius:10px}`,js:`// Alert dabao!`,tipTitle:"8 Years Tip:",tipText:"Cat ka photo try karo!"},
+"9 Years":{html:`<h1>🏫 Meri School</h1>\n<ul>\n<li>Class 1 - Drawing 🎨</li>\n<li>Class 2 - ABCD 🔤</li>\n<li>Class 3 - Coding 💻</li>\n</ul>`,css:`body{padding:20px;background:#e0f2fe;margin:0;font-family:Arial}\nul{background:#fff;padding:20px 40px;border-radius:15px;max-width:300px}\nli{padding:5px 0;font-size:16px}`,js:`// List banao!`,tipTitle:"9 Years Tip:",tipText:"Apni school list banao!"},
+"10 Years":{html:`<h1>🎮 Click Game</h1>\n<p>Score: <span id="sc">0</span></p>\n<button onclick="incScore()">CLICK KARO!</button>`,css:`body{text-align:center;padding:40px;background:#fef3c7;margin:0}\nbutton{padding:20px 40px;background:#f59e0b;color:#fff;border:none;border-radius:15px;font-size:20px}\n#sc{font-weight:900;color:#dc2626;font-size:24px}`,js:`function incScore(){document.getElementById('sc').innerText++;}`,tipTitle:"10 Years Tip:",tipText:"Logic samjho!"},
+"11-12 Years":{html:`<div class="card">\n<h1>👨‍💻 Hi, I am Coder Rohan</h1>\n<p>Age 12 | I make websites</p>\n<div class="skills">My Skills: HTML, CSS, JS</div>\n<button onclick="alert('Contact me!')">Hire Me</button>\n</div>`,css:`body{background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;margin:0;padding:40px;text-align:center}\n.card{background:rgba(255,255,255,0.1);padding:30px;border-radius:20px;max-width:320px;margin:auto}\n.skills{background:#fff;color:#000;padding:15px;border-radius:15px;margin-top:15px}\nbutton{margin-top:15px;padding:10px 20px;border-radius:20px;border:none;background:#6366f1;color:#fff;cursor:pointer}`,js:`// Portfolio banao!`,tipTitle:"11-12 Tip:",tipText:"Apna portfolio banao!"},
+"13-14 Years":{html:`<h1>🧮 Calculator</h1>\n<input id="n1" type="number" placeholder="N1">\n<input id="n2" type="number" placeholder="N2">\n<br><br>\n<button onclick="add()">Jodo (+)</button>\n<button onclick="mul()">Guna (x)</button>\n<p>Result: <span id="res">-</span></p>`,css:`body{text-align:center;padding:30px;margin:0;font-family:Arial}\ninput{padding:10px;border-radius:8px;border:2px solid #ddd;font-size:16px;width:120px}\nbutton{padding:10px 20px;background:#16a34a;color:#fff;border:none;border-radius:8px;margin:4px;cursor:pointer;font-size:16px}\n#res{font-weight:900;color:#16a34a;font-size:22px}`,js:`function add(){document.getElementById('res').innerText=Number(n1.value)+Number(n2.value);}\nfunction mul(){document.getElementById('res').innerText=Number(n1.value)*Number(n2.value);}`,tipTitle:"13-14 Tip:",tipText:"Minus, divide add karo!"},
+"15-16 Years":{html:`<header class="head"><b>🛒 FreshCart</b><span>Home | Cart</span></header>\n<div class="hero">\n<h1>Groceries<br><span class="green">Delivered Fast</span></h1>\n<p>30 min me delivery!</p>\n<button>Shop Now 🛒</button>\n</div>`,css:`body{margin:0;background:#f0fdf4;font-family:sans-serif}\n.head{background:#fff;padding:15px;display:flex;justify-content:space-between;box-shadow:0 2px 10px #0001}\n.head b{color:#16a34a;font-size:22px}\n.hero{padding:30px}\n.hero h1{font-size:38px;margin-bottom:8px}\n.green{color:#16a34a}\n.hero button{background:#16a34a;color:#fff;padding:12px 24px;border:none;border-radius:8px;cursor:pointer;font-size:16px}`,js:`// Pro shop!`,tipTitle:"15-16 Tip:",tipText:"Color, text change karo!"},
+"17-18 Years":{html:`<div class="chat">\n<h1>💬 Chat App</h1>\n<div class="bubble left">Hi! Kaisa laga? 😊</div>\n<div class="bubble right">Solid hai! 🔥</div>\n<input placeholder="Message...">\n</div>`,css:`body{background:#f3f4f6;padding:20px;font-family:Arial;margin:0}\n.chat{max-width:340px;margin:auto;background:#fff;border-radius:15px;padding:15px}\n.bubble{padding:10px;border-radius:10px;margin:6px 0;max-width:75%}\n.left{background:#e0e7ff}\n.right{background:#dcfce7;margin-left:auto}\ninput{width:100%;padding:10px;border-radius:20px;border:1px solid #ddd;margin-top:10px;box-sizing:border-box}`,js:`// Real chat banao!`,tipTitle:"17-18 Tip:",tipText:"JS se connect karo!"},
+"18+ Years":{html:`<!DOCTYPE html>\n<html><head><title>My Pro Website</title></head><body>\n<h1>🚀 Pro Coder</h1>\n<p>Full website khud likho!</p>\n<button onclick="alert('Pro!')">Click</button>\n</body></html>`,css:`body{padding:20px;font-family:Arial;margin:0}`,js:`// Full stack!`,tipTitle:"18+ Tip:",tipText:"React, Node try karo!"}
+};
+
+const readyMade={
+r1:{html:`<h1>🌟 My First Page</h1>\n<p>Naam <b style="color:blue">Aman</b> hai</p>\n<button onclick="alert('Hi!')">Hello</button>`,css:`body{text-align:center;padding:30px;background:#fef9c3;margin:0}\nbutton{padding:12px 20px;background:orange;border:none;border-radius:20px;color:#fff}`,js:`// First page!`},
+r2:{html:`<h1>🎨 Colour Game</h1>\n<div class="row">\n<div onclick="document.body.style.background='pink'" class="c" style="background:red"></div>\n<div onclick="document.body.style.background='lightblue'" class="c" style="background:blue"></div>\n<div onclick="document.body.style.background='lightgreen'" class="c" style="background:green"></div>\n</div>`,css:`body{text-align:center;padding:30px;transition:0.5s;margin:0}\n.row{display:flex;gap:10px;justify-content:center}\n.c{width:60px;height:60px;border-radius:50%;cursor:pointer}`,js:`// Colours!`},
+r3:{html:`<header class="head"><b>🛒 Mini Shop</b><span>Cart</span></header>\n<div class="cont">\n<h2>Toys - 50% OFF!</h2>\n<div class="card"><p>🧸 Teddy - ₹299</p><button>Buy</button></div>\n</div>`,css:`body{margin:0;background:#f0fdf4;font-family:Arial}\n.head{background:#fff;padding:12px;display:flex;justify-content:space-between;box-shadow:0 2px 8px #0001}\n.cont{padding:20px}\n.card{background:#fff;padding:15px;border-radius:12px;max-width:280px}\n.card button{background:#16a34a;color:#fff;padding:8px 16px;border:none;border-radius:8px;cursor:pointer}`,js:`// Shop!`}
+};
+
+const LANGUAGES=["HTML","CSS","JavaScript","Python","Java","C","C++","C#","PHP","Ruby","Go","Rust","Swift","Kotlin","TypeScript","SQL","Scratch (Block)","Block Coding","R","MATLAB"];
+const ages=Object.keys(ageTemplates);
+document.getElementById('ageList').innerHTML=ages.map((a,i)=>`<div class="age ${i===0?'active':''}" onclick="selectAge('${a}',this)"><span>${a}</span><span class="cls">${CLS_MAP[a]||''}</span></div>`).join('');
+document.getElementById('ageSelect').innerHTML='<option>Select Age</option>'+ages.map(a=>`<option value="${a}">${a} (${CLS_MAP[a]||''})</option>`).join('');
+document.getElementById('langList').innerHTML=LANGUAGES.slice(0,9).map((l,i)=>`<div class="lang ${i===0?'active':''}" onclick="selectLang('${l}',this)">${l}</div>`).join('');
+document.getElementById('langSelect').innerHTML=LANGUAGES.map(l=>`<option>${l}</option>`).join('');
+
+let currentTab='html';
+let currentAge='5 Years';
+
+function switchTab(tab,el){
+  currentTab=tab;
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  document.querySelectorAll('.editor').forEach(e=>e.classList.remove('active'));
+  const map={html:'editorHTML',css:'editorCSS',js:'editorJS'};
+  document.getElementById(map[tab]).classList.add('active');
+}
+function selectAge(age,el){
+  document.querySelectorAll('.age').forEach(x=>x.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('ageSelect').value=age;
+  currentAge=age;
+  applyAge(age);
+}
+function changeAgeBySelect(){
+  const age=document.getElementById('ageSelect').value;
+  if(!ageTemplates[age]) return;
+  currentAge=age;
+  document.querySelectorAll('.age').forEach(x=>{
+    if(x.querySelector('span').innerText===age) x.classList.add('active');
+    else x.classList.remove('active');
+  });
+  applyAge(age);
+}
+function applyAge(age){
+  const d=ageTemplates[age];
+  document.getElementById('editorHTML').value=d.html;
+  document.getElementById('editorCSS').value=d.css;
+  document.getElementById('editorJS').value=d.js||'';
+  document.getElementById('tipTitle').innerText=d.tipTitle;
+  document.getElementById('tipText').innerText=d.tipText;
+  document.getElementById('status').innerText='Ready - '+age+' ('+(CLS_MAP[age]||'')+')';
+  run();
+}
+function selectLang(lang,el){
+  document.querySelectorAll('.lang').forEach(x=>x.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('langSelect').value=lang;
+  showLangTip(lang);
+}
+function changeLang(){
+  const lang=document.getElementById('langSelect').value;
+  showLangTip(lang);
+}
+function showLangTip(lang){
+  document.getElementById('tipTitle').innerText=lang+' Tip:';
+  const tips={'HTML':'Structure - <h1>, <p>, <div>','CSS':'Rang do - color, background','JavaScript':'Magic - click, alert','Python':'print("Hello")','Java':'public class Main','C':'Boss of languages','C++':'C + objects','C#':'Windows + games','PHP':'Backend','Ruby':'Simple + friendly','Go':'Fast - Google','Rust':'Safe + fast','Swift':'Apple apps','Kotlin':'Android apps','TypeScript':'JS + types','SQL':'Database','Scratch (Block)':'Blocks - kids','Block Coding':'No typing','R':'Data science','MATLAB':'Engineering'};
+  document.getElementById('tipText').innerText=tips[lang]||'Try karo!';
+}
+function insertTag(tag){
+  const map={html:'editorHTML',css:'editorCSS',js:'editorJS'};
+  const editor=document.getElementById(map[currentTab]);
+  const start=editor.selectionStart;
+  let snippet='';
+  if(tag==='br') snippet='<br>';
+  else if(tag==='img') snippet='<img src="https://via.placeholder.com/100">';
+  else if(tag==='a') snippet='<a href="#">Link</a>';
+  else snippet='<'+tag+'>Yahan likho</'+tag+'>';
+  editor.value=editor.value.substring(0,start)+snippet+editor.value.substring(editor.selectionEnd);
+  editor.focus();
+  editor.selectionStart=editor.selectionEnd=start+snippet.length;
+  run();
+}
+const EMOJIS=['😀','😃','😄','😁','😊','🥰','😍','🤩','😎','🤔','😂','🥳','👍','👎','❤️','🔥','⭐','✨','🌟','💫','🎉','🎊','🎈','🎁','🐶','🐱','🐭','🐹','🐰','🦊','🐻','🐼','🍎','🍌','🍕','🍔','🌞','🌙','⭐','☁️','🌈','⚡','💻','📱','🎮','🚀','✈️','🏀','⚽','🎨','📚'];
+function openEmojiPicker(e){
+  e.stopPropagation();
+  const panel=document.getElementById('emojiPanel');
+  panel.innerHTML=EMOJIS.map(em=>`<span onclick="insertEmoji('${em}');closeEmoji()">${em}</span>`).join('');
+  panel.style.display='block';
+  panel.style.left=Math.min(e.clientX, window.innerWidth-300)+'px';
+  panel.style.top=(e.clientY-220)+'px';
+}
+function closeEmoji(){document.getElementById('emojiPanel').style.display='none';}
+document.addEventListener('click',function(e){
+  if(!e.target.closest('#emojiPanel') &&!e.target.closest('.chip')) closeEmoji();
+});
+function insertEmoji(em){
+  const map={html:'editorHTML',css:'editorCSS',js:'editorJS'};
+  const editor=document.getElementById(map[currentTab]);
+  const start=editor.selectionStart;
+  editor.value=editor.value.substring(0,start)+em+editor.value.substring(editor.selectionEnd);
+  editor.focus();
+  editor.selectionStart=editor.selectionEnd=start+em.length;
+  run();
+}
+function loadReady(){
+  const v=document.getElementById('readySelect').value;
+  if(!readyMade[v]) return;
+  const d=readyMade[v];
+  document.getElementById('editorHTML').value=d.html;
+  document.getElementById('editorCSS').value=d.css;
+  document.getElementById('editorJS').value=d.js||'';
+  run();
+}
+function blankPage(){
+  if(confirm('Blank karna hai?')){
+    document.getElementById('editorHTML').value='<h1>Hello World!</h1>\n<p>Naya code likho...</p>';
+    document.getElementById('editorCSS').value='body{padding:20px;font-family:Arial}';
+    document.getElementById('editorJS').value='';
+    run();
+  }
+}
+function buildFullHTML(){
+  const html=document.getElementById('editorHTML').value;
+  const css=document.getElementById('editorCSS').value;
+  const js=document.getElementById('editorJS').value;
+  if(html.includes('<html')||html.includes('<!DOCTYPE')){
+    return html + '\n<style>\n'+css+'\n</style>\n<script>\n'+js+'\n<\/script>';
+  }
+  return '<!DOCTYPE html>\n<html><head>\n<meta charset="UTF-8">\n<style>\n'+css+'\n</style>\n</head><body>\n'+html+'\n<script>\n'+js+'\n<\/script>\n</body></html>';
+}
+function run(){
+  const code=buildFullHTML();
+  document.getElementById('prev').srcdoc=code;
+  localStorage.setItem('clyxess_code',code);
+  analyzeCode();
+}
+function analyzeCode(){
+  const html=document.getElementById('editorHTML').value;
+  const css=document.getElementById('editorCSS').value;
+  const js=document.getElementById('editorJS').value;
+  let issues=[];
+  const openTags=(html.match(/<([a-z][a-z0-9]*)\b[^>]*>/gi)||[]).filter(t=>!/\/>|<br|<img|<input|<meta|<link|<hr/i.test(t));
+  const closeTags=(html.match(/<\/([a-z][a-z0-9]*)>/gi)||[]);
+  if(openTags.length!==closeTags.length) issues.push('Kuch tag band nahi hue - closing tag check karo');
+  const openB=(js.match(/{/g)||[]).length;
+  const closeB=(js.match(/}/g)||[]).length;
+  if(openB!==closeB) issues.push('JavaScript me { } balance galat');
+  const openP=(css.match(/{/g)||[]).length;
+  const closeP=(css.match(/}/g)||[]).length;
+  if(openP!==closeP) issues.push('CSS me { } balance galat');
+  const msg=document.getElementById('robotMsg');
+  if(issues.length===0){
+    msg.innerHTML='<span class="tip">✅ Code sahi hai! Shabash!</span>Color, text, image change karke try karo! 🌟';
+  } else {
+    msg.innerHTML=issues.map(i=>`<span class="err">⚠️ ${i}</span>`).join('')+'<span class="tip">💡 Har &lt;tag&gt; ka &lt;/tag&gt; hona chahiye!</span>';
+  }
+}
+function downloadCode(){
+  const blob=new Blob([buildFullHTML()],{type:'text/html'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='Clyxess-'+Date.now()+'.html';
+  a.click();
+}
+function copyAllCode(){
+  const code='HTML:\n'+document.getElementById('editorHTML').value+'\n\nCSS:\n'+document.getElementById('editorCSS').value+'\n\nJS:\n'+document.getElementById('editorJS').value;
+  navigator.clipboard.writeText(code).then(()=>alert('✅ Code copy ho gaya!'));
+}
+
+// ============ QR — FINAL FIX — PUBLIC URL + SMALL QR + RANDOM ALPHABET ============
+function openQR(){
+  document.getElementById('qrBox').style.display='flex';
+  newQR();
+}
+function newQR(){
+  run();
+  const box=document.getElementById('qrCanvas');
+  const linkInput=document.getElementById('linkInput');
+  const hint=document.getElementById('qrHint');
+  box.innerHTML='<p style="padding:20px;color:#666;font-size:12px">⏳ QR ban raha hai...</p>';
+  linkInput.value='Generating...';
+  hint.innerHTML='';
+
+  const code=buildFullHTML();
+  let compressed;
+  try{ compressed = LZString.compressToEncodedURIComponent(code); }
+  catch(e){ compressed = encodeURIComponent(code); }
+
+  let publicBase = "https://clyxessai-hyxke8fceedptrtgbhq4sx.streamlit.app";
+  try{
+    let origin = window.location.origin;
+    if(origin && origin.startsWith("https://")) publicBase = origin;
+    let pOrigin = "";
+    try{ pOrigin = window.parent.location.origin; }catch(e){}
+    if(pOrigin && pOrigin.startsWith("https://")) publicBase = pOrigin;
+  }catch(e){}
+
+  const randomId = Math.random().toString(36).substring(2,8);
+  let shareUrl = publicBase + "/?r=" + randomId + "&c=" + compressed;
+
+  if(compressed.length > 1800){
+    box.innerHTML='<div style="padding:20px;color:#f59e0b;font-size:12px;text-align:center">⚠️ Code thoda bada hai<br>Image hatao ya CSS chhota karo phir New QR dabao</div>';
+    linkInput.value='Code bada hai - chhota karo';
+    hint.innerHTML='';
+    return;
+  }
+
+  box.innerHTML='';
+  new QRCode(box, {
+    text: shareUrl,
+    width: 200,
+    height: 200,
+    correctLevel: QRCode.CorrectLevel.M
+  });
+
+  linkInput.value = shareUrl;
+  hint.innerHTML = '✅ Naya Link: ' + randomId + ' | Kisi bhi Mobile / Jio / WiFi pe khulega';
+}
+function copyLink(){
+  const linkInput=document.getElementById('linkInput');
+  const fullLink=linkInput.value;
+  if(!fullLink||fullLink.includes('Generating')||fullLink.includes('bada hai')){
+    alert('Pehle New QR generate hone do!');
+    return;
+  }
+  navigator.clipboard.writeText(fullLink).then(()=>alert('✅ Link Copy ho gaya!'));
+}
+function closeQR(){ document.getElementById('qrBox').style.display='none'; }
+
+function openLearn(){
+  const grid=document.getElementById('learnGrid');
+  grid.innerHTML=LEARN_CARDS.map((c,i)=>`
+    <div class="learnCard">
+      <h3>${c.title}</h3>
+      <div class="learnPreview">${c.preview}</div>
+      <div class="learnCode">
+        <button class="copyBtn" onclick="copyLearnCode(${i},event)">📋 Copy</button>
+        ${escapeHtml(c.code)}
+      </div>
+      <div class="learnTip">💡 ${c.tip}</div>
+    </div>
+  `).join('');
+  document.getElementById('learnPanel').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeLearn(){
+  document.getElementById('learnPanel').classList.remove('open');
+  document.body.style.overflow='hidden';
+}
+function copyLearnCode(idx,ev){
+  ev.stopPropagation();
+  navigator.clipboard.writeText(LEARN_CARDS[idx].code).then(()=>{
+    ev.target.innerText='✅ Copied!';
+    setTimeout(()=>ev.target.innerText='📋 Copy',1500);
+  });
+}
+function escapeHtml(s){
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+function toggleTheme(){
+  document.body.classList.toggle('light');
+  document.getElementById('themeBtn').innerText=document.body.classList.contains('light')?'☀️':'🌙';
+}
+function toggleRobot(){
+  const chat=document.getElementById('robotChat');
+  chat.style.display=chat.style.display==='block'?'none':'block';
+}
+let timer;
+['editorHTML','editorCSS','editorJS'].forEach(id=>{
+  document.getElementById(id).addEventListener('input',()=>{
+    clearTimeout(timer);
+    timer=setTimeout(run,500);
+  });
+});
+applyAge('5 Years');
+
+(function checkSharedPreview(){
+  try {
+    let url = '';
+    try{ url = window.location.href || ''; }catch(e){}
+    if(!url){ try{ url = window.parent.location.href || ''; }catch(e){} }
+    if(!url) return;
+    const params = new URLSearchParams(window.location.search);
+    let c = params.get('c');
+    if(!c){
+      const match = url.match(/[?&]c=([^&#]+)/);
+      if(match) c = match[1];
+    }
+    if(!c) return;
+    let decoded = null;
+    try{ decoded = LZString.decompressFromEncodedURIComponent(decodeURIComponent(c)); }catch(e){}
+    if(!decoded) return;
+    document.body.innerHTML='';
+    document.body.style.cssText='margin:0;padding:0;overflow:hidden;background:#fff';
+    const frame=document.createElement('iframe');
+    frame.style.cssText='position:fixed;inset:0;width:100vw;height:100vh;border:none;background:#fff';
+    frame.setAttribute('sandbox','allow-scripts allow-same-origin allow-modals allow-forms allow-popups');
+    frame.srcdoc=decoded;
+    document.body.appendChild(frame);
+  }catch(e){}
+})();
+</script>
+</body>
+</html>
+'''
+    html_code = html_code.replace("__BASE_URL__", base_url)
+    components.html(html_code, height=950, scrolling=False)    
     
 def render_vision_lab():
     import streamlit as st
