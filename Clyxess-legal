@@ -1,1 +1,17 @@
-
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Privacy Policy - Clyxess AI</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 40px; max-width: 800px; margin: auto; line-height: 1.6; color: #333; }
+        h1 { color: #3b82f6; }
+    </style>
+</head>
+<body>
+    <h1>Privacy Policy for Clyxess AI</h1>
+    <p><strong>Last updated:</strong> October 2024</p>
+    <p>Clyxess AI operates the Clyxess AI School application. We collect your email address and basic profile information when you log in using Google or Facebook, solely for authentication and personalized learning.</p>
+    <p>We use industry-standard authentication (Supabase) to protect your data. We do not sell your personal data to third parties.</p>
+    <p>For any queries, contact us at: <strong>chhabin541@gmail.com</strong></p>
+</body>
+</html>
