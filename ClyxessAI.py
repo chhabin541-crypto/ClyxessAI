@@ -2511,6 +2511,7 @@ def render_login_signup():
             st.session_state.trial_start = datetime.datetime.now()
             st.session_state.is_paid = False
             st.query_params.clear()
+            st.toast("Welcome back! Login successful.", icon="👋")
             st.rerun()
         except Exception as e:
             st.error(f"Auth Error: {e}")
@@ -2558,22 +2559,25 @@ def render_login_signup():
             password=st.text_input("Password",type="password",key="login_password", placeholder="Enter password", label_visibility="collapsed")
             
             if st.button("Log In ➔", type="primary", use_container_width=True):
-                try:
-                    r=supabase.auth.sign_in_with_password({"email":email,"password":password})
-                    st.session_state.user_email=email
-                    st.session_state.logged_in = True
-                    st.session_state.trial_start = datetime.datetime.now()
-                    st.session_state.is_paid = False
-                    st.rerun()
-                except Exception as e: st.error(f"Login failed: {e}")
+                with st.spinner("Logging you in..."):
+                    try:
+                        r=supabase.auth.sign_in_with_password({"email":email,"password":password})
+                        st.session_state.user_email=email
+                        st.session_state.logged_in = True
+                        st.session_state.trial_start = datetime.datetime.now()
+                        st.session_state.is_paid = False
+                        st.success("Welcome! Login successful.")
+                        st.toast(f"Welcome back, {email}!", icon="✅")
+                        st.rerun()
+                    except Exception as e: st.error(f"Login failed: {e}")
             
-            # 👇 FORGOT PASSWORD OPTION YAHAN HAI 👇
+            # 👇 FORGOT PASSWORD WITH GREEN SUCCESS MESSAGE 👇
             with st.expander("Forgot Password?"):
                 reset_email = st.text_input("Enter your registered email", key="reset_email")
                 if st.button("Send Reset Link", use_container_width=True):
                     try:
                         supabase.auth.reset_password_for_email(reset_email, options={"redirect_to": st.secrets.get("SUPABASE_REDIRECT_URL", "")})
-                        st.success("✅ Password reset link sent to your email!")
+                        st.success("✅ Password reset link successfully sent to your email!")
                     except Exception as e:
                         st.error(f"Error: {e}")
 
@@ -2584,10 +2588,23 @@ def render_login_signup():
             password=st.text_input("Password",type="password",key="signup_password", placeholder="Create password (e.g., Test@123)", label_visibility="collapsed")
             
             if st.button("Create Account ➔", use_container_width=True):
-                try:
-                    supabase.auth.sign_up({"email":email,"password":password,"options":{"data":{"name":name}}})
-                    st.success("✅ Account created. Please Log In.")
-                except Exception as e: st.error(f"Sign up failed: {e}")
+                with st.spinner("Creating your account..."):
+                    try:
+                        supabase.auth.sign_up({"email":email,"password":password,"options":{"data":{"name":name}}})
+                        st.success("✅ Account created! Please Log In to continue.")
+                        st.toast("Account created successfully!", icon="🎉")
+                    except Exception as e: st.error(f"Sign up failed: {e}")
+                
+        # 👇 YAHAN HAI AAPKA NAYA FOOTER (TERMS & PRIVACY) 👇
+        st.markdown("""
+        <div style="text-align: center; margin-top: 30px; font-size: 12px; color: #9ca3af; margin-bottom: 20px;">
+            By continuing, you agree to our 
+            <a href="https://chhabin541-crypto.github.io/ClyxessAI/terms.html" target="_blank" style="color: #8b5cf6; text-decoration: none; font-weight: 600;">Terms of Service</a> 
+            and 
+            <a href="https://chhabin541-crypto.github.io/ClyxessAI/" target="_blank" style="color: #8b5cf6; text-decoration: none; font-weight: 600;">Privacy Policy</a>.
+        </div>
+        """, unsafe_allow_html=True)
+        # 👆 FOOTER KHATAM 👆
                 
         st.stop() # 🛑 Login ke bina aage nahi jayega
 
@@ -2623,34 +2640,7 @@ def render_login_signup():
                     st.session_state.is_paid = True
                     st.rerun()
                     
-                st.stop() # 🛑 Payment ke bina aage nahi jayega
-
-
-# ==========================================
-# 💳 Razorpay Function (Isko iske theek niche rakho)
-# ==========================================
-def launch_razorpay(amount, user_email):
-    import streamlit.components.v1 as components
-    RAZORPAY_KEY_ID = "rzp_test_YourTestKeyHere" # Yahan apni key daalein
-    
-    razorpay_html = f"""
-    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-    <script>
-        var options = {{
-            "key": "{RAZORPAY_KEY_ID}",
-            "amount": "{amount * 100}", 
-            "currency": "INR",
-            "name": "Clyxess AI",
-            "description": "Premium Subscription",
-            "prefill": {{ "email": "{user_email}" }},
-            "handler": function (response){{ alert("Payment Successful! ID: " + response.razorpay_payment_id); }},
-            "theme": {{ "color": "#8b5cf6" }}
-        }};
-        var rzp1 = new Razorpay(options);
-        rzp1.open();
-    </script>
-    """
-    components.html(razorpay_html, height=0)
+                st.stop() # 🛑
 
 def render_image_generator():
     import streamlit as st
