@@ -2483,33 +2483,6 @@ def render_login_signup():
         .divider::before { margin-right: 15px; }
         .divider::after { margin-left: 15px; }
 
-        /* Buttons General */
-        .stButton button {
-            width: 100% !important;
-            border-radius: 10px !important;
-            padding: 10px !important;
-            font-weight: 600 !important;
-            font-size: 14px !important;
-            transition: all 0.3s ease !important;
-        }
-
-        /* Google Button (White) */
-        div[data-testid="stButton"]:has(div:contains("Google")) button {
-            background-color: #ffffff !important;
-            color: #000000 !important;
-            border: none !important;
-        }
-        div[data-testid="stButton"]:has(div:contains("Google")) button:hover {
-            background-color: #f3f4f6 !important;
-        }
-
-        /* Facebook Button (Dark Blue) */
-        div[data-testid="stButton"]:has(div:contains("Facebook")) button {
-            background-color: #1877F2 !important;
-            color: #ffffff !important;
-            border: none !important;
-        }
-        
         /* Log In / Sign Up Submit Button (Gradient) */
         div[data-testid="stButton"]:has(div:contains("Log In")) button,
         div[data-testid="stButton"]:has(div:contains("Create Account")) button {
@@ -2517,16 +2490,61 @@ def render_login_signup():
             color: white !important;
             border: none !important;
             box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4) !important;
+            padding: 10px !important;
+            border-radius: 10px !important;
+            font-weight: 600 !important;
         }
+        
+        /* Custom Social Buttons */
+        .social-btn {
+            display: flex; align-items: center; justify-content: center;
+            width: 100%; padding: 10px; border-radius: 10px;
+            font-weight: 600; font-size: 14px; text-decoration: none;
+            margin-bottom: 10px; transition: 0.3s;
+        }
+        .social-btn img { width: 20px; height: 20px; margin-right: 10px; }
+        .google-btn { background-color: #ffffff; color: #000000; border: 1px solid #ddd; }
+        .google-btn:hover { background-color: #f3f4f6; color: #000; }
+        .facebook-btn { background-color: #1877F2; color: #ffffff; border: none; }
+        .facebook-btn:hover { background-color: #166fe5; color: #fff; }
     </style>
     """, unsafe_allow_html=True)
+
+    # 🪄 Jugaad: Google/FB Login ke baad URL se token nikalne ke liye
+    components.html("""
+        <script>
+            var hash = window.location.hash;
+            if (hash) {
+                var params = new URLSearchParams(hash.substring(1));
+                var accessToken = params.get('access_token');
+                var refreshToken = params.get('refresh_token');
+                if (accessToken) {
+                    var newUrl = window.location.origin + window.location.pathname + '?access_token=' + accessToken + '&refresh_token=' + refreshToken;
+                    window.location.replace(newUrl);
+                }
+            }
+        </script>
+    """, height=0)
+
+    # Agar URL mein token aaya hai, toh login karwao
+    if "access_token" in st.query_params:
+        try:
+            supabase.auth.set_session(st.query_params["access_token"], st.query_params["refresh_token"])
+            st.session_state.user_email = supabase.auth.get_user().user.email
+            st.session_state.logged_in = True
+            st.session_state.trial_start = datetime.datetime.now()
+            st.session_state.is_paid = False
+            st.query_params.clear()
+            st.rerun()
+        except Exception as e:
+            st.error(f"Auth Error: {e}")
 
     # ==========================================
     # 🛑 1. AGAR USER LOGIN NAHI HAI
     # ==========================================
     if "logged_in" not in st.session_state or not st.session_state.logged_in:
         
-        # Naya Header (Clyxess AI aur Tagline)
+        # Header
         st.markdown("""
         <div style="text-align: center; margin-bottom: 30px;">
             <h1 style="color: white; font-size: 34px; font-weight: 800; margin-bottom: 5px;">
@@ -2538,20 +2556,31 @@ def render_login_signup():
         </div>
         """, unsafe_allow_html=True)
         
-        # Social Buttons
-        c1,c2=st.columns(2)
-        with c1:
-            if st.button("🇬 Google", use_container_width=True):
-                try:
-                    r=supabase.auth.sign_in_with_oauth({"provider":"google","options":{"redirect_to":st.secrets.get("SUPABASE_REDIRECT_URL","")}})
-                    if getattr(r,"url",None): st.link_button("Continue to Google",r.url,use_container_width=True)
-                except Exception as e: st.error(f"Google login failed: {e}")
-        with c2:
-            if st.button("🔷 Facebook", use_container_width=True):
-                try:
-                    r=supabase.auth.sign_in_with_oauth({"provider":"facebook","options":{"redirect_to":st.secrets.get("SUPABASE_REDIRECT_URL","")}})
-                    if getattr(r,"url",None): st.link_button("Continue to Facebook",r.url,use_container_width=True)
-                except Exception as e: st.error(f"Facebook login failed: {e}")
+        # OAuth URLs Generate Karo
+        google_url, fb_url = "", ""
+        try:
+            r_google = supabase.auth.sign_in_with_oauth({"provider": "google", "options": {"redirect_to": st.secrets.get("SUPABASE_REDIRECT_URL", "")}})
+            google_url = r_google.url
+        except Exception as e:
+            st.error(f"Google config error: {e}")
+
+        try:
+            r_fb = supabase.auth.sign_in_with_oauth({"provider": "facebook", "options": {"redirect_to": st.secrets.get("SUPABASE_REDIRECT_URL", "")}})
+            fb_url = r_fb.url
+        except Exception as e:
+            st.error(f"Facebook config error: {e}")
+
+        # Custom HTML Buttons with Logos
+        st.markdown(f"""
+            <a href="{google_url}" target="_self" class="social-btn google-btn">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="G">
+                Continue with Google
+            </a>
+            <a href="{fb_url}" target="_self" class="social-btn facebook-btn">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/b/b9/2023_Facebook_icon.svg" alt="F">
+                Continue with Facebook
+            </a>
+        """, unsafe_allow_html=True)
 
         # Divider
         st.markdown('<div class="divider">OR</div>', unsafe_allow_html=True)
@@ -2574,7 +2603,7 @@ def render_login_signup():
                     st.session_state.is_paid = False
                     
                     try:
-                        load_latest_chat_cloud() # Aapka purana function
+                        load_latest_chat_cloud()
                     except:
                         pass
                         
@@ -2628,7 +2657,7 @@ def render_login_signup():
                     if st.button("Buy ELITE ₹1449", key="buy_1449", use_container_width=True):
                         launch_razorpay(1449, st.session_state.get("user_email", ""))
 
-                # 🛠️ Testing Panel (Payment test karne ke liye)
+                # 🛠️ Testing Panel
                 st.write("---")
                 st.write("🛠️ **Testing Panel (Dev Only)**")
                 col_t1, col_t2 = st.columns(2)
@@ -2641,7 +2670,7 @@ def render_login_signup():
                     st.session_state.is_paid = True
                     st.rerun()
                     
-                st.stop() # 🛑 Yahan ruk jayega. Payment ke bina aage nahi jayega.
+                st.stop() # 🛑 Yahan ruk jayega.
 
 
 # ==========================================
