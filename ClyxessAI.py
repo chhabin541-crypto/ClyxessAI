@@ -2442,47 +2442,155 @@ def load_latest_chat_cloud():
         pass
 
 def render_login_signup():
-    st.title("🔐 Login / Sign Up")
+    # 🛠️ Imports (Function ke andar)
+    import streamlit as st
+    import streamlit.components.v1 as components
+    import datetime
+
     if not supabase:
         st.warning("Add SUPABASE_URL and SUPABASE_KEY to Streamlit secrets.")
-        return
-    st.markdown("### ⚡ Quick Login")
-    c1,c2=st.columns(2)
-    with c1:
-        if st.button("🔵 Continue with Google",use_container_width=True):
-            try:
-                r=supabase.auth.sign_in_with_oauth({"provider":"google","options":{"redirect_to":st.secrets.get("SUPABASE_REDIRECT_URL","")}})
-                if getattr(r,"url",None): st.link_button("Continue to Google",r.url,use_container_width=True)
-            except Exception as e: st.error(f"Google login failed: {e}")
-    with c2:
-        if st.button("🔷 Continue with Facebook",use_container_width=True):
-            try:
-                r=supabase.auth.sign_in_with_oauth({"provider":"facebook","options":{"redirect_to":st.secrets.get("SUPABASE_REDIRECT_URL","")}})
-                if getattr(r,"url",None): st.link_button("Continue to Facebook",r.url,use_container_width=True)
-            except Exception as e: st.error(f"Facebook login failed: {e}")
-    st.caption("Google/Facebook providers must be enabled in Supabase Authentication settings.")
+        st.stop()
 
-    tab1,tab2=st.tabs(["Log In","Sign Up"])
-    with tab1:
-        email=st.text_input("Email",key="login_email")
-        password=st.text_input("Password",type="password",key="login_password")
-        if st.button("Log In",type="primary"):
-            try:
-                r=supabase.auth.sign_in_with_password({"email":email,"password":password})
-                st.session_state.user_email=email
-                load_latest_chat_cloud()
-                st.success("Logged in successfully.")
-                st.rerun()
-            except Exception as e: st.error(f"Login failed: {e}")
-    with tab2:
-        name=st.text_input("Name",key="signup_name")
-        email=st.text_input("Email",key="signup_email")
-        password=st.text_input("Password",type="password",key="signup_password")
-        if st.button("Create Account"):
-            try:
-                supabase.auth.sign_up({"email":email,"password":password,"options":{"data":{"name":name}}})
-                st.success("Account created. Confirm email if your Supabase project requires it.")
-            except Exception as e: st.error(f"Sign up failed: {e}")
+    # 🎨 CSS Chhota aur Clean Box
+    st.markdown("""
+    <style>
+        .block-container { max-width: 450px !important; padding-top: 2rem !important; }
+        header {visibility: hidden;} footer {visibility: hidden;}
+        .stButton button { width: 100% !important; border-radius: 8px !important; }
+    </style>
+    """, unsafe_allow_html=True)
+
+    # ==========================================
+    # 🛑 1. AGAR USER LOGIN NAHI HAI
+    # ==========================================
+    if "logged_in" not in st.session_state or not st.session_state.logged_in:
+        st.title("🔐 Login / Sign Up")
+        
+        st.markdown("### ⚡ Quick Login")
+        c1,c2=st.columns(2)
+        with c1:
+            if st.button("🔵 Continue with Google",use_container_width=True):
+                try:
+                    r=supabase.auth.sign_in_with_oauth({"provider":"google","options":{"redirect_to":st.secrets.get("SUPABASE_REDIRECT_URL","")}})
+                    if getattr(r,"url",None): st.link_button("Continue to Google",r.url,use_container_width=True)
+                except Exception as e: st.error(f"Google login failed: {e}")
+        with c2:
+            if st.button("🔷 Continue with Facebook",use_container_width=True):
+                try:
+                    r=supabase.auth.sign_in_with_oauth({"provider":"facebook","options":{"redirect_to":st.secrets.get("SUPABASE_REDIRECT_URL","")}})
+                    if getattr(r,"url",None): st.link_button("Continue to Facebook",r.url,use_container_width=True)
+                except Exception as e: st.error(f"Facebook login failed: {e}")
+                
+        st.caption("Google/Facebook providers must be enabled in Supabase Authentication settings.")
+
+        tab1,tab2=st.tabs(["Log In","Sign Up"])
+        
+        with tab1:
+            email=st.text_input("Email",key="login_email")
+            password=st.text_input("Password",type="password",key="login_password")
+            if st.button("Log In",type="primary", use_container_width=True):
+                try:
+                    r=supabase.auth.sign_in_with_password({"email":email,"password":password})
+                    st.session_state.user_email=email
+                    st.session_state.logged_in = True
+                    
+                    # 👇 24 Ghante ka Trial Start
+                    st.session_state.trial_start = datetime.datetime.now()
+                    st.session_state.is_paid = False
+                    
+                    try:
+                        load_latest_chat_cloud() # Aapka purana function
+                    except:
+                        pass
+                        
+                    st.success("Logged in successfully.")
+                    st.rerun()
+                except Exception as e: st.error(f"Login failed: {e}")
+                
+        with tab2:
+            name=st.text_input("Name",key="signup_name")
+            email=st.text_input("Email",key="signup_email")
+            password=st.text_input("Password",type="password",key="signup_password")
+            if st.button("Create Account", use_container_width=True):
+                try:
+                    supabase.auth.sign_up({"email":email,"password":password,"options":{"data":{"name":name}}})
+                    st.success("Account created. Confirm email if your Supabase project requires it.")
+                except Exception as e: st.error(f"Sign up failed: {e}")
+                
+        st.stop() # 🛑 Yahan ruk jayega. Dashboard nahi khulega.
+
+    # ==========================================
+    # 🛑 2. AGAR USER LOGIN HAI PAR 24H TRIAL KHATAM
+    # ==========================================
+    if not st.session_state.get("is_paid", False):
+        if "trial_start" in st.session_state:
+            time_passed = datetime.datetime.now() - st.session_state.trial_start
+            if time_passed.total_seconds() >= 86400: # 86400 seconds = 24 hours
+                
+                st.error("⏳ Aapka 24 Ghante ka Free Trial khatam ho gaya hai! App use karne ke liye plan kharidein.")
+                st.markdown("<h2 style='text-align: center;'>Upgrade to Premium</h2>", unsafe_allow_html=True)
+                
+                c1, c2 = st.columns(2)
+                with c1:
+                    st.markdown("""
+                    <div style="background:rgba(255,255,255,0.05); padding:20px; border-radius:10px; text-align:center;">
+                        <h3>PRO Plan</h3>
+                        <h1 style="color:#00ffff;">₹949</h1>
+                    </div>
+                    """, unsafe_allow_html=True)
+                    if st.button("Buy PRO ₹949", key="buy_949", use_container_width=True):
+                        launch_razorpay(949, st.session_state.get("user_email", ""))
+
+                with c2:
+                    st.markdown("""
+                    <div style="background:rgba(0,255,255,0.1); border:1px solid #00ffff; padding:20px; border-radius:10px; text-align:center;">
+                        <h3 style="color:#00ffff;">ELITE Plan</h3>
+                        <h1 style="color:#00ffff;">₹1449</h1>
+                    </div>
+                    """, unsafe_allow_html=True)
+                    if st.button("Buy ELITE ₹1449", key="buy_1449", use_container_width=True):
+                        launch_razorpay(1449, st.session_state.get("user_email", ""))
+
+                # 🛠️ Testing Panel (Payment test karne ke liye)
+                st.write("---")
+                st.write("🛠️ **Testing Panel (Dev Only)**")
+                col_t1, col_t2 = st.columns(2)
+                if col_t1.button("Simulate ₹949 Payment"):
+                    st.session_state.user_plan = "pro"
+                    st.session_state.is_paid = True
+                    st.rerun()
+                if col_t2.button("Simulate ₹1449 Payment"):
+                    st.session_state.user_plan = "elite"
+                    st.session_state.is_paid = True
+                    st.rerun()
+                    
+                st.stop() # 🛑 Yahan ruk jayega. Payment ke bina aage nahi jayega.
+
+
+# ==========================================
+# 💳 Razorpay Function (Isko bhi iske theek niche paste kar dena)
+# ==========================================
+def launch_razorpay(amount, user_email):
+    import streamlit.components.v1 as components
+    RAZORPAY_KEY_ID = "rzp_test_YourTestKeyHere" # Yahan apni key daalein
+    
+    razorpay_html = f"""
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script>
+        var options = {{
+            "key": "{RAZORPAY_KEY_ID}",
+            "amount": "{amount * 100}", 
+            "currency": "INR",
+            "name": "Clyxess AI",
+            "prefill": {{ "email": "{user_email}" }},
+            "handler": function (response){{ alert("Payment Successful!"); }},
+            "theme": {{ "color": "#00ffff" }}
+        }};
+        var rzp1 = new Razorpay(options);
+        rzp1.open();
+    </script>
+    """
+    components.html(razorpay_html, height=0)
 
 def render_image_generator():
     import streamlit as st
