@@ -2451,12 +2451,73 @@ def render_login_signup():
         st.warning("Add SUPABASE_URL and SUPABASE_KEY to Streamlit secrets.")
         st.stop()
 
-    # 🎨 CSS Chhota aur Clean Box
+    # 🎨 PREMIUM CSS (Screenshot Jaisa Design)
     st.markdown("""
     <style>
-        .block-container { max-width: 450px !important; padding-top: 2rem !important; }
+        /* Main Background & Hide Defaults */
+        .stApp { background-color: #050814 !important; }
         header {visibility: hidden;} footer {visibility: hidden;}
-        .stButton button { width: 100% !important; border-radius: 8px !important; }
+        
+        /* Center the login box */
+        .block-container { 
+            max-width: 420px !important; 
+            padding-top: 4rem !important; 
+        }
+
+        /* Input Fields */
+        .stTextInput input {
+            background-color: #0b0e17 !important;
+            color: white !important;
+            border: 1px solid #1c2538 !important;
+            border-radius: 10px !important;
+            padding: 12px !important;
+        }
+        .stTextInput input:focus {
+            border-color: #3b82f6 !important;
+            box-shadow: 0 0 0 1px #3b82f6 !important;
+        }
+        
+        /* Divider */
+        .divider { display: flex; align-items: center; text-align: center; color: #4b5563; margin: 20px 0; font-size: 13px; font-weight: bold; }
+        .divider::before, .divider::after { content: ''; flex: 1; border-bottom: 1px solid #1c2538; }
+        .divider::before { margin-right: 15px; }
+        .divider::after { margin-left: 15px; }
+
+        /* Buttons General */
+        .stButton button {
+            width: 100% !important;
+            border-radius: 10px !important;
+            padding: 10px !important;
+            font-weight: 600 !important;
+            font-size: 14px !important;
+            transition: all 0.3s ease !important;
+        }
+
+        /* Google Button (White) */
+        div[data-testid="stButton"]:has(div:contains("Google")) button {
+            background-color: #ffffff !important;
+            color: #000000 !important;
+            border: none !important;
+        }
+        div[data-testid="stButton"]:has(div:contains("Google")) button:hover {
+            background-color: #f3f4f6 !important;
+        }
+
+        /* Facebook Button (Dark Blue) */
+        div[data-testid="stButton"]:has(div:contains("Facebook")) button {
+            background-color: #1877F2 !important;
+            color: #ffffff !important;
+            border: none !important;
+        }
+        
+        /* Log In / Sign Up Submit Button (Gradient) */
+        div[data-testid="stButton"]:has(div:contains("Log In")) button,
+        div[data-testid="stButton"]:has(div:contains("Create Account")) button {
+            background: linear-gradient(90deg, #3b82f6 0%, #8b5cf6 100%) !important;
+            color: white !important;
+            border: none !important;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4) !important;
+        }
     </style>
     """, unsafe_allow_html=True)
 
@@ -2464,31 +2525,45 @@ def render_login_signup():
     # 🛑 1. AGAR USER LOGIN NAHI HAI
     # ==========================================
     if "logged_in" not in st.session_state or not st.session_state.logged_in:
-        st.title("🔐 Login / Sign Up")
         
-        st.markdown("### ⚡ Quick Login")
+        # Naya Header (Clyxess AI aur Tagline)
+        st.markdown("""
+        <div style="text-align: center; margin-bottom: 30px;">
+            <h1 style="color: white; font-size: 34px; font-weight: 800; margin-bottom: 5px;">
+                Clyxess <span style="color: #3b82f6;">AI</span>
+            </h1>
+            <p style="color: #9ca3af; font-size: 14px;">
+                Learn future with Clyxess AI school
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        # Social Buttons
         c1,c2=st.columns(2)
         with c1:
-            if st.button("🔵 Continue with Google",use_container_width=True):
+            if st.button("🇬 Google", use_container_width=True):
                 try:
                     r=supabase.auth.sign_in_with_oauth({"provider":"google","options":{"redirect_to":st.secrets.get("SUPABASE_REDIRECT_URL","")}})
                     if getattr(r,"url",None): st.link_button("Continue to Google",r.url,use_container_width=True)
                 except Exception as e: st.error(f"Google login failed: {e}")
         with c2:
-            if st.button("🔷 Continue with Facebook",use_container_width=True):
+            if st.button("🔷 Facebook", use_container_width=True):
                 try:
                     r=supabase.auth.sign_in_with_oauth({"provider":"facebook","options":{"redirect_to":st.secrets.get("SUPABASE_REDIRECT_URL","")}})
                     if getattr(r,"url",None): st.link_button("Continue to Facebook",r.url,use_container_width=True)
                 except Exception as e: st.error(f"Facebook login failed: {e}")
-                
-        st.caption("Google/Facebook providers must be enabled in Supabase Authentication settings.")
+
+        # Divider
+        st.markdown('<div class="divider">OR</div>', unsafe_allow_html=True)
 
         tab1,tab2=st.tabs(["Log In","Sign Up"])
         
+        # --- LOG IN TAB ---
         with tab1:
-            email=st.text_input("Email",key="login_email")
-            password=st.text_input("Password",type="password",key="login_password")
-            if st.button("Log In",type="primary", use_container_width=True):
+            email=st.text_input("Email",key="login_email", placeholder="Enter your email", label_visibility="collapsed")
+            password=st.text_input("Password",type="password",key="login_password", placeholder="Enter password", label_visibility="collapsed")
+            
+            if st.button("Log In ➔", type="primary", use_container_width=True):
                 try:
                     r=supabase.auth.sign_in_with_password({"email":email,"password":password})
                     st.session_state.user_email=email
@@ -2507,11 +2582,13 @@ def render_login_signup():
                     st.rerun()
                 except Exception as e: st.error(f"Login failed: {e}")
                 
+        # --- SIGN UP TAB ---
         with tab2:
-            name=st.text_input("Name",key="signup_name")
-            email=st.text_input("Email",key="signup_email")
-            password=st.text_input("Password",type="password",key="signup_password")
-            if st.button("Create Account", use_container_width=True):
+            name=st.text_input("Name",key="signup_name", placeholder="Your Name", label_visibility="collapsed")
+            email=st.text_input("Email",key="signup_email", placeholder="Enter your email", label_visibility="collapsed")
+            password=st.text_input("Password",type="password",key="signup_password", placeholder="Create password", label_visibility="collapsed")
+            
+            if st.button("Create Account ➔", use_container_width=True):
                 try:
                     supabase.auth.sign_up({"email":email,"password":password,"options":{"data":{"name":name}}})
                     st.success("Account created. Confirm email if your Supabase project requires it.")
@@ -2528,14 +2605,14 @@ def render_login_signup():
             if time_passed.total_seconds() >= 86400: # 86400 seconds = 24 hours
                 
                 st.error("⏳ Aapka 24 Ghante ka Free Trial khatam ho gaya hai! App use karne ke liye plan kharidein.")
-                st.markdown("<h2 style='text-align: center;'>Upgrade to Premium</h2>", unsafe_allow_html=True)
+                st.markdown("<h2 style='text-align: center; color:white;'>Upgrade to Premium</h2>", unsafe_allow_html=True)
                 
                 c1, c2 = st.columns(2)
                 with c1:
                     st.markdown("""
-                    <div style="background:rgba(255,255,255,0.05); padding:20px; border-radius:10px; text-align:center;">
-                        <h3>PRO Plan</h3>
-                        <h1 style="color:#00ffff;">₹949</h1>
+                    <div style="background:rgba(255,255,255,0.05); padding:20px; border-radius:10px; text-align:center; border:1px solid #333;">
+                        <h3 style="color:white;">PRO Plan</h3>
+                        <h1 style="color:#3b82f6;">₹949</h1>
                     </div>
                     """, unsafe_allow_html=True)
                     if st.button("Buy PRO ₹949", key="buy_949", use_container_width=True):
@@ -2543,9 +2620,9 @@ def render_login_signup():
 
                 with c2:
                     st.markdown("""
-                    <div style="background:rgba(0,255,255,0.1); border:1px solid #00ffff; padding:20px; border-radius:10px; text-align:center;">
-                        <h3 style="color:#00ffff;">ELITE Plan</h3>
-                        <h1 style="color:#00ffff;">₹1449</h1>
+                    <div style="background:rgba(139,92,246,0.1); border:1px solid #8b5cf6; padding:20px; border-radius:10px; text-align:center;">
+                        <h3 style="color:#8b5cf6;">ELITE Plan</h3>
+                        <h1 style="color:#8b5cf6;">₹1449</h1>
                     </div>
                     """, unsafe_allow_html=True)
                     if st.button("Buy ELITE ₹1449", key="buy_1449", use_container_width=True):
@@ -2582,9 +2659,10 @@ def launch_razorpay(amount, user_email):
             "amount": "{amount * 100}", 
             "currency": "INR",
             "name": "Clyxess AI",
+            "description": "Premium Subscription",
             "prefill": {{ "email": "{user_email}" }},
-            "handler": function (response){{ alert("Payment Successful!"); }},
-            "theme": {{ "color": "#00ffff" }}
+            "handler": function (response){{ alert("Payment Successful! ID: " + response.razorpay_payment_id); }},
+            "theme": {{ "color": "#3b82f6" }}
         }};
         var rzp1 = new Razorpay(options);
         rzp1.open();
