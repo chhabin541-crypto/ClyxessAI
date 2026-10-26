@@ -2447,6 +2447,7 @@ def render_login_signup():
     import streamlit.components.v1 as components
     import datetime
     import urllib.parse
+    import webbrowser
 
     if not supabase:
         st.warning("Add SUPABASE_URL and SUPABASE_KEY to Streamlit secrets.")
@@ -2508,8 +2509,8 @@ def render_login_signup():
             supabase.auth.set_session(access_token, refresh_token)
             st.session_state.user_email = supabase.auth.get_user(access_token).user.email
             st.session_state.logged_in = True
-            st.session_state.trial_start = datetime.datetime.now()
             st.session_state.is_paid = False
+            st.session_state.plan_selected = False # Login ke baad plan select karna hai
             st.query_params.clear()
             st.toast("Welcome back! Login successful.", icon="👋")
             st.rerun()
@@ -2528,7 +2529,6 @@ def render_login_signup():
         </div>
         """, unsafe_allow_html=True)
         
-        # Social Logins
         google_url, fb_url = "", ""
         try:
             r_google = supabase.auth.sign_in_with_oauth({"provider": "google", "options": {"redirect_to": st.secrets.get("SUPABASE_REDIRECT_URL", "")}})
@@ -2553,7 +2553,6 @@ def render_login_signup():
 
         tab1,tab2=st.tabs(["Log In","Sign Up"])
         
-        # --- LOG IN TAB ---
         with tab1:
             email=st.text_input("Email",key="login_email", placeholder="Enter your email", label_visibility="collapsed")
             password=st.text_input("Password",type="password",key="login_password", placeholder="Enter password", label_visibility="collapsed")
@@ -2561,17 +2560,16 @@ def render_login_signup():
             if st.button("Log In ➔", type="primary", use_container_width=True):
                 with st.spinner("Logging you in..."):
                     try:
-                        r=supabase.auth.sign_in_with_password({"email":email,"password":password})
+                        supabase.auth.sign_in_with_password({"email":email,"password":password})
                         st.session_state.user_email=email
                         st.session_state.logged_in = True
-                        st.session_state.trial_start = datetime.datetime.now()
                         st.session_state.is_paid = False
+                        st.session_state.plan_selected = False # Trial abhi start nahi hoga
                         st.success("Welcome! Login successful.")
                         st.toast(f"Welcome back, {email}!", icon="✅")
                         st.rerun()
                     except Exception as e: st.error(f"Login failed: {e}")
             
-            # 👇 FORGOT PASSWORD WITH GREEN SUCCESS MESSAGE 👇
             with st.expander("Forgot Password?"):
                 reset_email = st.text_input("Enter your registered email", key="reset_email")
                 if st.button("Send Reset Link", use_container_width=True):
@@ -2581,7 +2579,6 @@ def render_login_signup():
                     except Exception as e:
                         st.error(f"Error: {e}")
 
-        # --- SIGN UP TAB ---
         with tab2:
             name=st.text_input("Name",key="signup_name", placeholder="Your Name", label_visibility="collapsed")
             email=st.text_input("Email",key="signup_email", placeholder="Enter your email", label_visibility="collapsed")
@@ -2595,7 +2592,6 @@ def render_login_signup():
                         st.toast("Account created successfully!", icon="🎉")
                     except Exception as e: st.error(f"Sign up failed: {e}")
                 
-        # 👇 YAHAN HAI AAPKA NAYA FOOTER (TERMS & PRIVACY) 👇
         st.markdown("""
         <div style="text-align: center; margin-top: 30px; font-size: 12px; color: #9ca3af; margin-bottom: 20px;">
             By continuing, you agree to our 
@@ -2604,12 +2600,54 @@ def render_login_signup():
             <a href="https://chhabin541-crypto.github.io/ClyxessAI/" target="_blank" style="color: #8b5cf6; text-decoration: none; font-weight: 600;">Privacy Policy</a>.
         </div>
         """, unsafe_allow_html=True)
-        # 👆 FOOTER KHATAM 👆
                 
         st.stop() # 🛑 Login ke bina aage nahi jayega
 
     # ==========================================
-    # 🛑 2. TRIAL CHECK & PREMIUM LOCK (₹1499 ONLY)
+    # 🛑 2. PLAN SELECTION (Naya Logic)
+    # ==========================================
+    if "plan_selected" not in st.session_state or not st.session_state.plan_selected:
+        st.markdown("<h2 style='text-align: center; color:white; margin-top: 30px;'>Choose Your Plan</h2>", unsafe_allow_html=True)
+        
+        col1, col2 = st.columns(2)
+        with col1:
+            st.markdown("""
+            <div style="background: rgba(255, 255, 255, 0.05); padding: 30px; border-radius: 15px; text-align: center; border: 1px solid #333; height: 220px;">
+                <h3 style="color: white;">Free Trial</h3>
+                <h1 style="color: #3b82f6; font-size: 40px;">24 Hours</h1>
+                <p style="color: #9ca3af;">Try all features for 1 day.</p>
+            </div>
+            """, unsafe_allow_html=True)
+            if st.button("Start Free Trial", use_container_width=True, type="primary"):
+                st.session_state.plan_selected = True
+                st.session_state.trial_start = datetime.datetime.now()
+                st.rerun()
+
+        with col2:
+            st.markdown("""
+            <div style="background: rgba(139, 92, 246, 0.1); padding: 30px; border-radius: 15px; text-align: center; border: 2px solid #8b5cf6; height: 220px;">
+                <h3 style="color: #8b5cf6;">Premium</h3>
+                <h1 style="color: #8b5cf6; font-size: 40px;">₹1499 <span style="font-size: 14px; color: #aaa;">/month</span></h1>
+                <p style="color: #9ca3af;">Unlimited access forever.</p>
+            </div>
+            """, unsafe_allow_html=True)
+            
+            # 🚨 APNA INSTAMOJO LINK YAHAN DAALEIN 🚨
+            INSTAMOJO_LINK = "https://imjo.in/YourLinkHere"
+            
+            if st.button("Buy Premium ₹1499", use_container_width=True):
+                webbrowser.open_new_tab(INSTAMOJO_LINK)
+                st.info("Payment complete karne ke baad 'I have paid' par click karein.")
+                
+            if st.button("✅ I have paid (Unlock App)"):
+                st.session_state.plan_selected = True
+                st.session_state.is_paid = True
+                st.rerun()
+                
+        st.stop() # 🛑 Bina plan select kiye aage nahi jayega
+
+    # ==========================================
+    # 🛑 3. TRIAL EXPIRY CHECK (24 Hours)
     # ==========================================
     if not st.session_state.get("is_paid", False):
         if "trial_start" in st.session_state:
@@ -2617,30 +2655,31 @@ def render_login_signup():
             if time_passed.total_seconds() >= 86400: # 24 Hours
                 
                 st.error("⏳ Aapka 24 Ghante ka Free Trial khatam ho gaya hai! Aage use karne ke liye Premium kharidein.")
-                st.markdown("<h2 style='text-align: center; color:white;'>Upgrade to Premium</h2>", unsafe_allow_html=True)
                 
-                # Sirf 1 Plan (₹1499) Center mein
                 col1, col2, col3 = st.columns([1, 2, 1])
                 with col2:
                     st.markdown("""
                     <div style="background:rgba(139,92,246,0.1); border:2px solid #8b5cf6; padding:30px; border-radius:15px; text-align:center;">
                         <h3 style="color:#8b5cf6;">Premium Plan</h3>
                         <h1 style="color:#8b5cf6; font-size: 40px;">₹1499 <span style="font-size:14px; color:#aaa;">/month</span></h1>
-                        <p style="color:#9ca3af;">100% Full Access to all modules</p>
                     </div>
                     """, unsafe_allow_html=True)
                     if st.button("Buy Premium ₹1499", key="buy_1499", use_container_width=True, type="primary"):
-                        launch_razorpay(1499, st.session_state.get("user_email", ""))
+                        webbrowser.open_new_tab(INSTAMOJO_LINK)
+                        st.info("Payment ke baad 'I have paid' par click karein.")
+                        
+                    if st.button("✅ I have paid (Unlock App)", key="paid_1499"):
+                        st.session_state.is_paid = True
+                        st.rerun()
 
-                # 🛠️ Testing Panel
+                # 🛠️ Testing Panel (Dev Only)
                 st.write("---")
                 st.write("🛠️ **Testing Panel (Dev Only)**")
                 if st.button("Simulate ₹1499 Payment (Unlock App)"):
-                    st.session_state.user_plan = "premium"
                     st.session_state.is_paid = True
                     st.rerun()
                     
-                st.stop() # 🛑
+                st.stop() # 🛑 Payment ke bina aage nahi jayega
 
 def render_image_generator():
     import streamlit as st
