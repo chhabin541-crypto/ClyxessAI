@@ -2453,12 +2453,21 @@ def render_login_signup():
         st.warning("Add SUPABASE_URL and SUPABASE_KEY to Streamlit secrets.")
         st.stop()
 
-    # 🎨 PREMIUM CSS
+    # 🚨 APNA INSTAMOJO LINK YAHAN DAALEIN 🚨
+    INSTAMOJO_LINK = "https://imjo.in/YourLinkHere" 
+
+    # 🎨 PREMIUM CSS (Sidebar ko hide karne ke liye bhi)
     st.markdown("""
     <style>
-        .stApp { background-color: #050814 !important; }
+        /* Main Background */
+        .stApp { background: radial-gradient(circle at top right, #1e1b4b 0%, #050814 50%) !important; }
         header {visibility: hidden;} footer {visibility: hidden;}
-        .block-container { max-width: 420px !important; padding-top: 3rem !important; }
+        
+        /* 🛑 HIDE SIDEBAR UNTIL LOGIN + PLAN */
+        [data-testid="stSidebar"] { display: none !important; }
+
+        /* Login Box */
+        .block-container { max-width: 800px !important; padding-top: 2rem !important; }
         .stTextInput input {
             background-color: #0b0e17 !important; color: white !important;
             border: 1px solid #1c2538 !important; border-radius: 10px !important; padding: 12px !important;
@@ -2467,12 +2476,16 @@ def render_login_signup():
         .divider { display: flex; align-items: center; text-align: center; color: #4b5563; margin: 20px 0; font-size: 13px; font-weight: bold; }
         .divider::before, .divider::after { content: ''; flex: 1; border-bottom: 1px solid #1c2538; }
         .divider::before { margin-right: 15px; } .divider::after { margin-left: 15px; }
+        
+        /* Buttons */
+        .stButton button { width: 100% !important; border-radius: 10px !important; font-weight: 600 !important; padding: 10px !important; }
         div[data-testid="stButton"]:has(div:contains("Log In")) button,
         div[data-testid="stButton"]:has(div:contains("Create Account")) button {
             background: linear-gradient(90deg, #3b82f6 0%, #8b5cf6 100%) !important;
-            color: white !important; border: none !important; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4) !important;
-            padding: 10px !important; border-radius: 10px !important; font-weight: 600 !important;
+            color: white !important; border: none !important;
         }
+        
+        /* Social Buttons */
         .social-btn {
             display: flex; align-items: center; justify-content: center;
             width: 100%; padding: 10px; border-radius: 10px; font-weight: 600; font-size: 14px; text-decoration: none;
@@ -2483,6 +2496,25 @@ def render_login_signup():
         .google-btn:hover { background-color: #f3f4f6; color: #000; }
         .facebook-btn { background-color: #1877F2; color: #ffffff; border: none; }
         .facebook-btn:hover { background-color: #166fe5; color: #fff; }
+
+        /* Premium Plan Cards */
+        .premium-card {
+            background: rgba(30, 27, 75, 0.4); border: 1px solid rgba(139, 92, 246, 0.3);
+            border-radius: 20px; padding: 25px; height: 100%; box-shadow: 0 0 30px rgba(139, 92, 246, 0.15);
+            position: relative;
+        }
+        .free-card {
+            background: rgba(31, 41, 55, 0.3); border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px; padding: 25px; height: 100%;
+        }
+        .feature-list { list-style: none; padding: 0; margin: 15px 0; color: #d1d5db; font-size: 13px; line-height: 2; }
+        .feature-list li { display: flex; align-items: center; gap: 8px; }
+        .feature-list li::before { content: "✔"; color: #10b981; font-weight: bold; }
+        .premium-feature li::before { content: "✨"; color: #8b5cf6; }
+        
+        /* Hide default streamlit elements for plan */
+        div[data-testid="stButton"]:has(div:contains("Start Free Trial")) button { background-color: transparent !important; color: white !important; border: 1px solid #4b5563 !important; }
+        div[data-testid="stButton"]:has(div:contains("Buy Premium")) button { background: linear-gradient(90deg, #8b5cf6 0%, #6d28d9 100%) !important; color: white !important; border: none !important; box-shadow: 0 4px 20px rgba(139, 92, 246, 0.4) !important; }
     </style>
     """, unsafe_allow_html=True)
 
@@ -2510,7 +2542,7 @@ def render_login_signup():
             st.session_state.user_email = supabase.auth.get_user(access_token).user.email
             st.session_state.logged_in = True
             st.session_state.is_paid = False
-            st.session_state.plan_selected = False # Login ke baad plan select karna hai
+            st.session_state.plan_selected = False 
             st.query_params.clear()
             st.toast("Welcome back! Login successful.", icon="👋")
             st.rerun()
@@ -2564,7 +2596,7 @@ def render_login_signup():
                         st.session_state.user_email=email
                         st.session_state.logged_in = True
                         st.session_state.is_paid = False
-                        st.session_state.plan_selected = False # Trial abhi start nahi hoga
+                        st.session_state.plan_selected = False 
                         st.success("Welcome! Login successful.")
                         st.toast(f"Welcome back, {email}!", icon="✅")
                         st.rerun()
@@ -2604,42 +2636,65 @@ def render_login_signup():
         st.stop() # 🛑 Login ke bina aage nahi jayega
 
     # ==========================================
-    # 🛑 2. PLAN SELECTION (Naya Logic)
+    # 🛑 2. PREMIUM PLAN SELECTION (NEW UI)
     # ==========================================
     if "plan_selected" not in st.session_state or not st.session_state.plan_selected:
-        st.markdown("<h2 style='text-align: center; color:white; margin-top: 30px;'>Choose Your Plan</h2>", unsafe_allow_html=True)
+        st.markdown("""
+        <div style="text-align: center; margin-top: 1rem; margin-bottom: 2rem;">
+            <h1 style="color: white; font-size: 34px; font-weight: 800;">Unlock your Productivity</h1>
+            <p style="color: #9ca3af; font-size: 15px;">Choose a plan that fits your learning journey.</p>
+        </div>
+        """, unsafe_allow_html=True)
+
+        col1, col2 = st.columns(2, gap="large")
         
-        col1, col2 = st.columns(2)
+        # LEFT: FREE TRIAL
         with col1:
             st.markdown("""
-            <div style="background: rgba(255, 255, 255, 0.05); padding: 30px; border-radius: 15px; text-align: center; border: 1px solid #333; height: 220px;">
-                <h3 style="color: white;">Free Trial</h3>
-                <h1 style="color: #3b82f6; font-size: 40px;">24 Hours</h1>
-                <p style="color: #9ca3af;">Try all features for 1 day.</p>
+            <div class="free-card">
+                <h3 style="color: white; margin: 0;">Basic Plan</h3>
+                <p style="color: #9ca3af; font-size: 13px; margin-top: 5px;">Perfect for exploring.</p>
+                <div style="margin: 15px 0;">
+                    <span style="color: #3b82f6; font-size: 38px; font-weight: 800;">Free</span>
+                    <span style="color: #9ca3af; font-size: 14px;"> / 24 Hours</span>
+                </div>
+                <ul class="feature-list">
+                    <li>Access to all labs</li>
+                    <li>AI Homework & Test</li>
+                    <li>Language & Cyber</li>
+                </ul>
             </div>
             """, unsafe_allow_html=True)
-            if st.button("Start Free Trial", use_container_width=True, type="primary"):
+            if st.button("Start Free Trial", use_container_width=True):
                 st.session_state.plan_selected = True
                 st.session_state.trial_start = datetime.datetime.now()
+                st.session_state.is_paid = False
                 st.rerun()
 
+        # RIGHT: PREMIUM
         with col2:
             st.markdown("""
-            <div style="background: rgba(139, 92, 246, 0.1); padding: 30px; border-radius: 15px; text-align: center; border: 2px solid #8b5cf6; height: 220px;">
-                <h3 style="color: #8b5cf6;">Premium</h3>
-                <h1 style="color: #8b5cf6; font-size: 40px;">₹1499 <span style="font-size: 14px; color: #aaa;">/month</span></h1>
-                <p style="color: #9ca3af;">Unlimited access forever.</p>
+            <div class="premium-card">
+                <div style="position: absolute; top: 15px; right: 15px; background: rgba(139, 92, 246, 0.2); color: #a78bfa; padding: 4px 10px; border-radius: 20px; font-size: 10px; font-weight: 700; border: 1px solid rgba(139, 92, 246, 0.3);">POPULAR</div>
+                <h3 style="color: #a78bfa; margin: 0;">Premium</h3>
+                <p style="color: #9ca3af; font-size: 13px; margin-top: 5px;">For serious learners.</p>
+                <div style="margin: 15px 0;">
+                    <span style="color: white; font-size: 38px; font-weight: 800;">₹1499</span>
+                    <span style="color: #9ca3af; font-size: 14px;"> / month</span>
+                </div>
+                <ul class="feature-list premium-feature">
+                    <li>Everything in Basic</li>
+                    <li>Unlimited Chats</li>
+                    <li>Priority AI Speed</li>
+                </ul>
             </div>
             """, unsafe_allow_html=True)
-            
-            # 🚨 APNA INSTAMOJO LINK YAHAN DAALEIN 🚨
-            INSTAMOJO_LINK = "https://imjo.in/YourLinkHere"
             
             if st.button("Buy Premium ₹1499", use_container_width=True):
                 webbrowser.open_new_tab(INSTAMOJO_LINK)
-                st.info("Payment complete karne ke baad 'I have paid' par click karein.")
+                st.info("Payment ke baad 'I have paid' par click karein.")
                 
-            if st.button("✅ I have paid (Unlock App)"):
+            if st.button("✅ I have paid (Unlock)"):
                 st.session_state.plan_selected = True
                 st.session_state.is_paid = True
                 st.rerun()
@@ -2659,7 +2714,7 @@ def render_login_signup():
                 col1, col2, col3 = st.columns([1, 2, 1])
                 with col2:
                     st.markdown("""
-                    <div style="background:rgba(139,92,246,0.1); border:2px solid #8b5cf6; padding:30px; border-radius:15px; text-align:center;">
+                    <div style="background:rgba(139,92,246,0.1); border:2px solid #8b5cf6; padding:20px; border-radius:15px; text-align:center;">
                         <h3 style="color:#8b5cf6;">Premium Plan</h3>
                         <h1 style="color:#8b5cf6; font-size: 40px;">₹1499 <span style="font-size:14px; color:#aaa;">/month</span></h1>
                     </div>
@@ -2679,7 +2734,7 @@ def render_login_signup():
                     st.session_state.is_paid = True
                     st.rerun()
                     
-                st.stop() # 🛑 Payment ke bina aage nahi jayega
+                st.stop() # 🛑 Trial khatam, toh lock
 
 def render_image_generator():
     import streamlit as st
