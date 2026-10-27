@@ -2457,46 +2457,63 @@ def render_login_signup():
     INSTAMOJO_MONTHLY_LINK = "https://imjo.in/MonthlyLinkHere"
     INSTAMOJO_YEARLY_LINK = "https://imjo.in/YearlyLinkHere" 
 
-    # 🎨 ULTRA PREMIUM CSS (With Hover Effects)
+    # 🎨 PREMIUM CSS (Hover Effects Added)
     st.markdown("""
     <style>
-        /* Main Background */
-        .stApp { background-color: #0b0f19 !important; }
-        header {visibility: hidden;} footer {visibility: hidden;}
+        @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css');
         
-        /* 🛑 HIDE SIDEBAR UNTIL LOGIN + PLAN */
+        .stApp { background: radial-gradient(circle at top right, #1e1b4b 0%, #050814 50%) !important; }
+        header {visibility: hidden;} footer {visibility: hidden;}
         [data-testid="stSidebar"] { display: none !important; }
-
-        .block-container { max-width: 1100px !important; padding-top: 2rem !important; }
+        .block-container { max-width: 1000px !important; padding-top: 2rem !important; }
         
         /* Inputs */
         .stTextInput input {
-            background-color: #111827 !important; color: white !important;
-            border: 1px solid #374151 !important; border-radius: 10px !important; padding: 12px !important;
+            background-color: #0b0e17 !important; color: white !important;
+            border: 1px solid #1c2538 !important; border-radius: 10px !important; padding: 12px !important;
         }
-        .stTextInput input:focus { border-color: #8b5cf6 !important; }
+        .stTextInput input:focus { border-color: #3b82f6 !important; box-shadow: 0 0 0 1px #3b82f6 !important; }
         
-        /* Hide default Streamlit Button borders */
-        .stButton button {
-            width: 100% !important; border-radius: 12px !important; font-weight: 600 !important; padding: 10px !important;
-            transition: all 0.2s !important;
+        .divider { display: flex; align-items: center; text-align: center; color: #4b5563; margin: 20px 0; font-size: 13px; font-weight: bold; }
+        .divider::before, .divider::after { content: ''; flex: 1; border-bottom: 1px solid #1c2538; }
+        .divider::before { margin-right: 15px; } .divider::after { margin-left: 15px; }
+        
+        /* Buttons */
+        .stButton button { width: 100% !important; border-radius: 10px !important; font-weight: 600 !important; padding: 10px !important; }
+        div[data-testid="stButton"]:has(div:contains("Log In")) button,
+        div[data-testid="stButton"]:has(div:contains("Create Account")) button,
+        div[data-testid="stButton"]:has(div:contains("Update Password")) button {
+            background: linear-gradient(90deg, #3b82f6 0%, #8b5cf6 100%) !important;
+            color: white !important; border: none !important;
         }
+        
+        /* Social Buttons */
+        .social-btn {
+            display: flex; align-items: center; justify-content: center;
+            width: 100%; padding: 10px; border-radius: 10px; font-weight: 600; font-size: 14px; text-decoration: none;
+            margin-bottom: 10px; transition: 0.3s;
+        }
+        .social-btn img { width: 20px; height: 20px; margin-right: 10px; }
+        .google-btn { background-color: #ffffff; color: #000000; border: 1px solid #ddd; }
+        .google-btn:hover { background-color: #f3f4f6; color: #000; }
+        .facebook-btn { background-color: #1877F2; color: #ffffff; border: none; }
+        .facebook-btn:hover { background-color: #166fe5; color: #fff; }
 
         /* =========================================
-           CARD BASE STYLES (WITH ANIMATION)
+           PREMIUM PLAN CARDS (WITH HOVER EFFECTS)
            ========================================= */
         .pricing-card {
             background: #111827; border-radius: 20px; padding: 30px; 
             border: 1px solid #1f2937; text-align: left; position: relative;
             height: 100%; display: flex; flex-direction: column; justify-content: space-between;
-            transition: all 0.3s ease-in-out; /* Smooth transition for hover */
+            transition: all 0.3s ease-in-out; /* Smooth hover transition */
             cursor: pointer;
         }
         
-        /* Common Hover Effect for all cards (Floating + Shadow) */
+        /* Common Hover Floating Effect */
         .pricing-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 15px 30px rgba(0,0,0,0.4);
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
         }
 
         /* Specific Card Overrides */
@@ -2538,7 +2555,7 @@ def render_login_signup():
         .feature-list li { margin-bottom: 12px; display: flex; align-items: center; gap: 10px; }
         .feature-list li::before { content: "✔"; color: #10b981; font-weight: bold; font-size: 14px; }
 
-        /* Custom Button Styling */
+        /* Custom Button Styles inside Cards */
         div[data-testid="stButton"]:has(div:contains("Start Free Trial")) button { background-color: transparent !important; color: #3b82f6 !important; border: 1px solid #3b82f6 !important; }
         div[data-testid="stButton"]:has(div:contains("Start Free Trial")) button:hover { background-color: #3b82f6 !important; color: white !important; }
         
@@ -2548,26 +2565,45 @@ def render_login_signup():
         div[data-testid="stButton"]:has(div:contains("Buy Yearly")) button { background-color: #f59e0b !important; color: white !important; border: none !important; }
         div[data-testid="stButton"]:has(div:contains("Buy Yearly")) button:hover { background-color: #d97706 !important; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4) !important; }
 
-        /* Verification Buttons */
+        /* I have paid button styling */
         div[data-testid="stButton"]:has(div:contains("I have paid")) button { background-color: #1f2937 !important; color: #9ca3af !important; border: 1px solid #374151 !important; font-size: 12px !important; margin-top: 5px; }
         div[data-testid="stButton"]:has(div:contains("I have paid")) button:hover { background-color: #374151 !important; color: white !important; }
-        
-        /* Footer */
-        .footer-pro { text-align: center; margin-top: 50px; color: #6b7280; font-size: 14px; padding-top: 20px; border-top: 1px solid #1f2937; }
-        .footer-pro a { color: #8b5cf6; text-decoration: none; margin: 0 10px; font-weight: 600; }
-        .footer-pro a:hover { text-decoration: underline; color: #a78bfa; }
+
+        /* =========================================
+           PROFESSIONAL FOOTER
+           ========================================= */
+        .footer-pro { 
+            text-align: center; margin-top: 60px; padding-top: 30px; 
+            border-top: 1px solid #1f2937; color: #9ca3af; font-size: 14px;
+        }
+        .footer-pro .contact-info { 
+            display: flex; justify-content: center; gap: 30px; margin-bottom: 20px; flex-wrap: wrap;
+        }
+        .footer-pro .contact-info div { display: flex; align-items: center; gap: 8px; }
+        .footer-pro .contact-info i { color: #8b5cf6; font-size: 16px; }
+        .footer-pro .social-links { display: flex; justify-content: center; gap: 15px; margin-bottom: 20px; }
+        .footer-pro .social-links a { 
+            color: #9ca3af; font-size: 20px; transition: 0.3s; text-decoration: none;
+        }
+        .footer-pro .social-links a:hover { color: #8b5cf6; transform: scale(1.2); }
+        .footer-pro .copyright { font-size: 12px; color: #4b5563; }
     </style>
     """, unsafe_allow_html=True)
 
-    # 🪄 URL Token Catcher
+    # 🪄 URL Token Catcher (Password Reset Support)
     components.html("""
         <script>
             var hash = window.location.hash;
             if (hash) {
                 var params = new URLSearchParams(hash.substring(1));
                 var accessToken = params.get('access_token');
+                var refreshToken = params.get('refresh_token');
+                var type = params.get('type');
                 if (accessToken) {
-                    window.location.replace(window.location.origin + window.location.pathname + '?access_token=' + accessToken);
+                    var newUrl = window.location.origin + window.location.pathname + '?access_token=' + accessToken;
+                    if (refreshToken) newUrl += '&refresh_token=' + refreshToken;
+                    if (type) newUrl += '&type=' + type;
+                    window.location.replace(newUrl);
                 }
             }
         </script>
@@ -2576,13 +2612,48 @@ def render_login_signup():
     if "access_token" in st.query_params:
         try:
             access_token = urllib.parse.unquote(st.query_params["access_token"])
-            supabase.auth.set_session(access_token, "")
-            st.session_state.user_email = supabase.auth.get_user(access_token).user.email
-            st.session_state.logged_in = True
-            st.query_params.clear()
-            st.rerun()
+            refresh_token = st.query_params.get("refresh_token", "")
+            token_type = st.query_params.get("type", "")
+            
+            if token_type == "recovery":
+                st.session_state.recovery_mode = True
+                st.session_state.recovery_token = access_token
+                st.session_state.recovery_refresh = refresh_token
+                st.query_params.clear()
+                st.rerun()
+            else:
+                supabase.auth.set_session(access_token, refresh_token)
+                st.session_state.user_email = supabase.auth.get_user(access_token).user.email
+                st.session_state.logged_in = True
+                st.query_params.clear()
+                st.rerun()
         except Exception as e:
             st.error(f"Auth Error: {e}")
+
+    # ==========================================
+    # 🛑 PASSWORD RECOVERY UI
+    # ==========================================
+    if st.session_state.get("recovery_mode", False):
+        st.markdown("""
+        <div style="text-align: center; margin-bottom: 30px;">
+            <h1 style="color: white; font-size: 34px; font-weight: 800; margin-bottom: 5px;">Create New Password</h1>
+            <p style="color: #9ca3af; font-size: 14px;">Enter your new password below.</p>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        new_password = st.text_input("New Password", type="password", key="new_pwd", placeholder="Enter new password", label_visibility="collapsed")
+        
+        if st.button("Update Password", type="primary", use_container_width=True, key="btn_update_pwd"):
+            with st.spinner("Updating password..."):
+                try:
+                    supabase.auth.set_session(st.session_state.recovery_token, st.session_state.recovery_refresh)
+                    supabase.auth.update_user({"password": new_password})
+                    st.success("✅ Password updated successfully! Please log in.")
+                    st.session_state.clear()
+                    st.rerun()
+                except Exception as e:
+                    st.error(f"Failed to update password: {e}")
+        st.stop()
 
     # ==========================================
     # 🛑 1. LOGIN / SIGNUP UI
@@ -2606,15 +2677,15 @@ def render_login_signup():
         except Exception: pass
 
         st.markdown(f"""
-            <a href="{google_url}" target="_self" style="display:flex; align-items:center; justify-content:center; background:#fff; color:#000; padding:12px; border-radius:10px; font-weight:600; text-decoration:none; margin-bottom:10px; transition:0.2s;" onmouseover="this.style.background='#e5e7eb'" onmouseout="this.style.background='#fff'">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" width="20" style="margin-right:10px;"> Continue with Google
+            <a href="{google_url}" target="_self" class="social-btn google-btn">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="G"> Continue with Google
             </a>
-            <a href="{fb_url}" target="_self" style="display:flex; align-items:center; justify-content:center; background:#1877F2; color:#fff; padding:12px; border-radius:10px; font-weight:600; text-decoration:none; margin-bottom:10px; transition:0.2s;" onmouseover="this.style.background='#166fe5'" onmouseout="this.style.background='#1877F2'">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/b/b9/2023_Facebook_icon.svg" width="20" style="margin-right:10px;"> Continue with Facebook
+            <a href="{fb_url}" target="_self" class="social-btn facebook-btn">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/b/b9/2023_Facebook_icon.svg" alt="F"> Continue with Facebook
             </a>
         """, unsafe_allow_html=True)
 
-        st.markdown('<div style="text-align: center; color: #4b5563; margin: 20px 0; font-weight: bold;">OR</div>', unsafe_allow_html=True)
+        st.markdown('<div class="divider">OR</div>', unsafe_allow_html=True)
 
         tab1,tab2=st.tabs(["Log In","Sign Up"])
         
@@ -2636,7 +2707,7 @@ def render_login_signup():
                 if st.button("Send Reset Link", use_container_width=True, key="btn_reset"):
                     try:
                         supabase.auth.reset_password_for_email(reset_email, options={"redirect_to": st.secrets.get("SUPABASE_REDIRECT_URL", "")})
-                        st.success("✅ Password reset link sent!")
+                        st.success("✅ Password reset link sent! Check your email.")
                     except Exception as e: st.error(f"Error: {e}")
 
         with tab2:
@@ -2678,15 +2749,18 @@ def render_login_signup():
                 plan_type = sub_data["plan_type"]
                 plan_name = "Free Trial" if plan_type == "free" else ("Monthly Plan" if plan_type == "monthly" else "Yearly Plan")
                 color = "#3b82f6" if plan_type == "free" else ("#8b5cf6" if plan_type == "monthly" else "#f59e0b")
-                time_left = expiry_date - now
                 
+                time_left = expiry_date - now
+                days_left = time_left.days
+                hours_left = time_left.seconds // 3600
+
                 st.sidebar.markdown(f"""
-                <div style="background: #111827; border-left: 4px solid {color}; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                <div style="background: rgba(30, 27, 75, 0.4); border: 1px solid {color}; border-radius: 10px; padding: 15px; margin-bottom: 20px;">
                     <p style="margin: 0; color: #9ca3af; font-size: 12px;">Logged in as</p>
-                    <h4 style="margin: 0 0 8px 0; color: white; font-size: 14px;">{user_email}</h4>
-                    <div style="background: {color}22; padding: 8px; border-radius: 6px; text-align: center;">
-                        <p style="margin: 0; color: {color}; font-weight: 700; font-size: 13px;">{plan_name}</p>
-                        <p style="margin: 0; color: #d1d5db; font-size: 11px;">⏳ {time_left.days}d {time_left.seconds // 3600}h remaining</p>
+                    <h4 style="margin: 0 0 10px 0; color: white; font-size: 13px;">{user_email}</h4>
+                    <div style="background: {color}22; padding: 8px; border-radius: 8px; text-align: center;">
+                        <p style="margin: 0; color: {color}; font-weight: 700; font-size: 14px;">{plan_name}</p>
+                        <p style="margin: 0; color: #d1d5db; font-size: 11px;">⏳ {days_left}d {hours_left}h remaining</p>
                     </div>
                 </div>
                 """, unsafe_allow_html=True)
@@ -2788,23 +2862,28 @@ def render_login_signup():
         # ================= PROFESSIONAL FOOTER =================
         st.markdown("""
         <div class="footer-pro">
-            <p>Need help? Contact us at <a href="mailto:infocarloxin24@gmail.com">infocarloxin24@gmail.com</a></p>
-            <div style="margin-top: 10px;">
-                <a href="#">Twitter / X</a> • 
-                <a href="#">Instagram</a> • 
-                <a href="#">LinkedIn</a>
+            <div class="contact-info">
+                <div><i class="fa-solid fa-envelope"></i> <a href="mailto:infocarloxin24@gmail.com" style="color:#9ca3af; text-decoration:none;">infocarloxin24@gmail.com</a></div>
+                <div><i class="fa-solid fa-phone"></i> +91 98765 43210</div>
+                <div><i class="fa-solid fa-location-dot"></i> Mumbai, India</div>
             </div>
-            <p style="margin-top: 15px; font-size: 12px; color: #4b5563;">© 2024 Clyxess AI. All rights reserved.</p>
+            <div class="social-links">
+                <a href="#"><i class="fa-brands fa-instagram"></i></a>
+                <a href="#"><i class="fa-brands fa-x-twitter"></i></a>
+                <a href="#"><i class="fa-brands fa-linkedin"></i></a>
+                <a href="#"><i class="fa-brands fa-github"></i></a>
+            </div>
+            <div class="copyright">
+                &copy; 2024 Clyxess AI. All rights reserved.
+            </div>
         </div>
         """, unsafe_allow_html=True)
 
-        st.stop() 
+        st.stop()
 
     # ==========================================
     # ✅ DASHBOARD (IF PLAN ACTIVE)
     # ==========================================
-    
-    # Testing Reset Button
     if st.sidebar.button("🛠️ [Testing] Reset My Plan", use_container_width=True, key="btn_reset_plan"):
         supabase.table("user_subscriptions").delete().eq("id", user_id).execute()
         st.rerun()
@@ -2813,20 +2892,15 @@ def render_login_signup():
         st.session_state.clear()
         st.rerun()
 
-    # Features Menu
     st.sidebar.markdown("### 📚 Select Mode")
     mode = st.sidebar.radio("", ["Normal Chat", "Cyber Security", "Homework"])
     
-    # 👇 YAHAN APNE PURANE MODULES CALL KARO
     if mode == "Normal Chat":
         st.write("Welcome to Normal Chat...")
-        # render_normal_chat()
     elif mode == "Cyber Security":
         st.write("Welcome to Cyber Security...")
-        # render_cyber_security()
     elif mode == "Homework":
         st.write("Welcome to Homework...")
-        # render_homework_test()
 
 def render_image_generator():
     import streamlit as st
