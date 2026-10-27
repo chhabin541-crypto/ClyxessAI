@@ -2817,7 +2817,7 @@ def render_login_signup():
                 <a href="#"><i class="fa-brands fa-instagram"></i></a>
                 <a href="#"><i class="fa-brands fa-x-twitter"></i></a>
                 <a href="#"><i class="fa-brands fa-linkedin"></i></a>
-                <a href="#"><i class="fa-brands fa-github"></i></a>
+                <a href="#"><i class="fa-brands fa-"></i></a>
             </div>
             <div class="copyright">
                 &copy; 2026 Clyxess AI. All rights reserved.
