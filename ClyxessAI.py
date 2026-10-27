@@ -2810,7 +2810,7 @@ def render_login_signup():
         <div class="footer-pro">
             <div class="contact-info">
                 <div><i class="fa-solid fa-envelope"></i> <a href="mailto:infocarloxin24@gmail.com" style="color:#9ca3af; text-decoration:none;">infocarloxin24@gmail.com</a></div>
-                <div><i class="fa-solid fa-phone"></i> tel:+917647996793</div>
+                <div><i class="fa-solid fa-phone"></i> <a href="tel:+917647996793</div>
                 <div><i class="fa-solid fa-location-dot"></i> Raipur 493221, India</div>
             </div>
             <div class="social-links">
