@@ -2457,23 +2457,21 @@ def render_login_signup():
     INSTAMOJO_MONTHLY_LINK = "https://imjo.in/MonthlyLinkHere"
     INSTAMOJO_YEARLY_LINK = "https://imjo.in/YearlyLinkHere" 
 
-    # 🎨 PREMIUM CSS (Hover Effects Added)
+    # 🎨 PREMIUM CSS
     st.markdown("""
     <style>
-        @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css');
-        
         .stApp { background: radial-gradient(circle at top right, #1e1b4b 0%, #050814 50%) !important; }
         header {visibility: hidden;} footer {visibility: hidden;}
-        [data-testid="stSidebar"] { display: none !important; }
-        .block-container { max-width: 1000px !important; padding-top: 2rem !important; }
         
-        /* Inputs */
+        /* 🛑 HIDE SIDEBAR UNTIL LOGIN + PLAN */
+        [data-testid="stSidebar"] { display: none !important; }
+
+        .block-container { max-width: 900px !important; padding-top: 2rem !important; }
         .stTextInput input {
             background-color: #0b0e17 !important; color: white !important;
             border: 1px solid #1c2538 !important; border-radius: 10px !important; padding: 12px !important;
         }
         .stTextInput input:focus { border-color: #3b82f6 !important; box-shadow: 0 0 0 1px #3b82f6 !important; }
-        
         .divider { display: flex; align-items: center; text-align: center; color: #4b5563; margin: 20px 0; font-size: 13px; font-weight: bold; }
         .divider::before, .divider::after { content: ''; flex: 1; border-bottom: 1px solid #1c2538; }
         .divider::before { margin-right: 15px; } .divider::after { margin-left: 15px; }
@@ -2481,8 +2479,7 @@ def render_login_signup():
         /* Buttons */
         .stButton button { width: 100% !important; border-radius: 10px !important; font-weight: 600 !important; padding: 10px !important; }
         div[data-testid="stButton"]:has(div:contains("Log In")) button,
-        div[data-testid="stButton"]:has(div:contains("Create Account")) button,
-        div[data-testid="stButton"]:has(div:contains("Update Password")) button {
+        div[data-testid="stButton"]:has(div:contains("Create Account")) button {
             background: linear-gradient(90deg, #3b82f6 0%, #8b5cf6 100%) !important;
             color: white !important; border: none !important;
         }
@@ -2499,110 +2496,32 @@ def render_login_signup():
         .facebook-btn { background-color: #1877F2; color: #ffffff; border: none; }
         .facebook-btn:hover { background-color: #166fe5; color: #fff; }
 
-        /* =========================================
-           PREMIUM PLAN CARDS (WITH HOVER EFFECTS)
-           ========================================= */
-        .pricing-card {
-            background: #111827; border-radius: 20px; padding: 30px; 
-            border: 1px solid #1f2937; text-align: left; position: relative;
-            height: 100%; display: flex; flex-direction: column; justify-content: space-between;
-            transition: all 0.3s ease-in-out; /* Smooth hover transition */
-            cursor: pointer;
+        /* Premium Plan Cards */
+        .premium-card {
+            background: rgba(30, 27, 75, 0.4); border: 1px solid rgba(139, 92, 246, 0.3);
+            border-radius: 20px; padding: 25px; height: 100%; box-shadow: 0 0 30px rgba(139, 92, 246, 0.15);
+            position: relative; text-align: center;
+        }
+        .free-card {
+            background: rgba(31, 41, 55, 0.3); border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px; padding: 25px; height: 100%; text-align: center;
         }
         
-        /* Common Hover Floating Effect */
-        .pricing-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
-        }
-
-        /* Specific Card Overrides */
-        .card-free { border-top: 4px solid #3b82f6; }
-        .card-free:hover { 
-            background: #1e293b; 
-            border-color: #60a5fa; 
-            box-shadow: 0 15px 30px rgba(59, 130, 246, 0.2); 
-        }
-        
-        .card-monthly { border-top: 4px solid #8b5cf6; border: 1px solid #8b5cf6; box-shadow: 0 0 30px rgba(139, 92, 246, 0.15); background: #15132b; }
-        .card-monthly:hover { 
-            background: #1e1a3d; 
-            border-color: #a78bfa; 
-            box-shadow: 0 15px 40px rgba(139, 92, 246, 0.4); 
-        }
-        
-        .card-yearly { border-top: 4px solid #f59e0b; }
-        .card-yearly:hover { 
-            background: #1e293b; 
-            border-color: #fbbf24; 
-            box-shadow: 0 15px 30px rgba(245, 158, 11, 0.2); 
-        }
-
-        .card-title { color: white; font-size: 20px; font-weight: 700; margin-bottom: 5px; }
-        .card-price { color: white; font-size: 42px; font-weight: 800; margin: 15px 0 5px 0; }
-        .card-price span { font-size: 14px; color: #9ca3af; font-weight: 400; }
-        
-        .badge-popular {
-            position: absolute; top: -14px; right: 20px; background: #8b5cf6; color: white;
-            padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; letter-spacing: 0.5px;
-        }
-        .badge-save {
-            position: absolute; top: -14px; right: 20px; background: #f59e0b; color: white;
-            padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; letter-spacing: 0.5px;
-        }
-
-        .feature-list { list-style: none; padding: 0; margin: 20px 0; color: #d1d5db; font-size: 13px; }
-        .feature-list li { margin-bottom: 12px; display: flex; align-items: center; gap: 10px; }
-        .feature-list li::before { content: "✔"; color: #10b981; font-weight: bold; font-size: 14px; }
-
-        /* Custom Button Styles inside Cards */
-        div[data-testid="stButton"]:has(div:contains("Start Free Trial")) button { background-color: transparent !important; color: #3b82f6 !important; border: 1px solid #3b82f6 !important; }
-        div[data-testid="stButton"]:has(div:contains("Start Free Trial")) button:hover { background-color: #3b82f6 !important; color: white !important; }
-        
-        div[data-testid="stButton"]:has(div:contains("Buy Monthly")) button { background-color: #8b5cf6 !important; color: white !important; border: none !important; }
-        div[data-testid="stButton"]:has(div:contains("Buy Monthly")) button:hover { background-color: #7c3aed !important; box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4) !important; }
-        
-        div[data-testid="stButton"]:has(div:contains("Buy Yearly")) button { background-color: #f59e0b !important; color: white !important; border: none !important; }
-        div[data-testid="stButton"]:has(div:contains("Buy Yearly")) button:hover { background-color: #d97706 !important; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4) !important; }
-
-        /* I have paid button styling */
-        div[data-testid="stButton"]:has(div:contains("I have paid")) button { background-color: #1f2937 !important; color: #9ca3af !important; border: 1px solid #374151 !important; font-size: 12px !important; margin-top: 5px; }
-        div[data-testid="stButton"]:has(div:contains("I have paid")) button:hover { background-color: #374151 !important; color: white !important; }
-
-        /* =========================================
-           PROFESSIONAL FOOTER
-           ========================================= */
-        .footer-pro { 
-            text-align: center; margin-top: 60px; padding-top: 30px; 
-            border-top: 1px solid #1f2937; color: #9ca3af; font-size: 14px;
-        }
-        .footer-pro .contact-info { 
-            display: flex; justify-content: center; gap: 30px; margin-bottom: 20px; flex-wrap: wrap;
-        }
-        .footer-pro .contact-info div { display: flex; align-items: center; gap: 8px; }
-        .footer-pro .contact-info i { color: #8b5cf6; font-size: 16px; }
-        .footer-pro .social-links { display: flex; justify-content: center; gap: 15px; margin-bottom: 20px; }
-        .footer-pro .social-links a { 
-            color: #9ca3af; font-size: 20px; transition: 0.3s; text-decoration: none;
-        }
-        .footer-pro .social-links a:hover { color: #8b5cf6; transform: scale(1.2); }
-        .footer-pro .copyright { font-size: 12px; color: #4b5563; }
+        div[data-testid="stButton"]:has(div:contains("Start Free Trial")) button { background-color: transparent !important; color: white !important; border: 1px solid #4b5563 !important; }
+        div[data-testid="stButton"]:has(div:contains("Buy Monthly")) button { background: linear-gradient(90deg, #8b5cf6 0%, #6d28d9 100%) !important; color: white !important; border: none !important; }
+        div[data-testid="stButton"]:has(div:contains("Buy Yearly")) button { background: linear-gradient(90deg, #f59e0b 0%, #d97706 100%) !important; color: white !important; border: none !important; }
     </style>
     """, unsafe_allow_html=True)
 
-    # 🪄 URL Token Catcher (Password Reset Support)
+    # 🪄 URL Token Catcher
     components.html("""
         <script>
             var hash = window.location.hash;
             if (hash) {
                 var params = new URLSearchParams(hash.substring(1));
                 var accessToken = params.get('access_token');
-                var refreshToken = params.get('refresh_token');
-                var type = params.get('type');
                 if (accessToken) {
                     var newUrl = window.location.origin + window.location.pathname + '?access_token=' + accessToken;
-                    if (refreshToken) newUrl += '&refresh_token=' + refreshToken;
-                    if (type) newUrl += '&type=' + type;
                     window.location.replace(newUrl);
                 }
             }
@@ -2612,48 +2531,13 @@ def render_login_signup():
     if "access_token" in st.query_params:
         try:
             access_token = urllib.parse.unquote(st.query_params["access_token"])
-            refresh_token = st.query_params.get("refresh_token", "")
-            token_type = st.query_params.get("type", "")
-            
-            if token_type == "recovery":
-                st.session_state.recovery_mode = True
-                st.session_state.recovery_token = access_token
-                st.session_state.recovery_refresh = refresh_token
-                st.query_params.clear()
-                st.rerun()
-            else:
-                supabase.auth.set_session(access_token, refresh_token)
-                st.session_state.user_email = supabase.auth.get_user(access_token).user.email
-                st.session_state.logged_in = True
-                st.query_params.clear()
-                st.rerun()
+            supabase.auth.set_session(access_token, "")
+            st.session_state.user_email = supabase.auth.get_user(access_token).user.email
+            st.session_state.logged_in = True
+            st.query_params.clear()
+            st.rerun()
         except Exception as e:
             st.error(f"Auth Error: {e}")
-
-    # ==========================================
-    # 🛑 PASSWORD RECOVERY UI
-    # ==========================================
-    if st.session_state.get("recovery_mode", False):
-        st.markdown("""
-        <div style="text-align: center; margin-bottom: 30px;">
-            <h1 style="color: white; font-size: 34px; font-weight: 800; margin-bottom: 5px;">Create New Password</h1>
-            <p style="color: #9ca3af; font-size: 14px;">Enter your new password below.</p>
-        </div>
-        """, unsafe_allow_html=True)
-        
-        new_password = st.text_input("New Password", type="password", key="new_pwd", placeholder="Enter new password", label_visibility="collapsed")
-        
-        if st.button("Update Password", type="primary", use_container_width=True, key="btn_update_pwd"):
-            with st.spinner("Updating password..."):
-                try:
-                    supabase.auth.set_session(st.session_state.recovery_token, st.session_state.recovery_refresh)
-                    supabase.auth.update_user({"password": new_password})
-                    st.success("✅ Password updated successfully! Please log in.")
-                    st.session_state.clear()
-                    st.rerun()
-                except Exception as e:
-                    st.error(f"Failed to update password: {e}")
-        st.stop()
 
     # ==========================================
     # 🛑 1. LOGIN / SIGNUP UI
@@ -2661,8 +2545,8 @@ def render_login_signup():
     if not st.session_state.get("logged_in", False):
         st.markdown("""
         <div style="text-align: center; margin-bottom: 30px;">
-            <h1 style="color: white; font-size: 36px; font-weight: 800; margin-bottom: 5px;">Clyxess <span style="color: #8b5cf6;">AI</span></h1>
-            <p style="color: #9ca3af; font-size: 15px;">Learn future with Clyxess AI school</p>
+            <h1 style="color: white; font-size: 34px; font-weight: 800; margin-bottom: 5px;">Clyxess <span style="color: #3b82f6;">AI</span></h1>
+            <p style="color: #9ca3af; font-size: 14px;">Learn future with Clyxess AI school</p>
         </div>
         """, unsafe_allow_html=True)
         
@@ -2671,6 +2555,7 @@ def render_login_signup():
             r_google = supabase.auth.sign_in_with_oauth({"provider": "google", "options": {"redirect_to": st.secrets.get("SUPABASE_REDIRECT_URL", "")}})
             google_url = r_google.url
         except Exception: pass
+
         try:
             r_fb = supabase.auth.sign_in_with_oauth({"provider": "facebook", "options": {"redirect_to": st.secrets.get("SUPABASE_REDIRECT_URL", "")}})
             fb_url = r_fb.url
@@ -2707,7 +2592,7 @@ def render_login_signup():
                 if st.button("Send Reset Link", use_container_width=True, key="btn_reset"):
                     try:
                         supabase.auth.reset_password_for_email(reset_email, options={"redirect_to": st.secrets.get("SUPABASE_REDIRECT_URL", "")})
-                        st.success("✅ Password reset link sent! Check your email.")
+                        st.success("✅ Password reset link sent!")
                     except Exception as e: st.error(f"Error: {e}")
 
         with tab2:
@@ -2722,19 +2607,21 @@ def render_login_signup():
                         st.success("✅ Account created! Please Log In to continue.")
                     except Exception as e: st.error(f"Sign up failed: {e}")
                 
-        st.stop()
+        st.stop() # 🛑 Login ke bina aage nahi jayega
 
     # ==========================================
     # 📧 DATABASE LOGIC (PLAN SELECTION GATE)
     # ==========================================
     user_email = st.session_state.get("user_email", "")
     user_id = supabase.auth.get_user().user.id
+    
+    # DB se data fetch karo
     res = supabase.table("user_subscriptions").select("*").eq("id", user_id).execute()
     
     show_plan_screen = False
     
     if len(res.data) == 0:
-        show_plan_screen = True
+        show_plan_screen = True # Naya user, show plans
     else:
         sub_data = res.data[0]
         expiry_str = sub_data["expiry_date"]
@@ -2743,9 +2630,11 @@ def render_login_signup():
             expiry_date = datetime.datetime.fromisoformat(expiry_str.replace('Z', '+00:00'))
             now = datetime.datetime.now(datetime.timezone.utc)
             if expiry_date <= now:
-                show_plan_screen = True
+                show_plan_screen = True # Plan expired, show plans
             else:
-                show_plan_screen = False
+                show_plan_screen = False # Active plan
+                
+                # Sidebar Status Box
                 plan_type = sub_data["plan_type"]
                 plan_name = "Free Trial" if plan_type == "free" else ("Monthly Plan" if plan_type == "monthly" else "Yearly Plan")
                 color = "#3b82f6" if plan_type == "free" else ("#8b5cf6" if plan_type == "monthly" else "#f59e0b")
@@ -2766,32 +2655,27 @@ def render_login_signup():
                 """, unsafe_allow_html=True)
 
     # ==========================================
-    # 🛑 2. ULTRA PREMIUM PLAN SELECTION SCREEN
+    # 🛑 2. PLAN SELECTION SCREEN
     # ==========================================
     if show_plan_screen:
         st.markdown("""
         <div style="text-align: center; margin-top: 1rem; margin-bottom: 2rem;">
-            <h1 style="color: white; font-size: 38px; font-weight: 800;">Choose your plan</h1>
-            <p style="color: #9ca3af; font-size: 16px;">7 days free trial. No credit card required.</p>
+            <h1 style="color: white; font-size: 34px; font-weight: 800;">Choose Your Plan</h1>
+            <p style="color: #9ca3af; font-size: 15px;">Select a plan to unlock all features.</p>
         </div>
         """, unsafe_allow_html=True)
 
-        col1, col2, col3 = st.columns(3, gap="large")
+        col1, col2, col3 = st.columns(3, gap="medium")
         
-        # ================= FREE TRIAL =================
+        # FREE TRIAL
         with col1:
             st.markdown("""
-            <div class="pricing-card card-free">
-                <div>
-                    <div class="card-title">Free</div>
-                    <div class="card-price">₹0 <span>/ 24 hours</span></div>
-                    <ul class="feature-list">
-                        <li>Access to all labs</li>
-                        <li>AI Homework & Test</li>
-                        <li>Language & Cyber Labs</li>
-                        <li>24/7 Customer support</li>
-                    </ul>
+            <div class="free-card">
+                <h3 style="color: white; margin: 0;">Free Trial</h3>
+                <div style="margin: 15px 0;">
+                    <span style="color: #3b82f6; font-size: 38px; font-weight: 800;">24h</span>
                 </div>
+                <p style="color: #9ca3af; font-size: 13px;">Try all features for 1 day.</p>
             </div>
             """, unsafe_allow_html=True)
             if st.button("Start Free Trial", use_container_width=True, key="btn_free"):
@@ -2801,28 +2685,22 @@ def render_login_signup():
                 }).execute()
                 st.rerun()
 
-        # ================= MONTHLY =================
+        # MONTHLY
         with col2:
             st.markdown("""
-            <div class="pricing-card card-monthly">
-                <div class="badge-popular">MOST POPULAR</div>
-                <div>
-                    <div class="card-title">Premium</div>
-                    <div class="card-price">₹1499 <span>/ month</span></div>
-                    <ul class="feature-list">
-                        <li>Everything in Free</li>
-                        <li>Unlimited AI Chats</li>
-                        <li>Priority AI Speed</li>
-                        <li>Premium Support</li>
-                    </ul>
+            <div class="premium-card">
+                <h3 style="color: #a78bfa; margin: 0;">Monthly</h3>
+                <div style="margin: 15px 0;">
+                    <span style="color: white; font-size: 38px; font-weight: 800;">₹1499</span>
                 </div>
+                <p style="color: #9ca3af; font-size: 13px;">Unlimited access for 30 days.</p>
             </div>
             """, unsafe_allow_html=True)
             
-            if st.button("Buy Premium ₹1499", use_container_width=True, key="btn_m"):
+            if st.button("Buy Monthly ₹1499", use_container_width=True, key="btn_m"):
                 webbrowser.open_new_tab(INSTAMOJO_MONTHLY_LINK)
                 
-            if st.button("✅ I have paid", key="btn_pm"):
+            if st.button("✅ Paid Monthly", key="btn_pm"):
                 expiry = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(days=30)
                 if len(res.data) == 0:
                     supabase.table("user_subscriptions").insert({"id": user_id, "email": user_email, "plan_type": "monthly", "expiry_date": expiry.isoformat(), "is_paid": True}).execute()
@@ -2830,28 +2708,23 @@ def render_login_signup():
                     supabase.table("user_subscriptions").update({"plan_type": "monthly", "expiry_date": expiry.isoformat(), "is_paid": True}).eq("id", user_id).execute()
                 st.rerun()
 
-        # ================= YEARLY =================
+        # YEARLY
         with col3:
             st.markdown("""
-            <div class="pricing-card card-yearly">
-                <div class="badge-save">SAVE ₹100</div>
-                <div>
-                    <div class="card-title">Yearly</div>
-                    <div class="card-price">₹1399 <span>/ month</span></div>
-                    <ul class="feature-list">
-                        <li>Everything in Premium</li>
-                        <li>Billed ₹16788 annually</li>
-                        <li>Highest Priority</li>
-                        <li>Dedicated Manager</li>
-                    </ul>
+            <div class="premium-card" style="border-color: #f59e0b;">
+                <div style="position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: #f59e0b; color: white; padding: 4px 12px; border-radius: 20px; font-size: 10px; font-weight: bold;">SAVE ₹100</div>
+                <h3 style="color: #f59e0b; margin: 0;">Yearly</h3>
+                <div style="margin: 15px 0;">
+                    <span style="color: white; font-size: 38px; font-weight: 800;">₹1399<span style="font-size:14px; color:#aaa;">/mo</span></span>
                 </div>
+                <p style="color: #9ca3af; font-size: 13px;">Billed ₹16788 annually.</p>
             </div>
             """, unsafe_allow_html=True)
             
             if st.button("Buy Yearly ₹1399", use_container_width=True, key="btn_y"):
                 webbrowser.open_new_tab(INSTAMOJO_YEARLY_LINK)
                 
-            if st.button("✅ I have paid", key="btn_py"):
+            if st.button("✅ Paid Yearly", key="btn_py"):
                 expiry = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(days=365)
                 if len(res.data) == 0:
                     supabase.table("user_subscriptions").insert({"id": user_id, "email": user_email, "plan_type": "yearly", "expiry_date": expiry.isoformat(), "is_paid": True}).execute()
@@ -2859,31 +2732,13 @@ def render_login_signup():
                     supabase.table("user_subscriptions").update({"plan_type": "yearly", "expiry_date": expiry.isoformat(), "is_paid": True}).eq("id", user_id).execute()
                 st.rerun()
 
-        # ================= PROFESSIONAL FOOTER =================
-        st.markdown("""
-        <div class="footer-pro">
-            <div class="contact-info">
-                <div><i class="fa-solid fa-envelope"></i> <a href="mailto:infocarloxin24@gmail.com" style="color:#9ca3af; text-decoration:none;">infocarloxin24@gmail.com</a></div>
-                <div><i class="fa-solid fa-phone"></i> +91 98765 43210</div>
-                <div><i class="fa-solid fa-location-dot"></i> Mumbai, India</div>
-            </div>
-            <div class="social-links">
-                <a href="#"><i class="fa-brands fa-instagram"></i></a>
-                <a href="#"><i class="fa-brands fa-x-twitter"></i></a>
-                <a href="#"><i class="fa-brands fa-linkedin"></i></a>
-                <a href="#"><i class="fa-brands fa-github"></i></a>
-            </div>
-            <div class="copyright">
-                &copy; 2024 Clyxess AI. All rights reserved.
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
-
-        st.stop()
+        st.stop() # 🛑 Plan select kiye bina aage nahi jayega.
 
     # ==========================================
     # ✅ DASHBOARD (IF PLAN ACTIVE)
     # ==========================================
+    
+    # 🛠️ TESTING BUTTON (Isko baad mein hata dena)
     if st.sidebar.button("🛠️ [Testing] Reset My Plan", use_container_width=True, key="btn_reset_plan"):
         supabase.table("user_subscriptions").delete().eq("id", user_id).execute()
         st.rerun()
@@ -2892,15 +2747,20 @@ def render_login_signup():
         st.session_state.clear()
         st.rerun()
 
+    # Features Menu
     st.sidebar.markdown("### 📚 Select Mode")
     mode = st.sidebar.radio("", ["Normal Chat", "Cyber Security", "Homework"])
     
+    # 👇 YAHAN APNE PURANE MODULES CALL KARO
     if mode == "Normal Chat":
         st.write("Welcome to Normal Chat...")
+        # render_normal_chat()
     elif mode == "Cyber Security":
         st.write("Welcome to Cyber Security...")
+        # render_cyber_security()
     elif mode == "Homework":
         st.write("Welcome to Homework...")
+        # render_homework_test()
 
 def render_image_generator():
     import streamlit as st
