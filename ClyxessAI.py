@@ -2813,25 +2813,6 @@ def render_login_signup():
                 <div><i class="fa-solid fa-phone"></i> +91 7647996793</div>
                 <div><i class="fa-solid fa-location-dot"></i> Raipur 493221, India</div>
             </div> 
-            <footer style="display:flex; flex-wrap:wrap; gap:30px; padding:40px; background:#0a0e1a; color:white; position:relative;">
-
-  <!-- Corner me Logo - Top Left -->
-  <div style="position:absolute; top:15px; left:20px;">
-    <img src="logo.png" alt="Clyxess AI Logo" style="width:55px; height:55px; border-radius:50%; background:white; padding:5px;">
-  </div>
-
-  <!-- Left Side - Description (Logo ke liye thoda gap diya hai) -->
-  <div style="flex:1.5; min-width:320px; margin-top:60px;">
-    <h3>🚀 Clyxess AI - Baccho Ka Future Lab</h3>
-    <p style="color:#aaa; font-size:13px; line-height:1.8;">
-      ✓ Age-wise AI Chatting & World Languages<br>
-      ✓ Smart Homework & Project Diagram Maker<br>
-      ✓ AeroLab, Rocket Lab, Physics Virtual Lab<br>
-      ✓ Coding, Cyber Security, Data Science, Finance & AI Teacher
-    </p>
-  </div>
-
-</footer>
             <div class="social-links">
                 <a href="https://www.instagram.com/clyxessai?utm_source=qr&exln=b2tpaWQ1dTU3OGI0"><i class="fa-brands fa-instagram"></i></a>
                 <a href="https://x.com/NishadSingcz"><i class="fa-brands fa-twitter"></i></a>
@@ -2939,7 +2920,8 @@ def render_image_generator():
                     st.markdown(res.choices[0].message.content)
                     
                 except Exception as e:
-                    st.error(f"Explanation Error: {e}")
+                    st.error(f"Explanation Error: {e}") 
+        
 def render_coding_lab_mod():
     import streamlit.components.v1 as components
     import socket
