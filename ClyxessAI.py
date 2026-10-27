@@ -2824,14 +2824,13 @@ def render_login_signup():
                 </div>
             </div>
             """, unsafe_allow_html=True)
-            # Streamlit ke native buttons (Ye pakka kaam karenge)
-            col1, col2 = st.columns(2)
+            # Cookie Policy Button
+            if st.button("🍪 Cookie Policy", use_container_width=True):
+               webbrowser.open_new_tab("https://chhabin541-crypto.github.io/ClyxessAI/cookie-policy.html")
 
-            with col1:
-                st.link_button("🍪 Cookie Policy", "https://chhabin541-crypto.github.io/ClyxessAI/cookie-policy.html", use_container_width=True)
-
-            with col2:
-                st.link_button("💸 Refund & Cancellation", "https://chhabin541-crypto.github.io/ClyxessAI/refund-cancellation.html", use_container_width=True)
+            # Refund Policy Button
+            if st.button("💸 Refund & Cancellation", use_container_width=True):
+                webbrowser.open_new_tab("https://chhabin541-crypto.github.io/ClyxessAI/refund-cancellation.html")
             if st.button("Buy Yearly ₹1399", use_container_width=True, key="btn_y"):
                 webbrowser.open_new_tab(INSTAMOJO_YEARLY_LINK)
                 
