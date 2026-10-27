@@ -2457,17 +2457,15 @@ def render_login_signup():
     INSTAMOJO_MONTHLY_LINK = "https://imjo.in/MonthlyLinkHere"
     INSTAMOJO_YEARLY_LINK = "https://imjo.in/YearlyLinkHere" 
 
-    # 🎨 PREMIUM CSS (Sidebar ko hide karne ke liye bhi)
+    # 🎨 PREMIUM CSS
     st.markdown("""
     <style>
-        /* Main Background */
         .stApp { background: radial-gradient(circle at top right, #1e1b4b 0%, #050814 50%) !important; }
         header {visibility: hidden;} footer {visibility: hidden;}
         
         /* 🛑 HIDE SIDEBAR UNTIL LOGIN + PLAN */
         [data-testid="stSidebar"] { display: none !important; }
 
-        /* Login Box */
         .block-container { max-width: 900px !important; padding-top: 2rem !important; }
         .stTextInput input {
             background-color: #0b0e17 !important; color: white !important;
@@ -2508,15 +2506,10 @@ def render_login_signup():
             background: rgba(31, 41, 55, 0.3); border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 20px; padding: 25px; height: 100%; text-align: center;
         }
-        .feature-list { list-style: none; padding: 0; margin: 15px 0; color: #d1d5db; font-size: 13px; line-height: 2; text-align: left;}
-        .feature-list li { display: flex; align-items: center; gap: 8px; }
-        .feature-list li::before { content: "✔"; color: #10b981; font-weight: bold; }
-        .premium-feature li::before { content: "✨"; color: #8b5cf6; }
         
-        /* Hide default streamlit elements for plan */
         div[data-testid="stButton"]:has(div:contains("Start Free Trial")) button { background-color: transparent !important; color: white !important; border: 1px solid #4b5563 !important; }
-        div[data-testid="stButton"]:has(div:contains("Buy Monthly")) button { background: linear-gradient(90deg, #8b5cf6 0%, #6d28d9 100%) !important; color: white !important; border: none !important; box-shadow: 0 4px 20px rgba(139, 92, 246, 0.4) !important; }
-        div[data-testid="stButton"]:has(div:contains("Buy Yearly")) button { background: linear-gradient(90deg, #f59e0b 0%, #d97706 100%) !important; color: white !important; border: none !important; box-shadow: 0 4px 20px rgba(245, 158, 11, 0.4) !important; }
+        div[data-testid="stButton"]:has(div:contains("Buy Monthly")) button { background: linear-gradient(90deg, #8b5cf6 0%, #6d28d9 100%) !important; color: white !important; border: none !important; }
+        div[data-testid="stButton"]:has(div:contains("Buy Yearly")) button { background: linear-gradient(90deg, #f59e0b 0%, #d97706 100%) !important; color: white !important; border: none !important; }
     </style>
     """, unsafe_allow_html=True)
 
@@ -2550,7 +2543,6 @@ def render_login_signup():
     # 🛑 1. LOGIN / SIGNUP UI
     # ==========================================
     if not st.session_state.get("logged_in", False):
-        
         st.markdown("""
         <div style="text-align: center; margin-bottom: 30px;">
             <h1 style="color: white; font-size: 34px; font-weight: 800; margin-bottom: 5px;">Clyxess <span style="color: #3b82f6;">AI</span></h1>
@@ -2586,119 +2578,71 @@ def render_login_signup():
             email=st.text_input("Email",key="login_email", placeholder="Enter your email", label_visibility="collapsed")
             password=st.text_input("Password",type="password",key="login_password", placeholder="Enter password", label_visibility="collapsed")
             
-            # 👇 KEY ADDED HERE
             if st.button("Log In ➔", type="primary", use_container_width=True, key="btn_login"):
                 with st.spinner("Logging you in..."):
                     try:
                         supabase.auth.sign_in_with_password({"email":email,"password":password})
                         st.session_state.user_email=email
                         st.session_state.logged_in = True
-                        st.success("Welcome! Login successful.")
-                        st.toast(f"Welcome back, {email}!", icon="✅")
                         st.rerun()
                     except Exception as e: st.error(f"Login failed: {e}")
             
             with st.expander("Forgot Password?"):
                 reset_email = st.text_input("Enter your registered email", key="reset_email")
-                # 👇 KEY ADDED HERE
                 if st.button("Send Reset Link", use_container_width=True, key="btn_reset"):
                     try:
                         supabase.auth.reset_password_for_email(reset_email, options={"redirect_to": st.secrets.get("SUPABASE_REDIRECT_URL", "")})
-                        st.success("✅ Password reset link successfully sent to your email!")
-                    except Exception as e:
-                        st.error(f"Error: {e}")
+                        st.success("✅ Password reset link sent!")
+                    except Exception as e: st.error(f"Error: {e}")
 
         with tab2:
             name=st.text_input("Name",key="signup_name", placeholder="Your Name", label_visibility="collapsed")
             email=st.text_input("Email",key="signup_email", placeholder="Enter your email", label_visibility="collapsed")
             password=st.text_input("Password",type="password",key="signup_password", placeholder="Create password", label_visibility="collapsed")
             
-            # 👇 KEY ADDED HERE
             if st.button("Create Account ➔", use_container_width=True, key="btn_signup"):
                 with st.spinner("Creating your account..."):
                     try:
                         supabase.auth.sign_up({"email":email,"password":password,"options":{"data":{"name":name}}})
                         st.success("✅ Account created! Please Log In to continue.")
-                        st.toast("Account created successfully!", icon="🎉")
                     except Exception as e: st.error(f"Sign up failed: {e}")
-                
-        st.markdown("""
-        <div style="text-align: center; margin-top: 30px; font-size: 12px; color: #9ca3af; margin-bottom: 20px;">
-            By continuing, you agree to our 
-            <a href="https://chhabin541-crypto.github.io/ClyxessAI/terms.html" target="_blank" style="color: #8b5cf6; text-decoration: none; font-weight: 600;">Terms of Service</a> 
-            and 
-            <a href="https://chhabin541-crypto.github.io/ClyxessAI/" target="_blank" style="color: #8b5cf6; text-decoration: none; font-weight: 600;">Privacy Policy</a>.
-        </div>
-        """, unsafe_allow_html=True)
                 
         st.stop() # 🛑 Login ke bina aage nahi jayega
 
     # ==========================================
-    # 📧 DATABASE LOGIC (EMAIL LOCK)
+    # 📧 DATABASE LOGIC (PLAN SELECTION GATE)
     # ==========================================
     user_email = st.session_state.get("user_email", "")
+    user_id = supabase.auth.get_user().user.id
     
-    if user_email:
-        try:
-            user_id = supabase.auth.get_user().user.id
-            
-            # Fetch or Create User Subscription
-            res = supabase.table("user_subscriptions").select("*").eq("id", user_id).execute()
-            
-            if len(res.data) == 0:
-                # Naya user -> 24 ghante ka trial
-                expiry = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(hours=24)
-                supabase.table("user_subscriptions").insert({
-                    "id": user_id, "email": user_email, "plan_type": "free", "expiry_date": expiry.isoformat(), "is_paid": False
-                }).execute()
-                st.rerun()
+    # DB se data fetch karo
+    res = supabase.table("user_subscriptions").select("*").eq("id", user_id).execute()
+    
+    show_plan_screen = False
+    
+    if len(res.data) == 0:
+        show_plan_screen = True # Naya user, show plans
+    else:
+        sub_data = res.data[0]
+        expiry_str = sub_data["expiry_date"]
+        
+        if expiry_str:
+            expiry_date = datetime.datetime.fromisoformat(expiry_str.replace('Z', '+00:00'))
+            now = datetime.datetime.now(datetime.timezone.utc)
+            if expiry_date <= now:
+                show_plan_screen = True # Plan expired, show plans
             else:
-                sub_data = res.data[0]
-                plan_type = sub_data["plan_type"]
-                expiry_str = sub_data["expiry_date"]
-                is_paid = sub_data["is_paid"]
-                
-                # Expiry Check
-                expiry_date = datetime.datetime.fromisoformat(expiry_str.replace('Z', '+00:00')) if expiry_str else datetime.datetime.now(datetime.timezone.utc)
-                now = datetime.datetime.now(datetime.timezone.utc)
-                time_left = expiry_date - now
-                days_left = time_left.days
-                hours_left = time_left.seconds // 3600
-                
-                # 🛑 IF EXPIRED -> SHOW PAYMENT LOCK
-                if time_left.total_seconds() <= 0:
-                    st.error("⏳ **Aapka Plan khatam ho gaya hai!** Aage use karne ke liye kripya plan renew karein.")
-                    
-                    col1, col2, col3 = st.columns(3, gap="medium")
-                    with col1:
-                        st.markdown("""<div class="free-card"><h3 style="color:white;">Free Trial</h3><h1 style="color:#3b82f6; font-size: 30px;">Expired</h1></div>""", unsafe_allow_html=True)
-                    with col2:
-                        st.markdown("""<div class="premium-card"><h3 style="color: #a78bfa;">Monthly</h3><h1 style="color:white; font-size: 30px;">₹1499 <span style="font-size:12px;">/mo</span></h1></div>""", unsafe_allow_html=True)
-                        # 👇 KEY ADDED HERE
-                        if st.button("Buy Monthly ₹1499", key="btn_buy_m"): webbrowser.open_new_tab(INSTAMOJO_MONTHLY_LINK)
-                        if st.button("✅ Paid Monthly", key="btn_pay_m"): 
-                            new_expiry = now + datetime.timedelta(days=30)
-                            supabase.table("user_subscriptions").update({"plan_type": "monthly", "expiry_date": new_expiry.isoformat(), "is_paid": True}).eq("id", user_id).execute()
-                            st.rerun()
-                    with col3:
-                        st.markdown("""<div class="premium-card" style="border-color: #f59e0b;"><div style="position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: #f59e0b; color: white; padding: 4px 12px; border-radius: 20px; font-size: 10px; font-weight: bold;">SAVE ₹100</div><h3 style="color: #f59e0b;">Yearly</h3><h1 style="color:white; font-size: 30px;">₹1399 <span style="font-size:12px;">/mo</span></h1></div>""", unsafe_allow_html=True)
-                        # 👇 KEY ADDED HERE
-                        if st.button("Buy Yearly ₹1399", key="btn_buy_y"): webbrowser.open_new_tab(INSTAMOJO_YEARLY_LINK)
-                        if st.button("✅ Paid Yearly", key="btn_pay_y"): 
-                            new_expiry = now + datetime.timedelta(days=365)
-                            supabase.table("user_subscriptions").update({"plan_type": "yearly", "expiry_date": new_expiry.isoformat(), "is_paid": True}).eq("id", user_id).execute()
-                            st.rerun()
-                    
-                    st.stop() # 🛑 Expired, block app
-
-                # ==========================================
-                # ✅ DASHBOARD (IF PLAN ACTIVE)
-                # ==========================================
+                show_plan_screen = False # Active plan
                 
                 # Sidebar Status Box
+                plan_type = sub_data["plan_type"]
                 plan_name = "Free Trial" if plan_type == "free" else ("Monthly Plan" if plan_type == "monthly" else "Yearly Plan")
                 color = "#3b82f6" if plan_type == "free" else ("#8b5cf6" if plan_type == "monthly" else "#f59e0b")
                 
+                time_left = expiry_date - now
+                days_left = time_left.days
+                hours_left = time_left.seconds // 3600
+
                 st.sidebar.markdown(f"""
                 <div style="background: rgba(30, 27, 75, 0.4); border: 1px solid {color}; border-radius: 10px; padding: 15px; margin-bottom: 20px;">
                     <p style="margin: 0; color: #9ca3af; font-size: 12px;">Logged in as</p>
@@ -2709,20 +2653,114 @@ def render_login_signup():
                     </div>
                 </div>
                 """, unsafe_allow_html=True)
+
+    # ==========================================
+    # 🛑 2. PLAN SELECTION SCREEN
+    # ==========================================
+    if show_plan_screen:
+        st.markdown("""
+        <div style="text-align: center; margin-top: 1rem; margin-bottom: 2rem;">
+            <h1 style="color: white; font-size: 34px; font-weight: 800;">Choose Your Plan</h1>
+            <p style="color: #9ca3af; font-size: 15px;">Select a plan to unlock all features.</p>
+        </div>
+        """, unsafe_allow_html=True)
+
+        col1, col2, col3 = st.columns(3, gap="medium")
+        
+        # FREE TRIAL
+        with col1:
+            st.markdown("""
+            <div class="free-card">
+                <h3 style="color: white; margin: 0;">Free Trial</h3>
+                <div style="margin: 15px 0;">
+                    <span style="color: #3b82f6; font-size: 38px; font-weight: 800;">24h</span>
+                </div>
+                <p style="color: #9ca3af; font-size: 13px;">Try all features for 1 day.</p>
+            </div>
+            """, unsafe_allow_html=True)
+            if st.button("Start Free Trial", use_container_width=True, key="btn_free"):
+                expiry = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(hours=24)
+                supabase.table("user_subscriptions").insert({
+                    "id": user_id, "email": user_email, "plan_type": "free", "expiry_date": expiry.isoformat(), "is_paid": False
+                }).execute()
+                st.rerun()
+
+        # MONTHLY
+        with col2:
+            st.markdown("""
+            <div class="premium-card">
+                <h3 style="color: #a78bfa; margin: 0;">Monthly</h3>
+                <div style="margin: 15px 0;">
+                    <span style="color: white; font-size: 38px; font-weight: 800;">₹1499</span>
+                </div>
+                <p style="color: #9ca3af; font-size: 13px;">Unlimited access for 30 days.</p>
+            </div>
+            """, unsafe_allow_html=True)
+            
+            if st.button("Buy Monthly ₹1499", use_container_width=True, key="btn_m"):
+                webbrowser.open_new_tab(INSTAMOJO_MONTHLY_LINK)
                 
-                # 👇 KEY ADDED HERE
-                if st.sidebar.button("🚪 Log Out", use_container_width=True, key="btn_logout"):
-                    st.session_state.clear()
-                    st.rerun()
+            if st.button("✅ Paid Monthly", key="btn_pm"):
+                expiry = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(days=30)
+                if len(res.data) == 0:
+                    supabase.table("user_subscriptions").insert({"id": user_id, "email": user_email, "plan_type": "monthly", "expiry_date": expiry.isoformat(), "is_paid": True}).execute()
+                else:
+                    supabase.table("user_subscriptions").update({"plan_type": "monthly", "expiry_date": expiry.isoformat(), "is_paid": True}).eq("id", user_id).execute()
+                st.rerun()
 
-                # Features Menu & Dashboard Content
-                st.sidebar.markdown("### 📚 Select Mode")
-                mode = st.sidebar.radio("", ["Normal Chat", "Cyber Security", "Homework"])
-                st.write(f"Welcome to {mode}...")
+        # YEARLY
+        with col3:
+            st.markdown("""
+            <div class="premium-card" style="border-color: #f59e0b;">
+                <div style="position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: #f59e0b; color: white; padding: 4px 12px; border-radius: 20px; font-size: 10px; font-weight: bold;">SAVE ₹100</div>
+                <h3 style="color: #f59e0b; margin: 0;">Yearly</h3>
+                <div style="margin: 15px 0;">
+                    <span style="color: white; font-size: 38px; font-weight: 800;">₹1399<span style="font-size:14px; color:#aaa;">/mo</span></span>
+                </div>
+                <p style="color: #9ca3af; font-size: 13px;">Billed ₹16788 annually.</p>
+            </div>
+            """, unsafe_allow_html=True)
+            
+            if st.button("Buy Yearly ₹1399", use_container_width=True, key="btn_y"):
+                webbrowser.open_new_tab(INSTAMOJO_YEARLY_LINK)
+                
+            if st.button("✅ Paid Yearly", key="btn_py"):
+                expiry = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(days=365)
+                if len(res.data) == 0:
+                    supabase.table("user_subscriptions").insert({"id": user_id, "email": user_email, "plan_type": "yearly", "expiry_date": expiry.isoformat(), "is_paid": True}).execute()
+                else:
+                    supabase.table("user_subscriptions").update({"plan_type": "yearly", "expiry_date": expiry.isoformat(), "is_paid": True}).eq("id", user_id).execute()
+                st.rerun()
 
-        except Exception as e:
-            st.error(f"Database Error: {e}")
-            st.stop()
+        st.stop() # 🛑 Plan select kiye bina aage nahi jayega.
+
+    # ==========================================
+    # ✅ DASHBOARD (IF PLAN ACTIVE)
+    # ==========================================
+    
+    # 🛠️ TESTING BUTTON (Isko baad mein hata dena)
+    if st.sidebar.button("🛠️ [Testing] Reset My Plan", use_container_width=True, key="btn_reset_plan"):
+        supabase.table("user_subscriptions").delete().eq("id", user_id).execute()
+        st.rerun()
+
+    if st.sidebar.button("🚪 Log Out", use_container_width=True, key="btn_logout"):
+        st.session_state.clear()
+        st.rerun()
+
+    # Features Menu
+    st.sidebar.markdown("### 📚 Select Mode")
+    mode = st.sidebar.radio("", ["Normal Chat", "Cyber Security", "Homework"])
+    
+    # 👇 YAHAN APNE PURANE MODULES CALL KARO
+    if mode == "Normal Chat":
+        st.write("Welcome to Normal Chat...")
+        # render_normal_chat()
+    elif mode == "Cyber Security":
+        st.write("Welcome to Cyber Security...")
+        # render_cyber_security()
+    elif mode == "Homework":
+        st.write("Welcome to Homework...")
+        # render_homework_test()
 
 def render_image_generator():
     import streamlit as st
