@@ -2815,7 +2815,7 @@ def render_login_signup():
             </div>
             <div class="social-links">
                 <a href="https://www.instagram.com/clyxessai?utm_source=qr&exln=b2tpaWQ1dTU3OGI0"><i class="fa-brands fa-instagram"></i></a>
-                <a href="#"><i class="fa-brands fa-twitter"></i></a>
+                <a href="https://x.com/NishadSingcz"><i class="fa-brands fa-twitter"></i></a>
                 <a href="https://www.linkedin.com/in/nishad-singh-970958420?utm_source=share_via&utm_content=profile&utm_medium=member_android"><i class="fa-brands fa-linkedin"></i></a>
                 <a href="https://youtube.com/@clyxess?si=3tbvHiHfHQwYCbA2"><i class="fa-brands fa-youtube"></i></a>
             </div>
