@@ -2831,18 +2831,6 @@ def render_login_signup():
     </p>
   </div>
 
-  <!-- Right Side - Contact -->
-  <div style="flex:1; min-width:280px; text-align:center; margin-top:60px; border-left:1px solid #1f2937; padding-left:20px;">
-    <p style="font-size:13px;">📧 infocarloxin24@gmail.com<br>📞 +91 7647996793<br>📍 Raipur 493221, India</p>
-    <div style="margin:15px 0;">
-      <a href="#" style="color:white; margin:0 8px;"><i class="fa-brands fa-instagram"></i></a>
-      <a href="#" style="color:white; margin:0 8px;"><i class="fa-brands fa-x-twitter"></i></a>
-      <a href="#" style="color:white; margin:0 8px;"><i class="fa-brands fa-linkedin"></i></a>
-      <a href="#" style="color:white; margin:0 8px;"><i class="fa-brands fa-youtube"></i></a>
-    </div>
-    <p style="font-size:12px; color:#777;">© 2026 Clyxess AI. All rights reserved.</p>
-  </div>
-
 </footer>
             <div class="social-links">
                 <a href="https://www.instagram.com/clyxessai?utm_source=qr&exln=b2tpaWQ1dTU3OGI0"><i class="fa-brands fa-instagram"></i></a>
