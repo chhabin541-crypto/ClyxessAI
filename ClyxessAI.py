@@ -2658,6 +2658,35 @@ def render_login_signup():
                         st.success("✅ Account created! Please Log In to continue.")
                     except Exception as e: st.error(f"Sign up failed: {e}")
                 
+        # ==========================================
+        # 👇 YAHAN NAYA FOOTER LAGA HAI (LOGIN KE NICHE)
+        # ==========================================
+        st.markdown("""
+        <div class="footer-pro">
+            <div class="contact-info">
+                <div><i class="fa-solid fa-envelope"></i> <a href="mailto:infocarloxin24@gmail.com" style="color:#9ca3af; text-decoration:none;">infocarloxin24@gmail.com</a></div>
+                <div><i class="fa-solid fa-phone"></i> +91 7647996793</div>
+                <div><i class="fa-solid fa-location-dot"></i> Raipur 493221, India</div>
+            </div> 
+            <div class="social-links">
+                <a href="https://www.instagram.com/clyxessai?utm_source=qr&exln=b2tpaWQ1dTU3OGI0" target="_blank"><i class="fa-brands fa-instagram"></i></a>
+                <a href="https://x.com/NishadSingcz" target="_blank"><i class="fa-brands fa-x-twitter"></i></a>
+                <a href="https://www.linkedin.com/in/nishad-singh-970958420?utm_source=share_via&utm_content=profile&utm_medium=member_android" target="_blank"><i class="fa-brands fa-linkedin"></i></a>
+                <a href="https://youtube.com/@clyxess?si=3tbvHiHfHQwYCbA2" target="_blank"><i class="fa-brands fa-youtube"></i></a>
+            </div>
+            <div style="margin-top: 15px; margin-bottom: 10px;">
+                <a href="https://chhabin541-crypto.github.io/ClyxessAI/" target="_blank" style="color: #8b5cf6; text-decoration: none; font-size: 12px; margin: 0 5px;">Privacy Policy</a> |
+                <a href="https://chhabin541-crypto.github.io/ClyxessAI/terms.html" target="_blank" style="color: #8b5cf6; text-decoration: none; font-size: 12px; margin: 0 5px;">Terms of Service</a> |
+                <a href="#" style="color: #8b5cf6; text-decoration: none; font-size: 12px; margin: 0 5px;">Cookie Policy</a> |
+                <a href="#" style="color: #8b5cf6; text-decoration: none; font-size: 12px; margin: 0 5px;">Refund & Cancellation</a>
+            </div>
+            <div class="copyright">
+                &copy; 2026 Clyxess AI. All rights reserved.
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+        # ==========================================
+                
         st.stop() # 🛑 Login ke bina aage nahi jayega
 
     # ==========================================
@@ -2805,7 +2834,9 @@ def render_login_signup():
                     supabase.table("user_subscriptions").update({"plan_type": "yearly", "expiry_date": expiry.isoformat(), "is_paid": True}).eq("id", user_id).execute()
                 st.rerun()
 
-        # ================= PROFESSIONAL FOOTER =================
+        # ==========================================
+        # 👇 YAHAN SUBSCRIPTION FOOTER UPDATE HUA HAI
+        # ==========================================
         st.markdown("""
         <div class="footer-pro">
             <div class="contact-info">
@@ -2814,16 +2845,23 @@ def render_login_signup():
                 <div><i class="fa-solid fa-location-dot"></i> Raipur 493221, India</div>
             </div> 
             <div class="social-links">
-                <a href="https://www.instagram.com/clyxessai?utm_source=qr&exln=b2tpaWQ1dTU3OGI0"><i class="fa-brands fa-instagram"></i></a>
-                <a href="https://x.com/NishadSingcz"><i class="fa-brands fa-twitter"></i></a>
-                <a href="https://www.linkedin.com/in/nishad-singh-970958420?utm_source=share_via&utm_content=profile&utm_medium=member_android"><i class="fa-brands fa-linkedin"></i></a>
-                <a href="https://youtube.com/@clyxess?si=3tbvHiHfHQwYCbA2"><i class="fa-brands fa-youtube"></i></a>
+                <a href="https://www.instagram.com/clyxessai?utm_source=qr&exln=b2tpaWQ1dTU3OGI0" target="_blank"><i class="fa-brands fa-instagram"></i></a>
+                <a href="https://x.com/NishadSingcz" target="_blank"><i class="fa-brands fa-x-twitter"></i></a>
+                <a href="https://www.linkedin.com/in/nishad-singh-970958420?utm_source=share_via&utm_content=profile&utm_medium=member_android" target="_blank"><i class="fa-brands fa-linkedin"></i></a>
+                <a href="https://youtube.com/@clyxess?si=3tbvHiHfHQwYCbA2" target="_blank"><i class="fa-brands fa-youtube"></i></a>
+            </div>
+            <div style="margin-top: 15px; margin-bottom: 10px;">
+                <a href="https://chhabin541-crypto.github.io/ClyxessAI/" target="_blank" style="color: #8b5cf6; text-decoration: none; font-size: 12px; margin: 0 5px;">Privacy Policy</a> |
+                <a href="https://chhabin541-crypto.github.io/ClyxessAI/terms.html" target="_blank" style="color: #8b5cf6; text-decoration: none; font-size: 12px; margin: 0 5px;">Terms of Service</a> |
+                <a href="#" style="color: #8b5cf6; text-decoration: none; font-size: 12px; margin: 0 5px;">Cookie Policy</a> |
+                <a href="#" style="color: #8b5cf6; text-decoration: none; font-size: 12px; margin: 0 5px;">Refund & Cancellation</a>
             </div>
             <div class="copyright">
                 &copy; 2026 Clyxess AI. All rights reserved.
             </div>
         </div>
         """, unsafe_allow_html=True)
+        # ==========================================
 
         st.stop() # 🛑 Plan select kiye bina aage nahi jayega.
 
