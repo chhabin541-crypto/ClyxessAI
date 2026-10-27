@@ -2712,7 +2712,7 @@ def render_login_signup():
         st.markdown("""
         <div style="text-align: center; margin-top: 1rem; margin-bottom: 2rem;">
             <h1 style="color: white; font-size: 34px; font-weight: 800;">Choose Your Plan</h1>
-            <p style="color: #9ca3af; font-size: 15px;">Learn future with Clyxess AI select a plan to unlock all features.</p>
+            <p style="color: #9ca3af; font-size: 15px;">Learn future with Clyxess AI select a plan to unlock all features for better education.</p>
         </div>
         """, unsafe_allow_html=True)
 
