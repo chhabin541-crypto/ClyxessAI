@@ -2857,7 +2857,7 @@ def render_login_signup():
                 <a href="https://chhabin541-crypto.github.io/ClyxessAI/" target="_blank" style="color: #8b5cf6; text-decoration: none; font-size: 12px; margin: 0 5px;">Privacy Policy</a> |
                 <a href="https://chhabin541-crypto.github.io/ClyxessAI/terms.html" target="_blank" style="color: #8b5cf6; text-decoration: none; font-size: 12px; margin: 0 5px;">Terms of Service</a> |
                 <a href="https://chhabin541-crypto.github.io/ClyxessAI/cookie-policy.html" target="_blank" style="color: #8b5cf6; text-decoration: none; font-size: 12px; margin: 0 5px;">Cookie Policy</a> | 
-                <a href="https://chhabin541-crypto.github.io/ClyxessAI/refund-cancellation.html" target="_blank" style="color: #8b5cf6; text-decoration: none; font-size: 12px; margin: 0 5px;">Refund & Cancellation</a>
+                <a href="https://chhabin541-crypto.github.io/ClyxessAI/refund-cancellation.html" target="_blank" style="color: #8b5cf6; text-decoration: none; font-size: 12px; margin: 0 5px;">Refund & Cancellation</a> | 
             </div>
             <div class="copyright">
                 &copy; 2026 Clyxess AI. All rights reserved.
