@@ -2824,7 +2824,14 @@ def render_login_signup():
                 </div>
             </div>
             """, unsafe_allow_html=True)
-            
+            # Streamlit ke native buttons (Ye pakka kaam karenge)
+            col1, col2 = st.columns(2)
+
+            with col1:
+                st.link_button("🍪 Cookie Policy", "https://chhabin541-crypto.github.io/ClyxessAI/cookie-policy.html", use_container_width=True)
+
+            with col2:
+                st.link_button("💸 Refund & Cancellation", "https://chhabin541-crypto.github.io/ClyxessAI/refund-cancellation.html", use_container_width=True)
             if st.button("Buy Yearly ₹1399", use_container_width=True, key="btn_y"):
                 webbrowser.open_new_tab(INSTAMOJO_YEARLY_LINK)
                 
@@ -2856,9 +2863,7 @@ def render_login_signup():
             <div style="margin-top: 15px; margin-bottom: 10px;">
                 <a href="https://chhabin541-crypto.github.io/ClyxessAI/" target="_blank" style="color: #8b5cf6; text-decoration: none; font-size: 12px; margin: 0 5px;">Privacy Policy</a> |
                 <a href="https://chhabin541-crypto.github.io/ClyxessAI/terms.html" target="_blank" style="color: #8b5cf6; text-decoration: none; font-size: 12px; margin: 0 5px;">Terms of Service</a> |
-                <a href="https://chhabin541-crypto.github.io/ClyxessAI/cookie-policy.html" target="_blank" style="color: #8b5cf6; text-decoration: none; font-size: 12px; margin: 0 5px;">Cookie Policy</a> | 
-                <a href="https://chhabin541-crypto.github.io/ClyxessAI/refund-cancellation.html" target="_blank" style="color: #8b5cf6; text-decoration: none; font-size: 12px; margin: 0 5px;">Refund & Cancellation</a> | 
-            </div>
+                
             <div class="copyright">
                 &copy; 2026 Clyxess AI. All rights reserved.
             </div>
