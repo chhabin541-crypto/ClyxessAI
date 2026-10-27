@@ -2814,7 +2814,7 @@ def render_login_signup():
                 <div><i class="fa-solid fa-location-dot"></i> Raipur 493221, India</div>
             </div>
             <div class="social-links">
-                <a href="#"><i class="fa-brands fa-instagram"></i></a>
+                <a href="https://www.instagram.com/clyxessai?utm_source=qr&exln=b2tpaWQ1dTU3OGI0"><i class="fa-brands fa-instagram"></i></a>
                 <a href="#"><i class="fa-brands fa-x-twitter"></i></a>
                 <a href="#"><i class="fa-brands fa-linkedin"></i></a>
                 <a href="#"><i class="fa-brands fa-youtube"></i></a>
