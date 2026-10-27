@@ -2527,9 +2527,8 @@ def render_login_signup():
             if (hash) {
                 var params = new URLSearchParams(hash.substring(1));
                 var accessToken = params.get('access_token');
-                var refreshToken = params.get('refresh_token');
                 if (accessToken) {
-                    var newUrl = window.location.origin + window.location.pathname + '?access_token=' + accessToken + '&refresh_token=' + refreshToken;
+                    var newUrl = window.location.origin + window.location.pathname + '?access_token=' + accessToken;
                     window.location.replace(newUrl);
                 }
             }
@@ -2539,12 +2538,10 @@ def render_login_signup():
     if "access_token" in st.query_params:
         try:
             access_token = urllib.parse.unquote(st.query_params["access_token"])
-            refresh_token = urllib.parse.unquote(st.query_params["refresh_token"])
-            supabase.auth.set_session(access_token, refresh_token)
+            supabase.auth.set_session(access_token, "")
             st.session_state.user_email = supabase.auth.get_user(access_token).user.email
             st.session_state.logged_in = True
             st.query_params.clear()
-            st.toast("Welcome back! Login successful.", icon="👋")
             st.rerun()
         except Exception as e:
             st.error(f"Auth Error: {e}")
@@ -2552,7 +2549,7 @@ def render_login_signup():
     # ==========================================
     # 🛑 1. LOGIN / SIGNUP UI
     # ==========================================
-    if "logged_in" not in st.session_state or not st.session_state.logged_in:
+    if not st.session_state.get("logged_in", False):
         
         st.markdown("""
         <div style="text-align: center; margin-bottom: 30px;">
@@ -2589,7 +2586,8 @@ def render_login_signup():
             email=st.text_input("Email",key="login_email", placeholder="Enter your email", label_visibility="collapsed")
             password=st.text_input("Password",type="password",key="login_password", placeholder="Enter password", label_visibility="collapsed")
             
-            if st.button("Log In ➔", type="primary", use_container_width=True):
+            # 👇 KEY ADDED HERE
+            if st.button("Log In ➔", type="primary", use_container_width=True, key="btn_login"):
                 with st.spinner("Logging you in..."):
                     try:
                         supabase.auth.sign_in_with_password({"email":email,"password":password})
@@ -2602,7 +2600,8 @@ def render_login_signup():
             
             with st.expander("Forgot Password?"):
                 reset_email = st.text_input("Enter your registered email", key="reset_email")
-                if st.button("Send Reset Link", use_container_width=True):
+                # 👇 KEY ADDED HERE
+                if st.button("Send Reset Link", use_container_width=True, key="btn_reset"):
                     try:
                         supabase.auth.reset_password_for_email(reset_email, options={"redirect_to": st.secrets.get("SUPABASE_REDIRECT_URL", "")})
                         st.success("✅ Password reset link successfully sent to your email!")
@@ -2612,9 +2611,10 @@ def render_login_signup():
         with tab2:
             name=st.text_input("Name",key="signup_name", placeholder="Your Name", label_visibility="collapsed")
             email=st.text_input("Email",key="signup_email", placeholder="Enter your email", label_visibility="collapsed")
-            password=st.text_input("Password",type="password",key="signup_password", placeholder="Create password (e.g., Test@123)", label_visibility="collapsed")
+            password=st.text_input("Password",type="password",key="signup_password", placeholder="Create password", label_visibility="collapsed")
             
-            if st.button("Create Account ➔", use_container_width=True):
+            # 👇 KEY ADDED HERE
+            if st.button("Create Account ➔", use_container_width=True, key="btn_signup"):
                 with st.spinner("Creating your account..."):
                     try:
                         supabase.auth.sign_up({"email":email,"password":password,"options":{"data":{"name":name}}})
@@ -2636,91 +2636,93 @@ def render_login_signup():
     # ==========================================
     # 📧 DATABASE LOGIC (EMAIL LOCK)
     # ==========================================
-    user_email = st.session_state.user_email
-    try:
-        user_id = supabase.auth.get_user().user.id
-        
-        # Fetch or Create User Subscription
-        res = supabase.table("user_subscriptions").select("*").eq("id", user_id).execute()
-        
-        if len(res.data) == 0:
-            # Naya user -> 24 ghante ka trial
-            expiry = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(hours=24)
-            supabase.table("user_subscriptions").insert({
-                "id": user_id, "email": user_email, "plan_type": "free", "expiry_date": expiry.isoformat(), "is_paid": False
-            }).execute()
-            st.rerun()
-        else:
-            sub_data = res.data[0]
-            plan_type = sub_data["plan_type"]
-            expiry_str = sub_data["expiry_date"]
-            is_paid = sub_data["is_paid"]
+    user_email = st.session_state.get("user_email", "")
+    
+    if user_email:
+        try:
+            user_id = supabase.auth.get_user().user.id
             
-            # Expiry Check
-            expiry_date = datetime.datetime.fromisoformat(expiry_str.replace('Z', '+00:00')) if expiry_str else datetime.datetime.now(datetime.timezone.utc)
-            now = datetime.datetime.now(datetime.timezone.utc)
-            time_left = expiry_date - now
-            days_left = time_left.days
-            hours_left = time_left.seconds // 3600
+            # Fetch or Create User Subscription
+            res = supabase.table("user_subscriptions").select("*").eq("id", user_id).execute()
             
-            # 🛑 IF EXPIRED -> SHOW PAYMENT LOCK
-            if time_left.total_seconds() <= 0:
-                st.error("⏳ **Aapka Plan khatam ho gaya hai!** Aage use karne ke liye kripya plan renew karein.")
-                
-                col1, col2, col3 = st.columns(3, gap="medium")
-                with col1:
-                    st.markdown("""<div class="free-card"><h3 style="color:white;">Free Trial</h3><h1 style="color:#3b82f6; font-size: 30px;">Expired</h1></div>""", unsafe_allow_html=True)
-                with col2:
-                    st.markdown("""<div class="premium-card"><h3 style="color: #a78bfa;">Monthly</h3><h1 style="color:white; font-size: 30px;">₹1499 <span style="font-size:12px;">/mo</span></h1></div>""", unsafe_allow_html=True)
-                    if st.button("Buy Monthly ₹1499", key="buy_m"): webbrowser.open_new_tab(INSTAMOJO_MONTHLY_LINK)
-                    if st.button("✅ Paid Monthly", key="pay_m"): 
-                        new_expiry = now + datetime.timedelta(days=30)
-                        supabase.table("user_subscriptions").update({"plan_type": "monthly", "expiry_date": new_expiry.isoformat(), "is_paid": True}).eq("id", user_id).execute()
-                        st.rerun()
-                with col3:
-                    st.markdown("""<div class="premium-card" style="border-color: #f59e0b;"><div style="position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: #f59e0b; color: white; padding: 4px 12px; border-radius: 20px; font-size: 10px; font-weight: bold;">SAVE ₹100</div><h3 style="color: #f59e0b;">Yearly</h3><h1 style="color:white; font-size: 30px;">₹1399 <span style="font-size:12px;">/mo</span></h1></div>""", unsafe_allow_html=True)
-                    if st.button("Buy Yearly ₹1399", key="buy_y"): webbrowser.open_new_tab(INSTAMOJO_YEARLY_LINK)
-                    if st.button("✅ Paid Yearly", key="pay_y"): 
-                        new_expiry = now + datetime.timedelta(days=365)
-                        supabase.table("user_subscriptions").update({"plan_type": "yearly", "expiry_date": new_expiry.isoformat(), "is_paid": True}).eq("id", user_id).execute()
-                        st.rerun()
-                
-                st.stop() # 🛑 Expired, block app
-
-            # ==========================================
-            # ✅ DASHBOARD (IF PLAN ACTIVE)
-            # ==========================================
-            
-            # Sidebar Status Box
-            plan_name = "Free Trial" if plan_type == "free" else ("Monthly Plan" if plan_type == "monthly" else "Yearly Plan")
-            color = "#3b82f6" if plan_type == "free" else ("#8b5cf6" if plan_type == "monthly" else "#f59e0b")
-            
-            st.sidebar.markdown(f"""
-            <div style="background: rgba(30, 27, 75, 0.4); border: 1px solid {color}; border-radius: 10px; padding: 15px; margin-bottom: 20px;">
-                <p style="margin: 0; color: #9ca3af; font-size: 12px;">Logged in as</p>
-                <h4 style="margin: 0 0 10px 0; color: white; font-size: 13px;">{user_email}</h4>
-                <div style="background: {color}22; padding: 8px; border-radius: 8px; text-align: center;">
-                    <p style="margin: 0; color: {color}; font-weight: 700; font-size: 14px;">{plan_name}</p>
-                    <p style="margin: 0; color: #d1d5db; font-size: 11px;">⏳ {days_left}d {hours_left}h remaining</p>
-                </div>
-            </div>
-            """, unsafe_allow_html=True)
-            
-            if st.sidebar.button("🚪 Log Out", use_container_width=True):
-                st.session_state.clear()
+            if len(res.data) == 0:
+                # Naya user -> 24 ghante ka trial
+                expiry = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(hours=24)
+                supabase.table("user_subscriptions").insert({
+                    "id": user_id, "email": user_email, "plan_type": "free", "expiry_date": expiry.isoformat(), "is_paid": False
+                }).execute()
                 st.rerun()
+            else:
+                sub_data = res.data[0]
+                plan_type = sub_data["plan_type"]
+                expiry_str = sub_data["expiry_date"]
+                is_paid = sub_data["is_paid"]
+                
+                # Expiry Check
+                expiry_date = datetime.datetime.fromisoformat(expiry_str.replace('Z', '+00:00')) if expiry_str else datetime.datetime.now(datetime.timezone.utc)
+                now = datetime.datetime.now(datetime.timezone.utc)
+                time_left = expiry_date - now
+                days_left = time_left.days
+                hours_left = time_left.seconds // 3600
+                
+                # 🛑 IF EXPIRED -> SHOW PAYMENT LOCK
+                if time_left.total_seconds() <= 0:
+                    st.error("⏳ **Aapka Plan khatam ho gaya hai!** Aage use karne ke liye kripya plan renew karein.")
+                    
+                    col1, col2, col3 = st.columns(3, gap="medium")
+                    with col1:
+                        st.markdown("""<div class="free-card"><h3 style="color:white;">Free Trial</h3><h1 style="color:#3b82f6; font-size: 30px;">Expired</h1></div>""", unsafe_allow_html=True)
+                    with col2:
+                        st.markdown("""<div class="premium-card"><h3 style="color: #a78bfa;">Monthly</h3><h1 style="color:white; font-size: 30px;">₹1499 <span style="font-size:12px;">/mo</span></h1></div>""", unsafe_allow_html=True)
+                        # 👇 KEY ADDED HERE
+                        if st.button("Buy Monthly ₹1499", key="btn_buy_m"): webbrowser.open_new_tab(INSTAMOJO_MONTHLY_LINK)
+                        if st.button("✅ Paid Monthly", key="btn_pay_m"): 
+                            new_expiry = now + datetime.timedelta(days=30)
+                            supabase.table("user_subscriptions").update({"plan_type": "monthly", "expiry_date": new_expiry.isoformat(), "is_paid": True}).eq("id", user_id).execute()
+                            st.rerun()
+                    with col3:
+                        st.markdown("""<div class="premium-card" style="border-color: #f59e0b;"><div style="position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: #f59e0b; color: white; padding: 4px 12px; border-radius: 20px; font-size: 10px; font-weight: bold;">SAVE ₹100</div><h3 style="color: #f59e0b;">Yearly</h3><h1 style="color:white; font-size: 30px;">₹1399 <span style="font-size:12px;">/mo</span></h1></div>""", unsafe_allow_html=True)
+                        # 👇 KEY ADDED HERE
+                        if st.button("Buy Yearly ₹1399", key="btn_buy_y"): webbrowser.open_new_tab(INSTAMOJO_YEARLY_LINK)
+                        if st.button("✅ Paid Yearly", key="btn_pay_y"): 
+                            new_expiry = now + datetime.timedelta(days=365)
+                            supabase.table("user_subscriptions").update({"plan_type": "yearly", "expiry_date": new_expiry.isoformat(), "is_paid": True}).eq("id", user_id).execute()
+                            st.rerun()
+                    
+                    st.stop() # 🛑 Expired, block app
 
-            # ==========================================
-            # 🛑 2. NEW USER (PLAN SELECTION)
-            # ==========================================
-            if plan_type == "free" and not is_paid and days_left >= 0:
-                # If they are in trial, show the dashboard directly (or optionally prompt them to buy)
-                # The code below ensures the app works for the free trial user
-                pass 
+                # ==========================================
+                # ✅ DASHBOARD (IF PLAN ACTIVE)
+                # ==========================================
+                
+                # Sidebar Status Box
+                plan_name = "Free Trial" if plan_type == "free" else ("Monthly Plan" if plan_type == "monthly" else "Yearly Plan")
+                color = "#3b82f6" if plan_type == "free" else ("#8b5cf6" if plan_type == "monthly" else "#f59e0b")
+                
+                st.sidebar.markdown(f"""
+                <div style="background: rgba(30, 27, 75, 0.4); border: 1px solid {color}; border-radius: 10px; padding: 15px; margin-bottom: 20px;">
+                    <p style="margin: 0; color: #9ca3af; font-size: 12px;">Logged in as</p>
+                    <h4 style="margin: 0 0 10px 0; color: white; font-size: 13px;">{user_email}</h4>
+                    <div style="background: {color}22; padding: 8px; border-radius: 8px; text-align: center;">
+                        <p style="margin: 0; color: {color}; font-weight: 700; font-size: 14px;">{plan_name}</p>
+                        <p style="margin: 0; color: #d1d5db; font-size: 11px;">⏳ {days_left}d {hours_left}h remaining</p>
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
+                
+                # 👇 KEY ADDED HERE
+                if st.sidebar.button("🚪 Log Out", use_container_width=True, key="btn_logout"):
+                    st.session_state.clear()
+                    st.rerun()
 
-    except Exception as e:
-        st.error(f"Database Error: {e}")
-        st.stop()
+                # Features Menu & Dashboard Content
+                st.sidebar.markdown("### 📚 Select Mode")
+                mode = st.sidebar.radio("", ["Normal Chat", "Cyber Security", "Homework"])
+                st.write(f"Welcome to {mode}...")
+
+        except Exception as e:
+            st.error(f"Database Error: {e}")
+            st.stop()
 
 def render_image_generator():
     import streamlit as st
