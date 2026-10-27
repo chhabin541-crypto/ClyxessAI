@@ -2457,16 +2457,18 @@ def render_login_signup():
     INSTAMOJO_MONTHLY_LINK = "https://imjo.in/MonthlyLinkHere"
     INSTAMOJO_YEARLY_LINK = "https://imjo.in/YearlyLinkHere" 
 
-    # 🎨 PREMIUM CSS
+    # 🎨 PREMIUM CSS (Hover Effects + Footer)
     st.markdown("""
     <style>
+        @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css');
+        
         .stApp { background: radial-gradient(circle at top right, #1e1b4b 0%, #050814 50%) !important; }
         header {visibility: hidden;} footer {visibility: hidden;}
         
         /* 🛑 HIDE SIDEBAR UNTIL LOGIN + PLAN */
         [data-testid="stSidebar"] { display: none !important; }
 
-        .block-container { max-width: 900px !important; padding-top: 2rem !important; }
+        .block-container { max-width: 1000px !important; padding-top: 2rem !important; }
         .stTextInput input {
             background-color: #0b0e17 !important; color: white !important;
             border: 1px solid #1c2538 !important; border-radius: 10px !important; padding: 12px !important;
@@ -2496,20 +2498,69 @@ def render_login_signup():
         .facebook-btn { background-color: #1877F2; color: #ffffff; border: none; }
         .facebook-btn:hover { background-color: #166fe5; color: #fff; }
 
-        /* Premium Plan Cards */
-        .premium-card {
-            background: rgba(30, 27, 75, 0.4); border: 1px solid rgba(139, 92, 246, 0.3);
-            border-radius: 20px; padding: 25px; height: 100%; box-shadow: 0 0 30px rgba(139, 92, 246, 0.15);
-            position: relative; text-align: center;
-        }
-        .free-card {
-            background: rgba(31, 41, 55, 0.3); border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 20px; padding: 25px; height: 100%; text-align: center;
+        /* =========================================
+           PREMIUM PLAN CARDS (Hover + Floating)
+           ========================================= */
+        .pricing-card {
+            background: #111827; border-radius: 20px; padding: 30px; 
+            border: 1px solid #1f2937; text-align: left; position: relative;
+            height: 100%; display: flex; flex-direction: column; justify-content: space-between;
+            transition: all 0.3s ease-in-out; cursor: pointer;
         }
         
-        div[data-testid="stButton"]:has(div:contains("Start Free Trial")) button { background-color: transparent !important; color: white !important; border: 1px solid #4b5563 !important; }
-        div[data-testid="stButton"]:has(div:contains("Buy Monthly")) button { background: linear-gradient(90deg, #8b5cf6 0%, #6d28d9 100%) !important; color: white !important; border: none !important; }
-        div[data-testid="stButton"]:has(div:contains("Buy Yearly")) button { background: linear-gradient(90deg, #f59e0b 0%, #d97706 100%) !important; color: white !important; border: none !important; }
+        /* Hawa Style Hover Effect */
+        .pricing-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+        }
+
+        .card-free { border-top: 4px solid #3b82f6; }
+        .card-free:hover { background: #1e293b; border-color: #60a5fa; box-shadow: 0 15px 30px rgba(59, 130, 246, 0.3); }
+        
+        .card-monthly { border-top: 4px solid #8b5cf6; border: 1px solid #8b5cf6; box-shadow: 0 0 30px rgba(139, 92, 246, 0.15); background: #15132b; }
+        .card-monthly:hover { background: #1e1a3d; border-color: #a78bfa; box-shadow: 0 15px 40px rgba(139, 92, 246, 0.5); }
+        
+        .card-yearly { border-top: 4px solid #f59e0b; }
+        .card-yearly:hover { background: #1e293b; border-color: #fbbf24; box-shadow: 0 15px 30px rgba(245, 158, 11, 0.3); }
+
+        .card-title { color: white; font-size: 22px; font-weight: 700; margin-bottom: 5px; }
+        .card-price { color: white; font-size: 42px; font-weight: 800; margin: 15px 0 5px 0; }
+        .card-price span { font-size: 14px; color: #9ca3af; font-weight: 400; }
+        
+        .badge-popular { position: absolute; top: -14px; right: 20px; background: #8b5cf6; color: white; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; }
+        .badge-save { position: absolute; top: -14px; right: 20px; background: #f59e0b; color: white; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; }
+
+        .feature-list { list-style: none; padding: 0; margin: 20px 0; color: #d1d5db; font-size: 13.5px; line-height: 1.6; }
+        .feature-list li { margin-bottom: 10px; display: flex; align-items: flex-start; gap: 10px; }
+        .feature-list li::before { content: "✔"; color: #10b981; font-weight: bold; font-size: 14px; margin-top: 2px; }
+        .feature-list .highlight { color: white; font-weight: 600; }
+
+        /* Button Overrides */
+        div[data-testid="stButton"]:has(div:contains("Start Free Trial")) button { background-color: transparent !important; color: #3b82f6 !important; border: 1px solid #3b82f6 !important; }
+        div[data-testid="stButton"]:has(div:contains("Start Free Trial")) button:hover { background-color: #3b82f6 !important; color: white !important; }
+        
+        div[data-testid="stButton"]:has(div:contains("Buy Monthly")) button { background-color: #8b5cf6 !important; color: white !important; border: none !important; }
+        div[data-testid="stButton"]:has(div:contains("Buy Monthly")) button:hover { background-color: #7c3aed !important; box-shadow: 0 4px 15px rgba(139, 92, 246, 0.5) !important; }
+        
+        div[data-testid="stButton"]:has(div:contains("Buy Yearly")) button { background-color: #f59e0b !important; color: white !important; border: none !important; }
+        div[data-testid="stButton"]:has(div:contains("Buy Yearly")) button:hover { background-color: #d97706 !important; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.5) !important; }
+        
+        div[data-testid="stButton"]:has(div:contains("Paid Monthly")) button,
+        div[data-testid="stButton"]:has(div:contains("Paid Yearly")) button { background-color: #1f2937 !important; color: #9ca3af !important; border: 1px solid #374151 !important; font-size: 12px !important; margin-top: 5px; }
+        div[data-testid="stButton"]:has(div:contains("Paid Monthly")) button:hover,
+        div[data-testid="stButton"]:has(div:contains("Paid Yearly")) button:hover { background-color: #374151 !important; color: white !important; }
+
+        /* =========================================
+           PROFESSIONAL FOOTER
+           ========================================= */
+        .footer-pro { text-align: center; margin-top: 60px; padding-top: 30px; border-top: 1px solid #1f2937; color: #9ca3af; font-size: 14px; }
+        .footer-pro .contact-info { display: flex; justify-content: center; gap: 30px; margin-bottom: 20px; flex-wrap: wrap; }
+        .footer-pro .contact-info div { display: flex; align-items: center; gap: 8px; }
+        .footer-pro .contact-info i { color: #8b5cf6; font-size: 16px; }
+        .footer-pro .social-links { display: flex; justify-content: center; gap: 15px; margin-bottom: 20px; }
+        .footer-pro .social-links a { color: #9ca3af; font-size: 20px; transition: 0.3s; text-decoration: none; }
+        .footer-pro .social-links a:hover { color: #8b5cf6; transform: scale(1.2); }
+        .footer-pro .copyright { font-size: 12px; color: #4b5563; }
     </style>
     """, unsafe_allow_html=True)
 
@@ -2667,15 +2718,22 @@ def render_login_signup():
 
         col1, col2, col3 = st.columns(3, gap="medium")
         
-        # FREE TRIAL
+        # ================= FREE TRIAL =================
         with col1:
             st.markdown("""
-            <div class="free-card">
-                <h3 style="color: white; margin: 0;">Free Trial</h3>
-                <div style="margin: 15px 0;">
-                    <span style="color: #3b82f6; font-size: 38px; font-weight: 800;">24h</span>
+            <div class="pricing-card card-free">
+                <div>
+                    <div class="card-title">Free Trial</div>
+                    <div class="card-price">₹0 <span>/ 24 hours</span></div>
+                    <ul class="feature-list">
+                        <li class="highlight">All Features for 1 Day</li>
+                        <li>Access to all AI Labs & Tools</li>
+                        <li>AI Homework & Test Generator</li>
+                        <li>Language & Cyber Security Labs</li>
+                        <li>Basic Customer Support</li>
+                        <li>No Credit Card Required</li>
+                    </ul>
                 </div>
-                <p style="color: #9ca3af; font-size: 13px;">Try all features for 1 day.</p>
             </div>
             """, unsafe_allow_html=True)
             if st.button("Start Free Trial", use_container_width=True, key="btn_free"):
@@ -2685,15 +2743,23 @@ def render_login_signup():
                 }).execute()
                 st.rerun()
 
-        # MONTHLY
+        # ================= MONTHLY =================
         with col2:
             st.markdown("""
-            <div class="premium-card">
-                <h3 style="color: #a78bfa; margin: 0;">Monthly</h3>
-                <div style="margin: 15px 0;">
-                    <span style="color: white; font-size: 38px; font-weight: 800;">₹1499</span>
+            <div class="pricing-card card-monthly">
+                <div class="badge-popular">MOST POPULAR</div>
+                <div>
+                    <div class="card-title">Monthly Premium</div>
+                    <div class="card-price">₹1499 <span>/ month</span></div>
+                    <ul class="feature-list">
+                        <li class="highlight">Unlimited Access to Everything</li>
+                        <li>Unlimited AI Chats & Explanations</li>
+                        <li>Priority AI Speed (Fast Responses)</li>
+                        <li>Advanced Parent Dashboard</li>
+                        <li>Export Projects & Reports</li>
+                        <li>24/7 Premium Support</li>
+                    </ul>
                 </div>
-                <p style="color: #9ca3af; font-size: 13px;">Unlimited access for 30 days.</p>
             </div>
             """, unsafe_allow_html=True)
             
@@ -2708,16 +2774,23 @@ def render_login_signup():
                     supabase.table("user_subscriptions").update({"plan_type": "monthly", "expiry_date": expiry.isoformat(), "is_paid": True}).eq("id", user_id).execute()
                 st.rerun()
 
-        # YEARLY
+        # ================= YEARLY =================
         with col3:
             st.markdown("""
-            <div class="premium-card" style="border-color: #f59e0b;">
-                <div style="position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: #f59e0b; color: white; padding: 4px 12px; border-radius: 20px; font-size: 10px; font-weight: bold;">SAVE ₹100</div>
-                <h3 style="color: #f59e0b; margin: 0;">Yearly</h3>
-                <div style="margin: 15px 0;">
-                    <span style="color: white; font-size: 38px; font-weight: 800;">₹1399<span style="font-size:14px; color:#aaa;">/mo</span></span>
+            <div class="pricing-card card-yearly">
+                <div class="badge-save">SAVE ₹100/mo</div>
+                <div>
+                    <div class="card-title">Yearly Premium</div>
+                    <div class="card-price">₹1399 <span>/ month</span></div>
+                    <ul class="feature-list">
+                        <li class="highlight">Everything in Monthly</li>
+                        <li>Billed Annually (₹16,788/year)</li>
+                        <li>Highest Priority AI Processing</li>
+                        <li>Early Access to New Features</li>
+                        <li>Dedicated Account Manager</li>
+                        <li>Exclusive Beta Tools Access</li>
+                    </ul>
                 </div>
-                <p style="color: #9ca3af; font-size: 13px;">Billed ₹16788 annually.</p>
             </div>
             """, unsafe_allow_html=True)
             
@@ -2731,6 +2804,26 @@ def render_login_signup():
                 else:
                     supabase.table("user_subscriptions").update({"plan_type": "yearly", "expiry_date": expiry.isoformat(), "is_paid": True}).eq("id", user_id).execute()
                 st.rerun()
+
+        # ================= PROFESSIONAL FOOTER =================
+        st.markdown("""
+        <div class="footer-pro">
+            <div class="contact-info">
+                <div><i class="fa-solid fa-envelope"></i> <a href="mailto:infocarloxin24@gmail.com" style="color:#9ca3af; text-decoration:none;">infocarloxin24@gmail.com</a></div>
+                <div><i class="fa-solid fa-phone"></i> +91 98765 43210</div>
+                <div><i class="fa-solid fa-location-dot"></i> Mumbai, India</div>
+            </div>
+            <div class="social-links">
+                <a href="#"><i class="fa-brands fa-instagram"></i></a>
+                <a href="#"><i class="fa-brands fa-x-twitter"></i></a>
+                <a href="#"><i class="fa-brands fa-linkedin"></i></a>
+                <a href="#"><i class="fa-brands fa-github"></i></a>
+            </div>
+            <div class="copyright">
+                &copy; 2024 Clyxess AI. All rights reserved.
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
 
         st.stop() # 🛑 Plan select kiye bina aage nahi jayega.
 
