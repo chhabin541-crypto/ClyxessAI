@@ -2810,8 +2810,8 @@ def render_login_signup():
         <div class="footer-pro">
             <div class="contact-info">
                 <div><i class="fa-solid fa-envelope"></i> <a href="mailto:infocarloxin24@gmail.com" style="color:#9ca3af; text-decoration:none;">infocarloxin24@gmail.com</a></div>
-                <div><i class="fa-solid fa-phone"></i> +91 98765 43210</div>
-                <div><i class="fa-solid fa-location-dot"></i> Mumbai, India</div>
+                <div><i class="fa-solid fa-phone"></i> tel:+917647996793</div>
+                <div><i class="fa-solid fa-location-dot"></i> Raipur 493221, India</div>
             </div>
             <div class="social-links">
                 <a href="#"><i class="fa-brands fa-instagram"></i></a>
@@ -2820,7 +2820,7 @@ def render_login_signup():
                 <a href="#"><i class="fa-brands fa-github"></i></a>
             </div>
             <div class="copyright">
-                &copy; 2024 Clyxess AI. All rights reserved.
+                &copy; 2026 Clyxess AI. All rights reserved.
             </div>
         </div>
         """, unsafe_allow_html=True)
