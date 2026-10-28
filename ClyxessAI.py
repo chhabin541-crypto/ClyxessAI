@@ -12129,13 +12129,14 @@ def render_school_chat():
             st.error("AI response नहीं आ पाया. Please try again.")
             return
         response = completion.choices[0].message.content
-        placeholder = st.empty()
-        typed = ""
-        for word in response.split(" "):
-            typed += word + " "
-            placeholder.markdown(typed + "▌")
-            time.sleep(0.02)
-        placeholder.markdown(response)
+        # Typing Animation Start
+placeholder = st.empty()
+typed = ""
+for word in response.split(" "):
+    typed += word + " "
+    placeholder.markdown(typed + "▌")
+    time.sleep(0.01)
+placeholder.markdown(response)
         if sources:
             st.caption("Sources:\n" + sources)
         st.caption("🔒 Clyxess AI | Secure • Fast • Private")
