@@ -11955,73 +11955,31 @@ def render_normal_chat():
         system += "\n\n### RULES ###\n1. Clean answer do.\n2. Koi Sources/Links section mat add karo.\n3. Koi URL mat add karo.\n4. Reply in user's language.\n"
 
     with st.chat_message("assistant"):
-    # AI Response
-    completion, used_model = get_groq_response(client, st.session_state.messages, system, "")
-    
-    if completion is None:
-        st.error("AI response नहीं आ पाया. Please try again.")
-        st.stop() 
-        
-    response = completion.choices[0].message.content
+        # SPINNER - User chat karte hi pehle ye ayega
+        responding = st.empty()
+        responding.markdown("""
+            <div style='display:flex;align-items:center;gap:10px;color:#aaa'>
+                <div style='border:2px solid #333;border-top:2px solid #ffcc00;border-radius:50%;width:16px;height:16px;animation:spin 0.8s linear infinite'></div>
+                <b>Clyxess is responding<span class="dots"></span></b>
+            </div>
+            <style>
+            @keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+           .dots::after{content:'';animation:dotAnim 1.2s infinite}
+            @keyframes dotAnim{0%{content:''}25%{content:'.'}50%{content:'..'}75%{content:'...'}100%{content:''}}
+            </style>
+        """, unsafe_allow_html=True)
 
-    # TYPING ANIMATION
-    placeholder = st.empty()
-    typed = ""
-    for word in response.split(" "):
-        typed += word + " "
-        placeholder.markdown(typed + "▌")
-        time.sleep(0.01)
-    placeholder.markdown(response)
+        completion, used_model = get_groq_response(client, st.session_state.messages, system, "")
+        if completion is None:
+            responding.empty()
+            st.error("AI response नहीं आ पाया. Please try again.")
+            return
+        response = completion.choices[0].message.content
+        responding.empty()
 
-    # BRANDING LINE
-    st.markdown("<p style='color: #9ca3af; font-size: 12px; margin-top: 10px; margin-bottom: 5px;'><b>Clyxess AI | Secure • Fast • Private</b></p>", unsafe_allow_html=True)
-
-    # CSS FOR BUTTONS
-    st.markdown("""
-        <style>
-            div[data-testid="stButton"] button[kind="secondary"] {
-                background-color: transparent !important;
-                border: none !important;
-                color: #9ca3af !important; 
-                padding: 0px 5px !important;
-                font-size: 18px !important;
-                box-shadow: none !important;
-                transition: 0.2s;
-            }
-            div[data-testid="stButton"] button[kind="secondary"]:hover {
-                color: #ffffff !important;
-                background-color: transparent !important;
-                transform: scale(1.1);
-            }
-        </style>
-    """, unsafe_allow_html=True)
-
-    # BUTTONS
-    msg_index = len(st.session_state.messages) 
-    col1, col2, col3, col4, _ = st.columns([0.4, 0.4, 0.4, 0.4, 8])
-    
-    with col1:
-        if st.button("📋", key=f"copy_{msg_index}", help="Copy text"):
-            st.toast("Text Copied!", icon="✅")
-    with col2:
-        if st.button("👍", key=f"like_{msg_index}", help="Good response"):
-            st.toast("Thanks for liking!", icon="❤️")
-    with col3:
-        if st.button("👎", key=f"dislike_{msg_index}", help="Bad response"):
-            st.toast("We will improve!", icon="💔")
-    with col4:
-        if st.button("🔗", key=f"share_{msg_index}", help="Share this chat"):
-            st.toast("Link Copied to share!", icon="🔗")
-
-    # Niche ka baaki code
-    if sources:
-        st.caption("Sources:\n" + sources)
-    
-    st.session_state.messages.append({"role": "assistant", "content": response})
-    st.rerun()
-            
-           
-        
+        placeholder = st.empty()
+        typed = ""
+        for word in response.split(" "):
             typed += word + " "
             placeholder.markdown(typed + "▌")
             time.sleep(0.01)
@@ -12112,19 +12070,18 @@ def render_school_chat():
             st.error("AI response नहीं आ पाया. Please try again.")
             return
         response = completion.choices[0].message.content
-        # Typing Animation Start
-placeholder = st.empty()
-typed = ""
-for word in response.split(" "):
-    typed += word + " "
-    placeholder.markdown(typed + "▌")
-    time.sleep(0.01)
-placeholder.markdown(response)
-if sources:
-    st.caption("Sources:\n" + sources)
-st.caption("🔒 Clyxess AI | Secure • Fast • Private")
-messages.append({"role": "assistant", "content": response}) 
-st.rerun()
+        placeholder = st.empty()
+        typed = ""
+        for word in response.split(" "):
+            typed += word + " "
+            placeholder.markdown(typed + "▌")
+            time.sleep(0.02)
+        placeholder.markdown(response)
+        if sources:
+            st.caption("Sources:\n" + sources)
+        st.caption("🔒 Clyxess AI | Secure • Fast • Private")
+        messages.append({"role": "assistant", "content": response})
+        st.rerun()
 
 if mode == "Normal Chat":
     render_normal_chat()
