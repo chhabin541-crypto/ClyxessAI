@@ -2824,13 +2824,7 @@ def render_login_signup():
                 </div>
             </div>
             """, unsafe_allow_html=True)
-            # Cookie Policy Button
-            if st.button("🍪 Cookie Policy", use_container_width=True):
-               webbrowser.open_new_tab("https://chhabin541-crypto.github.io/ClyxessAI/cookie-policy.html")
-
-            # Refund Policy Button
-            if st.button("💸 Refund & Cancellation", use_container_width=True):
-                webbrowser.open_new_tab("https://chhabin541-crypto.github.io/ClyxessAI/refund-cancellation.html")
+          
             if st.button("Buy Yearly ₹1399", use_container_width=True, key="btn_y"):
                 webbrowser.open_new_tab(INSTAMOJO_YEARLY_LINK)
                 
