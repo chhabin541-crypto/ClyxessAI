@@ -2624,12 +2624,11 @@ def render_login_signup():
 
         st.markdown('<div class="divider">OR</div>', unsafe_allow_html=True)
 
-        tab1,tab2=st.tabs(["Log In","Sign Up"])
-        
-       with tab1:
+        tab1, tab2 = st.tabs(["Log In", "Sign Up"])
+
+    with tab1:
         email_val = st.text_input("Email", key="login_email", placeholder="Enter your email", label_visibility="collapsed")
         password_val = st.text_input("Password", type="password", key="login_password", placeholder="Enter password", label_visibility="collapsed")
-
         if st.button("Log In →", type="primary", use_container_width=True, key="btn_login"):
             with st.spinner("Logging you in..."):
                 try:
@@ -2644,6 +2643,8 @@ def render_login_signup():
                         st.rerun()
                 except Exception as ex:
                     st.error(f"Login failed: {ex}")
+        
+       
                 
             
             with st.expander("Forgot Password?"):
