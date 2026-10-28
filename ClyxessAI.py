@@ -12132,11 +12132,11 @@ for word in response.split(" "):
     placeholder.markdown(typed + "▌")
     time.sleep(0.01)
 placeholder.markdown(response)
-        if sources:
-            st.caption("Sources:\n" + sources)
-        st.caption("🔒 Clyxess AI | Secure • Fast • Private")
-        messages.append({"role": "assistant", "content": response})
-        st.rerun()
+if sources:
+    st.caption("Sources:\n" + sources)
+st.caption("🔒 Clyxess AI | Secure • Fast • Private")
+messages.append({"role": "assistant", "content": response}) 
+st.rerun()
 
 if mode == "Normal Chat":
     render_normal_chat()
