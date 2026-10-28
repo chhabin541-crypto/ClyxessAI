@@ -2644,8 +2644,7 @@ def render_login_signup():
                         st.rerun()
                 except Exception as ex:
                     st.error(f"Login failed: {ex}")
-                    except Exception as e:  
-                        st.error(f"Login failed: {e}")
+                
             
             with st.expander("Forgot Password?"):
                 reset_email = st.text_input("Enter your registered email", key="reset_email")
