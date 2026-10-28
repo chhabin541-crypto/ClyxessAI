@@ -11987,49 +11987,56 @@ def render_normal_chat():
     st.markdown("<p style='color: #9ca3af; font-size: 12px; margin-top: 10px; margin-bottom: 5px;'><b>Clyxess AI | Secure • Fast • Private</b></p>", unsafe_allow_html=True)
 
     # 3. Professional Transparent Buttons ka CSS
-    st.markdown("""
-        <style>
-            /* Sirf in buttons ko target karne ke liye (sidebar ko chhod kar) */
-            div[data-testid="stButton"] button[kind="secondary"] {
-                background-color: transparent !important;
-                border: none !important;
-                color: #9ca3af !important; 
-                padding: 0px 5px !important;
-                font-size: 18px !important;
-                box-shadow: none !important;
-                transition: 0.2s;
-            }
-            /* Jab mouse upar aaye */
-            div[data-testid="stButton"] button[kind="secondary"]:hover {
-                color: #ffffff !important;
-                background-color: transparent !important;
-                transform: scale(1.1);
-            }
-        </style>
-    """, unsafe_allow_html=True)
+    # 1. AI se response mangwaya (Agar aapne isko upar nahi likha toh)
+# completion, used_model = get_groq_response(...) 
 
-    # 4. Buttons (Copy, Like, Dislike, Share)
-    # msg_index use kiya hai taaki Streamlit error na de
-    msg_index = len(st.session_state.messages) 
-    
-    # 4 chhote columns taaki icons ekdum paas-paas aur chhote rahein
-    col1, col2, col3, col4, _ = st.columns([0.4, 0.4, 0.4, 0.4, 8])
-    
-    with col1:
-        if st.button("📋", key=f"copy_{msg_index}", help="Copy text"):
-            st.toast("Text Copied!", icon="✅")
-            
-    with col2:
-        if st.button("👍", key=f"like_{msg_index}", help="Good response"):
-            st.toast("Thanks for liking!", icon="❤️")
-            
-    with col3:
-        if st.button("👎", key=f"dislike_{msg_index}", help="Bad response"):
-            st.toast("We will improve!", icon="💔")
-            
-    with col4:
-        if st.button("🔗", key=f"share_{msg_index}", help="Share this chat"):
-            st.toast("Link Copied to share!", icon="🔗")
+# 2. Response ko screen par dikhayein
+st.markdown(response)
+
+# 3. Branding Line
+st.markdown("<p style='color: #9ca3af; font-size: 12px; margin-top: 10px; margin-bottom: 5px;'><b>Clyxess AI | Secure • Fast • Private</b></p>", unsafe_allow_html=True)
+
+# 4. CSS (Icons ko professional banane ke liye)
+st.markdown("""
+    <style>
+        div[data-testid="stButton"] button[kind="secondary"] {
+            background-color: transparent !important;
+            border: none !important;
+            color: #9ca3af !important; 
+            padding: 0px 5px !important;
+            font-size: 18px !important;
+            box-shadow: none !important;
+            transition: 0.2s;
+        }
+        div[data-testid="stButton"] button[kind="secondary"]:hover {
+            color: #ffffff !important;
+            background-color: transparent !important;
+            transform: scale(1.1);
+        }
+    </style>
+""", unsafe_allow_html=True)
+
+# 5. Buttons (Copy, Like, Dislike, Share)
+msg_index = len(st.session_state.messages) 
+
+# Columns (Buttons ko paas-paas rakhne ke liye)
+col1, col2, col3, col4, _ = st.columns([0.4, 0.4, 0.4, 0.4, 8])
+
+with col1:
+    if st.button("📋", key=f"copy_{msg_index}", help="Copy text"):
+        st.toast("Text Copied!", icon="✅")
+        
+with col2:
+    if st.button("👍", key=f"like_{msg_index}", help="Good response"):
+        st.toast("Thanks for liking!", icon="❤️")
+        
+with col3:
+    if st.button("👎", key=f"dislike_{msg_index}", help="Bad response"):
+        st.toast("We will improve!", icon="💔")
+        
+with col4:
+    if st.button("🔗", key=f"share_{msg_index}", help="Share this chat"):
+        st.toast("Link Copied to share!", icon="🔗")
             return
         response = completion.choices[0].message.content
         responding.empty()
