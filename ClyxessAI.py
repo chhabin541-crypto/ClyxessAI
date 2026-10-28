@@ -12029,9 +12029,6 @@ def render_normal_chat():
         if st.button("🔗", key=f"share_{msg_index}", help="Share this chat"):
             st.toast("Link Copied to share!", icon="🔗")
             
-    with col4:
-        if st.button("🔗", key=f"share_{msg_index}", help="Share this chat"):
-            st.toast("Link Copied to share!", icon="🔗")
            
         
             typed += word + " "
