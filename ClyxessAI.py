@@ -12037,13 +12037,8 @@ with col3:
 with col4:
     if st.button("🔗", key=f"share_{msg_index}", help="Share this chat"):
         st.toast("Link Copied to share!", icon="🔗")
-            return
-        response = completion.choices[0].message.content
-        responding.empty()
-
-        placeholder = st.empty()
-        typed = ""
-        for word in response.split(" "):
+           
+        
             typed += word + " "
             placeholder.markdown(typed + "▌")
             time.sleep(0.01)
