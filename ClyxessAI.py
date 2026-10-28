@@ -2448,6 +2448,7 @@ def render_login_signup():
     import datetime
     import urllib.parse
     import webbrowser
+    import time # Naya import time add kiya hai
 
     if not supabase:
         st.warning("Add SUPABASE_URL and SUPABASE_KEY to Streamlit secrets.")
@@ -2460,7 +2461,6 @@ def render_login_signup():
     # 🎨 PREMIUM CSS (Hover Effects + Footer)
     st.markdown("""
     <style>
-        /* 👇 Yahan Font Awesome 5 (Old Version) wapas laga diya hai taaki Bird icon dikhe */
         @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css');
         
         .stApp { background: radial-gradient(circle at top right, #1e1b4b 0%, #050814 50%) !important; }
@@ -2509,7 +2509,6 @@ def render_login_signup():
             transition: all 0.3s ease-in-out; cursor: pointer;
         }
         
-        /* Hawa Style Hover Effect */
         .pricing-card:hover {
             transform: translateY(-10px);
             box-shadow: 0 20px 40px rgba(0,0,0,0.5);
@@ -2659,9 +2658,6 @@ def render_login_signup():
                         st.success("✅ Account created! Please Log In to continue.")
                     except Exception as e: st.error(f"Sign up failed: {e}")
                 
-        # ==========================================
-        # 👇 YAHAN LOGIN FOOTER UPDATE HUA HAI (fa-twitter wapas)
-        # ==========================================
         st.markdown("""
         <div class="footer-pro">
             <div class="contact-info">
@@ -2671,7 +2667,6 @@ def render_login_signup():
             </div> 
             <div class="social-links">
                 <a href="https://www.instagram.com/clyxessai?utm_source=qr&exln=b2tpaWQ1dTU3OGI0" target="_blank"><i class="fab fa-instagram"></i></a>
-                <!-- Yahan wapas purana Twitter Bird aa gaya -->
                 <a href="https://x.com/NishadSingcz" target="_blank"><i class="fab fa-twitter"></i></a>
                 <a href="https://www.linkedin.com/in/nishad-singh-970958420?utm_source=share_via&utm_content=profile&utm_medium=member_android" target="_blank"><i class="fab fa-linkedin"></i></a>
                 <a href="https://youtube.com/@clyxess?si=3tbvHiHfHQwYCbA2" target="_blank"><i class="fab fa-youtube"></i></a>
@@ -2687,9 +2682,8 @@ def render_login_signup():
             </div>
         </div>
         """, unsafe_allow_html=True)
-        # ==========================================
                 
-        st.stop() # 🛑 Login ke bina aage nahi jayega
+        st.stop() 
 
     # ==========================================
     # 📧 DATABASE LOGIC (PLAN SELECTION GATE)
@@ -2697,13 +2691,12 @@ def render_login_signup():
     user_email = st.session_state.get("user_email", "")
     user_id = supabase.auth.get_user().user.id
     
-    # DB se data fetch karo
     res = supabase.table("user_subscriptions").select("*").eq("id", user_id).execute()
     
     show_plan_screen = False
     
     if len(res.data) == 0:
-        show_plan_screen = True # Naya user, show plans
+        show_plan_screen = True 
     else:
         sub_data = res.data[0]
         expiry_str = sub_data["expiry_date"]
@@ -2712,11 +2705,10 @@ def render_login_signup():
             expiry_date = datetime.datetime.fromisoformat(expiry_str.replace('Z', '+00:00'))
             now = datetime.datetime.now(datetime.timezone.utc)
             if expiry_date <= now:
-                show_plan_screen = True # Plan expired, show plans
+                show_plan_screen = True 
             else:
-                show_plan_screen = False # Active plan
+                show_plan_screen = False 
                 
-                # Sidebar Status Box
                 plan_type = sub_data["plan_type"]
                 plan_name = "Free Trial" if plan_type == "free" else ("Monthly Plan" if plan_type == "monthly" else "Yearly Plan")
                 color = "#3b82f6" if plan_type == "free" else ("#8b5cf6" if plan_type == "monthly" else "#f59e0b")
@@ -2749,7 +2741,6 @@ def render_login_signup():
 
         col1, col2, col3 = st.columns(3, gap="medium")
         
-        # ================= FREE TRIAL =================
         with col1:
             st.markdown("""
             <div class="pricing-card card-free">
@@ -2774,7 +2765,6 @@ def render_login_signup():
                 }).execute()
                 st.rerun()
 
-        # ================= MONTHLY =================
         with col2:
             st.markdown("""
             <div class="pricing-card card-monthly">
@@ -2805,7 +2795,6 @@ def render_login_signup():
                     supabase.table("user_subscriptions").update({"plan_type": "monthly", "expiry_date": expiry.isoformat(), "is_paid": True}).eq("id", user_id).execute()
                 st.rerun()
 
-        # ================= YEARLY =================
         with col3:
             st.markdown("""
             <div class="pricing-card card-yearly">
@@ -2836,9 +2825,6 @@ def render_login_signup():
                     supabase.table("user_subscriptions").update({"plan_type": "yearly", "expiry_date": expiry.isoformat(), "is_paid": True}).eq("id", user_id).execute()
                 st.rerun()
 
-        # ==========================================
-        # 👇 YAHAN SUBSCRIPTION FOOTER UPDATE HUA HAI (fa-twitter wapas)
-        # ==========================================
         st.markdown("""
         <div class="footer-pro">
             <div class="contact-info">
@@ -2848,7 +2834,6 @@ def render_login_signup():
             </div> 
             <div class="social-links">
                 <a href="https://www.instagram.com/clyxessai?utm_source=qr&exln=b2tpaWQ1dTU3OGI0" target="_blank"><i class="fab fa-instagram"></i></a>
-                <!-- Yahan wapas purana Twitter Bird aa gaya -->
                 <a href="https://x.com/NishadSingcz" target="_blank"><i class="fab fa-twitter"></i></a>
                 <a href="https://www.linkedin.com/in/nishad-singh-970958420?utm_source=share_via&utm_content=profile&utm_medium=member_android" target="_blank"><i class="fab fa-linkedin"></i></a>
                 <a href="https://youtube.com/@clyxess?si=3tbvHiHfHQwYCbA2" target="_blank"><i class="fab fa-youtube"></i></a>
@@ -2863,13 +2848,28 @@ def render_login_signup():
             </div>
         </div>
         """, unsafe_allow_html=True)
-        # ==========================================
 
-        st.stop() # 🛑 Plan select kiye bina aage nahi jayega.
+        st.stop() 
 
     # ==========================================
     # ✅ DASHBOARD (IF PLAN ACTIVE)
     # ==========================================
+    
+    # ==================================================
+    # 🟢 NAYA CODE: STEP 1 (CHAT HISTORY INIT & FETCH)
+    # ==================================================
+    if "messages" not in st.session_state:
+        st.session_state.messages = []
+    if "current_chat_id" not in st.session_state:
+        st.session_state.current_chat_id = None
+
+    # Fetch history from Supabase
+    try:
+        history_response = supabase.table('chat_sessions').select('*').eq('user_email', user_email).order('created_at', desc=True).execute()
+        st.session_state.user_history = history_response.data
+    except Exception as e:
+        st.session_state.user_history = []
+    # ==================================================
     
     # 🛠️ TESTING BUTTON (Isko baad mein hata dena)
     if st.sidebar.button("🛠️ [Testing] Reset My Plan", use_container_width=True, key="btn_reset_plan"):
@@ -2879,6 +2879,34 @@ def render_login_signup():
     if st.sidebar.button("🚪 Log Out", use_container_width=True, key="btn_logout"):
         st.session_state.clear()
         st.rerun()
+
+    # ==================================================
+    # 🟢 NAYA CODE: STEP 2 (SIDEBAR MEIN RECENT CHATS)
+    # ==================================================
+    st.sidebar.divider()
+    st.sidebar.markdown("### 🕒 All Recents")
+    
+    if 'user_history' in st.session_state and len(st.session_state.user_history) > 0:
+        for chat in st.session_state.user_history:
+            col1, col2 = st.sidebar.columns([5, 1])
+            
+            with col1:
+                if st.button(f"💬 {chat['title']}", key=f"open_{chat['id']}", use_container_width=True):
+                    st.session_state.current_chat_id = chat['id']
+                    st.session_state.messages = chat['messages']
+                    st.rerun()
+            
+            with col2:
+                if st.button("🗑️", key=f"del_{chat['id']}"):
+                    supabase.table('chat_sessions').delete().eq('id', chat['id']).execute()
+                    if st.session_state.current_chat_id == chat['id']:
+                        st.session_state.messages = []
+                        st.session_state.current_chat_id = None
+                    st.rerun()
+    else:
+        st.sidebar.info("Abhi koi chat save nahi hai.")
+    st.sidebar.divider()
+    # ==================================================
 
     # Features Menu
     st.sidebar.markdown("### 📚 Select Mode")
