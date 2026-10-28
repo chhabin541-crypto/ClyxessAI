@@ -2627,17 +2627,23 @@ def render_login_signup():
         tab1,tab2=st.tabs(["Log In","Sign Up"])
         
         with tab1:
-            email=st.text_input("Email",key="login_email", placeholder="Enter your email", label_visibility="collapsed")
-            password=st.text_input("Password",type="password",key="login_password", placeholder="Enter password", label_visibility="collapsed")
-            
-            if st.button("Log In ➔", type="primary", use_container_width=True, key="btn_login"):
-                with st.spinner("Logging you in..."):
-                    try:
-                        supabase.auth.sign_in_with_password({"email":email,"password":password})
-                        st.session_state.user_email=email
-                        st.session_state.logged_in = True
-                        st.rerun()
-                    except Exception as e: st.error(f"Login failed: {e}")
+    st.text_input("Email",key="login_email", placeholder="Enter your email", label_visibility="collapsed")
+    st.text_input("Password",type="password",key="login_password", placeholder="Enter password", label_visibility="collapsed")
+
+    if st.button("Log In →", type="primary", use_container_width=True, key="btn_login"):
+        with st.spinner("Logging you in..."):
+            try:
+                email_val = st.session_state.get("login_email", "").strip()
+                password_val = st.session_state.get("login_password", "").strip()
+
+                if not email_val or not password_val:
+                    st.error("Email aur password dono dalo")
+                else:
+                    supabase.auth.sign_in_with_password({"email": email_val,"password": password_val})
+                    st.session_state.user_email=email_val
+                    st.session_state.logged_in = True
+                    st.rerun()
+            except Exception as e: st.error(f"Login failed: {e}")
             
             with st.expander("Forgot Password?"):
                 reset_email = st.text_input("Enter your registered email", key="reset_email")
