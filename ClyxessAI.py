@@ -2441,7 +2441,7 @@ def load_latest_chat_cloud():
     except Exception:
         pass
 
- def render_login_signup():
+def render_login_signup():
     # 🛠️ Imports
     import streamlit as st
     import streamlit.components.v1 as components
