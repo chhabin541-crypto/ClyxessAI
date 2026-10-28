@@ -2626,23 +2626,27 @@ def render_login_signup():
 
         tab1, tab2 = st.tabs(["Log In", "Sign Up"])
 
+    tab1, tab2 = st.tabs(["Log In", "Sign Up"])
+
     with tab1:
-        email_val = st.text_input("Email", key="login_email", placeholder="Enter your email", label_visibility="collapsed")
-        password_val = st.text_input("Password", type="password", key="login_password", placeholder="Enter password", label_visibility="collapsed")
-        if st.button("Log In →", type="primary", use_container_width=True, key="btn_login"):
-            with st.spinner("Logging you in..."):
-                try:
-                    e = email_val.strip()
-                    p = password_val.strip()
-                    if not e or not p:
-                        st.error("Email aur password dono dalo")
-                    else:
+        with st.form("login_form_final", clear_on_submit=False):
+            email_val = st.text_input("Email", key="login_email_final", placeholder="Enter your email")
+            password_val = st.text_input("Password", type="password", key="login_password_final", placeholder="Enter password")
+            submitted = st.form_submit_button("Log In →", type="primary", use_container_width=True)
+            if submitted:
+                e = email_val.strip()
+                p = password_val.strip()
+                if not e or not p:
+                    st.error(f"Debug: Email len={len(e)}, Pass len={len(p)} - Email aur password dono dalo")
+                else:
+                    try:
                         supabase.auth.sign_in_with_password({"email": e, "password": p})
                         st.session_state.user_email = e
                         st.session_state.logged_in = True
+                        st.success("Login success!")
                         st.rerun()
-                except Exception as ex:
-                    st.error(f"Login failed: {ex}")
+                    except Exception as ex:
+                        st.error(f"Login failed: {ex}")
         
        
                 
