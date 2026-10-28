@@ -2626,23 +2626,24 @@ def render_login_signup():
 
         tab1,tab2=st.tabs(["Log In","Sign Up"])
         
-        with tab1:
-            st.text_input("Email",key="login_email", placeholder="Enter your email", label_visibility="collapsed")
-            st.text_input("Password",type="password",key="login_password", placeholder="Enter password", label_visibility="collapsed")
+       with tab1:
+        email_val = st.text_input("Email", key="login_email", placeholder="Enter your email", label_visibility="collapsed")
+        password_val = st.text_input("Password", type="password", key="login_password", placeholder="Enter password", label_visibility="collapsed")
 
-            if st.button("Log In →", type="primary", use_container_width=True, key="btn_login"):
-               with st.spinner("Logging you in..."):
-                    try:
-                        email_val = st.session_state.get("login_email", "").strip()
-                        password_val = st.session_state.get("login_password", "").strip()
-
-                        if not email_val or not password_val:
-                            st.error("Email aur password dono dalo")
-                        else:
-                            supabase.auth.sign_in_with_password({"email": email_val,"password": password_val})
-                            st.session_state.user_email=email_val
-                            st.session_state.logged_in = True
-                            st.rerun()
+        if st.button("Log In →", type="primary", use_container_width=True, key="btn_login"):
+            with st.spinner("Logging you in..."):
+                try:
+                    e = email_val.strip()
+                    p = password_val.strip()
+                    if not e or not p:
+                        st.error("Email aur password dono dalo")
+                    else:
+                        supabase.auth.sign_in_with_password({"email": e, "password": p})
+                        st.session_state.user_email = e
+                        st.session_state.logged_in = True
+                        st.rerun()
+                except Exception as ex:
+                    st.error(f"Login failed: {ex}")
                     except Exception as e:  
                         st.error(f"Login failed: {e}")
             
