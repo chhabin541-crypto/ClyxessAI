@@ -11978,7 +11978,7 @@ def render_normal_chat():
         st.stop() 
         
     response = completion.choices[0].message.content
-    responding.empty() # Spinner hatao
+    responding.empty()
 
     # TYPING ANIMATION
     placeholder = st.empty()
@@ -11986,8 +11986,8 @@ def render_normal_chat():
     for word in response.split(" "):
         typed += word + " "
         placeholder.markdown(typed + "▌")
-        time.sleep(0.01) # Speed of typing
-    placeholder.markdown(response) # Final text
+        time.sleep(0.01)
+    placeholder.markdown(response)
 
     # BRANDING LINE
     st.markdown("<p style='color: #9ca3af; font-size: 12px; margin-top: 10px; margin-bottom: 5px;'><b>Clyxess AI | Secure • Fast • Private</b></p>", unsafe_allow_html=True)
@@ -12019,14 +12019,15 @@ def render_normal_chat():
     with col1:
         if st.button("📋", key=f"copy_{msg_index}", help="Copy text"):
             st.toast("Text Copied!", icon="✅")
-            
     with col2:
         if st.button("👍", key=f"like_{msg_index}", help="Good response"):
             st.toast("Thanks for liking!", icon="❤️")
-            
     with col3:
         if st.button("👎", key=f"dislike_{msg_index}", help="Bad response"):
             st.toast("We will improve!", icon="💔")
+    with col4:
+        if st.button("🔗", key=f"share_{msg_index}", help="Share this chat"):
+            st.toast("Link Copied to share!", icon="🔗")
             
     with col4:
         if st.button("🔗", key=f"share_{msg_index}", help="Share this chat"):
