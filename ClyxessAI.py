@@ -2959,7 +2959,7 @@ def render_image_generator():
                     st.success(f"### 📖 Parts of {prompt}")
                     st.markdown(res.choices[0].message.content)
                     
-    except Exception as e:
+     except Exception as e:
         st.error(f"Explanation Error: {e}") 
         
  def render_coding_lab_mod():
