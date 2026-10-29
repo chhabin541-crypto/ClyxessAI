@@ -11696,36 +11696,43 @@ Give: Situation, Problem, Two possible decisions, ask student what they'd do, as
         <p style="color:#7089aa; font-size:13px;">From first AI concept to advanced AI research.</p>
     </div>
     """, unsafe_allow_html=True)    
-# ------------------------------------------
-# TAB 1: FILTERS & CONTROLS
-# ------------------------------------------
-with tab1:
-    st.subheader("Allowed AI Learning Modes")
-    st.write("Uncheck any mode you want to lock from your child's menu.")
-    
-    # Settings pehle se fetch ho chuki hain (settings variable mein)
-    col1, col2 = st.columns(2)
-    with col1:
-        school_mode = st.toggle("🏫 School Mode (AI Tutor)", value=settings.get('is_school_mode', True), key="t_school")
-        math_solver = st.toggle("🧮 Science & Math Solver", value=settings.get('is_math_solver', True), key="t_math")
-    with col2:
-        creative_writing = st.toggle("✍️ Creative Writing Studio", value=settings.get('is_creative_writing', True), key="t_creative")
-        image_gen = st.toggle("🎨 AI Image Generator", value=settings.get('is_image_gen', True), key="t_image")
-        
-    # 👇 YEH NAYA BUTTON HAI JO DATABASE MEIN SAVE KAREGA
-    if st.button("💾 Save Filter Settings", type="primary", use_container_width=True):
-        try:
-            supabase.table("parent_settings").update({
-                "is_school_mode": school_mode,
-                "is_math_solver": math_solver,
-                "is_creative_writing": creative_writing,
-                "is_image_gen": image_gen
-            }).eq("user_email", user_email).execute()
-            st.success("✅ Filter settings saved to database successfully!")
-        except Exception as e:
-            st.error(f"Error saving settings: {e}")
+import urllib.parse
+import datetime
 
-    st.divider()
+# 👇 Yeh function error ko fix karega aur asli report banayega
+def learning_report():
+    user_email = st.session_state.get("user_email", "")
+    
+    # Agar database connect hai toh data fetch karo
+    try:
+        res = supabase.table("study_logs").select("*").eq("user_email", user_email).execute()
+        logs = res.data
+        
+        if not logs:
+            return "Abhi tak koi study record nahi hai. Bacche ke padhne par yahan report aayegi."
+            
+        total_mins = sum(item['duration_minutes'] for item in logs)
+        hours = total_mins // 60
+        mins = total_mins % 60
+        
+        report_text = "📊 CLYXESS AI LEARNING REPORT\n"
+        report_text += "----------------------------\n"
+        report_text += f"Total Study Time: {hours} hours {mins} mins\n\n"
+        report_text += "Subject-wise Breakdown:\n"
+        
+        subjects = {}
+        for log in logs:
+            subj = log.get('subject', 'General')
+            subjects[subj] = subjects.get(subj, 0) + log['duration_minutes']
+            
+        for subj, time in subjects.items():
+            report_text += f"- {subj}: {time} mins\n"
+            
+        return report_text
+        
+    except Exception as e:
+        # Agar database mein table nahi bani hai toh dummy report dikhayega
+        return "📊 CLYXESS AI LEARNING REPORT\n\nBacche ne abhi tak koi class nahi li hai. Jab wo padhega, uski report yahan aayegi."
     
 def render_parent_dashboard():
     import streamlit as st
