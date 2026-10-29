@@ -3050,8 +3050,6 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',sans-serif;he
 .chip{background:var(--panel2);border:1px solid var(--border);color:var(--text);padding:3px 8px;border-radius:6px;font-size:10px;cursor:pointer;font-family:Consolas,monospace}
 .chip:hover{border-color:var(--accent);background:var(--accent);color:#fff}
 .status{padding:5px 10px;background:var(--bg);font-size:10px;color:var(--muted);display:flex;justify-content:space-between}
-
-/* 👇 Yahan Mobile Screen ka size bada kiya hai aur upar fix kiya hai 👇 */
 .right{width:300px;background:var(--panel);display:flex;flex-direction:column;border-left:1px solid var(--border);flex-shrink:0}
 .rhead{padding:7px 10px;background:var(--panel2);border-bottom:1px solid var(--border);display:flex;justify-content:space-between;font-size:10px}
 .rwrap{flex:1;padding:10px;overflow-y:auto;overflow-x:hidden;background:linear-gradient(135deg,#2a2a35,#1e1e24);display:flex;justify-content:center;align-items:flex-start;}
@@ -3059,13 +3057,10 @@ body.light .rwrap{background:linear-gradient(135deg,#e5e7eb,#d1d5db)}
 .mobileFrame{width:240px;height:460px;background:#000;border-radius:30px;padding:6px;box-shadow:0 15px 40px rgba(0,0,0,0.6);border:2px solid #333;margin:0 auto;flex-shrink:0;display:block;position:relative}
 .notch{width:100px;height:15px;background:#000;border-radius:0 0 12px 12px;margin:-6px auto 4px;position:relative;z-index:2}
 #prev{width:100%;height:100%;border:none;background:#fff;border-radius:24px;display:block;overflow:auto}
-
-/* 👇 Console aur Run Button ka CSS 👇 */
 #consoleWrap{display:none;width:100%;height:100%;flex-direction:column; padding: 5px; box-sizing: border-box;}
 #runBtn{display:block;width:100%;padding:10px;margin-bottom:10px;background:var(--success);color:#fff;border:none;border-radius:8px;font-weight:bold;cursor:pointer;font-size:13px}
 #runBtn:hover{background:#16a34a}
 #consoleOutput{flex:1;background:#000;color:#22c55e;font-family:monospace;padding:10px;border-radius:8px;overflow:auto;white-space:pre-wrap;font-size:12px;border:1px solid #333}
-
 #qrBox{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:9999;justify-content:center;align-items:center}
 #qrBox.modal{background:var(--panel);padding:18px;border-radius:16px;text-align:center;width:90%;max-width:360px;border:1px solid var(--border)}
 #qrBox h4{color:var(--text);margin-bottom:10px;font-size:14px}
@@ -3158,13 +3153,11 @@ body.light.learnCode{background:#1e293b;color:#67e8f9}
 <div class="rhead"><span>👁 Live Preview / Output</span><span style="color:var(--success)">● Live</span></div>
 <div class="rwrap">
     
-    <!-- 👇 Mobile Screen Frame 👇 -->
     <div class="mobileFrame" id="mobilePreview">
         <div class="notch"></div>
         <iframe id="prev" scrolling="yes"></iframe>
     </div>
 
-    <!-- 👇 Console Output for Backend Languages 👇 -->
     <div id="consoleWrap">
         <button id="runBtn" onclick="runBackendCode()">▶️ Run Code</button>
         <div id="consoleOutput">> Output will appear here...</div>
@@ -3205,8 +3198,6 @@ body.light.learnCode{background:#1e293b;color:#67e8f9}
 
 <script>
 const CLS_MAP={"5 Years":"Class 1","6 Years":"Class 1","7 Years":"Class 2","8 Years":"Class 3","9 Years":"Class 4","10 Years":"Class 5","11-12 Years":"Class 6-7","13-14 Years":"Class 8-9","15-16 Years":"Class 10","17-18 Years":"Class 11-12","18+ Years":"College"};
-
-// 👇 Yahan aapka pura Original Learn Cards data hai (Jo maine nahi chheda) 👇
 const LEARN_CARDS = [
   {title:"📝 Heading (H1)", preview:`<h1 style="font-size:28px;color:#dc2626;margin:0">Hello Duniya!</h1>`, code:`<h1>Hello Duniya!</h1>`, tip:"Bada title ke liye <h1> use karo."},
   {title:"📄 Paragraph", preview:`<p style="margin:0;color:#333">Main 5 saal ka hu aur mujhe coding pasand hai!</p>`, code:`<p>Yahan apni baat likho...</p>`, tip:"Text ke liye <p> use karo."},
@@ -3228,7 +3219,6 @@ const LEARN_CARDS = [
   {title:"💬 Flex Box", preview:`<div style="display:flex;gap:8px"><div style="background:#333;color:#fff;padding:8px;border-radius:8px">Side</div><div style="background:#eee;color:#333;padding:8px;border-radius:8px;flex:1">Main</div></div>`, code:`<div style="display:flex">\n <div>Side</div>\n <div>Main</div>\n</div>`, tip:"display:flex se side-by-side boxes bante hain."}
 ];
 
-// 👇 Yahan aapka pura Original Age Templates data hai (Jo maine nahi chheda) 👇
 const ageTemplates={
 "5 Years":{html:`<h1>👋 Hello! Mera Naam Aman Hai</h1>\n<p>Main 5 saal ka hu!</p>\n<h2 style="color:blue">Mera favourite color BLUE hai</h2>\n<button onclick="alert('Wah! 🌟')">Mujhe Dabao!</button>`,css:`body{text-align:center;padding:30px;background:#fef9c3;font-family:Comic Sans MS;margin:0}\nh1{background:#fff;padding:15px;border-radius:15px}\nbutton{padding:15px 30px;background:orange;color:#fff;border:none;border-radius:20px;font-size:16px}`,js:`// Sirf click karo!`,tipTitle:"5 Years Tip:",tipText:"Apna naam likho. Blue ko RED karo!"},
 "6 Years":{html:`<h1>🔤 ABCD</h1>\n<div class="box">A for Apple 🍎</div>\n<div class="box">B for Ball ⚽</div>\n<button onclick="this.innerText='Shabash! 🌟'">Click Karo</button>`,css:`body{text-align:center;padding:20px;background:#dcfce7;margin:0}\n.box{background:#fff;margin:10px;padding:15px;border-radius:15px;font-size:20px}\nbutton{padding:10px 20px;background:#6366f1;color:#fff;border:none;border-radius:10px}`,js:`// Kuch nahi`,tipTitle:"6 Years Tip:",tipText:"Apna fruit likho!"},
@@ -3243,14 +3233,12 @@ const ageTemplates={
 "18+ Years":{html:`<!DOCTYPE html>\n<html><head><title>My Pro Website</title></head><body>\n<h1>🚀 Pro Coder</h1>\n<p>Full website khud likho!</p>\n<button onclick="alert('Pro!')">Click</button>\n</body></html>`,css:`body{padding:20px;font-family:Arial;margin:0}`,js:`// Full stack!`,tipTitle:"18+ Tip:",tipText:"React, Node try karo!"}
 };
 
-// 👇 Yahan aapka pura Original Readymade data hai (Jo maine nahi chheda) 👇
 const readyMade={
 r1:{html:`<h1>🌟 My First Page</h1>\n<p>Naam <b style="color:blue">Aman</b> hai</p>\n<button onclick="alert('Hi!')">Hello</button>`,css:`body{text-align:center;padding:30px;background:#fef9c3;margin:0}\nbutton{padding:12px 20px;background:orange;border:none;border-radius:20px;color:#fff}`,js:`// First page!`},
 r2:{html:`<h1>🎨 Colour Game</h1>\n<div class="row">\n<div onclick="document.body.style.background='pink'" class="c" style="background:red"></div>\n<div onclick="document.body.style.background='lightblue'" class="c" style="background:blue"></div>\n<div onclick="document.body.style.background='lightgreen'" class="c" style="background:green"></div>\n</div>`,css:`body{text-align:center;padding:30px;transition:0.5s;margin:0}\n.row{display:flex;gap:10px;justify-content:center}\n.c{width:60px;height:60px;border-radius:50%;cursor:pointer}`,js:`// Colours!`},
 r3:{html:`<header class="head"><b>🛒 Mini Shop</b><span>Cart</span></header>\n<div class="cont">\n<h2>Toys - 50% OFF!</h2>\n<div class="card"><p>🧸 Teddy - ₹299</p><button>Buy</button></div>\n</div>`,css:`body{margin:0;background:#f0fdf4;font-family:Arial}\n.head{background:#fff;padding:12px;display:flex;justify-content:space-between;box-shadow:0 2px 8px #0001}\n.cont{padding:20px}\n.card{background:#fff;padding:15px;border-radius:12px;max-width:280px}\n.card button{background:#16a34a;color:#fff;padding:8px 16px;border:none;border-radius:8px;cursor:pointer}`,js:`// Shop!`}
 };
 
-// 👇 NAYA: 20 Languages ke liye Backend Data (Piston API ke liye) 👇
 const backendData = {
   "Python": { ext: "main.py", code: "print('Hello Duniya!')\nfor i in range(3):\n    print('Count:', i)" },
   "Java": { ext: "Main.java", code: "public class Main {\n    public static void main(String[] args) {\n        System.out.println(\"Hello Duniya!\");\n    }\n}" },
@@ -3269,10 +3257,23 @@ const backendData = {
   "MATLAB": { ext: "main.m", code: "disp('Hello Duniya!')" }
 };
 
+// 👇 Judge0 CE ke Language IDs 👇
 const apiMap = {
-  "Python": "python", "Java": "java", "C": "c", "C++": "c++", "C#": "csharp",
-  "PHP": "php", "Ruby": "ruby", "Go": "go", "Rust": "rust", "Swift": "swift",
-  "Kotlin": "kotlin", "TypeScript": "typescript", "SQL": "sqlite3", "R": "r", "MATLAB": "octave"
+  "Python": 100, // Python 3.12.5
+  "Java": 91, // JDK 17.0.6
+  "C": 103, // GCC 14.1.0
+  "C++": 105, // GCC 14.1.0
+  "C#": 51, // Mono 6.6.0.161
+  "PHP": 98, // 8.3.11
+  "Ruby": 72, // 2.7.0
+  "Go": 107, // 1.23.5
+  "Rust": 108, // 1.85.0
+  "Swift": 83, // 5.2.3
+  "Kotlin": 111, // 2.1.10
+  "TypeScript": 101, // 5.6.2
+  "SQL": 82, // SQLite 3.27.2
+  "R": 99, // 4.4.1
+  "MATLAB": null // Supported nahi hai
 };
 
 const LANGUAGES=["HTML","CSS","JavaScript","Python","Java","C","C++","C#","PHP","Ruby","Go","Rust","Swift","Kotlin","TypeScript","SQL","Scratch (Block)","Block Coding","R","MATLAB"];
@@ -3300,7 +3301,6 @@ function changeLang(){
   selectLang(lang, null);
 }
 
-// 👇 Yahan Language Select karne ka logic fix kiya hai 👇
 function selectLang(lang, el){
   currentLang = lang;
   
@@ -3315,15 +3315,13 @@ function selectLang(lang, el){
   const isVisual = ["Scratch (Block)", "Block Coding"].includes(lang);
 
   if(isFrontend) {
-    // Frontend Mode (HTML/CSS/JS)
     document.getElementById('mobilePreview').style.display = 'block';
     document.getElementById('consoleWrap').style.display = 'none';
     document.getElementById('tab-css').style.display = 'block';
     document.getElementById('tab-js').style.display = 'block';
     document.getElementById('tab-html').innerText = '📄 index.html';
-    applyAge(currentAge); // Age template load hoga
+    applyAge(currentAge); 
   } else if (isVisual) {
-    // Visual/Block Mode
     document.getElementById('mobilePreview').style.display = 'none';
     document.getElementById('consoleWrap').style.display = 'flex';
     document.getElementById('tab-css').style.display = 'none';
@@ -3337,7 +3335,6 @@ function selectLang(lang, el){
     document.getElementById('consoleOutput').innerText = "> Visual language selected. No code execution available in text mode.";
     document.getElementById('consoleOutput').style.color = "#f59e0b";
   } else {
-    // Backend Mode (Python, PHP, Java, etc.)
     document.getElementById('mobilePreview').style.display = 'none';
     document.getElementById('consoleWrap').style.display = 'flex';
     document.getElementById('tab-css').style.display = 'none';
@@ -3347,7 +3344,6 @@ function selectLang(lang, el){
     const config = backendData[lang] || { ext: "code.txt", code: "// Write code here" };
     document.getElementById('tab-html').innerText = '📄 ' + config.ext;
     
-    // Tab ko html par switch karo
     document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
     document.getElementById('tab-html').classList.add('active');
     document.querySelectorAll('.editor').forEach(e=>e.classList.remove('active'));
@@ -3361,16 +3357,16 @@ function selectLang(lang, el){
   }
 }
 
-// 👇 Piston API se code run karne ka function 👇
+// 👇 Naya Judge0 CE API Logic 👇
 async function runBackendCode() {
   const lang = currentLang;
   const code = document.getElementById('editorHTML').value;
-  const apiLang = apiMap[lang];
+  const langId = apiMap[lang];
   const consoleOutput = document.getElementById('consoleOutput');
   const runBtn = document.getElementById('runBtn');
 
-  if(!apiLang) {
-    consoleOutput.innerText = "> Error: API runner not available for this language.";
+  if(!langId) {
+    consoleOutput.innerText = "> Error: This language is not supported by the execution API.";
     consoleOutput.style.color = "#ef4444";
     return;
   }
@@ -3381,33 +3377,51 @@ async function runBackendCode() {
   consoleOutput.style.color = "#eab308"; 
 
   try {
-    const response = await fetch("https://emkc.org/api/v2/piston/execute", {
+    // Step 1: Submit code to Judge0
+    const submitResponse = await fetch("https://ce.judge0.com/submissions?base64_encoded=false&wait=false", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        language: apiLang,
-        version: "*",
-        files: [{ content: code }]
+        source_code: code,
+        language_id: langId
       })
     });
     
-    const result = await response.json();
-    
-    if (result.run) {
-      if (result.run.stdout) {
-        consoleOutput.innerText = "> Output:\n\n" + result.run.stdout;
-        consoleOutput.style.color = "#22c55e"; 
-      } else if (result.run.stderr) {
-        consoleOutput.innerText = "> Error:\n\n" + result.run.stderr;
-        consoleOutput.style.color = "#ef4444"; 
-      } else {
-        consoleOutput.innerText = "> Code ran successfully (No output).";
-        consoleOutput.style.color = "#22c55e"; 
-      }
-    } else {
-       consoleOutput.innerText = "> API Error: " + JSON.stringify(result);
-       consoleOutput.style.color = "#ef4444";
+    const submitResult = await submitResponse.json();
+    const token = submitResult.token;
+
+    if (!token) {
+      throw new Error("Submission failed, no token received.");
     }
+
+    // Step 2: Poll for result
+    let result = null;
+    while (true) {
+      const pollResponse = await fetch(`https://ce.judge0.com/submissions/${token}?base64_encoded=false`);
+      result = await pollResponse.json();
+      
+      // Status 1 = In Queue, 2 = Processing
+      if (result.status && result.status.id !== 1 && result.status.id !== 2) {
+        break;
+      }
+      await new Promise(r => setTimeout(r, 500)); // Wait 0.5s before polling again
+    }
+
+    // Step 3: Display output
+    if (result.stdout) {
+      consoleOutput.innerText = "> Output:\n\n" + result.stdout;
+      consoleOutput.style.color = "#22c55e"; 
+    } else if (result.stderr) {
+      consoleOutput.innerText = "> Error:\n\n" + result.stderr;
+      consoleOutput.style.color = "#ef4444"; 
+    } else if (result.compile_output) {
+      consoleOutput.innerText = "> Compilation Error:\n\n" + result.compile_output;
+      consoleOutput.style.color = "#ef4444";
+    } else {
+      consoleOutput.innerText = "> Code ran successfully (No output).";
+      consoleOutput.style.color = "#22c55e"; 
+    }
+
   } catch (error) {
     consoleOutput.innerText = "> Network Error: " + error.message;
     consoleOutput.style.color = "#ef4444";
@@ -3437,7 +3451,6 @@ function changeAgeBySelect(){
 }
 
 function applyAge(age){
-  // Agar backend language select hai toh Age template load mat karo
   if(!["HTML", "CSS", "JavaScript"].includes(currentLang)) return; 
   
   const d=ageTemplates[age];
@@ -3565,7 +3578,6 @@ function copyAllCode(){
   navigator.clipboard.writeText(code).then(()=>alert('✅ Code copy ho gaya!'));
 }
 
-// ============ QR — FINAL FIX ============
 function openQR(){
   document.getElementById('qrBox').style.display='flex';
   newQR();
@@ -3702,7 +3714,7 @@ applyAge('5 Years');
 </html>
 '''
     html_code = html_code.replace("__BASE_URL__", base_url)
-    components.html(html_code, height=950, scrolling=False)    
+    components.html(html_code, height=950, scrolling=False)   
     
 def render_vision_lab():
     import streamlit as st
