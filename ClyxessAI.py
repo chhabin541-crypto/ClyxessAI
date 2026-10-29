@@ -2962,9 +2962,9 @@ def render_image_generator():
                 except Exception as e:
                     st.error(f"Explanation Error: {e}") 
         
-  def render_coding_lab_mod():
-    import streamlit.components.v1 as components
-    import socket
+ def render_coding_lab_mod():
+     import streamlit.components.v1 as components
+     import socket
 
     def get_best_lan_ip():
         candidates = []
