@@ -2962,7 +2962,7 @@ def render_image_generator():
                 except Exception as e:
                     st.error(f"Explanation Error: {e}") 
         
- def render_coding_lab_mod():
+  def render_coding_lab_mod():
     import streamlit.components.v1 as components
     import socket
 
