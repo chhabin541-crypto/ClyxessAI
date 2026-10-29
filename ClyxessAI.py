@@ -3050,17 +3050,22 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',sans-serif;he
 .chip{background:var(--panel2);border:1px solid var(--border);color:var(--text);padding:3px 8px;border-radius:6px;font-size:10px;cursor:pointer;font-family:Consolas,monospace}
 .chip:hover{border-color:var(--accent);background:var(--accent);color:#fff}
 .status{padding:5px 10px;background:var(--bg);font-size:10px;color:var(--muted);display:flex;justify-content:space-between}
-.right{width:320px;background:var(--panel);display:flex;flex-direction:column;border-left:1px solid var(--border);flex-shrink:0}
+
+/* 👇 Yahan Mobile Screen ka size bada kiya hai aur upar fix kiya hai 👇 */
+.right{width:300px;background:var(--panel);display:flex;flex-direction:column;border-left:1px solid var(--border);flex-shrink:0}
 .rhead{padding:7px 10px;background:var(--panel2);border-bottom:1px solid var(--border);display:flex;justify-content:space-between;font-size:10px}
-.rwrap{flex:1;padding:15px;overflow-y:auto;overflow-x:hidden;background:linear-gradient(135deg,#2a2a35,#1e1e24);display:flex;justify-content:center;align-items:center;flex-direction:column}
+.rwrap{flex:1;padding:10px;overflow-y:auto;overflow-x:hidden;background:linear-gradient(135deg,#2a2a35,#1e1e24);display:flex;justify-content:center;align-items:flex-start;}
 body.light .rwrap{background:linear-gradient(135deg,#e5e7eb,#d1d5db)}
-.mobileFrame{width:260px;height:480px;background:#000;border-radius:35px;padding:8px;box-shadow:0 20px 50px rgba(0,0,0,0.8);border:2px solid #333;margin:0 auto;flex-shrink:0;display:none;position:relative}
-.notch{width:110px;height:18px;background:#000;border-radius:0 0 15px 15px;margin:-8px auto 5px;position:relative;z-index:2}
-#prev{width:100%;height:100%;border:none;background:#fff;border-radius:28px;display:block;overflow:auto}
-#consoleWrap{display:none;width:100%;height:100%;flex-direction:column}
+.mobileFrame{width:240px;height:460px;background:#000;border-radius:30px;padding:6px;box-shadow:0 15px 40px rgba(0,0,0,0.6);border:2px solid #333;margin:0 auto;flex-shrink:0;display:block;position:relative}
+.notch{width:100px;height:15px;background:#000;border-radius:0 0 12px 12px;margin:-6px auto 4px;position:relative;z-index:2}
+#prev{width:100%;height:100%;border:none;background:#fff;border-radius:24px;display:block;overflow:auto}
+
+/* 👇 Console aur Run Button ka CSS 👇 */
+#consoleWrap{display:none;width:100%;height:100%;flex-direction:column; padding: 5px; box-sizing: border-box;}
 #runBtn{display:block;width:100%;padding:10px;margin-bottom:10px;background:var(--success);color:#fff;border:none;border-radius:8px;font-weight:bold;cursor:pointer;font-size:13px}
 #runBtn:hover{background:#16a34a}
 #consoleOutput{flex:1;background:#000;color:#22c55e;font-family:monospace;padding:10px;border-radius:8px;overflow:auto;white-space:pre-wrap;font-size:12px;border:1px solid #333}
+
 #qrBox{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:9999;justify-content:center;align-items:center}
 #qrBox.modal{background:var(--panel);padding:18px;border-radius:16px;text-align:center;width:90%;max-width:360px;border:1px solid var(--border)}
 #qrBox h4{color:var(--text);margin-bottom:10px;font-size:14px}
@@ -3126,12 +3131,12 @@ body.light.learnCode{background:#1e293b;color:#67e8f9}
 
 <div class="center">
 <div class="tabs" id="tabsContainer">
-  <div class="tab active" id="tab-html" onclick="switchTab('html',this)">📄 index.html</div>
-  <div class="tab" id="tab-css" onclick="switchTab('css',this)">🎨 style.css</div>
-  <div class="tab" id="tab-js" onclick="switchTab('js',this)">⚡ script.js</div>
+<div class="tab active" id="tab-html" onclick="switchTab('html',this)">📄 index.html</div>
+<div class="tab" id="tab-css" onclick="switchTab('css',this)">🎨 style.css</div>
+<div class="tab" id="tab-js" onclick="switchTab('js',this)">⚡ script.js</div>
 </div>
 <div class="editorWrap">
-<textarea class="editor active" id="editorHTML" placeholder="Code yahan likho..."></textarea>
+<textarea class="editor active" id="editorHTML" placeholder="HTML yahan likho..."></textarea>
 <textarea class="editor" id="editorCSS" placeholder="CSS yahan likho..."></textarea>
 <textarea class="editor" id="editorJS" placeholder="JavaScript yahan likho..."></textarea>
 </div>
@@ -3152,18 +3157,18 @@ body.light.learnCode{background:#1e293b;color:#67e8f9}
 <div class="right">
 <div class="rhead"><span>👁 Live Preview / Output</span><span style="color:var(--success)">● Live</span></div>
 <div class="rwrap">
-  
-  <!-- Mobile Screen Preview -->
-  <div class="mobileFrame" id="mobilePreview">
-    <div class="notch"></div>
-    <iframe id="prev" scrolling="yes"></iframe>
-  </div>
+    
+    <!-- 👇 Mobile Screen Frame 👇 -->
+    <div class="mobileFrame" id="mobilePreview">
+        <div class="notch"></div>
+        <iframe id="prev" scrolling="yes"></iframe>
+    </div>
 
-  <!-- Backend Console -->
-  <div id="consoleWrap">
-    <button id="runBtn" onclick="runBackendCode()">▶️ Run Code</button>
-    <div id="consoleOutput">> Output will appear here...</div>
-  </div>
+    <!-- 👇 Console Output for Backend Languages 👇 -->
+    <div id="consoleWrap">
+        <button id="runBtn" onclick="runBackendCode()">▶️ Run Code</button>
+        <div id="consoleOutput">> Output will appear here...</div>
+    </div>
 
 </div>
 </div>
@@ -3199,6 +3204,53 @@ body.light.learnCode{background:#1e293b;color:#67e8f9}
 </div>
 
 <script>
+const CLS_MAP={"5 Years":"Class 1","6 Years":"Class 1","7 Years":"Class 2","8 Years":"Class 3","9 Years":"Class 4","10 Years":"Class 5","11-12 Years":"Class 6-7","13-14 Years":"Class 8-9","15-16 Years":"Class 10","17-18 Years":"Class 11-12","18+ Years":"College"};
+
+// 👇 Yahan aapka pura Original Learn Cards data hai (Jo maine nahi chheda) 👇
+const LEARN_CARDS = [
+  {title:"📝 Heading (H1)", preview:`<h1 style="font-size:28px;color:#dc2626;margin:0">Hello Duniya!</h1>`, code:`<h1>Hello Duniya!</h1>`, tip:"Bada title ke liye <h1> use karo."},
+  {title:"📄 Paragraph", preview:`<p style="margin:0;color:#333">Main 5 saal ka hu aur mujhe coding pasand hai!</p>`, code:`<p>Yahan apni baat likho...</p>`, tip:"Text ke liye <p> use karo."},
+  {title:"🎨 Color", preview:`<span style="color:#2563eb;font-weight:bold">Mera favourite color BLUE hai</span>`, code:`<p style="color:blue">Mera favourite color BLUE hai</p>`, tip:"blue ki jagah red, green try karo!"},
+  {title:"🔘 Button", preview:`<button style="padding:10px 20px;background:#f59e0b;color:#fff;border:none;border-radius:10px;font-weight:bold">Mujhe Dabao!</button>`, code:`<button>Mujhe Dabao!</button>`, tip:"Button ke liye <button> use karo."},
+  {title:"🖼️ Image", preview:`<img src="https://cdn-icons-png.flaticon.com/512/616/616408.png" width="70">`, code:`<img src="IMAGE-LINK" width="100">`, tip:"Image ke liye <img> use karo."},
+  {title:"🔗 Link", preview:`<a href="#" style="color:#6366f1;text-decoration:underline">Click Karo</a>`, code:`<a href="https://google.com">Google</a>`, tip:"Link ke liye <a href='...'> use karo."},
+  {title:"📋 List", preview:`<ul style="margin:0;padding-left:20px;color:#333"><li>Class 1 - Drawing</li><li>Class 2 - Coding</li></ul>`, code:`<ul>\n <li>Class 1 - Drawing</li>\n <li>Class 2 - Coding</li>\n</ul>`, tip:"List ke liye <ul> aur <li> use karo."},
+  {title:"📊 Slider", preview:`<input type="range" min="0" max="100" value="50" style="width:150px">`, code:`<input type="range" min="0" max="100">`, tip:"Slider ke liye input type='range' likho."},
+  {title:"✍️ Input Box", preview:`<input type="text" placeholder="Naam..." style="padding:8px;border-radius:6px;border:1px solid #ccc">`, code:`<input type="text" placeholder="Naam likho...">`, tip:"Input ke liye input type='text' use karo."},
+  {title:"🎯 Alert", preview:`<button onclick="alert('Wah! 🌟')" style="padding:8px 16px;background:#22c55e;color:#fff;border:none;border-radius:8px">Click Karo</button>`, code:`<button onclick="alert('Wah!')">Click Karo</button>`, tip:"onclick='alert(...)' se click pe popup aata hai."},
+  {title:"🖍️ Background Color", preview:`<div style="background:#fef9c3;padding:15px;border-radius:10px;color:#333;width:100%;text-align:center">Rangila Box!</div>`, code:`<div style="background:#fef9c3;padding:15px">Rangila Box!</div>`, tip:"background: color se box rangila hota hai."},
+  {title:"⬛ Box Border", preview:`<div style="border:3px solid #dc2626;padding:12px;border-radius:10px;color:#333;width:100%;text-align:center">Mera Box</div>`, code:`<div style="border:3px solid red;padding:12px">Mera Box</div>`, tip:"border: 3px solid red se border aata hai."},
+  {title:"🎬 Emoji", preview:`<div style="font-size:30px">😀 🚀 ❤️ 🌟 🎉</div>`, code:`😀 🚀 ❤️ 🌟 🎉`, tip:"Emoji seedha code me likho!"},
+  {title:"🖼️ Circle Image", preview:`<img src="https://cdn-icons-png.flaticon.com/512/616/616408.png" width="70" style="border-radius:50%">`, code:`<img src="LINK" style="border-radius:50%">`, tip:"border-radius:50% se gol image banti hai."},
+  {title:"📐 Center Text", preview:`<div style="text-align:center;color:#333">Yeh Center Me Hai</div>`, code:`<div style="text-align:center">Yeh Center Me Hai</div>`, tip:"text-align:center se text center aata hai."},
+  {title:"🎮 Score Game", preview:`<div style="text-align:center"><p style="margin:0;color:#333">Score: <b id="demoScore">0</b></p><button onclick="document.getElementById('demoScore').innerText++" style="padding:6px 12px;background:#f59e0b;color:#fff;border:none;border-radius:6px">+1</button></div>`, code:`<p>Score: <span id="s">0</span></p>\n<button onclick="document.getElementById('s').innerText++">+1</button>`, tip:"Click pe score badhao!"},
+  {title:"🌈 Gradient", preview:`<div style="background:linear-gradient(135deg,#667eea,#764ba2);padding:15px;color:#fff;border-radius:10px;width:100%;text-align:center">Gradient!</div>`, code:`<div style="background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;padding:15px">Gradient!</div>`, tip:"2 rang mix karne ke liye gradient use karo."},
+  {title:"💬 Flex Box", preview:`<div style="display:flex;gap:8px"><div style="background:#333;color:#fff;padding:8px;border-radius:8px">Side</div><div style="background:#eee;color:#333;padding:8px;border-radius:8px;flex:1">Main</div></div>`, code:`<div style="display:flex">\n <div>Side</div>\n <div>Main</div>\n</div>`, tip:"display:flex se side-by-side boxes bante hain."}
+];
+
+// 👇 Yahan aapka pura Original Age Templates data hai (Jo maine nahi chheda) 👇
+const ageTemplates={
+"5 Years":{html:`<h1>👋 Hello! Mera Naam Aman Hai</h1>\n<p>Main 5 saal ka hu!</p>\n<h2 style="color:blue">Mera favourite color BLUE hai</h2>\n<button onclick="alert('Wah! 🌟')">Mujhe Dabao!</button>`,css:`body{text-align:center;padding:30px;background:#fef9c3;font-family:Comic Sans MS;margin:0}\nh1{background:#fff;padding:15px;border-radius:15px}\nbutton{padding:15px 30px;background:orange;color:#fff;border:none;border-radius:20px;font-size:16px}`,js:`// Sirf click karo!`,tipTitle:"5 Years Tip:",tipText:"Apna naam likho. Blue ko RED karo!"},
+"6 Years":{html:`<h1>🔤 ABCD</h1>\n<div class="box">A for Apple 🍎</div>\n<div class="box">B for Ball ⚽</div>\n<button onclick="this.innerText='Shabash! 🌟'">Click Karo</button>`,css:`body{text-align:center;padding:20px;background:#dcfce7;margin:0}\n.box{background:#fff;margin:10px;padding:15px;border-radius:15px;font-size:20px}\nbutton{padding:10px 20px;background:#6366f1;color:#fff;border:none;border-radius:10px}`,js:`// Kuch nahi`,tipTitle:"6 Years Tip:",tipText:"Apna fruit likho!"},
+"7 Years":{html:`<h1>🎨 Colour Game</h1>\n<p>Rang pe click karo!</p>\n<div class="row">\n<div onclick="document.body.style.background='lightcoral'" class="c" style="background:red"></div>\n<div onclick="document.body.style.background='lightblue'" class="c" style="background:blue"></div>\n<div onclick="document.body.style.background='lightgreen'" class="c" style="background:green"></div>\n</div>`,css:`body{text-align:center;padding:30px;transition:0.5s;margin:0}\n.row{display:flex;gap:10px;justify-content:center}\n.c{width:60px;height:60px;border-radius:15px;cursor:pointer}`,js:`// Rang click karo!`,tipTitle:"7 Years Tip:",tipText:"Apne colors add karo!"},
+"8 Years":{html:`<h1>🐶 My Pet Dog</h1>\n<img src="https://cdn-icons-png.flaticon.com/512/616/616408.png" width="100">\n<p>Naam Tommy hai!</p>\n<button onclick="alert('Bhow Bhow! 🐶')">Bulao</button>`,css:`body{text-align:center;padding:20px;background:#ffedd5;margin:0}\nbutton{padding:10px 20px;background:#f59e0b;color:#fff;border:none;border-radius:10px}`,js:`// Alert dabao!`,tipTitle:"8 Years Tip:",tipText:"Cat ka photo try karo!"},
+"9 Years":{html:`<h1>🏫 Meri School</h1>\n<ul>\n<li>Class 1 - Drawing 🎨</li>\n<li>Class 2 - ABCD 🔤</li>\n<li>Class 3 - Coding 💻</li>\n</ul>`,css:`body{padding:20px;background:#e0f2fe;margin:0;font-family:Arial}\nul{background:#fff;padding:20px 40px;border-radius:15px;max-width:300px}\nli{padding:5px 0;font-size:16px}`,js:`// List banao!`,tipTitle:"9 Years Tip:",tipText:"Apni school list banao!"},
+"10 Years":{html:`<h1>🎮 Click Game</h1>\n<p>Score: <span id="sc">0</span></p>\n<button onclick="incScore()">CLICK KARO!</button>`,css:`body{text-align:center;padding:40px;background:#fef3c7;margin:0}\nbutton{padding:20px 40px;background:#f59e0b;color:#fff;border:none;border-radius:15px;font-size:20px}\n#sc{font-weight:900;color:#dc2626;font-size:24px}`,js:`function incScore(){document.getElementById('sc').innerText++;}`,tipTitle:"10 Years Tip:",tipText:"Logic samjho!"},
+"11-12 Years":{html:`<div class="card">\n<h1>👨‍💻 Hi, I am Coder Rohan</h1>\n<p>Age 12 | I make websites</p>\n<div class="skills">My Skills: HTML, CSS, JS</div>\n<button onclick="alert('Contact me!')">Hire Me</button>\n</div>`,css:`body{background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;margin:0;padding:40px;text-align:center}\n.card{background:rgba(255,255,255,0.1);padding:30px;border-radius:20px;max-width:320px;margin:auto}\n.skills{background:#fff;color:#000;padding:15px;border-radius:15px;margin-top:15px}\nbutton{margin-top:15px;padding:10px 20px;border-radius:20px;border:none;background:#6366f1;color:#fff;cursor:pointer}`,js:`// Portfolio banao!`,tipTitle:"11-12 Tip:",tipText:"Apna portfolio banao!"},
+"13-14 Years":{html:`<h1>🧮 Calculator</h1>\n<input id="n1" type="number" placeholder="N1">\n<input id="n2" type="number" placeholder="N2">\n<br><br>\n<button onclick="add()">Jodo (+)</button>\n<button onclick="mul()">Guna (x)</button>\n<p>Result: <span id="res">-</span></p>`,css:`body{text-align:center;padding:30px;margin:0;font-family:Arial}\ninput{padding:10px;border-radius:8px;border:2px solid #ddd;font-size:16px;width:120px}\nbutton{padding:10px 20px;background:#16a34a;color:#fff;border:none;border-radius:8px;margin:4px;cursor:pointer;font-size:16px}\n#res{font-weight:900;color:#16a34a;font-size:22px}`,js:`function add(){document.getElementById('res').innerText=Number(n1.value)+Number(n2.value);}\nfunction mul(){document.getElementById('res').innerText=Number(n1.value)*Number(n2.value);}`,tipTitle:"13-14 Tip:",tipText:"Minus, divide add karo!"},
+"15-16 Years":{html:`<header class="head"><b>🛒 FreshCart</b><span>Home | Cart</span></header>\n<div class="hero">\n<h1>Groceries<br><span class="green">Delivered Fast</span></h1>\n<p>30 min me delivery!</p>\n<button>Shop Now 🛒</button>\n</div>`,css:`body{margin:0;background:#f0fdf4;font-family:sans-serif}\n.head{background:#fff;padding:15px;display:flex;justify-content:space-between;box-shadow:0 2px 10px #0001}\n.head b{color:#16a34a;font-size:22px}\n.hero{padding:30px}\n.hero h1{font-size:38px;margin-bottom:8px}\n.green{color:#16a34a}\n.hero button{background:#16a34a;color:#fff;padding:12px 24px;border:none;border-radius:8px;cursor:pointer;font-size:16px}`,js:`// Pro shop!`,tipTitle:"15-16 Tip:",tipText:"Color, text change karo!"},
+"17-18 Years":{html:`<div class="chat">\n<h1>💬 Chat App</h1>\n<div class="bubble left">Hi! Kaisa laga? 😊</div>\n<div class="bubble right">Solid hai! 🔥</div>\n<input placeholder="Message...">\n</div>`,css:`body{background:#f3f4f6;padding:20px;font-family:Arial;margin:0}\n.chat{max-width:340px;margin:auto;background:#fff;border-radius:15px;padding:15px}\n.bubble{padding:10px;border-radius:10px;margin:6px 0;max-width:75%}\n.left{background:#e0e7ff}\n.right{background:#dcfce7;margin-left:auto}\ninput{width:100%;padding:10px;border-radius:20px;border:1px solid #ddd;margin-top:10px;box-sizing:border-box}`,js:`// Real chat banao!`,tipTitle:"17-18 Tip:",tipText:"JS se connect karo!"},
+"18+ Years":{html:`<!DOCTYPE html>\n<html><head><title>My Pro Website</title></head><body>\n<h1>🚀 Pro Coder</h1>\n<p>Full website khud likho!</p>\n<button onclick="alert('Pro!')">Click</button>\n</body></html>`,css:`body{padding:20px;font-family:Arial;margin:0}`,js:`// Full stack!`,tipTitle:"18+ Tip:",tipText:"React, Node try karo!"}
+};
+
+// 👇 Yahan aapka pura Original Readymade data hai (Jo maine nahi chheda) 👇
+const readyMade={
+r1:{html:`<h1>🌟 My First Page</h1>\n<p>Naam <b style="color:blue">Aman</b> hai</p>\n<button onclick="alert('Hi!')">Hello</button>`,css:`body{text-align:center;padding:30px;background:#fef9c3;margin:0}\nbutton{padding:12px 20px;background:orange;border:none;border-radius:20px;color:#fff}`,js:`// First page!`},
+r2:{html:`<h1>🎨 Colour Game</h1>\n<div class="row">\n<div onclick="document.body.style.background='pink'" class="c" style="background:red"></div>\n<div onclick="document.body.style.background='lightblue'" class="c" style="background:blue"></div>\n<div onclick="document.body.style.background='lightgreen'" class="c" style="background:green"></div>\n</div>`,css:`body{text-align:center;padding:30px;transition:0.5s;margin:0}\n.row{display:flex;gap:10px;justify-content:center}\n.c{width:60px;height:60px;border-radius:50%;cursor:pointer}`,js:`// Colours!`},
+r3:{html:`<header class="head"><b>🛒 Mini Shop</b><span>Cart</span></header>\n<div class="cont">\n<h2>Toys - 50% OFF!</h2>\n<div class="card"><p>🧸 Teddy - ₹299</p><button>Buy</button></div>\n</div>`,css:`body{margin:0;background:#f0fdf4;font-family:Arial}\n.head{background:#fff;padding:12px;display:flex;justify-content:space-between;box-shadow:0 2px 8px #0001}\n.cont{padding:20px}\n.card{background:#fff;padding:15px;border-radius:12px;max-width:280px}\n.card button{background:#16a34a;color:#fff;padding:8px 16px;border:none;border-radius:8px;cursor:pointer}`,js:`// Shop!`}
+};
+
+// 👇 NAYA: 20 Languages ke liye Backend Data (Piston API ke liye) 👇
 const backendData = {
   "Python": { ext: "main.py", code: "print('Hello Duniya!')\nfor i in range(3):\n    print('Count:', i)" },
   "Java": { ext: "Main.java", code: "public class Main {\n    public static void main(String[] args) {\n        System.out.println(\"Hello Duniya!\");\n    }\n}" },
@@ -3223,32 +3275,8 @@ const apiMap = {
   "Kotlin": "kotlin", "TypeScript": "typescript", "SQL": "sqlite3", "R": "r", "MATLAB": "octave"
 };
 
-const CLS_MAP={"5 Years":"Class 1","6 Years":"Class 1","7 Years":"Class 2","8 Years":"Class 3","9 Years":"Class 4","10 Years":"Class 5","11-12 Years":"Class 6-7","13-14 Years":"Class 8-9","15-16 Years":"Class 10","17-18 Years":"Class 11-12","18+ Years":"College"};
-const LEARN_CARDS = [ /*... same as original ...*/ ]; 
-
-const ageTemplates={
-"5 Years":{html:`<h1>👋 Hello! Mera Naam Aman Hai</h1>\n<p>Main 5 saal ka hu!</p>\n<h2 style="color:blue">Mera favourite color BLUE hai</h2>\n<button onclick="alert('Wah! 🌟')">Mujhe Dabao!</button>`,css:`body{text-align:center;padding:30px;background:#fef9c3;font-family:Comic Sans MS;margin:0}\nh1{background:#fff;padding:15px;border-radius:15px}\nbutton{padding:15px 30px;background:orange;color:#fff;border:none;border-radius:20px;font-size:16px}`,js:`// Sirf click karo!`,tipTitle:"5 Years Tip:",tipText:"Apna naam likho. Blue ko RED karo!"},
-"6 Years":{html:`<h1>🔤 ABCD</h1>\n<div class="box">A for Apple 🍎</div>\n<div class="box">B for Ball ⚽</div>\n<button onclick="this.innerText='Shabash! 🌟'">Click Karo</button>`,css:`body{text-align:center;padding:20px;background:#dcfce7;margin:0}\n.box{background:#fff;margin:10px;padding:15px;border-radius:15px;font-size:20px}\nbutton{padding:10px 20px;background:#6366f1;color:#fff;border:none;border-radius:10px}`,js:`// Kuch nahi`,tipTitle:"6 Years Tip:",tipText:"Apna fruit likho!"},
-"7 Years":{html:`<h1>🎨 Colour Game</h1>\n<p>Rang pe click karo!</p>\n<div class="row">\n<div onclick="document.body.style.background='lightcoral'" class="c" style="background:red"></div>\n<div onclick="document.body.style.background='lightblue'" class="c" style="background:blue"></div>\n<div onclick="document.body.style.background='lightgreen'" class="c" style="background:green"></div>\n</div>`,css:`body{text-align:center;padding:30px;transition:0.5s;margin:0}\n.row{display:flex;gap:10px;justify-content:center}\n.c{width:60px;height:60px;border-radius:15px;cursor:pointer}`,js:`// Rang click karo!`,tipTitle:"7 Years Tip:",tipText:"Apne colors add karo!"},
-"8 Years":{html:`<h1>🐶 My Pet Dog</h1>\n<img src="https://cdn-icons-png.flaticon.com/512/616/616408.png" width="100">\n<p>Naam Tommy hai!</p>\n<button onclick="alert('Bhow Bhow! 🐶')">Bulao</button>`,css:`body{text-align:center;padding:20px;background:#ffedd5;margin:0}\nbutton{padding:10px 20px;background:#f59e0b;color:#fff;border:none;border-radius:10px}`,js:`// Alert dabao!`,tipTitle:"8 Years Tip:",tipText:"Cat ka photo try karo!"},
-"9 Years":{html:`<h1>🏫 Meri School</h1>\n<ul>\n<li>Class 1 - Drawing 🎨</li>\n<li>Class 2 - ABCD 🔤</li>\n<li>Class 3 - Coding 💻</li>\n</ul>`,css:`body{padding:20px;background:#e0f2fe;margin:0;font-family:Arial}\nul{background:#fff;padding:20px 40px;border-radius:15px;max-width:300px}\nli{padding:5px 0;font-size:16px}`,js:`// List banao!`,tipTitle:"9 Years Tip:",tipText:"Apni school list banao!"},
-"10 Years":{html:`<h1>🎮 Click Game</h1>\n<p>Score: <span id="sc">0</span></p>\n<button onclick="incScore()">CLICK KARO!</button>`,css:`body{text-align:center;padding:40px;background:#fef3c7;margin:0}\nbutton{padding:20px 40px;background:#f59e0b;color:#fff;border:none;border-radius:15px;font-size:20px}\n#sc{font-weight:900;color:#dc2626;font-size:24px}`,js:`function incScore(){document.getElementById('sc').innerText++;}`,tipTitle:"10 Years Tip:",tipText:"Logic samjho!"},
-"11-12 Years":{html:`<div class="card">\n<h1>👨‍💻 Hi, I am Coder Rohan</h1>\n<p>Age 12 | I make websites</p>\n<div class="skills">My Skills: HTML, CSS, JS</div>\n<button onclick="alert('Contact me!')">Hire Me</button>\n</div>`,css:`body{background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;margin:0;padding:40px;text-align:center}\n.card{background:rgba(255,255,255,0.1);padding:30px;border-radius:20px;max-width:320px;margin:auto}\n.skills{background:#fff;color:#000;padding:15px;border-radius:15px;margin-top:15px}\nbutton{margin-top:15px;padding:10px 20px;border-radius:20px;border:none;background:#6366f1;color:#fff;cursor:pointer}`,js:`// Portfolio banao!`,tipTitle:"11-12 Tip:",tipText:"Apna portfolio banao!"},
-"13-14 Years":{html:`<h1>🧮 Calculator</h1>\n<input id="n1" type="number" placeholder="N1">\n<input id="n2" type="number" placeholder="N2">\n<br><br>\n<button onclick="add()">Jodo (+)</button>\n<button onclick="mul()">Guna (x)</button>\n<p>Result: <span id="res">-</span></p>`,css:`body{text-align:center;padding:30px;margin:0;font-family:Arial}\ninput{padding:10px;border-radius:8px;border:2px solid #ddd;font-size:16px;width:120px}\nbutton{padding:10px 20px;background:#16a34a;color:#fff;border:none;border-radius:8px;margin:4px;cursor:pointer;font-size:16px}\n#res{font-weight:900;color:#16a34a;font-size:22px}`,js:`function add(){document.getElementById('res').innerText=Number(n1.value)+Number(n2.value);}\nfunction mul(){document.getElementById('res').innerText=Number(n1.value)*Number(n2.value);}`,tipTitle:"13-14 Tip:",tipText:"Minus, divide add karo!"},
-"15-16 Years":{html:`<header class="head"><b>🛒 FreshCart</b><span>Home | Cart</span></header>\n<div class="hero">\n<h1>Groceries<br><span class="green">Delivered Fast</span></h1>\n<p>30 min me delivery!</p>\n<button>Shop Now 🛒</button>\n</div>`,css:`body{margin:0;background:#f0fdf4;font-family:sans-serif}\n.head{background:#fff;padding:15px;display:flex;justify-content:space-between;box-shadow:0 2px 10px #0001}\n.head b{color:#16a34a;font-size:22px}\n.hero{padding:30px}\n.hero h1{font-size:38px;margin-bottom:8px}\n.green{color:#16a34a}\n.hero button{background:#16a34a;color:#fff;padding:12px 24px;border:none;border-radius:8px;cursor:pointer;font-size:16px}`,js:`// Pro shop!`,tipTitle:"15-16 Tip:",tipText:"Color, text change karo!"},
-"17-18 Years":{html:`<div class="chat">\n<h1>💬 Chat App</h1>\n<div class="bubble left">Hi! Kaisa laga? 😊</div>\n<div class="bubble right">Solid hai! 🔥</div>\n<input placeholder="Message...">\n</div>`,css:`body{background:#f3f4f6;padding:20px;font-family:Arial;margin:0}\n.chat{max-width:340px;margin:auto;background:#fff;border-radius:15px;padding:15px}\n.bubble{padding:10px;border-radius:10px;margin:6px 0;max-width:75%}\n.left{background:#e0e7ff}\n.right{background:#dcfce7;margin-left:auto}\ninput{width:100%;padding:10px;border-radius:20px;border:1px solid #ddd;margin-top:10px;box-sizing:border-box}`,js:`// Real chat banao!`,tipTitle:"17-18 Tip:",tipText:"JS se connect karo!"},
-"18+ Years":{html:`<!DOCTYPE html>\n<html><head><title>My Pro Website</title></head><body>\n<h1>🚀 Pro Coder</h1>\n<p>Full website khud likho!</p>\n<button onclick="alert('Pro!')">Click</button>\n</body></html>`,css:`body{padding:20px;font-family:Arial;margin:0}`,js:`// Full stack!`,tipTitle:"18+ Tip:",tipText:"React, Node try karo!"}
-};
-
-const readyMade={
-r1:{html:`<h1>🌟 My First Page</h1>\n<p>Naam <b style="color:blue">Aman</b> hai</p>\n<button onclick="alert('Hi!')">Hello</button>`,css:`body{text-align:center;padding:30px;background:#fef9c3;margin:0}\nbutton{padding:12px 20px;background:orange;border:none;border-radius:20px;color:#fff}`,js:`// First page!`},
-r2:{html:`<h1>🎨 Colour Game</h1>\n<div class="row">\n<div onclick="document.body.style.background='pink'" class="c" style="background:red"></div>\n<div onclick="document.body.style.background='lightblue'" class="c" style="background:blue"></div>\n<div onclick="document.body.style.background='lightgreen'" class="c" style="background:green"></div>\n</div>`,css:`body{text-align:center;padding:30px;transition:0.5s;margin:0}\n.row{display:flex;gap:10px;justify-content:center}\n.c{width:60px;height:60px;border-radius:50%;cursor:pointer}`,js:`// Colours!`},
-r3:{html:`<header class="head"><b>🛒 Mini Shop</b><span>Cart</span></header>\n<div class="cont">\n<h2>Toys - 50% OFF!</h2>\n<div class="card"><p>🧸 Teddy - ₹299</p><button>Buy</button></div>\n</div>`,css:`body{margin:0;background:#f0fdf4;font-family:Arial}\n.head{background:#fff;padding:12px;display:flex;justify-content:space-between;box-shadow:0 2px 8px #0001}\n.cont{padding:20px}\n.card{background:#fff;padding:15px;border-radius:12px;max-width:280px}\n.card button{background:#16a34a;color:#fff;padding:8px 16px;border:none;border-radius:8px;cursor:pointer}`,js:`// Shop!`}
-};
-
 const LANGUAGES=["HTML","CSS","JavaScript","Python","Java","C","C++","C#","PHP","Ruby","Go","Rust","Swift","Kotlin","TypeScript","SQL","Scratch (Block)","Block Coding","R","MATLAB"];
 const ages=Object.keys(ageTemplates);
-
 document.getElementById('ageList').innerHTML=ages.map((a,i)=>`<div class="age ${i===0?'active':''}" onclick="selectAge('${a}',this)"><span>${a}</span><span class="cls">${CLS_MAP[a]||''}</span></div>`).join('');
 document.getElementById('ageSelect').innerHTML='<option>Select Age</option>'+ages.map(a=>`<option value="${a}">${a} (${CLS_MAP[a]||''})</option>`).join('');
 document.getElementById('langList').innerHTML=LANGUAGES.slice(0,9).map((l,i)=>`<div class="lang ${i===0?'active':''}" onclick="selectLang('${l}',this)">${l}</div>`).join('');
@@ -3272,6 +3300,7 @@ function changeLang(){
   selectLang(lang, null);
 }
 
+// 👇 Yahan Language Select karne ka logic fix kiya hai 👇
 function selectLang(lang, el){
   currentLang = lang;
   
@@ -3286,40 +3315,43 @@ function selectLang(lang, el){
   const isVisual = ["Scratch (Block)", "Block Coding"].includes(lang);
 
   if(isFrontend) {
+    // Frontend Mode (HTML/CSS/JS)
     document.getElementById('mobilePreview').style.display = 'block';
     document.getElementById('consoleWrap').style.display = 'none';
-    document.getElementById('tab-html').style.display = 'block';
     document.getElementById('tab-css').style.display = 'block';
     document.getElementById('tab-js').style.display = 'block';
     document.getElementById('tab-html').innerText = '📄 index.html';
-    applyAge(currentAge); 
+    applyAge(currentAge); // Age template load hoga
   } else if (isVisual) {
+    // Visual/Block Mode
     document.getElementById('mobilePreview').style.display = 'none';
     document.getElementById('consoleWrap').style.display = 'flex';
-    document.getElementById('tab-html').style.display = 'block';
     document.getElementById('tab-css').style.display = 'none';
     document.getElementById('tab-js').style.display = 'none';
     
     document.getElementById('tab-html').innerText = '🧩 Block Editor';
-    switchTab('html', document.getElementById('tab-html'));
-    
-    document.getElementById('editorHTML').value = "// Scratch aur Block Coding visual languages hain.\n// Inhe yahan text mein nahi likha ja sakta.\n// Kripya Block Editor ka use karein.";
+    document.getElementById('editorHTML').value = "// Scratch aur Block Coding visual languages hain.\n// Inhe yahan text mein nahi likha ja sakta.";
     document.getElementById('editorCSS').value = '';
     document.getElementById('editorJS').value = '';
     document.getElementById('runBtn').style.display = 'none';
     document.getElementById('consoleOutput').innerText = "> Visual language selected. No code execution available in text mode.";
     document.getElementById('consoleOutput').style.color = "#f59e0b";
   } else {
+    // Backend Mode (Python, PHP, Java, etc.)
     document.getElementById('mobilePreview').style.display = 'none';
     document.getElementById('consoleWrap').style.display = 'flex';
-    document.getElementById('tab-html').style.display = 'block';
     document.getElementById('tab-css').style.display = 'none';
     document.getElementById('tab-js').style.display = 'none';
     document.getElementById('runBtn').style.display = 'block'; 
     
     const config = backendData[lang] || { ext: "code.txt", code: "// Write code here" };
     document.getElementById('tab-html').innerText = '📄 ' + config.ext;
-    switchTab('html', document.getElementById('tab-html'));
+    
+    // Tab ko html par switch karo
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    document.getElementById('tab-html').classList.add('active');
+    document.querySelectorAll('.editor').forEach(e=>e.classList.remove('active'));
+    document.getElementById('editorHTML').classList.add('active');
     
     document.getElementById('editorHTML').value = config.code;
     document.getElementById('editorCSS').value = '';
@@ -3329,6 +3361,7 @@ function selectLang(lang, el){
   }
 }
 
+// 👇 Piston API se code run karne ka function 👇
 async function runBackendCode() {
   const lang = currentLang;
   const code = document.getElementById('editorHTML').value;
@@ -3385,10 +3418,8 @@ async function runBackendCode() {
 }
 
 function selectAge(age,el){
-  if(el) {
-    document.querySelectorAll('.age').forEach(x=>x.classList.remove('active'));
-    el.classList.add('active');
-  }
+  document.querySelectorAll('.age').forEach(x=>x.classList.remove('active'));
+  if(el) el.classList.add('active');
   document.getElementById('ageSelect').value=age;
   currentAge=age;
   applyAge(age);
@@ -3406,7 +3437,9 @@ function changeAgeBySelect(){
 }
 
 function applyAge(age){
+  // Agar backend language select hai toh Age template load mat karo
   if(!["HTML", "CSS", "JavaScript"].includes(currentLang)) return; 
+  
   const d=ageTemplates[age];
   if(!d) return;
   document.getElementById('editorHTML').value=d.html;
@@ -3463,7 +3496,6 @@ function insertEmoji(em){
   editor.selectionStart=editor.selectionEnd=start+em.length;
   run();
 }
-
 function loadReady(){
   if(!["HTML", "CSS", "JavaScript"].includes(currentLang)) return; 
   const v=document.getElementById('readySelect').value;
@@ -3474,7 +3506,6 @@ function loadReady(){
   document.getElementById('editorJS').value=d.js||'';
   run();
 }
-
 function blankPage(){
   if(!["HTML", "CSS", "JavaScript"].includes(currentLang)) return; 
   if(confirm('Blank karna hai?')){
@@ -3484,7 +3515,6 @@ function blankPage(){
     run();
   }
 }
-
 function buildFullHTML(){
   const html=document.getElementById('editorHTML').value;
   const css=document.getElementById('editorCSS').value;
@@ -3494,7 +3524,6 @@ function buildFullHTML(){
   }
   return '<!DOCTYPE html>\n<html><head>\n<meta charset="UTF-8">\n<style>\n'+css+'\n</style>\n</head><body>\n'+html+'\n<script>\n'+js+'\n<\/script>\n</body></html>';
 }
-
 function run(){
   if(!["HTML", "CSS", "JavaScript"].includes(currentLang)) return;
   const code=buildFullHTML();
@@ -3502,7 +3531,6 @@ function run(){
   localStorage.setItem('clyxess_code',code);
   analyzeCode();
 }
-
 function analyzeCode(){
   if(!["HTML", "CSS", "JavaScript"].includes(currentLang)) return;
   const html=document.getElementById('editorHTML').value;
@@ -3525,7 +3553,6 @@ function analyzeCode(){
     msg.innerHTML=issues.map(i=>`<span class="err">⚠️ ${i}</span>`).join('')+'<span class="tip">💡 Har &lt;tag&gt; ka &lt;/tag&gt; hona chahiye!</span>';
   }
 }
-
 function downloadCode(){
   const blob=new Blob([buildFullHTML()],{type:'text/html'});
   const a=document.createElement('a');
@@ -3643,7 +3670,7 @@ let timer;
     timer=setTimeout(run,500);
   });
 });
-selectLang('HTML', null);
+applyAge('5 Years');
 
 (function checkSharedPreview(){
   try {
@@ -3675,7 +3702,7 @@ selectLang('HTML', null);
 </html>
 '''
     html_code = html_code.replace("__BASE_URL__", base_url)
-    components.html(html_code, height=1050, scrolling=False)    
+    components.html(html_code, height=950, scrolling=False)    
     
 def render_vision_lab():
     import streamlit as st
