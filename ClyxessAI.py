@@ -2959,8 +2959,8 @@ def render_image_generator():
                     st.success(f"### 📖 Parts of {prompt}")
                     st.markdown(res.choices[0].message.content)
                     
-                except Exception as e:
-                    st.error(f"Explanation Error: {e}") 
+    except Exception as e:
+        st.error(f"Explanation Error: {e}") 
         
  def render_coding_lab_mod():
      import streamlit.components.v1 as components
