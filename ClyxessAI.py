@@ -11816,18 +11816,35 @@ def render_parent_dashboard():
     ])
 
     # ------------------------------------------
-    # TAB 1: FILTERS (Puraane code ki tarah)
-    # ------------------------------------------
-    with tab1:
-        st.subheader("Allowed AI Learning Modes")
-        col1, col2 = st.columns(2)
-        with col1:
-            st.toggle("🏫 School Mode (AI Tutor)", value=settings.get('is_school_mode', True), key="t_school")
-            st.toggle("🧮 Science & Math Solver", value=settings.get('is_math_solver', True), key="t_math")
-        with col2:
-            st.toggle("✍️ Creative Writing Studio", value=settings.get('is_creative_writing', True), key="t_creative")
-            st.toggle("🎨 AI Image Generator", value=settings.get('is_image_gen', True), key="t_image")
-        st.info("Note: Toggles ko database se connect karne ke liye code update karein.")
+# TAB 1: FILTERS & CONTROLS
+# ------------------------------------------
+with tab1:
+    st.subheader("Allowed AI Learning Modes")
+    st.write("Uncheck any mode you want to lock from your child's menu.")
+    
+    col1, col2 = st.columns(2)
+    with col1:
+        # Yahan 'school_mode =' add karna zaroori hai taaki value save ho sake
+        school_mode = st.toggle("🏫 School Mode (AI Tutor)", value=settings.get('is_school_mode', True), key="t_school")
+        math_solver = st.toggle("🧮 Science & Math Solver", value=settings.get('is_math_solver', True), key="t_math")
+        
+    with col2:
+        creative_writing = st.toggle("✍️ Creative Writing Studio", value=settings.get('is_creative_writing', True), key="t_creative")
+        image_gen = st.toggle("🎨 AI Image Generator", value=settings.get('is_image_gen', True), key="t_image")
+        
+    # 👇 YEH SAVE BUTTON HAI (Blue message hata kar yeh lagayein)
+    if st.button("💾 Save Filter Settings", type="primary", use_container_width=True):
+        try:
+            supabase.table("parent_settings").update({
+                "is_school_mode": school_mode,
+                "is_math_solver": math_solver,
+                "is_creative_writing": creative_writing,
+                "is_image_gen": image_gen
+            }).eq("user_email", user_email).execute()
+            
+            st.success("✅ Filter settings saved successfully!")
+        except Exception as e:
+            st.error(f"Error saving settings: {e}")
 
     # ------------------------------------------
     # TAB 2: SCREEN TIME (Basic Logic)
