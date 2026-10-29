@@ -12025,28 +12025,79 @@ with st.sidebar:
     else:
         st.caption("Not logged in — sign in to save chats and view parent progress.")
 
-    mode = st.radio("Select Mode", [
-        "Normal Chat",
-        "Creative Lab (School Mode)", 
-        "🈳 Learn Language",
-        "🎮 Play & Learn",
-        "🎨 Creative AI Image Generator",
-        "📷 Vision Lab", 
-        "✈️ Aero Lab", 
-        "💡 Logic Lab",
-        "🧠 Cyber Security", 
-        "🎨 Art Machine Design",  
-        "🎭 Peer Roleplay Modes",
-        "📝 Interactive Homework & Test",
-        "👨‍👩‍👦 Parent Dashboard", 
-        "👨‍💻 Coding Lab",  
-        "🧠 Learn AI",  
-        "🚀 Physics Lab",  
-        "🔢 Math Lab",  
-        "💸 Learn Finance", 
-        "📱 Data Science and Machine Learning",  
-        "🔐 Login / Sign Up"
-    ])
+    # File ke top par 'import time' add karna na bhoolen (agar pehle se nahi hai)
+
+user_email = st.session_state.get("user_email", "")
+
+# 1. Database se parent ki settings fetch karein
+try:
+    res = supabase.table("parent_settings").select("allowed_modes").eq("user_email", user_email).execute()
+    # Agar database mein pehle se setting hai toh use karein, warna khali dict {}
+    allowed_dict = res.data[0].get('allowed_modes', {}) if res.data else {}
+except:
+    allowed_dict = {}
+
+# 2. Aapki poori master list (Bilkul aapke emojis ke sath)
+ALL_MODES = [
+    "Normal Chat",
+    "Creative Lab (School Mode)", 
+    "🈳 Learn Language",
+    "🎮 Play & Learn",
+    "🎨 Creative AI Image Generator",
+    "📷 Vision Lab", 
+    "✈️ Aero Lab", 
+    "💡 Logic Lab",
+    "🧠 Cyber Security", 
+    "🎨 Art Machine Design",  
+    "🎭 Peer Roleplay Modes",
+    "📝 Interactive Homework & Test",
+    "👨‍👩‍👦 Parent Dashboard", 
+    "👨‍💻 Coding Lab",  
+    "🧠 Learn AI",  
+    "🚀 Physics Lab",  
+    "🔢 Math Lab",  
+    "💸 Learn Finance", 
+    "📱 Data Science and Machine Learning",  
+    "🔐 Login / Sign Up"
+]
+
+# 3. Filter Logic: Sirf allowed modes ko nikal kar nayi list banayein
+available_modes = []
+for m in ALL_MODES:
+    # Parent Dashboard aur Login hamesha dikhna chahiye (ise lock nahi kar sakte)
+    if m in ["👨‍👩‍👦 Parent Dashboard", "🔐 Login / Sign Up"]:
+        available_modes.append(m)
+    # Baaki modes tabhi dikhayein agar parent ne database mein unhe 'True' (Allow) kiya hai
+    elif allowed_dict.get(m, True) == True:
+        available_modes.append(m)
+
+# 4. Sidebar mein dynamic list dikhayein
+st.sidebar.markdown("### Select Mode")
+mode = st.sidebar.radio("", available_modes)
+
+# 5. Time Tracking Logic (Takki report ban sake)
+if "prev_mode" not in st.session_state:
+    st.session_state.prev_mode = mode
+    st.session_state.mode_start_time = time.time()
+
+if mode != st.session_state.prev_mode:
+    # Kitne minute purane mode mein bitaye?
+    time_spent_mins = int((time.time() - st.session_state.mode_start_time) / 60)
+    
+    # Agar 1 minute se zyada time bitaya hai aur wo Parent Dashboard nahi tha, toh DB mein save karo
+    if time_spent_mins > 0 and st.session_state.prev_mode not in ["👨‍👩‍👦 Parent Dashboard", "🔐 Login / Sign Up"]:
+        try:
+            supabase.table("study_logs").insert({
+                "user_email": user_email,
+                "subject": st.session_state.prev_mode,
+                "duration_minutes": time_spent_mins
+            }).execute()
+        except:
+            pass 
+            
+    # Naye mode ke liye timer reset karo
+    st.session_state.prev_mode = mode
+    st.session_state.mode_start_time = time.time()
     st.markdown("---")
     if st.button("+ New Chat", use_container_width=True):
         st.session_state.messages=[]
