@@ -12048,14 +12048,15 @@ with st.sidebar:
     else:
         st.caption("Not logged in — sign in to save chats and view parent progress.")
 
-    # File ke top par 'import time' add karna na bhoolen (agar pehle se nahi hai)
+    import time
+import uuid
+# Note: Agar aapke file mein 'uuid' import nahi hai, toh upar 'import uuid' likh lena.
 
 user_email = st.session_state.get("user_email", "")
 
 # 1. Database se parent ki settings fetch karein
 try:
     res = supabase.table("parent_settings").select("allowed_modes").eq("user_email", user_email).execute()
-    # Agar database mein pehle se setting hai toh use karein, warna khali dict {}
     allowed_dict = res.data[0].get('allowed_modes', {}) if res.data else {}
 except:
     allowed_dict = {}
@@ -12087,18 +12088,44 @@ ALL_MODES = [
 # 3. Filter Logic: Sirf allowed modes ko nikal kar nayi list banayein
 available_modes = []
 for m in ALL_MODES:
-    # Parent Dashboard aur Login hamesha dikhna chahiye (ise lock nahi kar sakte)
     if m in ["👨‍👩‍👦 Parent Dashboard", "🔐 Login / Sign Up"]:
         available_modes.append(m)
-    # Baaki modes tabhi dikhayein agar parent ne database mein unhe 'True' (Allow) kiya hai
     elif allowed_dict.get(m, True) == True:
         available_modes.append(m)
 
-# 4. Sidebar mein dynamic list dikhayein
-st.sidebar.markdown("### Select Mode")
-mode = st.sidebar.radio("", available_modes)
 
-# 5. Time Tracking Logic (Takki report ban sake)
+# ==========================================
+# 👇 SIDEBAR KA SAARA UI YAHAN HAI 👇
+# ==========================================
+with st.sidebar:
+    
+    # 1. New Chat Button
+    if st.button("➕ New Chat", use_container_width=True, type="primary"):
+        st.session_state.messages = []
+        st.session_state.session_id = str(uuid.uuid4())
+        st.session_state.school_messages = []
+        st.session_state.school_session_id = str(uuid.uuid4())
+        st.rerun()
+        
+    # 2. India Live Time
+    try:
+        time_str = get_india_datetime_context().replace("Current India date: ", "")
+        st.caption("🇮🇳 India live time: " + time_str)
+    except:
+        import datetime
+        ist_time = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=5, minutes=30)))
+        st.caption("🇮🇳 India live time: " + ist_time.strftime("%A, %d %B %Y. %I:%M %p (IST)"))
+
+    st.divider()
+
+    # 3. Sidebar mein dynamic list dikhayein
+    st.markdown("### Select Mode")
+    mode = st.radio("", available_modes)
+
+
+# ==========================================
+# 👇 TIME TRACKING LOGIC (Background mein chalega) 👇
+# ==========================================
 if "prev_mode" not in st.session_state:
     st.session_state.prev_mode = mode
     st.session_state.mode_start_time = time.time()
@@ -12107,7 +12134,7 @@ if mode != st.session_state.prev_mode:
     # Kitne minute purane mode mein bitaye?
     time_spent_mins = int((time.time() - st.session_state.mode_start_time) / 60)
     
-    # Agar 1 minute se zyada time bitaya hai aur wo Parent Dashboard nahi tha, toh DB mein save karo
+    # Agar 1 minute se zyada time bitaya hai, toh DB mein save karo
     if time_spent_mins > 0 and st.session_state.prev_mode not in ["👨‍👩‍👦 Parent Dashboard", "🔐 Login / Sign Up"]:
         try:
             supabase.table("study_logs").insert({
@@ -12121,14 +12148,6 @@ if mode != st.session_state.prev_mode:
     # Naye mode ke liye timer reset karo
     st.session_state.prev_mode = mode
     st.session_state.mode_start_time = time.time()
-    st.markdown("---")
-    if st.button("+ New Chat", use_container_width=True):
-        st.session_state.messages=[]
-        st.session_state.session_id=str(uuid.uuid4())
-        st.session_state.school_messages=[]
-        st.session_state.school_session_id=str(uuid.uuid4())
-        st.rerun()
-    st.caption("🇮🇳 India live time: "+get_india_datetime_context().replace("Current India date: ",""))
 
 # ---- routes: one unique screen per feature ----
 if mode == "🔐 Login / Sign Up":
