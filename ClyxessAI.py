@@ -11894,13 +11894,15 @@ def render_parent_dashboard():
 
         if st.button("💾 Save Mode Settings", type="primary", use_container_width=True):
             try:
-                supabase.table("parent_settings").update({
-                    "allowed_modes": new_settings
-                }).eq("user_email", user_email).execute()
-                st.success("✅ Modes updated successfully! Child's menu is updated.")
-                st.rerun()
-            except Exception as e:
-                st.error(f"Error saving settings: {e}")
+        # UPSERT use kiya hai taaki naya user ho ya purana, data pakka save ho
+        supabase.table("parent_settings").upsert({
+            "user_email": user_email,
+            "allowed_modes": new_settings
+        }).execute()
+        st.success("✅ Modes updated successfully! Child's menu is updated.")
+        st.rerun()
+    except Exception as e:
+        st.error(f"Error saving settings: {e}")
 
     # ------------------------------------------
     # TAB 2: SCREEN TIME
