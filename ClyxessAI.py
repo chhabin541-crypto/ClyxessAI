@@ -2962,9 +2962,9 @@ def render_image_generator():
      except Exception as e:
         st.error(f"Explanation Error: {e}") 
         
- def render_coding_lab_mod():
-     import streamlit.components.v1 as components
-     import socket
+def render_coding_lab_mod():
+    import streamlit.components.v1 as components
+    import socket
 
     def get_best_lan_ip():
         candidates = []
@@ -3050,8 +3050,6 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',sans-serif;he
 .chip{background:var(--panel2);border:1px solid var(--border);color:var(--text);padding:3px 8px;border-radius:6px;font-size:10px;cursor:pointer;font-family:Consolas,monospace}
 .chip:hover{border-color:var(--accent);background:var(--accent);color:#fff}
 .status{padding:5px 10px;background:var(--bg);font-size:10px;color:var(--muted);display:flex;justify-content:space-between}
-
-/* Mobile Frame and Right Panel Fixed Size */
 .right{width:320px;background:var(--panel);display:flex;flex-direction:column;border-left:1px solid var(--border);flex-shrink:0}
 .rhead{padding:7px 10px;background:var(--panel2);border-bottom:1px solid var(--border);display:flex;justify-content:space-between;font-size:10px}
 .rwrap{flex:1;padding:15px;overflow-y:auto;overflow-x:hidden;background:linear-gradient(135deg,#2a2a35,#1e1e24);display:flex;justify-content:center;align-items:center;flex-direction:column}
@@ -3059,13 +3057,10 @@ body.light .rwrap{background:linear-gradient(135deg,#e5e7eb,#d1d5db)}
 .mobileFrame{width:260px;height:480px;background:#000;border-radius:35px;padding:8px;box-shadow:0 20px 50px rgba(0,0,0,0.8);border:2px solid #333;margin:0 auto;flex-shrink:0;display:none;position:relative}
 .notch{width:110px;height:18px;background:#000;border-radius:0 0 15px 15px;margin:-8px auto 5px;position:relative;z-index:2}
 #prev{width:100%;height:100%;border:none;background:#fff;border-radius:28px;display:block;overflow:auto}
-
-/* Console output for backend */
 #consoleWrap{display:none;width:100%;height:100%;flex-direction:column}
 #runBtn{display:block;width:100%;padding:10px;margin-bottom:10px;background:var(--success);color:#fff;border:none;border-radius:8px;font-weight:bold;cursor:pointer;font-size:13px}
 #runBtn:hover{background:#16a34a}
 #consoleOutput{flex:1;background:#000;color:#22c55e;font-family:monospace;padding:10px;border-radius:8px;overflow:auto;white-space:pre-wrap;font-size:12px;border:1px solid #333}
-
 #qrBox{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:9999;justify-content:center;align-items:center}
 #qrBox.modal{background:var(--panel);padding:18px;border-radius:16px;text-align:center;width:90%;max-width:360px;border:1px solid var(--border)}
 #qrBox h4{color:var(--text);margin-bottom:10px;font-size:14px}
@@ -3204,9 +3199,6 @@ body.light.learnCode{background:#1e293b;color:#67e8f9}
 </div>
 
 <script>
-// ==========================================
-// ALL 20 LANGUAGES DATA (Frontend, Backend & Visual)
-// ==========================================
 const backendData = {
   "Python": { ext: "main.py", code: "print('Hello Duniya!')\nfor i in range(3):\n    print('Count:', i)" },
   "Java": { ext: "Main.java", code: "public class Main {\n    public static void main(String[] args) {\n        System.out.println(\"Hello Duniya!\");\n    }\n}" },
@@ -3232,7 +3224,7 @@ const apiMap = {
 };
 
 const CLS_MAP={"5 Years":"Class 1","6 Years":"Class 1","7 Years":"Class 2","8 Years":"Class 3","9 Years":"Class 4","10 Years":"Class 5","11-12 Years":"Class 6-7","13-14 Years":"Class 8-9","15-16 Years":"Class 10","17-18 Years":"Class 11-12","18+ Years":"College"};
-const LEARN_CARDS = [ /*... same as original ...*/ ]; // Assume populated
+const LEARN_CARDS = [ /*... same as original ...*/ ]; 
 
 const ageTemplates={
 "5 Years":{html:`<h1>👋 Hello! Mera Naam Aman Hai</h1>\n<p>Main 5 saal ka hu!</p>\n<h2 style="color:blue">Mera favourite color BLUE hai</h2>\n<button onclick="alert('Wah! 🌟')">Mujhe Dabao!</button>`,css:`body{text-align:center;padding:30px;background:#fef9c3;font-family:Comic Sans MS;margin:0}\nh1{background:#fff;padding:15px;border-radius:15px}\nbutton{padding:15px 30px;background:orange;color:#fff;border:none;border-radius:20px;font-size:16px}`,js:`// Sirf click karo!`,tipTitle:"5 Years Tip:",tipText:"Apna naam likho. Blue ko RED karo!"},
@@ -3254,7 +3246,6 @@ r2:{html:`<h1>🎨 Colour Game</h1>\n<div class="row">\n<div onclick="document.b
 r3:{html:`<header class="head"><b>🛒 Mini Shop</b><span>Cart</span></header>\n<div class="cont">\n<h2>Toys - 50% OFF!</h2>\n<div class="card"><p>🧸 Teddy - ₹299</p><button>Buy</button></div>\n</div>`,css:`body{margin:0;background:#f0fdf4;font-family:Arial}\n.head{background:#fff;padding:12px;display:flex;justify-content:space-between;box-shadow:0 2px 8px #0001}\n.cont{padding:20px}\n.card{background:#fff;padding:15px;border-radius:12px;max-width:280px}\n.card button{background:#16a34a;color:#fff;padding:8px 16px;border:none;border-radius:8px;cursor:pointer}`,js:`// Shop!`}
 };
 
-// All 20 Languages List
 const LANGUAGES=["HTML","CSS","JavaScript","Python","Java","C","C++","C#","PHP","Ruby","Go","Rust","Swift","Kotlin","TypeScript","SQL","Scratch (Block)","Block Coding","R","MATLAB"];
 const ages=Object.keys(ageTemplates);
 
@@ -3295,7 +3286,6 @@ function selectLang(lang, el){
   const isVisual = ["Scratch (Block)", "Block Coding"].includes(lang);
 
   if(isFrontend) {
-    // Frontend Mode (HTML/CSS/JS)
     document.getElementById('mobilePreview').style.display = 'block';
     document.getElementById('consoleWrap').style.display = 'none';
     document.getElementById('tab-html').style.display = 'block';
@@ -3304,7 +3294,6 @@ function selectLang(lang, el){
     document.getElementById('tab-html').innerText = '📄 index.html';
     applyAge(currentAge); 
   } else if (isVisual) {
-    // Visual/Block Mode (Scratch)
     document.getElementById('mobilePreview').style.display = 'none';
     document.getElementById('consoleWrap').style.display = 'flex';
     document.getElementById('tab-html').style.display = 'block';
@@ -3321,13 +3310,12 @@ function selectLang(lang, el){
     document.getElementById('consoleOutput').innerText = "> Visual language selected. No code execution available in text mode.";
     document.getElementById('consoleOutput').style.color = "#f59e0b";
   } else {
-    // Backend Mode (Python, PHP, Java, etc.)
     document.getElementById('mobilePreview').style.display = 'none';
     document.getElementById('consoleWrap').style.display = 'flex';
     document.getElementById('tab-html').style.display = 'block';
     document.getElementById('tab-css').style.display = 'none';
     document.getElementById('tab-js').style.display = 'none';
-    document.getElementById('runBtn').style.display = 'block'; // Show Run button
+    document.getElementById('runBtn').style.display = 'block'; 
     
     const config = backendData[lang] || { ext: "code.txt", code: "// Write code here" };
     document.getElementById('tab-html').innerText = '📄 ' + config.ext;
