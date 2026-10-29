@@ -11742,7 +11742,7 @@ def render_parent_dashboard():
     import time
 
     # ==========================================
-    # 1. LEARNING REPORT (Andar define kiya hai)
+    # 1. LEARNING REPORT
     # ==========================================
     def learning_report():
         user_email = st.session_state.get("user_email", "")
@@ -11843,16 +11843,33 @@ def render_parent_dashboard():
     ])
 
     # ------------------------------------------
-    # TAB 1: FILTERS (Dynamic Modes)
+    # TAB 1: FILTERS (Exact Match with Sidebar)
     # ------------------------------------------
     with tab1:
         st.subheader("Allowed AI Learning Modes")
         st.write("Uncheck any mode you want to lock from your child's menu.")
         
+        # 👇 YAHAN MAINE EXACT EMOJIS KE SATH NAAM MATCH KAR DIYE HAIN 👇
         ALL_MODES = [
-            "Normal Chat", "Creative Lab (School Mode)", "Play & Learn", 
-            "Creative AI Image Generator", "Vision Lab", "Cyber Security", 
-            "Interactive Homework & Test", "Coding Lab", "Math Lab"
+            "Normal Chat",
+            "Creative Lab (School Mode)", 
+            "🈳 Learn Language",
+            "🎮 Play & Learn",
+            "🎨 Creative AI Image Generator",
+            "📷 Vision Lab", 
+            "✈️ Aero Lab", 
+            "💡 Logic Lab",
+            "🧠 Cyber Security", 
+            "🎨 Art Machine Design",  
+            "🎭 Peer Roleplay Modes",
+            "📝 Interactive Homework & Test",
+            "👨‍💻 Coding Lab",  
+            "🧠 Learn AI",  
+            "🚀 Physics Lab",  
+            "🔢 Math Lab",  
+            "💸 Learn Finance", 
+            "📱 Data Science and Machine Learning"
+            # Parent Dashboard aur Login ko yahan nahi dala kyunki unhe lock nahi karna chahiye
         ]
         
         current_allowed = settings.get('allowed_modes', {})
@@ -11866,11 +11883,15 @@ def render_parent_dashboard():
             is_allowed = current_allowed.get(mode, True)
             if i % 2 == 0:
                 with col1:
-                    new_settings[mode] = st.toggle(mode, value=is_allowed, key=f"toggle_{mode}")
+                    new_settings[mode] = st.toggle(mode, value=is_allowed, key=f"toggle_{i}")
             else:
                 with col2:
-                    new_settings[mode] = st.toggle(mode, value=is_allowed, key=f"toggle_{mode}")
+                    new_settings[mode] = st.toggle(mode, value=is_allowed, key=f"toggle_{i}")
                     
+        # Dashboard aur Login ko hamesha True rakhna hai database mein
+        new_settings["👨‍👩‍👦 Parent Dashboard"] = True
+        new_settings["🔐 Login / Sign Up"] = True
+
         if st.button("💾 Save Mode Settings", type="primary", use_container_width=True):
             try:
                 supabase.table("parent_settings").update({
