@@ -2959,8 +2959,8 @@ def render_image_generator():
                     st.success(f"### 📖 Parts of {prompt}")
                     st.markdown(res.choices[0].message.content)
                     
-     except Exception as e:
-        st.error(f"Explanation Error: {e}") 
+                except Exception as e:
+                    st.error(f"Explanation Error: {e}") 
         
 def render_coding_lab_mod():
     import streamlit.components.v1 as components
@@ -3050,17 +3050,13 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',sans-serif;he
 .chip{background:var(--panel2);border:1px solid var(--border);color:var(--text);padding:3px 8px;border-radius:6px;font-size:10px;cursor:pointer;font-family:Consolas,monospace}
 .chip:hover{border-color:var(--accent);background:var(--accent);color:#fff}
 .status{padding:5px 10px;background:var(--bg);font-size:10px;color:var(--muted);display:flex;justify-content:space-between}
-.right{width:320px;background:var(--panel);display:flex;flex-direction:column;border-left:1px solid var(--border);flex-shrink:0}
+.right{width:220px;background:var(--panel);display:flex;flex-direction:column;border-left:1px solid var(--border);flex-shrink:0}
 .rhead{padding:7px 10px;background:var(--panel2);border-bottom:1px solid var(--border);display:flex;justify-content:space-between;font-size:10px}
-.rwrap{flex:1;padding:15px;overflow-y:auto;overflow-x:hidden;background:linear-gradient(135deg,#2a2a35,#1e1e24);display:flex;justify-content:center;align-items:center;flex-direction:column}
-body.light .rwrap{background:linear-gradient(135deg,#e5e7eb,#d1d5db)}
-.mobileFrame{width:260px;height:480px;background:#000;border-radius:35px;padding:8px;box-shadow:0 20px 50px rgba(0,0,0,0.8);border:2px solid #333;margin:0 auto;flex-shrink:0;display:none;position:relative}
-.notch{width:110px;height:18px;background:#000;border-radius:0 0 15px 15px;margin:-8px auto 5px;position:relative;z-index:2}
-#prev{width:100%;height:100%;border:none;background:#fff;border-radius:28px;display:block;overflow:auto}
-#consoleWrap{display:none;width:100%;height:100%;flex-direction:column}
-#runBtn{display:block;width:100%;padding:10px;margin-bottom:10px;background:var(--success);color:#fff;border:none;border-radius:8px;font-weight:bold;cursor:pointer;font-size:13px}
-#runBtn:hover{background:#16a34a}
-#consoleOutput{flex:1;background:#000;color:#22c55e;font-family:monospace;padding:10px;border-radius:8px;overflow:auto;white-space:pre-wrap;font-size:12px;border:1px solid #333}
+.rwrap{flex:1;padding:8px;overflow-y:auto;overflow-x:hidden;background:linear-gradient(135deg,#2a2a35,#1e1e24);display:flex;justify-content:center;align-items:flex-start}
+body.light.rwrap{background:linear-gradient(135deg,#e5e7eb,#d1d5db)}
+.mobileFrame{width:200px;height:400px;background:#000;border-radius:24px;padding:5px;box-shadow:0 15px 40px rgba(0,0,0,0.6);border:2px solid #333;margin:0 auto;flex-shrink:0}
+.mobileFrame.notch{width:60px;height:10px;background:#000;border-radius:20px;margin:0 auto 3px;position:relative;z-index:2}
+#prev{width:100%;height:100%;border:none;background:#fff;border-radius:18px;display:block;overflow:auto}
 #qrBox{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:9999;justify-content:center;align-items:center}
 #qrBox.modal{background:var(--panel);padding:18px;border-radius:16px;text-align:center;width:90%;max-width:360px;border:1px solid var(--border)}
 #qrBox h4{color:var(--text);margin-bottom:10px;font-size:14px}
@@ -3125,17 +3121,17 @@ body.light.learnCode{background:#1e293b;color:#67e8f9}
 </div>
 
 <div class="center">
-<div class="tabs" id="tabsContainer">
-  <div class="tab active" id="tab-html" onclick="switchTab('html',this)">📄 index.html</div>
-  <div class="tab" id="tab-css" onclick="switchTab('css',this)">🎨 style.css</div>
-  <div class="tab" id="tab-js" onclick="switchTab('js',this)">⚡ script.js</div>
+<div class="tabs">
+<div class="tab active" onclick="switchTab('html',this)">📄 index.html</div>
+<div class="tab" onclick="switchTab('css',this)">🎨 style.css</div>
+<div class="tab" onclick="switchTab('js',this)">⚡ script.js</div>
 </div>
 <div class="editorWrap">
-<textarea class="editor active" id="editorHTML" placeholder="Code yahan likho..."></textarea>
+<textarea class="editor active" id="editorHTML" placeholder="HTML yahan likho..."></textarea>
 <textarea class="editor" id="editorCSS" placeholder="CSS yahan likho..."></textarea>
 <textarea class="editor" id="editorJS" placeholder="JavaScript yahan likho..."></textarea>
 </div>
-<div class="toolrow" id="toolrow">
+<div class="toolrow">
 <span class="chip" onclick="insertTag('h1')">&lt;h1&gt;</span>
 <span class="chip" onclick="insertTag('p')">&lt;p&gt;</span>
 <span class="chip" onclick="insertTag('div')">&lt;div&gt;</span>
@@ -3150,21 +3146,12 @@ body.light.learnCode{background:#1e293b;color:#67e8f9}
 </div>
 
 <div class="right">
-<div class="rhead"><span>👁 Live Preview / Output</span><span style="color:var(--success)">● Live</span></div>
+<div class="rhead"><span>👁 Live Preview</span><span style="color:var(--success)">● Live</span></div>
 <div class="rwrap">
-  
-  <!-- Mobile Screen Preview -->
-  <div class="mobileFrame" id="mobilePreview">
-    <div class="notch"></div>
-    <iframe id="prev" scrolling="yes"></iframe>
-  </div>
-
-  <!-- Backend Console -->
-  <div id="consoleWrap">
-    <button id="runBtn" onclick="runBackendCode()">▶️ Run Code</button>
-    <div id="consoleOutput">> Output will appear here...</div>
-  </div>
-
+<div class="mobileFrame">
+<div class="notch"></div>
+<iframe id="prev" scrolling="yes"></iframe>
+</div>
 </div>
 </div>
 </div>
@@ -3199,32 +3186,27 @@ body.light.learnCode{background:#1e293b;color:#67e8f9}
 </div>
 
 <script>
-const backendData = {
-  "Python": { ext: "main.py", code: "print('Hello Duniya!')\nfor i in range(3):\n    print('Count:', i)" },
-  "Java": { ext: "Main.java", code: "public class Main {\n    public static void main(String[] args) {\n        System.out.println(\"Hello Duniya!\");\n    }\n}" },
-  "C": { ext: "main.c", code: "#include <stdio.h>\nint main() {\n    printf(\"Hello Duniya!\\n\");\n    return 0;\n}" },
-  "C++": { ext: "main.cpp", code: "#include <iostream>\nusing namespace std;\nint main() {\n    cout << \"Hello Duniya!\";\n    return 0;\n}" },
-  "C#": { ext: "Program.cs", code: "using System;\nclass Program {\n    static void Main() {\n        Console.WriteLine(\"Hello Duniya!\");\n    }\n}" },
-  "PHP": { ext: "index.php", code: "<?php\necho 'Hello Duniya!';\n?>" },
-  "Ruby": { ext: "main.rb", code: "puts 'Hello Duniya!'" },
-  "Go": { ext: "main.go", code: "package main\nimport \"fmt\"\nfunc main() {\n    fmt.Println(\"Hello Duniya!\")\n}" },
-  "Rust": { ext: "main.rs", code: "fn main() {\n    println!(\"Hello Duniya!\");\n}" },
-  "Swift": { ext: "main.swift", code: "print(\"Hello Duniya!\")" },
-  "Kotlin": { ext: "Main.kt", code: "fun main() {\n    println(\"Hello Duniya!\")\n}" },
-  "TypeScript": { ext: "main.ts", code: "console.log('Hello Duniya!');" },
-  "SQL": { ext: "query.sql", code: "SELECT 'Hello Duniya!' AS Message;" },
-  "R": { ext: "main.r", code: "print('Hello Duniya!')" },
-  "MATLAB": { ext: "main.m", code: "disp('Hello Duniya!')" }
-};
-
-const apiMap = {
-  "Python": "python", "Java": "java", "C": "c", "C++": "c++", "C#": "csharp",
-  "PHP": "php", "Ruby": "ruby", "Go": "go", "Rust": "rust", "Swift": "swift",
-  "Kotlin": "kotlin", "TypeScript": "typescript", "SQL": "sqlite3", "R": "r", "MATLAB": "octave"
-};
-
 const CLS_MAP={"5 Years":"Class 1","6 Years":"Class 1","7 Years":"Class 2","8 Years":"Class 3","9 Years":"Class 4","10 Years":"Class 5","11-12 Years":"Class 6-7","13-14 Years":"Class 8-9","15-16 Years":"Class 10","17-18 Years":"Class 11-12","18+ Years":"College"};
-const LEARN_CARDS = [ /*... same as original ...*/ ]; 
+const LEARN_CARDS = [
+  {title:"📝 Heading (H1)", preview:`<h1 style="font-size:28px;color:#dc2626;margin:0">Hello Duniya!</h1>`, code:`<h1>Hello Duniya!</h1>`, tip:"Bada title ke liye <h1> use karo."},
+  {title:"📄 Paragraph", preview:`<p style="margin:0;color:#333">Main 5 saal ka hu aur mujhe coding pasand hai!</p>`, code:`<p>Yahan apni baat likho...</p>`, tip:"Text ke liye <p> use karo."},
+  {title:"🎨 Color", preview:`<span style="color:#2563eb;font-weight:bold">Mera favourite color BLUE hai</span>`, code:`<p style="color:blue">Mera favourite color BLUE hai</p>`, tip:"blue ki jagah red, green try karo!"},
+  {title:"🔘 Button", preview:`<button style="padding:10px 20px;background:#f59e0b;color:#fff;border:none;border-radius:10px;font-weight:bold">Mujhe Dabao!</button>`, code:`<button>Mujhe Dabao!</button>`, tip:"Button ke liye <button> use karo."},
+  {title:"🖼️ Image", preview:`<img src="https://cdn-icons-png.flaticon.com/512/616/616408.png" width="70">`, code:`<img src="IMAGE-LINK" width="100">`, tip:"Image ke liye <img> use karo."},
+  {title:"🔗 Link", preview:`<a href="#" style="color:#6366f1;text-decoration:underline">Click Karo</a>`, code:`<a href="https://google.com">Google</a>`, tip:"Link ke liye <a href='...'> use karo."},
+  {title:"📋 List", preview:`<ul style="margin:0;padding-left:20px;color:#333"><li>Class 1 - Drawing</li><li>Class 2 - Coding</li></ul>`, code:`<ul>\n <li>Class 1 - Drawing</li>\n <li>Class 2 - Coding</li>\n</ul>`, tip:"List ke liye <ul> aur <li> use karo."},
+  {title:"📊 Slider", preview:`<input type="range" min="0" max="100" value="50" style="width:150px">`, code:`<input type="range" min="0" max="100">`, tip:"Slider ke liye input type='range' likho."},
+  {title:"✍️ Input Box", preview:`<input type="text" placeholder="Naam..." style="padding:8px;border-radius:6px;border:1px solid #ccc">`, code:`<input type="text" placeholder="Naam likho...">`, tip:"Input ke liye input type='text' use karo."},
+  {title:"🎯 Alert", preview:`<button onclick="alert('Wah! 🌟')" style="padding:8px 16px;background:#22c55e;color:#fff;border:none;border-radius:8px">Click Karo</button>`, code:`<button onclick="alert('Wah!')">Click Karo</button>`, tip:"onclick='alert(...)' se click pe popup aata hai."},
+  {title:"🖍️ Background Color", preview:`<div style="background:#fef9c3;padding:15px;border-radius:10px;color:#333;width:100%;text-align:center">Rangila Box!</div>`, code:`<div style="background:#fef9c3;padding:15px">Rangila Box!</div>`, tip:"background: color se box rangila hota hai."},
+  {title:"⬛ Box Border", preview:`<div style="border:3px solid #dc2626;padding:12px;border-radius:10px;color:#333;width:100%;text-align:center">Mera Box</div>`, code:`<div style="border:3px solid red;padding:12px">Mera Box</div>`, tip:"border: 3px solid red se border aata hai."},
+  {title:"🎬 Emoji", preview:`<div style="font-size:30px">😀 🚀 ❤️ 🌟 🎉</div>`, code:`😀 🚀 ❤️ 🌟 🎉`, tip:"Emoji seedha code me likho!"},
+  {title:"🖼️ Circle Image", preview:`<img src="https://cdn-icons-png.flaticon.com/512/616/616408.png" width="70" style="border-radius:50%">`, code:`<img src="LINK" style="border-radius:50%">`, tip:"border-radius:50% se gol image banti hai."},
+  {title:"📐 Center Text", preview:`<div style="text-align:center;color:#333">Yeh Center Me Hai</div>`, code:`<div style="text-align:center">Yeh Center Me Hai</div>`, tip:"text-align:center se text center aata hai."},
+  {title:"🎮 Score Game", preview:`<div style="text-align:center"><p style="margin:0;color:#333">Score: <b id="demoScore">0</b></p><button onclick="document.getElementById('demoScore').innerText++" style="padding:6px 12px;background:#f59e0b;color:#fff;border:none;border-radius:6px">+1</button></div>`, code:`<p>Score: <span id="s">0</span></p>\n<button onclick="document.getElementById('s').innerText++">+1</button>`, tip:"Click pe score badhao!"},
+  {title:"🌈 Gradient", preview:`<div style="background:linear-gradient(135deg,#667eea,#764ba2);padding:15px;color:#fff;border-radius:10px;width:100%;text-align:center">Gradient!</div>`, code:`<div style="background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;padding:15px">Gradient!</div>`, tip:"2 rang mix karne ke liye gradient use karo."},
+  {title:"💬 Flex Box", preview:`<div style="display:flex;gap:8px"><div style="background:#333;color:#fff;padding:8px;border-radius:8px">Side</div><div style="background:#eee;color:#333;padding:8px;border-radius:8px;flex:1">Main</div></div>`, code:`<div style="display:flex">\n <div>Side</div>\n <div>Main</div>\n</div>`, tip:"display:flex se side-by-side boxes bante hain."}
+];
 
 const ageTemplates={
 "5 Years":{html:`<h1>👋 Hello! Mera Naam Aman Hai</h1>\n<p>Main 5 saal ka hu!</p>\n<h2 style="color:blue">Mera favourite color BLUE hai</h2>\n<button onclick="alert('Wah! 🌟')">Mujhe Dabao!</button>`,css:`body{text-align:center;padding:30px;background:#fef9c3;font-family:Comic Sans MS;margin:0}\nh1{background:#fff;padding:15px;border-radius:15px}\nbutton{padding:15px 30px;background:orange;color:#fff;border:none;border-radius:20px;font-size:16px}`,js:`// Sirf click karo!`,tipTitle:"5 Years Tip:",tipText:"Apna naam likho. Blue ko RED karo!"},
@@ -3248,7 +3230,6 @@ r3:{html:`<header class="head"><b>🛒 Mini Shop</b><span>Cart</span></header>\n
 
 const LANGUAGES=["HTML","CSS","JavaScript","Python","Java","C","C++","C#","PHP","Ruby","Go","Rust","Swift","Kotlin","TypeScript","SQL","Scratch (Block)","Block Coding","R","MATLAB"];
 const ages=Object.keys(ageTemplates);
-
 document.getElementById('ageList').innerHTML=ages.map((a,i)=>`<div class="age ${i===0?'active':''}" onclick="selectAge('${a}',this)"><span>${a}</span><span class="cls">${CLS_MAP[a]||''}</span></div>`).join('');
 document.getElementById('ageSelect').innerHTML='<option>Select Age</option>'+ages.map(a=>`<option value="${a}">${a} (${CLS_MAP[a]||''})</option>`).join('');
 document.getElementById('langList').innerHTML=LANGUAGES.slice(0,9).map((l,i)=>`<div class="lang ${i===0?'active':''}" onclick="selectLang('${l}',this)">${l}</div>`).join('');
@@ -3256,7 +3237,6 @@ document.getElementById('langSelect').innerHTML=LANGUAGES.map(l=>`<option>${l}</
 
 let currentTab='html';
 let currentAge='5 Years';
-let currentLang='HTML';
 
 function switchTab(tab,el){
   currentTab=tab;
@@ -3266,134 +3246,13 @@ function switchTab(tab,el){
   const map={html:'editorHTML',css:'editorCSS',js:'editorJS'};
   document.getElementById(map[tab]).classList.add('active');
 }
-
-function changeLang(){
-  const lang=document.getElementById('langSelect').value;
-  selectLang(lang, null);
-}
-
-function selectLang(lang, el){
-  currentLang = lang;
-  
-  if(el){
-    document.querySelectorAll('.lang').forEach(x=>x.classList.remove('active'));
-    el.classList.add('active');
-  }
-  document.getElementById('langSelect').value = lang;
-  showLangTip(lang);
-
-  const isFrontend = ["HTML", "CSS", "JavaScript"].includes(lang);
-  const isVisual = ["Scratch (Block)", "Block Coding"].includes(lang);
-
-  if(isFrontend) {
-    document.getElementById('mobilePreview').style.display = 'block';
-    document.getElementById('consoleWrap').style.display = 'none';
-    document.getElementById('tab-html').style.display = 'block';
-    document.getElementById('tab-css').style.display = 'block';
-    document.getElementById('tab-js').style.display = 'block';
-    document.getElementById('tab-html').innerText = '📄 index.html';
-    applyAge(currentAge); 
-  } else if (isVisual) {
-    document.getElementById('mobilePreview').style.display = 'none';
-    document.getElementById('consoleWrap').style.display = 'flex';
-    document.getElementById('tab-html').style.display = 'block';
-    document.getElementById('tab-css').style.display = 'none';
-    document.getElementById('tab-js').style.display = 'none';
-    
-    document.getElementById('tab-html').innerText = '🧩 Block Editor';
-    switchTab('html', document.getElementById('tab-html'));
-    
-    document.getElementById('editorHTML').value = "// Scratch aur Block Coding visual languages hain.\n// Inhe yahan text mein nahi likha ja sakta.\n// Kripya Block Editor ka use karein.";
-    document.getElementById('editorCSS').value = '';
-    document.getElementById('editorJS').value = '';
-    document.getElementById('runBtn').style.display = 'none';
-    document.getElementById('consoleOutput').innerText = "> Visual language selected. No code execution available in text mode.";
-    document.getElementById('consoleOutput').style.color = "#f59e0b";
-  } else {
-    document.getElementById('mobilePreview').style.display = 'none';
-    document.getElementById('consoleWrap').style.display = 'flex';
-    document.getElementById('tab-html').style.display = 'block';
-    document.getElementById('tab-css').style.display = 'none';
-    document.getElementById('tab-js').style.display = 'none';
-    document.getElementById('runBtn').style.display = 'block'; 
-    
-    const config = backendData[lang] || { ext: "code.txt", code: "// Write code here" };
-    document.getElementById('tab-html').innerText = '📄 ' + config.ext;
-    switchTab('html', document.getElementById('tab-html'));
-    
-    document.getElementById('editorHTML').value = config.code;
-    document.getElementById('editorCSS').value = '';
-    document.getElementById('editorJS').value = '';
-    document.getElementById('consoleOutput').innerText = "> Click 'Run Code' to start.";
-    document.getElementById('consoleOutput').style.color = "#22c55e";
-  }
-}
-
-async function runBackendCode() {
-  const lang = currentLang;
-  const code = document.getElementById('editorHTML').value;
-  const apiLang = apiMap[lang];
-  const consoleOutput = document.getElementById('consoleOutput');
-  const runBtn = document.getElementById('runBtn');
-
-  if(!apiLang) {
-    consoleOutput.innerText = "> Error: API runner not available for this language.";
-    consoleOutput.style.color = "#ef4444";
-    return;
-  }
-
-  runBtn.innerText = "⏳ Running...";
-  runBtn.disabled = true;
-  consoleOutput.innerText = "> Compiling and running...";
-  consoleOutput.style.color = "#eab308"; 
-
-  try {
-    const response = await fetch("https://emkc.org/api/v2/piston/execute", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        language: apiLang,
-        version: "*",
-        files: [{ content: code }]
-      })
-    });
-    
-    const result = await response.json();
-    
-    if (result.run) {
-      if (result.run.stdout) {
-        consoleOutput.innerText = "> Output:\n\n" + result.run.stdout;
-        consoleOutput.style.color = "#22c55e"; 
-      } else if (result.run.stderr) {
-        consoleOutput.innerText = "> Error:\n\n" + result.run.stderr;
-        consoleOutput.style.color = "#ef4444"; 
-      } else {
-        consoleOutput.innerText = "> Code ran successfully (No output).";
-        consoleOutput.style.color = "#22c55e"; 
-      }
-    } else {
-       consoleOutput.innerText = "> API Error: " + JSON.stringify(result);
-       consoleOutput.style.color = "#ef4444";
-    }
-  } catch (error) {
-    consoleOutput.innerText = "> Network Error: " + error.message;
-    consoleOutput.style.color = "#ef4444";
-  } finally {
-    runBtn.innerText = "▶️ Run Code";
-    runBtn.disabled = false;
-  }
-}
-
 function selectAge(age,el){
-  if(el) {
-    document.querySelectorAll('.age').forEach(x=>x.classList.remove('active'));
-    el.classList.add('active');
-  }
+  document.querySelectorAll('.age').forEach(x=>x.classList.remove('active'));
+  el.classList.add('active');
   document.getElementById('ageSelect').value=age;
   currentAge=age;
   applyAge(age);
 }
-
 function changeAgeBySelect(){
   const age=document.getElementById('ageSelect').value;
   if(!ageTemplates[age]) return;
@@ -3404,11 +3263,8 @@ function changeAgeBySelect(){
   });
   applyAge(age);
 }
-
 function applyAge(age){
-  if(!["HTML", "CSS", "JavaScript"].includes(currentLang)) return; 
   const d=ageTemplates[age];
-  if(!d) return;
   document.getElementById('editorHTML').value=d.html;
   document.getElementById('editorCSS').value=d.css;
   document.getElementById('editorJS').value=d.js||'';
@@ -3417,15 +3273,22 @@ function applyAge(age){
   document.getElementById('status').innerText='Ready - '+age+' ('+(CLS_MAP[age]||'')+')';
   run();
 }
-
+function selectLang(lang,el){
+  document.querySelectorAll('.lang').forEach(x=>x.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('langSelect').value=lang;
+  showLangTip(lang);
+}
+function changeLang(){
+  const lang=document.getElementById('langSelect').value;
+  showLangTip(lang);
+}
 function showLangTip(lang){
   document.getElementById('tipTitle').innerText=lang+' Tip:';
   const tips={'HTML':'Structure - <h1>, <p>, <div>','CSS':'Rang do - color, background','JavaScript':'Magic - click, alert','Python':'print("Hello")','Java':'public class Main','C':'Boss of languages','C++':'C + objects','C#':'Windows + games','PHP':'Backend','Ruby':'Simple + friendly','Go':'Fast - Google','Rust':'Safe + fast','Swift':'Apple apps','Kotlin':'Android apps','TypeScript':'JS + types','SQL':'Database','Scratch (Block)':'Blocks - kids','Block Coding':'No typing','R':'Data science','MATLAB':'Engineering'};
   document.getElementById('tipText').innerText=tips[lang]||'Try karo!';
 }
-
 function insertTag(tag){
-  if(!["HTML", "CSS", "JavaScript"].includes(currentLang)) return; 
   const map={html:'editorHTML',css:'editorCSS',js:'editorJS'};
   const editor=document.getElementById(map[currentTab]);
   const start=editor.selectionStart;
@@ -3439,7 +3302,6 @@ function insertTag(tag){
   editor.selectionStart=editor.selectionEnd=start+snippet.length;
   run();
 }
-
 const EMOJIS=['😀','😃','😄','😁','😊','🥰','😍','🤩','😎','🤔','😂','🥳','👍','👎','❤️','🔥','⭐','✨','🌟','💫','🎉','🎊','🎈','🎁','🐶','🐱','🐭','🐹','🐰','🦊','🐻','🐼','🍎','🍌','🍕','🍔','🌞','🌙','⭐','☁️','🌈','⚡','💻','📱','🎮','🚀','✈️','🏀','⚽','🎨','📚'];
 function openEmojiPicker(e){
   e.stopPropagation();
@@ -3454,7 +3316,6 @@ document.addEventListener('click',function(e){
   if(!e.target.closest('#emojiPanel') &&!e.target.closest('.chip')) closeEmoji();
 });
 function insertEmoji(em){
-  if(!["HTML", "CSS", "JavaScript"].includes(currentLang)) return; 
   const map={html:'editorHTML',css:'editorCSS',js:'editorJS'};
   const editor=document.getElementById(map[currentTab]);
   const start=editor.selectionStart;
@@ -3463,9 +3324,7 @@ function insertEmoji(em){
   editor.selectionStart=editor.selectionEnd=start+em.length;
   run();
 }
-
 function loadReady(){
-  if(!["HTML", "CSS", "JavaScript"].includes(currentLang)) return; 
   const v=document.getElementById('readySelect').value;
   if(!readyMade[v]) return;
   const d=readyMade[v];
@@ -3474,9 +3333,7 @@ function loadReady(){
   document.getElementById('editorJS').value=d.js||'';
   run();
 }
-
 function blankPage(){
-  if(!["HTML", "CSS", "JavaScript"].includes(currentLang)) return; 
   if(confirm('Blank karna hai?')){
     document.getElementById('editorHTML').value='<h1>Hello World!</h1>\n<p>Naya code likho...</p>';
     document.getElementById('editorCSS').value='body{padding:20px;font-family:Arial}';
@@ -3484,7 +3341,6 @@ function blankPage(){
     run();
   }
 }
-
 function buildFullHTML(){
   const html=document.getElementById('editorHTML').value;
   const css=document.getElementById('editorCSS').value;
@@ -3494,17 +3350,13 @@ function buildFullHTML(){
   }
   return '<!DOCTYPE html>\n<html><head>\n<meta charset="UTF-8">\n<style>\n'+css+'\n</style>\n</head><body>\n'+html+'\n<script>\n'+js+'\n<\/script>\n</body></html>';
 }
-
 function run(){
-  if(!["HTML", "CSS", "JavaScript"].includes(currentLang)) return;
   const code=buildFullHTML();
   document.getElementById('prev').srcdoc=code;
   localStorage.setItem('clyxess_code',code);
   analyzeCode();
 }
-
 function analyzeCode(){
-  if(!["HTML", "CSS", "JavaScript"].includes(currentLang)) return;
   const html=document.getElementById('editorHTML').value;
   const css=document.getElementById('editorCSS').value;
   const js=document.getElementById('editorJS').value;
@@ -3525,7 +3377,6 @@ function analyzeCode(){
     msg.innerHTML=issues.map(i=>`<span class="err">⚠️ ${i}</span>`).join('')+'<span class="tip">💡 Har &lt;tag&gt; ka &lt;/tag&gt; hona chahiye!</span>';
   }
 }
-
 function downloadCode(){
   const blob=new Blob([buildFullHTML()],{type:'text/html'});
   const a=document.createElement('a');
@@ -3538,7 +3389,7 @@ function copyAllCode(){
   navigator.clipboard.writeText(code).then(()=>alert('✅ Code copy ho gaya!'));
 }
 
-// ============ QR — FINAL FIX ============
+// ============ QR — FINAL FIX — PUBLIC URL + SMALL QR + RANDOM ALPHABET ============
 function openQR(){
   document.getElementById('qrBox').style.display='flex';
   newQR();
@@ -3643,7 +3494,7 @@ let timer;
     timer=setTimeout(run,500);
   });
 });
-selectLang('HTML', null);
+applyAge('5 Years');
 
 (function checkSharedPreview(){
   try {
@@ -3675,7 +3526,7 @@ selectLang('HTML', null);
 </html>
 '''
     html_code = html_code.replace("__BASE_URL__", base_url)
-    components.html(html_code, height=1050, scrolling=False)  
+    components.html(html_code, height=950, scrolling=False)    
     
 def render_vision_lab():
     import streamlit as st
