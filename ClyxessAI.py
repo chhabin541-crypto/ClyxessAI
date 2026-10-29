@@ -11736,15 +11736,45 @@ def learning_report():
     
 def render_parent_dashboard():
     import streamlit as st
+    import urllib.parse
     import datetime
     import json
-    import urllib.parse # Download/Share ke liye zaroori hai
+    import time
 
-    user_email = st.session_state.get("user_email", "")
+    # ==========================================
+    # 1. LEARNING REPORT (Andar define kiya hai)
+    # ==========================================
+    def learning_report():
+        user_email = st.session_state.get("user_email", "")
+        try:
+            res = supabase.table("study_logs").select("*").eq("user_email", user_email).execute()
+            logs = res.data
+            if not logs:
+                return "Abhi tak koi study record nahi hai. Bacche ke padhne par yahan report aayegi."
+                
+            total_mins = sum(item['duration_minutes'] for item in logs)
+            hours = total_mins // 60
+            mins = total_mins % 60
+            
+            report_text = "📊 CLYXESS AI LEARNING REPORT\n----------------------------\n"
+            report_text += f"Total Study Time: {hours} hours {mins} mins\n\nSubject-wise Breakdown:\n"
+            
+            subjects = {}
+            for log in logs:
+                subj = log.get('subject', 'General')
+                subjects[subj] = subjects.get(subj, 0) + log['duration_minutes']
+                
+            for subj, time_spent in subjects.items():
+                report_text += f"- {subj}: {time_spent} mins\n"
+            return report_text
+        except Exception:
+            return "📊 CLYXESS AI LEARNING REPORT\n\nBacche ne abhi tak koi class nahi li hai. Jab wo padhega, uski report yahan aayegi."
 
     # ==========================================
     # 🔐 PIN LOCK SCREEN
     # ==========================================
+    user_email = st.session_state.get("user_email", "")
+    
     if "parent_unlocked" not in st.session_state:
         st.session_state.parent_unlocked = False
 
@@ -11761,12 +11791,11 @@ def render_parent_dashboard():
         with col2:
             pin_input = st.text_input("Enter PIN", type="password", max_chars=4, placeholder="Default is 1234")
             if st.button("Unlock Dashboard", use_container_width=True, type="primary"):
-                # Database se PIN check karo (Agar DB use nahi kar rahe toh default 1234 rakhein)
                 try:
                     res = supabase.table("parent_settings").select("parent_pin").eq("user_email", user_email).execute()
                     saved_pin = res.data[0]['parent_pin'] if len(res.data) > 0 else "1234"
                 except:
-                    saved_pin = "1234" # Fallback agar DB table na ho
+                    saved_pin = "1234"
                 
                 if pin_input == saved_pin:
                     st.session_state.parent_unlocked = True
@@ -11776,7 +11805,7 @@ def render_parent_dashboard():
         return 
 
     # ==========================================
-    # 📊 MAIN DASHBOARD (Premium UI)
+    # 📊 MAIN DASHBOARD
     # ==========================================
     st.markdown("<h1 style='text-align: center;'>👨‍👩‍👧 Parent Safety Center</h1>", unsafe_allow_html=True)
     
@@ -11786,8 +11815,6 @@ def render_parent_dashboard():
             st.session_state.parent_unlocked = False
             st.rerun()
 
-    # --- Top Metrics (Aapke purane code se) ---
-    # Safe get use kiya hai taaki agar state khali ho toh error na aaye
     best = max(st.session_state.get('play_best_scores', {}).values(), default=0)
     completed_levels = len(st.session_state.get('play_completed_levels', []))
     current_level = st.session_state.get('play_age', '1-2 Years')
@@ -11799,7 +11826,7 @@ def render_parent_dashboard():
     
     st.divider()
 
-    # Settings fetch karein (Agar pehle se table bana rakhi hai)
+    # Fetch Settings
     try:
         settings_res = supabase.table("parent_settings").select("*").eq("user_email", user_email).execute()
         settings = settings_res.data[0] if len(settings_res.data) > 0 else {}
@@ -11816,38 +11843,46 @@ def render_parent_dashboard():
     ])
 
     # ------------------------------------------
-# TAB 1: FILTERS & CONTROLS
-# ------------------------------------------
-with tab1:
-    st.subheader("Allowed AI Learning Modes")
-    st.write("Uncheck any mode you want to lock from your child's menu.")
-    
-    col1, col2 = st.columns(2)
-    with col1:
-        # Yahan 'school_mode =' add karna zaroori hai taaki value save ho sake
-        school_mode = st.toggle("🏫 School Mode (AI Tutor)", value=settings.get('is_school_mode', True), key="t_school")
-        math_solver = st.toggle("🧮 Science & Math Solver", value=settings.get('is_math_solver', True), key="t_math")
+    # TAB 1: FILTERS (Dynamic Modes)
+    # ------------------------------------------
+    with tab1:
+        st.subheader("Allowed AI Learning Modes")
+        st.write("Uncheck any mode you want to lock from your child's menu.")
         
-    with col2:
-        creative_writing = st.toggle("✍️ Creative Writing Studio", value=settings.get('is_creative_writing', True), key="t_creative")
-        image_gen = st.toggle("🎨 AI Image Generator", value=settings.get('is_image_gen', True), key="t_image")
+        ALL_MODES = [
+            "Normal Chat", "Creative Lab (School Mode)", "Play & Learn", 
+            "Creative AI Image Generator", "Vision Lab", "Cyber Security", 
+            "Interactive Homework & Test", "Coding Lab", "Math Lab"
+        ]
         
-    # 👇 YEH SAVE BUTTON HAI (Blue message hata kar yeh lagayein)
-    if st.button("💾 Save Filter Settings", type="primary", use_container_width=True):
-        try:
-            supabase.table("parent_settings").update({
-                "is_school_mode": school_mode,
-                "is_math_solver": math_solver,
-                "is_creative_writing": creative_writing,
-                "is_image_gen": image_gen
-            }).eq("user_email", user_email).execute()
-            
-            st.success("✅ Filter settings saved successfully!")
-        except Exception as e:
-            st.error(f"Error saving settings: {e}")
+        current_allowed = settings.get('allowed_modes', {})
+        if not isinstance(current_allowed, dict):
+            current_allowed = {}
+
+        col1, col2 = st.columns(2)
+        new_settings = {}
+        
+        for i, mode in enumerate(ALL_MODES):
+            is_allowed = current_allowed.get(mode, True)
+            if i % 2 == 0:
+                with col1:
+                    new_settings[mode] = st.toggle(mode, value=is_allowed, key=f"toggle_{mode}")
+            else:
+                with col2:
+                    new_settings[mode] = st.toggle(mode, value=is_allowed, key=f"toggle_{mode}")
+                    
+        if st.button("💾 Save Mode Settings", type="primary", use_container_width=True):
+            try:
+                supabase.table("parent_settings").update({
+                    "allowed_modes": new_settings
+                }).eq("user_email", user_email).execute()
+                st.success("✅ Modes updated successfully! Child's menu is updated.")
+                st.rerun()
+            except Exception as e:
+                st.error(f"Error saving settings: {e}")
 
     # ------------------------------------------
-    # TAB 2: SCREEN TIME (Basic Logic)
+    # TAB 2: SCREEN TIME
     # ------------------------------------------
     with tab2:
         st.subheader("Today's Student Screen Time")
@@ -11864,11 +11899,17 @@ with tab1:
         
         st.write("**Set Daily Screen Time Limit:**")
         limit_options = [15, 30, 45, 60, 90, 120]
-        st.radio("Select Limit (minutes)", limit_options, horizontal=True, key="time_radio")
-        st.button("Update Time Limit")
+        selected_limit = st.radio("Select Limit (minutes)", limit_options, horizontal=True, key="time_radio")
+        
+        if st.button("Update Time Limit"):
+            try:
+                supabase.table("parent_settings").update({"time_limit_mins": selected_limit}).eq("user_email", user_email).execute()
+                st.success("✅ Time limit updated in database!")
+            except Exception as e:
+                st.error(f"Error: {e}")
 
     # ------------------------------------------
-    # TAB 3: AUDIT LOGS (Chat History)
+    # TAB 3: AUDIT LOGS
     # ------------------------------------------
     with tab3:
         st.subheader("Search Student Chat Prompts")
@@ -11892,29 +11933,21 @@ with tab1:
                 """, unsafe_allow_html=True)
 
     # ------------------------------------------
-    # TAB 4: PROGRESS REPORT (Aapka Purana Code)
+    # TAB 4: PROGRESS REPORT
     # ------------------------------------------
     with tab4:
         st.subheader("📄 Learning Progress Report")
-        
-        # Yahan learning_report() function call hoga
-        report = learning_report() # Agar yeh error de raha tha toh pehle isko define kar lein
-        
-        if not report:
-            report = "Abhi tak koi report generate nahi hui hai. Bacche ke khelne/padhne par report banegi."
+        report = learning_report() 
             
-        # Report ko ek sundar card mein dikhaya
         st.markdown(f"""
         <div style="background-color: #111827; padding: 20px; border-radius: 10px; border: 1px solid #374151;">
             <pre style="color: #d1d5db; white-space: pre-wrap; font-family: inherit;">{report}</pre>
         </div>
         """, unsafe_allow_html=True)
         
-        st.write("") # Space
+        st.write("") 
         
-        # Download aur Share Buttons
         col_dl, col_sh = st.columns(2)
-        
         with col_dl:
             st.download_button(
                 label="📄 Save Report",
@@ -11923,9 +11956,7 @@ with tab1:
                 mime="text/plain",
                 use_container_width=True
             )
-            
         with col_sh:
-            # Share via WhatsApp
             share_text = urllib.parse.quote(report)
             st.link_button(
                 "📤 Share via WhatsApp", 
@@ -11934,7 +11965,7 @@ with tab1:
             )
 
     # ------------------------------------------
-    # TAB 5: SECURITY (PIN Change)
+    # TAB 5: SECURITY
     # ------------------------------------------
     with tab5:
         st.subheader("🔑 Change 4-Digit Parent PIN")
@@ -11945,13 +11976,28 @@ with tab1:
             if len(new_pin) != 4:
                 st.error("PIN must be exactly 4 digits.")
             else:
-                st.success("✅ PIN updated successfully! (Database logic is pending)")
+                try:
+                    res = supabase.table("parent_settings").select("parent_pin").eq("user_email", user_email).execute()
+                    saved_pin = res.data[0]['parent_pin'] if res.data else "1234"
+                    
+                    if current_pin != saved_pin:
+                        st.error("❌ Current PIN is incorrect.")
+                    else:
+                        supabase.table("parent_settings").update({"parent_pin": new_pin}).eq("user_email", user_email).execute()
+                        st.success("✅ PIN updated successfully in database!")
+                except Exception as e:
+                    st.error(f"Error updating PIN: {e}")
         
         st.divider()
         st.subheader("📧 Parent Alert Email")
         alert_email = st.text_input("Email for daily reports", value=settings.get('alert_email', ''))
+        
         if st.button("Save Email Preferences"):
-            st.success("Email preferences saved!")
+            try:
+                supabase.table("parent_settings").update({"alert_email": alert_email}).eq("user_email", user_email).execute()
+                st.success("✅ Email preferences saved in database!")
+            except Exception as e:
+                st.error(f"Error saving email: {e}")
 
 # ============================================================
 # UI START
