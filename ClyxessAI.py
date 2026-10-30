@@ -12554,59 +12554,59 @@ if completion is None:
     st.error("AI response नहीं आ पाया. Please try again.")
     st.stop()
         
-    response = completion.choices[0].message.content
-    responding.empty()
+    # 1. Response lo
+response = completion.choices[0].message.content
 
-    # Typing Animation
-    placeholder = st.empty()
-    typed = ""
-    for word in response.split(" "):
-        typed += word + " "
-        placeholder.markdown(typed + "▌")
-        time.sleep(0.01)
-    placeholder.markdown(response)
+# 2. Spinner ko turant hatao (Isse "Clyxess is responding" gayab ho jayega)
+responding.empty()
 
-    # Buttons ke liye CSS (Transparent aur chhota look)
-    st.markdown("""
-        <style>
-            div[data-testid="stButton"] button[kind="secondary"] {
-                background-color: transparent !important;
-                border: none !important;
-                color: #9ca3af !important; 
-                padding: 0px 5px !important;
-                font-size: 16px !important;
-                box-shadow: none !important;
-                transition: 0.2s;
-            }
-            div[data-testid="stButton"] button[kind="secondary"]:hover {
-                color: #ffffff !important;
-                background-color: transparent !important;
-                transform: scale(1.1);
-            }
-        </style>
-    """, unsafe_allow_html=True)
+# 3. Typing Animation
+placeholder = st.empty()
+typed = ""
+for word in response.split(" "):
+    typed += word + " "
+    placeholder.markdown(typed + "▌")
+    time.sleep(0.01)
+placeholder.markdown(response)
 
-    # Action Buttons (Copy, Like, Dislike, Share)
-    msg_idx = len(st.session_state.get("messages", []))
-    
-    col1, col2, col3, col4, _ = st.columns([0.4, 0.4, 0.4, 0.4, 8])
-    
-    with col1:
-        if st.button("📋", key=f"copy_{msg_idx}", help="Copy"):
-            st.toast("Text Copied!", icon="✅")
-            st.code(response, language="text")
-            
-    with col2:
-        if st.button("👍", key=f"like_{msg_idx}", help="Like"):
-            st.toast("Thanks for liking!", icon="❤️")
-            
-    with col3:
-        if st.button("👎", key=f"dislike_{msg_idx}", help="Dislike"):
-            st.toast("We will improve!", icon="💔")
-            
-    with col4:
-        if st.button("🔗", key=f"share_{msg_idx}", help="Share"):
-            st.toast("Link Copied to share!", icon="🔗")
+# 4. Buttons ke liye CSS (Transparent aur chhota look)
+st.markdown("""
+    <style>
+        div[data-testid="stButton"] button[kind="secondary"] {
+            background-color: transparent !important;
+            border: none !important;
+            color: #9ca3af !important; 
+            padding: 0px 5px !important;
+            font-size: 16px !important;
+            box-shadow: none !important;
+            transition: 0.2s;
+        }
+        div[data-testid="stButton"] button[kind="secondary"]:hover {
+            color: #ffffff !important;
+            background-color: transparent !important;
+            transform: scale(1.1);
+        }
+    </style>
+""", unsafe_allow_html=True)
+
+# 5. Action Buttons (Copy, Like, Dislike, Share)
+msg_idx = len(st.session_state.get("messages", []))
+
+col1, col2, col3, col4, _ = st.columns([0.4, 0.4, 0.4, 0.4, 8])
+
+with col1:
+    if st.button("📋", key=f"copy_{msg_idx}", help="Copy"):
+        st.toast("Text Copied!", icon="✅")
+        st.code(response, language="text")
+with col2:
+    if st.button("👍", key=f"like_{msg_idx}", help="Like"):
+        st.toast("Thanks for liking!", icon="❤️")
+with col3:
+    if st.button("👎", key=f"dislike_{msg_idx}", help="Dislike"):
+        st.toast("We will improve!", icon="💔")
+with col4:
+    if st.button("🔗", key=f"share_{msg_idx}", help="Share"):
+        st.toast("Link Copied to share!", icon="🔗")
     
     # ==================================================
     # 👆 NAYA CODE KHATAM 👆
