@@ -12523,7 +12523,13 @@ def render_normal_chat():
 5. Kuch bhi invent mat karo.
 6. Reply in user's language. 
 """ 
-        
+system = "You are Clyxess AI, a helpful and smart assistant."
+
+if search_context:
+    system += "\n\n=== LIVE WEB INFO ===\n" + search_context + "\n=== END ===\n"
+else:
+    system += "\n\n### RULES ###\n1. Clean answer do..."
+    
 if search_context:
     system += "\n\n=== LIVE WEB INFO ===\n" + search_context + "\n=== END ===\n"
 else:
