@@ -12529,30 +12529,30 @@ def render_normal_chat():
         system += "\n\n### RULES ###\n1. Clean answer do.\n2. Koi Sources/Links section mat add karo.\n3. Koi URL mat add karo.\n4. Reply in user's language.\n"
 
     with st.chat_message("assistant"):
-        # SPINNER - User chat karte hi pehle ye ayega
-        responding = st.empty()
-        responding.markdown("""
-            <div style='display:flex;align-items:center;gap:10px;color:#aaa'>
-                <div style='border:2px solid #333;border-top:2px solid #ffcc00;border-radius:50%;width:16px;height:16px;animation:spin 0.8s linear infinite'></div>
-                <b>Clyxess is responding<span class="dots"></span></b>
-            </div>
-            <style>
-            @keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
-            .dots::after{content:'';animation:dotAnim 1.2s infinite}
-            @keyframes dotAnim{0%{content:''}25%{content:'.'}50%{content:'..'}75%{content:'...'}100%{content:''}}
-            </style>
-         """, unsafe_allow_html=True)
+    # SPINNER - User chat karte hi pehle ye ayega
+    responding = st.empty()
+    responding.markdown("""
+        <div style='display:flex;align-items:center;gap:10px;color:#aaa'>
+            <div style='border:2px solid #333;border-top:2px solid #ffcc00;border-radius:50%;width:16px;height:16px;animation:spin 0.8s linear infinite'></div>
+            <b>Clyxess is responding<span class="dots"></span></b>
+        </div>
+        <style>
+        @keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+       .dots::after{content:'';animation:dotAnim 1.2s infinite}
+        @keyframes dotAnim{0%{content:''}25%{content:'.'}50%{content:'..'}75%{content:'...'}100%{content:''}}
+        </style>
+    """, unsafe_allow_html=True)
 
-         # AI Response
-         completion, used_model = get_groq_response(client, st.session_state.messages, system, "")
+    # AI Response
+    completion, used_model = get_groq_response(client, st.session_state.messages, system, "")
     
-         if completion is None:
-            responding.empty()
-            st.error("AI response नहीं आ पाया. Please try again.")
-        st.stop() # App ko yahin rokne ke liye
+    if completion is None:
+        responding.empty()
+        st.error("AI response नहीं आ पाया. Please try again.")
+        st.stop()
         
     response = completion.choices[0].message.content
-    responding.empty() # Spinner hatao
+    responding.empty()
 
     # Typing Animation
     placeholder = st.empty()
@@ -12561,7 +12561,7 @@ def render_normal_chat():
         typed += word + " "
         placeholder.markdown(typed + "▌")
         time.sleep(0.01)
-    placeholder.markdown(response) # Final text
+    placeholder.markdown(response)
 
     # Buttons ke liye CSS (Transparent aur chhota look)
     st.markdown("""
