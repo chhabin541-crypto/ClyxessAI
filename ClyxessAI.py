@@ -12543,15 +12543,16 @@ def render_normal_chat():
         </style>
     """, unsafe_allow_html=True)
 
+    # AI Response
     completion, used_model = get_groq_response(client, st.session_state.messages, system, "")
     
     if completion is None:
         responding.empty()
         st.error("AI response नहीं आ पाया. Please try again.")
-        return # Aapne return rakha hai toh maine waisa hi chhoda hai
+        st.stop() # App ko yahin rokne ke liye
         
     response = completion.choices[0].message.content
-    responding.empty()
+    responding.empty() # Spinner hatao
 
     # Typing Animation
     placeholder = st.empty()
@@ -12560,16 +12561,11 @@ def render_normal_chat():
         typed += word + " "
         placeholder.markdown(typed + "▌")
         time.sleep(0.01)
-    placeholder.markdown(response)
+    placeholder.markdown(response) # Final text
 
-    # ==================================================
-    # 👇 YAHAN SE NAYA CODE SHURU HOTA HAI (BUTTONS) 👇
-    # ==================================================
-    
-    # 1. Buttons ko transparent aur professional banane ka CSS
+    # Buttons ke liye CSS (Transparent aur chhota look)
     st.markdown("""
         <style>
-            /* Sirf in action buttons ko target karne ke liye */
             div[data-testid="stButton"] button[kind="secondary"] {
                 background-color: transparent !important;
                 border: none !important;
@@ -12579,7 +12575,6 @@ def render_normal_chat():
                 box-shadow: none !important;
                 transition: 0.2s;
             }
-            /* Jab mouse upar aaye toh white ho jaye */
             div[data-testid="stButton"] button[kind="secondary"]:hover {
                 color: #ffffff !important;
                 background-color: transparent !important;
@@ -12588,15 +12583,14 @@ def render_normal_chat():
         </style>
     """, unsafe_allow_html=True)
 
-    # 2. Buttons ke liye columns (taaki paas-paas rahein)
-    # msg_idx se unique key banegi taaki error na aaye
+    # Action Buttons (Copy, Like, Dislike, Share)
     msg_idx = len(st.session_state.get("messages", []))
     
     col1, col2, col3, col4, _ = st.columns([0.4, 0.4, 0.4, 0.4, 8])
     
     with col1:
         if st.button("📋", key=f"copy_{msg_idx}", help="Copy"):
-            st.toast("Copied!", icon="✅")
+            st.toast("Text Copied!", icon="✅")
             st.code(response, language="text")
             
     with col2:
@@ -12609,7 +12603,7 @@ def render_normal_chat():
             
     with col4:
         if st.button("🔗", key=f"share_{msg_idx}", help="Share"):
-            st.toast("Link copied to share!", icon="🔗")
+            st.toast("Link Copied to share!", icon="🔗")
     
     # ==================================================
     # 👆 NAYA CODE KHATAM 👆
