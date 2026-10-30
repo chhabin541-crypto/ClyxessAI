@@ -12616,8 +12616,8 @@ st.rerun()
     # ==================================================
 
 # ========= CONDITIONAL SOURCES =========
-show_links = want_youtube or want_news or (want_sources and sources)
-if show_links:
+    show_links = want_youtube or want_news or (want_sources and sources)
+    if show_links:
         with st.expander("🔗 Sources & Links", expanded=False):
             if youtube_link:
                 st.markdown(f"**📺 YouTube:** [Watch video]({youtube_link})")
@@ -12628,15 +12628,13 @@ if show_links:
                 st.markdown("**🔗 Website Sources:**")
                 st.markdown(sources)
 
-    # 👇 YAHAN DHYAN DEIN: Ye lines thodi peeche (left) honi chahiye 👇
     st.caption("🔒 Clyxess AI | Secure • Fast • Private")
     
-    # Dhyan rakhein: Variable ka naam 'response_text' hi rakhein
-    st.session_state.messages.append({"role": "assistant", "content": response_text})
-    
-    save_current_chat_cloud()
-    
-    st.rerun()
+# 👇 YAHAN SE CHAT BLOCK BAHAR HOTA HAI (Space kam ho jayega) 👇
+st.session_state.messages.append({"role": "assistant", "content": response_text})
+save_current_chat_cloud()
+
+st.rerun()
 
 def render_school_chat():
     st.title("🚀 Creative Lab — School Mode")
