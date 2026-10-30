@@ -12528,8 +12528,8 @@ def render_normal_chat():
     else:
         system += "\n\n### RULES ###\n1. Clean answer do.\n2. Koi Sources/Links section mat add karo.\n3. Koi URL mat add karo.\n4. Reply in user's language.\n"
 
-    with st.chat_message("assistant"):  # <--- Yeh left par rahega
-    # SPINNER (Yahan se Tab/space shuru hota hai)
+    with st.chat_message("assistant"):
+    # SPINNER - User chat karte hi pehle ye ayega
     responding = st.empty()
     responding.markdown("""
         <div style='display:flex;align-items:center;gap:10px;color:#aaa'>
@@ -12543,14 +12543,12 @@ def render_normal_chat():
         </style>
     """, unsafe_allow_html=True)
 
-    # 👇 Yahan se aage ka code bhi right side mein hona chahiye 👇
     completion, used_model = get_groq_response(client, st.session_state.messages, system, "")
     
     if completion is None:
         responding.empty()
         st.error("AI response नहीं आ पाया. Please try again.")
-        return
-    # ... (baaki code)
+        return # Aapne return rakha hai toh maine waisa hi chhoda hai
         
     response = completion.choices[0].message.content
     responding.empty()
