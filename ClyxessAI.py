@@ -12524,16 +12524,11 @@ def render_normal_chat():
 6. Reply in user's language. 
 """ 
 system = "You are Clyxess AI, a helpful and smart assistant."
-
-if search_context:
-    system += "\n\n=== LIVE WEB INFO ===\n" + search_context + "\n=== END ===\n"
-else:
-    system += "\n\n### RULES ###\n1. Clean answer do..."
+search_context = ""
     
 if search_context:
     system += "\n\n=== LIVE WEB INFO ===\n" + search_context + "\n=== END ===\n"
 else:
-        
     system += "\n\n### RULES ###\n1. Clean answer do.\n2. Koi Sources/Links section mat add karo.\n3. Koi URL mat add karo.\n4. Reply in user's language.\n"
 
 with st.chat_message("assistant"):
