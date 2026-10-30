@@ -12615,7 +12615,7 @@ st.rerun()
     # 👆 NAYA CODE KHATAM 👆
     # ==================================================
 
-        # ============ CONDITIONAL SOURCES ============
+        # ========= CONDITIONAL SOURCES =========
         show_links = want_youtube or want_news or (want_sources and sources)
         if show_links:
             with st.expander("🔗 Sources & Links", expanded=False):
@@ -12625,12 +12625,17 @@ st.rerun()
                     st.markdown(f"**📰 Google News:** [Read news]({google_news_link})")
                 if want_sources and sources:
                     st.markdown("---")
-                    st.markdown("**📎 Website Sources:**")
+                    st.markdown("**🔗 Website Sources:**")
                     st.markdown(sources)
 
+        # 👇 YAHAN DHYAN DEIN: Ye lines thodi peeche (left) honi chahiye 👇
         st.caption("🔒 Clyxess AI | Secure • Fast • Private")
-        st.session_state.messages.append({"role": "assistant", "content": response})
+        
+        # Dhyan rakhein: Variable ka naam 'response_text' hi rakhein
+        st.session_state.messages.append({"role": "assistant", "content": response_text})
+        
         save_current_chat_cloud()
+        
         st.rerun()
 
 def render_school_chat():
