@@ -12628,7 +12628,7 @@ if show_links:
                 st.markdown("**🔗 Website Sources:**")
                 st.markdown(sources)
 
-    st.caption("🔒 Clyxess AI | Secure • Fast • Private")
+st.caption("🔒 Clyxess AI | Secure • Fast • Private")
     
 # 👇 YAHAN SE CHAT BLOCK BAHAR HOTA HAI (Space kam ho jayega) 👇
 st.session_state.messages.append({"role": "assistant", "content": response_text})
