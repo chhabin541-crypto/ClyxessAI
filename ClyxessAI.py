@@ -12521,12 +12521,14 @@ def render_normal_chat():
 3. Source URLs markdown format mein: [Source Name](URL)
 4. Agar LIVE WEB INFO khali hai toh bolo: "Confirmed info nahi mila."
 5. Kuch bhi invent mat karo.
-6. Reply in user's language.
-"""
-        if search_context:
-            system += "\n\n=== LIVE WEB INFO ===\n" + search_context + "\n=== END ===\n"
-    else:
-        system += "\n\n### RULES ###\n1. Clean answer do.\n2. Koi Sources/Links section mat add karo.\n3. Koi URL mat add karo.\n4. Reply in user's language.\n"
+6. Reply in user's language. 
+""" 
+        
+if search_context:
+    system += "\n\n=== LIVE WEB INFO ===\n" + search_context + "\n=== END ===\n"
+else:
+        
+    system += "\n\n### RULES ###\n1. Clean answer do.\n2. Koi Sources/Links section mat add karo.\n3. Koi URL mat add karo.\n4. Reply in user's language.\n"
 
 with st.chat_message("assistant"):
     # SPINNER - User chat karte hi pehle ye ayega
