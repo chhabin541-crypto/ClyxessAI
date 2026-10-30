@@ -12532,7 +12532,7 @@ else:
     system += "\n\n### RULES ###\n1. Clean answer do.\n2. Koi Sources/Links section mat add karo.\n3. Koi URL mat add karo.\n4. Reply in user's language.\n"
 
 with st.chat_message("assistant"):
-    # SPINNER - User chat karte hi pehle ye ayega
+    # 1. Spinner Start
     responding = st.empty()
     responding.markdown("""
         <div style='display:flex;align-items:center;gap:10px;color:#aaa'>
@@ -12546,67 +12546,70 @@ with st.chat_message("assistant"):
         </style>
     """, unsafe_allow_html=True)
 
-# AI Response
-completion, used_model = get_groq_response(client, st.session_state.messages, system, "")
-
-if completion is None:
-    responding.empty()
-    st.error("AI response नहीं आ पाया. Please try again.")
-    st.stop()
+    # 2. API Call (Aapka existing function)
+    completion, used_model = get_groq_response(client, st.session_state.messages, system, "")
+    
+    if completion is None:
+        responding.empty()
+        st.error("AI response नहीं आ पाया. Please try again.")
+        st.stop()
         
-    # 1. Response lo
-response = completion.choices[0].message.content
+    response_text = completion.choices[0].message.content
 
-# 2. Spinner ko turant hatao (Isse "Clyxess is responding" gayab ho jayega)
-responding.empty()
+    # 3. Spinner ko hatao (Yeh zaroori hai)
+    responding.empty() 
 
-# 3. Typing Animation
-placeholder = st.empty()
-typed = ""
-for word in response.split(" "):
-    typed += word + " "
-    placeholder.markdown(typed + "▌")
-    time.sleep(0.01)
-placeholder.markdown(response)
+    # 4. Typing Animation
+    placeholder = st.empty()
+    typed = ""
+    for word in response_text.split(" "):
+        typed += word + " "
+        placeholder.markdown(typed + "▌")
+        time.sleep(0.01)
+    placeholder.markdown(response_text) # Final text yahan set hoga
 
-# 4. Buttons ke liye CSS (Transparent aur chhota look)
-st.markdown("""
-    <style>
-        div[data-testid="stButton"] button[kind="secondary"] {
-            background-color: transparent !important;
-            border: none !important;
-            color: #9ca3af !important; 
-            padding: 0px 5px !important;
-            font-size: 16px !important;
-            box-shadow: none !important;
-            transition: 0.2s;
-        }
-        div[data-testid="stButton"] button[kind="secondary"]:hover {
-            color: #ffffff !important;
-            background-color: transparent !important;
-            transform: scale(1.1);
-        }
-    </style>
-""", unsafe_allow_html=True)
+    # ==========================================
+    # 5. BUTTONS (Ab yeh pakka Text ke niche aayenge)
+    # ==========================================
+    st.markdown("""
+        <style>
+            div[data-testid="stButton"] button[kind="secondary"] {
+                background-color: transparent !important;
+                border: none !important;
+                color: #9ca3af !important; 
+                padding: 0px 5px !important;
+                font-size: 16px !important;
+                box-shadow: none !important;
+            }
+            div[data-testid="stButton"] button[kind="secondary"]:hover {
+                color: #ffffff !important;
+                transform: scale(1.1);
+            }
+        </style>
+    """, unsafe_allow_html=True)
 
-# 5. Action Buttons (Copy, Like, Dislike, Share)
-msg_idx = len(st.session_state.get("messages", []))
+    msg_idx = len(st.session_state.messages)
+    col1, col2, col3, col4, _ = st.columns([0.4, 0.4, 0.4, 0.4, 8])
+    
+    with col1:
+        if st.button("📋", key=f"c_{msg_idx}"):
+            copy_text_to_clipboard(response_text) # Bina box dikhaye copy hoga
+            st.toast("Copied!", icon="✅")
+    with col2:
+        if st.button("👍", key=f"l_{msg_idx}"):
+            st.toast("Liked!", icon="❤️")
+    with col3:
+        if st.button("👎", key=f"d_{msg_idx}"):
+            st.toast("Disliked!", icon="💔")
+    with col4:
+        if st.button("🔗", key=f"sh_{msg_idx}"):
+            st.toast("Shared!", icon="🔗")
 
-col1, col2, col3, col4, _ = st.columns([0.4, 0.4, 0.4, 0.4, 8])
+# 5. Message ko history mein save karo
+st.session_state.messages.append({"role": "assistant", "content": response_text})
 
-with col1:
-    if st.button("📋", key=f"copy_{msg_idx}", help="Copy"):
-        st.toast("Text Copied!", icon="✅")
-        st.code(response, language="text")
-with col2:
-    if st.button("👍", key=f"like_{msg_idx}", help="Like"):
-        st.toast("Thanks for liking!", icon="❤️")
-with col3:
-    if st.button("👎", key=f"dislike_{msg_idx}", help="Dislike"):
-        st.toast("We will improve!", icon="💔")
-with col4:
-    if st.button("🔗", key=f"share_{msg_idx}", help="Share"):
-        st.toast("Link Copied to share!", icon="🔗")
+# 6. Page Refresh (Taki naya message sahi jagah aaye)
+st.rerun()
     
     # ==================================================
     # 👆 NAYA CODE KHATAM 👆
