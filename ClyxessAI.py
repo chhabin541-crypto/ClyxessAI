@@ -12532,7 +12532,7 @@ else:
     system += "\n\n### RULES ###\n1. Clean answer do.\n2. Koi Sources/Links section mat add karo.\n3. Koi URL mat add karo.\n4. Reply in user's language.\n"
 
 with st.chat_message("assistant"):
-    # 1. Spinner Start
+    # 1. Spinner dikhao
     responding = st.empty()
     responding.markdown("""
         <div style='display:flex;align-items:center;gap:10px;color:#aaa'>
@@ -12545,8 +12545,8 @@ with st.chat_message("assistant"):
         @keyframes dotAnim{0%{content:''}25%{content:'.'}50%{content:'..'}75%{content:'...'}100%{content:''}}
         </style>
     """, unsafe_allow_html=True)
-
-    # 2. API Call (Aapka existing function)
+    
+    # 2. API Call
     completion, used_model = get_groq_response(client, st.session_state.messages, system, "")
     
     if completion is None:
@@ -12556,21 +12556,32 @@ with st.chat_message("assistant"):
         
     response_text = completion.choices[0].message.content
 
-    # 3. Spinner ko hatao (Yeh zaroori hai)
+    # 3. 👇 SABSE ZAROORI LINE: Spinner ko turant hatao (Isse "Clyxess is responding" gayab hoga) 👇
     responding.empty() 
 
-    # 4. Typing Animation
+    # 4. Ab Typing Animation shuru karo
     placeholder = st.empty()
     typed = ""
     for word in response_text.split(" "):
         typed += word + " "
         placeholder.markdown(typed + "▌")
-        time.sleep(0.01)
-    placeholder.markdown(response_text) # Final text yahan set hoga
+        time.sleep(0.02) # Speed thodi slow ki hai taaki smooth lage
+    placeholder.markdown(response_text) # Final text bina cursor ke
 
-    # ==========================================
-    # 5. BUTTONS (Ab yeh pakka Text ke niche aayenge)
-    # ==========================================
+    # 5. Sources aur Links (Agar hain toh)
+    show_links = want_youtube or want_news or (want_sources and sources)
+    if show_links:
+        with st.expander("🔗 Sources & Links", expanded=False):
+            if youtube_link:
+                st.markdown(f"**📺 YouTube:** [Watch video]({youtube_link})")
+            if google_news_link:
+                st.markdown(f"**📰 Google News:** [Read news]({google_news_link})")
+            if want_sources and sources:
+                st.markdown("---")
+                st.markdown("**🔗 Website Sources:**")
+                st.markdown(sources)
+
+    # 6. Buttons (Ab yeh typing pura hone ke BAAD dikhenge)
     st.markdown("""
         <style>
             div[data-testid="stButton"] button[kind="secondary"] {
@@ -12593,7 +12604,6 @@ with st.chat_message("assistant"):
     
     with col1:
         if st.button("📋", key=f"c_{msg_idx}"):
-            copy_text_to_clipboard(response_text) # Bina box dikhaye copy hoga
             st.toast("Copied!", icon="✅")
     with col2:
         if st.button("👍", key=f"l_{msg_idx}"):
@@ -12604,11 +12614,14 @@ with st.chat_message("assistant"):
     with col4:
         if st.button("🔗", key=f"sh_{msg_idx}"):
             st.toast("Shared!", icon="🔗")
+    
+    st.caption("🔒 Clyxess AI | Secure • Fast • Private")
 
-# 5. Message ko history mein save karo
+# ==========================================
+# YEH CHAT BLOCK KE BAHAR HAI (Bilkul Left Side)
+# ==========================================
 st.session_state.messages.append({"role": "assistant", "content": response_text})
-
-# 6. Page Refresh (Taki naya message sahi jagah aaye)
+save_current_chat_cloud()
 st.rerun()
     
     # ==================================================
