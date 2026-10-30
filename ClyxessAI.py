@@ -12617,7 +12617,7 @@ st.rerun()
 
 # ========= CONDITIONAL SOURCES =========
 show_links = want_youtube or want_news or (want_sources and sources)
-    if show_links:
+if show_links:
         with st.expander("🔗 Sources & Links", expanded=False):
             if youtube_link:
                 st.markdown(f"**📺 YouTube:** [Watch video]({youtube_link})")
