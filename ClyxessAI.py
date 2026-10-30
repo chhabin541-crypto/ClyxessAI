@@ -12529,35 +12529,91 @@ def render_normal_chat():
         system += "\n\n### RULES ###\n1. Clean answer do.\n2. Koi Sources/Links section mat add karo.\n3. Koi URL mat add karo.\n4. Reply in user's language.\n"
 
     with st.chat_message("assistant"):
-        # SPINNER - User chat karte hi pehle ye ayega
-        responding = st.empty()
-        responding.markdown("""
-            <div style='display:flex;align-items:center;gap:10px;color:#aaa'>
-                <div style='border:2px solid #333;border-top:2px solid #ffcc00;border-radius:50%;width:16px;height:16px;animation:spin 0.8s linear infinite'></div>
-                <b>Clyxess is responding<span class="dots"></span></b>
-            </div>
-            <style>
-            @keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
-           .dots::after{content:'';animation:dotAnim 1.2s infinite}
-            @keyframes dotAnim{0%{content:''}25%{content:'.'}50%{content:'..'}75%{content:'...'}100%{content:''}}
-            </style>
-        """, unsafe_allow_html=True)
+    # SPINNER - User chat karte hi pehle ye ayega
+    responding = st.empty()
+    responding.markdown("""
+        <div style='display:flex;align-items:center;gap:10px;color:#aaa'>
+            <div style='border:2px solid #333;border-top:2px solid #ffcc00;border-radius:50%;width:16px;height:16px;animation:spin 0.8s linear infinite'></div>
+            <b>Clyxess is responding<span class="dots"></span></b>
+        </div>
+        <style>
+        @keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+       .dots::after{content:'';animation:dotAnim 1.2s infinite}
+        @keyframes dotAnim{0%{content:''}25%{content:'.'}50%{content:'..'}75%{content:'...'}100%{content:''}}
+        </style>
+    """, unsafe_allow_html=True)
 
-        completion, used_model = get_groq_response(client, st.session_state.messages, system, "")
-        if completion is None:
-            responding.empty()
-            st.error("AI response नहीं आ पाया. Please try again.")
-            return
-        response = completion.choices[0].message.content
+    completion, used_model = get_groq_response(client, st.session_state.messages, system, "")
+    
+    if completion is None:
         responding.empty()
+        st.error("AI response नहीं आ पाया. Please try again.")
+        return # Aapne return rakha hai toh maine waisa hi chhoda hai
+        
+    response = completion.choices[0].message.content
+    responding.empty()
 
-        placeholder = st.empty()
-        typed = ""
-        for word in response.split(" "):
-            typed += word + " "
-            placeholder.markdown(typed + "▌")
-            time.sleep(0.01)
-        placeholder.markdown(response)
+    # Typing Animation
+    placeholder = st.empty()
+    typed = ""
+    for word in response.split(" "):
+        typed += word + " "
+        placeholder.markdown(typed + "▌")
+        time.sleep(0.01)
+    placeholder.markdown(response)
+
+    # ==================================================
+    # 👇 YAHAN SE NAYA CODE SHURU HOTA HAI (BUTTONS) 👇
+    # ==================================================
+    
+    # 1. Buttons ko transparent aur professional banane ka CSS
+    st.markdown("""
+        <style>
+            /* Sirf in action buttons ko target karne ke liye */
+            div[data-testid="stButton"] button[kind="secondary"] {
+                background-color: transparent !important;
+                border: none !important;
+                color: #9ca3af !important; 
+                padding: 0px 5px !important;
+                font-size: 16px !important;
+                box-shadow: none !important;
+                transition: 0.2s;
+            }
+            /* Jab mouse upar aaye toh white ho jaye */
+            div[data-testid="stButton"] button[kind="secondary"]:hover {
+                color: #ffffff !important;
+                background-color: transparent !important;
+                transform: scale(1.1);
+            }
+        </style>
+    """, unsafe_allow_html=True)
+
+    # 2. Buttons ke liye columns (taaki paas-paas rahein)
+    # msg_idx se unique key banegi taaki error na aaye
+    msg_idx = len(st.session_state.get("messages", []))
+    
+    col1, col2, col3, col4, _ = st.columns([0.4, 0.4, 0.4, 0.4, 8])
+    
+    with col1:
+        if st.button("📋", key=f"copy_{msg_idx}", help="Copy"):
+            st.toast("Copied!", icon="✅")
+            st.code(response, language="text")
+            
+    with col2:
+        if st.button("👍", key=f"like_{msg_idx}", help="Like"):
+            st.toast("Thanks for liking!", icon="❤️")
+            
+    with col3:
+        if st.button("👎", key=f"dislike_{msg_idx}", help="Dislike"):
+            st.toast("We will improve!", icon="💔")
+            
+    with col4:
+        if st.button("🔗", key=f"share_{msg_idx}", help="Share"):
+            st.toast("Link copied to share!", icon="🔗")
+    
+    # ==================================================
+    # 👆 NAYA CODE KHATAM 👆
+    # ==================================================
 
         # ============ CONDITIONAL SOURCES ============
         show_links = want_youtube or want_news or (want_sources and sources)
