@@ -12521,133 +12521,61 @@ def render_normal_chat():
 3. Source URLs markdown format mein: [Source Name](URL)
 4. Agar LIVE WEB INFO khali hai toh bolo: "Confirmed info nahi mila."
 5. Kuch bhi invent mat karo.
-6. Reply in user's language. 
-""" 
-system = "You are Clyxess AI, a helpful and smart assistant."
-search_context = ""
-    
-if search_context:
-    system += "\n\n=== LIVE WEB INFO ===\n" + search_context + "\n=== END ===\n"
-else:
-    system += "\n\n### RULES ###\n1. Clean answer do.\n2. Koi Sources/Links section mat add karo.\n3. Koi URL mat add karo.\n4. Reply in user's language.\n"
+6. Reply in user's language.
+"""
+        if search_context:
+            system += "\n\n=== LIVE WEB INFO ===\n" + search_context + "\n=== END ===\n"
+    else:
+        system += "\n\n### RULES ###\n1. Clean answer do.\n2. Koi Sources/Links section mat add karo.\n3. Koi URL mat add karo.\n4. Reply in user's language.\n"
 
-with st.chat_message("assistant"):
-    # 1. Spinner dikhao
-    responding = st.empty()
-    responding.markdown("""
-        <div style='display:flex;align-items:center;gap:10px;color:#aaa'>
-            <div style='border:2px solid #333;border-top:2px solid #ffcc00;border-radius:50%;width:16px;height:16px;animation:spin 0.8s linear infinite'></div>
-            <b>Clyxess is responding<span class="dots"></span></b>
-        </div>
-        <style>
-        @keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
-       .dots::after{content:'';animation:dotAnim 1.2s infinite}
-        @keyframes dotAnim{0%{content:''}25%{content:'.'}50%{content:'..'}75%{content:'...'}100%{content:''}}
-        </style>
-    """, unsafe_allow_html=True)
-    
-    # 2. API Call
-    completion, used_model = get_groq_response(client, st.session_state.messages, system, "")
-    
-    if completion is None:
+    with st.chat_message("assistant"):
+        # SPINNER - User chat karte hi pehle ye ayega
+        responding = st.empty()
+        responding.markdown("""
+            <div style='display:flex;align-items:center;gap:10px;color:#aaa'>
+                <div style='border:2px solid #333;border-top:2px solid #ffcc00;border-radius:50%;width:16px;height:16px;animation:spin 0.8s linear infinite'></div>
+                <b>Clyxess is responding<span class="dots"></span></b>
+            </div>
+            <style>
+            @keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+           .dots::after{content:'';animation:dotAnim 1.2s infinite}
+            @keyframes dotAnim{0%{content:''}25%{content:'.'}50%{content:'..'}75%{content:'...'}100%{content:''}}
+            </style>
+        """, unsafe_allow_html=True)
+
+        completion, used_model = get_groq_response(client, st.session_state.messages, system, "")
+        if completion is None:
+            responding.empty()
+            st.error("AI response नहीं आ पाया. Please try again.")
+            return
+        response = completion.choices[0].message.content
         responding.empty()
-        st.error("AI response नहीं आ पाया. Please try again.")
-        st.stop()
-        
-    response_text = completion.choices[0].message.content
 
-    # 3. 👇 SABSE ZAROORI LINE: Spinner ko turant hatao (Isse "Clyxess is responding" gayab hoga) 👇
-    responding.empty() 
+        placeholder = st.empty()
+        typed = ""
+        for word in response.split(" "):
+            typed += word + " "
+            placeholder.markdown(typed + "▌")
+            time.sleep(0.01)
+        placeholder.markdown(response)
 
-    # 4. Ab Typing Animation shuru karo
-    placeholder = st.empty()
-    typed = ""
-    for word in response_text.split(" "):
-        typed += word + " "
-        placeholder.markdown(typed + "▌")
-        time.sleep(0.02) # Speed thodi slow ki hai taaki smooth lage
-    placeholder.markdown(response_text) # Final text bina cursor ke
+        # ============ CONDITIONAL SOURCES ============
+        show_links = want_youtube or want_news or (want_sources and sources)
+        if show_links:
+            with st.expander("🔗 Sources & Links", expanded=False):
+                if youtube_link:
+                    st.markdown(f"**📺 YouTube:** [Watch video]({youtube_link})")
+                if google_news_link:
+                    st.markdown(f"**📰 Google News:** [Read news]({google_news_link})")
+                if want_sources and sources:
+                    st.markdown("---")
+                    st.markdown("**📎 Website Sources:**")
+                    st.markdown(sources)
 
-    # 5. Sources aur Links (Agar hain toh)
-    show_links = want_youtube or want_news or (want_sources and sources)
-    if show_links:
-        with st.expander("🔗 Sources & Links", expanded=False):
-            if youtube_link:
-                st.markdown(f"**📺 YouTube:** [Watch video]({youtube_link})")
-            if google_news_link:
-                st.markdown(f"**📰 Google News:** [Read news]({google_news_link})")
-            if want_sources and sources:
-                st.markdown("---")
-                st.markdown("**🔗 Website Sources:**")
-                st.markdown(sources)
-
-    # 6. Buttons (Ab yeh typing pura hone ke BAAD dikhenge)
-    st.markdown("""
-        <style>
-            div[data-testid="stButton"] button[kind="secondary"] {
-                background-color: transparent !important;
-                border: none !important;
-                color: #9ca3af !important; 
-                padding: 0px 5px !important;
-                font-size: 16px !important;
-                box-shadow: none !important;
-            }
-            div[data-testid="stButton"] button[kind="secondary"]:hover {
-                color: #ffffff !important;
-                transform: scale(1.1);
-            }
-        </style>
-    """, unsafe_allow_html=True)
-
-    msg_idx = len(st.session_state.messages)
-    col1, col2, col3, col4, _ = st.columns([0.4, 0.4, 0.4, 0.4, 8])
-    
-    with col1:
-        if st.button("📋", key=f"c_{msg_idx}"):
-            st.toast("Copied!", icon="✅")
-    with col2:
-        if st.button("👍", key=f"l_{msg_idx}"):
-            st.toast("Liked!", icon="❤️")
-    with col3:
-        if st.button("👎", key=f"d_{msg_idx}"):
-            st.toast("Disliked!", icon="💔")
-    with col4:
-        if st.button("🔗", key=f"sh_{msg_idx}"):
-            st.toast("Shared!", icon="🔗")
-    
-    st.caption("🔒 Clyxess AI | Secure • Fast • Private")
-
-# ==========================================
-# YEH CHAT BLOCK KE BAHAR HAI (Bilkul Left Side)
-# ==========================================
-st.session_state.messages.append({"role": "assistant", "content": response_text})
-save_current_chat_cloud()
-st.rerun()
-    
-    # ==================================================
-    # 👆 NAYA CODE KHATAM 👆
-    # ==================================================
-
-# ========= CONDITIONAL SOURCES =========
-show_links = want_youtube or want_news or (want_sources and sources)
-if show_links:
-        with st.expander("🔗 Sources & Links", expanded=False):
-            if youtube_link:
-                st.markdown(f"**📺 YouTube:** [Watch video]({youtube_link})")
-            if google_news_link:
-                st.markdown(f"**📰 Google News:** [Read news]({google_news_link})")
-            if want_sources and sources:
-                st.markdown("---")
-                st.markdown("**🔗 Website Sources:**")
-                st.markdown(sources)
-
-st.caption("🔒 Clyxess AI | Secure • Fast • Private")
-    
-# 👇 YAHAN SE CHAT BLOCK BAHAR HOTA HAI (Space kam ho jayega) 👇
-st.session_state.messages.append({"role": "assistant", "content": response_text})
-save_current_chat_cloud()
-
-st.rerun()
+        st.caption("🔒 Clyxess AI | Secure • Fast • Private")
+        st.session_state.messages.append({"role": "assistant", "content": response})
+        save_current_chat_cloud()
+        st.rerun()
 
 def render_school_chat():
     st.title("🚀 Creative Lab — School Mode")
