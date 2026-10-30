@@ -12529,9 +12529,9 @@ def render_normal_chat():
         system += "\n\n### RULES ###\n1. Clean answer do.\n2. Koi Sources/Links section mat add karo.\n3. Koi URL mat add karo.\n4. Reply in user's language.\n"
 
     with st.chat_message("assistant"):
-         # SPINNER - User chat karte hi pehle ye ayega
-         responding = st.empty()
-         responding.markdown("""
+        # SPINNER - User chat karte hi pehle ye ayega
+        responding = st.empty()
+        responding.markdown("""
             <div style='display:flex;align-items:center;gap:10px;color:#aaa'>
                 <div style='border:2px solid #333;border-top:2px solid #ffcc00;border-radius:50%;width:16px;height:16px;animation:spin 0.8s linear infinite'></div>
                 <b>Clyxess is responding<span class="dots"></span></b>
