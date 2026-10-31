@@ -2448,26 +2448,24 @@ def render_login_signup():
     import datetime
     import urllib.parse
     import webbrowser
+    import time 
 
     if not supabase:
         st.warning("Add SUPABASE_URL and SUPABASE_KEY to Streamlit secrets.")
         st.stop()
 
-    # 🚨 APNE INSTAMOJO LINKS YAHAN DAALEIN 🚨
-    INSTAMOJO_MONTHLY_LINK = "https://imjo.in/MonthlyLinkHere"
-    INSTAMOJO_YEARLY_LINK = "https://imjo.in/YearlyLinkHere" 
+    # 🚨 1. APNE INSTAMOJO LINKS YAHAN DAALEIN 🚨
+    # Instamojo par link banate waqt Redirect URL mein ?plan=monthly&status=success lagana
+    INSTAMOJO_MONTHLY_LINK = "https://imjo.in/AapkaMonthlyLinkYahan" 
+    INSTAMOJO_YEARLY_LINK = "https://imjo.in/AapkaYearlyLinkYahan"   
 
-    # 🎨 PREMIUM CSS (Hover Effects + Footer)
+    # 🎨 PREMIUM CSS
     st.markdown("""
     <style>
         @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css');
-        
         .stApp { background: radial-gradient(circle at top right, #1e1b4b 0%, #050814 50%) !important; }
         header {visibility: hidden;} footer {visibility: hidden;}
-        
-        /* 🛑 HIDE SIDEBAR UNTIL LOGIN + PLAN */
         [data-testid="stSidebar"] { display: none !important; }
-
         .block-container { max-width: 1000px !important; padding-top: 2rem !important; }
         .stTextInput input {
             background-color: #0b0e17 !important; color: white !important;
@@ -2478,7 +2476,6 @@ def render_login_signup():
         .divider::before, .divider::after { content: ''; flex: 1; border-bottom: 1px solid #1c2538; }
         .divider::before { margin-right: 15px; } .divider::after { margin-left: 15px; }
         
-        /* Buttons */
         .stButton button { width: 100% !important; border-radius: 10px !important; font-weight: 600 !important; padding: 10px !important; }
         div[data-testid="stButton"]:has(div:contains("Log In")) button,
         div[data-testid="stButton"]:has(div:contains("Create Account")) button {
@@ -2486,72 +2483,28 @@ def render_login_signup():
             color: white !important; border: none !important;
         }
         
-        /* Social Buttons */
-        .social-btn {
-            display: flex; align-items: center; justify-content: center;
-            width: 100%; padding: 10px; border-radius: 10px; font-weight: 600; font-size: 14px; text-decoration: none;
-            margin-bottom: 10px; transition: 0.3s;
-        }
+        .social-btn { display: flex; align-items: center; justify-content: center; width: 100%; padding: 10px; border-radius: 10px; font-weight: 600; font-size: 14px; text-decoration: none; margin-bottom: 10px; transition: 0.3s; }
         .social-btn img { width: 20px; height: 20px; margin-right: 10px; }
         .google-btn { background-color: #ffffff; color: #000000; border: 1px solid #ddd; }
         .google-btn:hover { background-color: #f3f4f6; color: #000; }
         .facebook-btn { background-color: #1877F2; color: #ffffff; border: none; }
         .facebook-btn:hover { background-color: #166fe5; color: #fff; }
 
-        /* =========================================
-           PREMIUM PLAN CARDS (Hover + Floating)
-           ========================================= */
-        .pricing-card {
-            background: #111827; border-radius: 20px; padding: 30px; 
-            border: 1px solid #1f2937; text-align: left; position: relative;
-            height: 100%; display: flex; flex-direction: column; justify-content: space-between;
-            transition: all 0.3s ease-in-out; cursor: pointer;
-        }
-        
-        .pricing-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
-        }
-
+        .pricing-card { background: #111827; border-radius: 20px; padding: 30px; border: 1px solid #1f2937; text-align: left; position: relative; height: 100%; display: flex; flex-direction: column; justify-content: space-between; transition: all 0.3s ease-in-out; cursor: pointer; }
+        .pricing-card:hover { transform: translateY(-10px); box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
         .card-free { border-top: 4px solid #3b82f6; }
-        .card-free:hover { background: #1e293b; border-color: #60a5fa; box-shadow: 0 15px 30px rgba(59, 130, 246, 0.3); }
-        
         .card-monthly { border-top: 4px solid #8b5cf6; border: 1px solid #8b5cf6; box-shadow: 0 0 30px rgba(139, 92, 246, 0.15); background: #15132b; }
-        .card-monthly:hover { background: #1e1a3d; border-color: #a78bfa; box-shadow: 0 15px 40px rgba(139, 92, 246, 0.5); }
-        
         .card-yearly { border-top: 4px solid #f59e0b; }
-        .card-yearly:hover { background: #1e293b; border-color: #fbbf24; box-shadow: 0 15px 30px rgba(245, 158, 11, 0.3); }
-
         .card-title { color: white; font-size: 22px; font-weight: 700; margin-bottom: 5px; }
         .card-price { color: white; font-size: 42px; font-weight: 800; margin: 15px 0 5px 0; }
         .card-price span { font-size: 14px; color: #9ca3af; font-weight: 400; }
-        
         .badge-popular { position: absolute; top: -14px; right: 20px; background: #8b5cf6; color: white; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; }
         .badge-save { position: absolute; top: -14px; right: 20px; background: #f59e0b; color: white; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; }
-
         .feature-list { list-style: none; padding: 0; margin: 20px 0; color: #d1d5db; font-size: 13.5px; line-height: 1.6; }
         .feature-list li { margin-bottom: 10px; display: flex; align-items: flex-start; gap: 10px; }
         .feature-list li::before { content: "✔"; color: #10b981; font-weight: bold; font-size: 14px; margin-top: 2px; }
         .feature-list .highlight { color: white; font-weight: 600; }
 
-        /* Button Overrides */
-        div[data-testid="stButton"]:has(div:contains("Start Free Trial")) button { background-color: transparent !important; color: #3b82f6 !important; border: 1px solid #3b82f6 !important; }
-        div[data-testid="stButton"]:has(div:contains("Start Free Trial")) button:hover { background-color: #3b82f6 !important; color: white !important; }
-        
-        div[data-testid="stButton"]:has(div:contains("Buy Monthly")) button { background-color: #8b5cf6 !important; color: white !important; border: none !important; }
-        div[data-testid="stButton"]:has(div:contains("Buy Monthly")) button:hover { background-color: #7c3aed !important; box-shadow: 0 4px 15px rgba(139, 92, 246, 0.5) !important; }
-        
-        div[data-testid="stButton"]:has(div:contains("Buy Yearly")) button { background-color: #f59e0b !important; color: white !important; border: none !important; }
-        div[data-testid="stButton"]:has(div:contains("Buy Yearly")) button:hover { background-color: #d97706 !important; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.5) !important; }
-        
-        div[data-testid="stButton"]:has(div:contains("Paid Monthly")) button,
-        div[data-testid="stButton"]:has(div:contains("Paid Yearly")) button { background-color: #1f2937 !important; color: #9ca3af !important; border: 1px solid #374151 !important; font-size: 12px !important; margin-top: 5px; }
-        div[data-testid="stButton"]:has(div:contains("Paid Monthly")) button:hover,
-        div[data-testid="stButton"]:has(div:contains("Paid Yearly")) button:hover { background-color: #374151 !important; color: white !important; }
-
-        /* =========================================
-           PROFESSIONAL FOOTER
-           ========================================= */
         .footer-pro { text-align: center; margin-top: 60px; padding-top: 30px; border-top: 1px solid #1f2937; color: #9ca3af; font-size: 14px; }
         .footer-pro .contact-info { display: flex; justify-content: center; gap: 30px; margin-bottom: 20px; flex-wrap: wrap; }
         .footer-pro .contact-info div { display: flex; align-items: center; gap: 8px; }
@@ -2563,34 +2516,78 @@ def render_login_signup():
     </style>
     """, unsafe_allow_html=True)
 
-    # 🪄 URL Token Catcher
+    # 🪄 URL Token Cleaner (Email verify fix)
     components.html("""
         <script>
             var hash = window.location.hash;
-            if (hash) {
-                var params = new URLSearchParams(hash.substring(1));
-                var accessToken = params.get('access_token');
-                if (accessToken) {
-                    var newUrl = window.location.origin + window.location.pathname + '?access_token=' + accessToken;
-                    window.location.replace(newUrl);
-                }
+            if (hash && hash.includes('access_token')) {
+                window.history.replaceState(null, null, window.location.pathname + window.location.search);
             }
         </script>
     """, height=0)
 
+    # ==========================================
+    # 🛑 1. EMAIL VERIFICATION LOGIC
+    # ==========================================
     if "access_token" in st.query_params:
         try:
             access_token = urllib.parse.unquote(st.query_params["access_token"])
             supabase.auth.set_session(access_token, "")
-            st.session_state.user_email = supabase.auth.get_user(access_token).user.email
-            st.session_state.logged_in = True
+            user = supabase.auth.get_user(access_token)
+            if user and user.user:
+                st.session_state.user_email = user.user.email
+                st.session_state.logged_in = True
+                st.query_params.clear()
+                st.rerun()
+        except Exception:
             st.query_params.clear()
-            st.rerun()
-        except Exception as e:
-            st.error(f"Auth Error: {e}")
 
     # ==========================================
-    # 🛑 1. LOGIN / SIGNUP UI
+    # 🛑 2. PAYMENT SUCCESS LOGIC (Instamojo Redirect)
+    # ==========================================
+    if "status" in st.query_params and st.query_params["status"] == "success":
+        if st.session_state.get("logged_in", False):
+            try:
+                # Supabase se current logged-in user nikaalein
+                user_data = supabase.auth.get_user()
+                user_email = user_data.user.email
+                user_id = user_data.user.id
+                
+                # URL se plan type nikaalein (monthly ya yearly)
+                plan_type = st.query_params.get("plan", "monthly")
+                
+                # Din calculate karein
+                days = 30 if plan_type == "monthly" else 365
+                expiry = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(days=days)
+                
+                # Database Update karein
+                supabase.table("user_subscriptions").upsert({
+                    "id": user_id, 
+                    "email": user_email, 
+                    "plan_type": plan_type, 
+                    "expiry_date": expiry.isoformat(), 
+                    "is_paid": True
+                }).execute()
+                
+                # URL clear karein
+                st.query_params.clear()
+                
+                # SUCCESS SCREEN
+                st.balloons()
+                st.success(f"🎉 Payment Successful! Welcome to Clyxess AI.")
+                st.markdown(f"### Aapka **{plan_type.capitalize()} Plan** activate ho gaya hai.")
+                st.info(f"Plan valid till: {expiry.strftime('%d %b %Y')}")
+                
+                if st.button("Go to Dashboard 🚀", type="primary", use_container_width=True):
+                    st.rerun()
+                st.stop()
+                
+            except Exception as e:
+                st.error(f"Payment verification error: {e}")
+                st.query_params.clear()
+
+    # ==========================================
+    # 🛑 3. LOGIN / SIGNUP UI
     # ==========================================
     if not st.session_state.get("logged_in", False):
         st.markdown("""
@@ -2624,9 +2621,6 @@ def render_login_signup():
 
         tab1,tab2=st.tabs(["Log In","Sign Up"])
         
-        # ==========================================
-        # ✅ TAB 1: LOGIN (FIXED LOGIC)
-        # ==========================================
         with tab1:
             email=st.text_input("Email",key="login_email", placeholder="Enter your email", label_visibility="collapsed")
             password=st.text_input("Password",type="password",key="login_password", placeholder="Enter password", label_visibility="collapsed")
@@ -2644,7 +2638,7 @@ def render_login_signup():
                             st.rerun()
                         except Exception as e:
                             if "Email not confirmed" in str(e):
-                                st.error("⚠️ Email verify nahi hui hai! Please apna email inbox check karein aur link par click karein.")
+                                st.error("⚠️ Email verify nahi hui hai! Inbox check karein.")
                             else:
                                 st.error(f"Login failed: {e}")
             
@@ -2656,9 +2650,6 @@ def render_login_signup():
                         st.success("✅ Password reset link sent!")
                     except Exception as e: st.error(f"Error: {e}")
 
-        # ==========================================
-        # ✅ TAB 2: SIGN UP (FIXED LOGIC)
-        # ==========================================
         with tab2:
             name=st.text_input("Name",key="signup_name", placeholder="Your Name", label_visibility="collapsed")
             email=st.text_input("Email",key="signup_email", placeholder="Enter your email", label_visibility="collapsed")
@@ -2673,13 +2664,11 @@ def render_login_signup():
                             clean_email = email.strip().lower()
                             supabase.auth.sign_up({"email": clean_email, "password": password, "options": {"data": {"name": name}}})
                             st.success("✅ Account created successfully!")
-                            st.info("📧 Aapke email par ek verification link bheja gaya hai. Kripya usko click karein. Verify karne ke baad aap Log In kar sakte hain.")
+                            st.info("📧 Email par verification link bheja gaya hai. Kripya usko click karein.")
                         except Exception as e: 
                             st.error(f"Sign up failed: {e}")
-                
-        # ==========================================
-        # 👇 LOGIN FOOTER
-        # ==========================================
+
+        # Footer (Aapka purana wala)
         st.markdown("""
         <div class="footer-pro">
             <div class="contact-info">
@@ -2705,34 +2694,38 @@ def render_login_signup():
         </div>
         """, unsafe_allow_html=True)
                 
-        st.stop() # 🛑 Login ke bina aage nahi jayega
+        st.stop() 
 
     # ==========================================
-    # 📧 DATABASE LOGIC (PLAN SELECTION GATE)
+    # 🛑 4. DATABASE CHECK & AUTO-LOCK LOGIC
     # ==========================================
     user_email = st.session_state.get("user_email", "")
     user_id = supabase.auth.get_user().user.id
     
-    # DB se data fetch karo
     res = supabase.table("user_subscriptions").select("*").eq("id", user_id).execute()
     
     show_plan_screen = False
+    trial_used = False
+    is_expired = False
     
     if len(res.data) == 0:
-        show_plan_screen = True # Naya user, show plans
+        show_plan_screen = True 
     else:
+        trial_used = True # User ne pehle kabhi koi plan liya hai (Free ya Paid)
         sub_data = res.data[0]
         expiry_str = sub_data["expiry_date"]
         
         if expiry_str:
             expiry_date = datetime.datetime.fromisoformat(expiry_str.replace('Z', '+00:00'))
             now = datetime.datetime.now(datetime.timezone.utc)
+            
             if expiry_date <= now:
-                show_plan_screen = True # Plan expired, show plans
+                show_plan_screen = True 
+                is_expired = True 
             else:
-                show_plan_screen = False # Active plan
+                show_plan_screen = False 
                 
-                # Sidebar Status Box
+                # Sidebar Status (Agar Dashboard khula hai)
                 plan_type = sub_data["plan_type"]
                 plan_name = "Free Trial" if plan_type == "free" else ("Monthly Plan" if plan_type == "monthly" else "Yearly Plan")
                 color = "#3b82f6" if plan_type == "free" else ("#8b5cf6" if plan_type == "monthly" else "#f59e0b")
@@ -2753,19 +2746,24 @@ def render_login_signup():
                 """, unsafe_allow_html=True)
 
     # ==========================================
-    # 🛑 2. PLAN SELECTION SCREEN
+    # 🛑 5. PLAN SELECTION SCREEN (Auto-Lock ya Naya User)
     # ==========================================
     if show_plan_screen:
+        
+        # Agar expired hai, toh warning dikhao
+        if is_expired:
+            st.warning("⚠️ Aapka plan expire ho gaya hai. Please koi naya plan kharidein.")
+            
         st.markdown("""
         <div style="text-align: center; margin-top: 1rem; margin-bottom: 2rem;">
             <h1 style="color: white; font-size: 34px; font-weight: 800;">Choose Your Plan</h1>
-            <p style="color: #9ca3af; font-size: 15px;">Learn future with Clyxess AI select a plan to unlock all features for better education.</p>
+            <p style="color: #9ca3af; font-size: 15px;">Unlock all features to continue learning.</p>
         </div>
         """, unsafe_allow_html=True)
 
         col1, col2, col3 = st.columns(3, gap="medium")
         
-        # ================= FREE TRIAL =================
+        # --- FREE TRIAL ---
         with col1:
             st.markdown("""
             <div class="pricing-card card-free">
@@ -2776,21 +2774,25 @@ def render_login_signup():
                         <li class="highlight">All Features for 1 Day</li>
                         <li>Access to all AI Labs & Tools</li>
                         <li>AI Homework & Test Generator</li>
-                        <li>Language & Cyber Security Labs</li>
-                        <li>Basic Customer Support</li>
-                        <li>No Credit Card Required</li>
                     </ul>
                 </div>
             </div>
             """, unsafe_allow_html=True)
-            if st.button("Start Free Trial", use_container_width=True, key="btn_free"):
-                expiry = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(hours=24)
-                supabase.table("user_subscriptions").insert({
-                    "id": user_id, "email": user_email, "plan_type": "free", "expiry_date": expiry.isoformat(), "is_paid": False
-                }).execute()
-                st.rerun()
+            
+            # Sirf tabhi dikhao jab user ne kabhi koi plan na liya ho
+            if not trial_used:
+                if st.button("Start Free Trial", use_container_width=True, key="btn_free"):
+                    with st.spinner("Activating Trial..."):
+                        expiry = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(hours=24)
+                        supabase.table("user_subscriptions").insert({
+                            "id": user_id, "email": user_email, "plan_type": "free", "expiry_date": expiry.isoformat(), "is_paid": False
+                        }).execute()
+                        time.sleep(1)
+                    st.rerun()
+            else:
+                st.info("Aapne free trial pehle hi use kar liya hai.")
 
-        # ================= MONTHLY =================
+        # --- MONTHLY ---
         with col2:
             st.markdown("""
             <div class="pricing-card card-monthly">
@@ -2800,11 +2802,7 @@ def render_login_signup():
                     <div class="card-price">₹1499 <span>/ month</span></div>
                     <ul class="feature-list">
                         <li class="highlight">Unlimited Access to Everything</li>
-                        <li>Unlimited AI Chats & Explanations</li>
-                        <li>Priority AI Speed (Fast Responses)</li>
-                        <li>Advanced Parent Dashboard</li>
-                        <li>Export Projects & Reports</li>
-                        <li>24/7 Premium Support</li>
+                        <li>Priority AI Speed</li>
                     </ul>
                 </div>
             </div>
@@ -2812,16 +2810,9 @@ def render_login_signup():
             
             if st.button("Buy Monthly ₹1499", use_container_width=True, key="btn_m"):
                 webbrowser.open_new_tab(INSTAMOJO_MONTHLY_LINK)
-                
-            if st.button("✅ Paid Monthly", key="btn_pm"):
-                expiry = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(days=30)
-                if len(res.data) == 0:
-                    supabase.table("user_subscriptions").insert({"id": user_id, "email": user_email, "plan_type": "monthly", "expiry_date": expiry.isoformat(), "is_paid": True}).execute()
-                else:
-                    supabase.table("user_subscriptions").update({"plan_type": "monthly", "expiry_date": expiry.isoformat(), "is_paid": True}).eq("id", user_id).execute()
-                st.rerun()
+                st.info("Payment complete karein, uske baad page refresh hoga.")
 
-        # ================= YEARLY =================
+        # --- YEARLY ---
         with col3:
             st.markdown("""
             <div class="pricing-card card-yearly">
@@ -2831,11 +2822,7 @@ def render_login_signup():
                     <div class="card-price">₹1399 <span>/ month</span></div>
                     <ul class="feature-list">
                         <li class="highlight">Everything in Monthly</li>
-                        <li>Billed Annually (₹16,788/year)</li>
-                        <li>Highest Priority AI Processing</li>
-                        <li>Early Access to New Features</li>
-                        <li>Dedicated Account Manager</li>
-                        <li>Exclusive Beta Tools Access</li>
+                        <li>Billed Annually</li>
                     </ul>
                 </div>
             </div>
@@ -2843,58 +2830,18 @@ def render_login_signup():
           
             if st.button("Buy Yearly ₹1399", use_container_width=True, key="btn_y"):
                 webbrowser.open_new_tab(INSTAMOJO_YEARLY_LINK)
-                
-            if st.button("✅ Paid Yearly", key="btn_py"):
-                expiry = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(days=365)
-                if len(res.data) == 0:
-                    supabase.table("user_subscriptions").insert({"id": user_id, "email": user_email, "plan_type": "yearly", "expiry_date": expiry.isoformat(), "is_paid": True}).execute()
-                else:
-                    supabase.table("user_subscriptions").update({"plan_type": "yearly", "expiry_date": expiry.isoformat(), "is_paid": True}).eq("id", user_id).execute()
-                st.rerun()
+                st.info("Payment complete karein, uske baad page refresh hoga.")
 
-        # ==========================================
-        # 👇 SUBSCRIPTION FOOTER
-        # ==========================================
-        st.markdown("""
-        <div class="footer-pro">
-            <div class="contact-info">
-                <div><i class="fas fa-envelope"></i> <a href="mailto:infocarloxin24@gmail.com" style="color:#9ca3af; text-decoration:none;">infocarloxin24@gmail.com</a></div>
-                <div><i class="fas fa-phone"></i> +91 7647996793</div>
-                <div><i class="fas fa-map-marker-alt"></i> Raipur 493221, India</div>
-            </div> 
-            <div class="social-links">
-                <a href="https://www.instagram.com/clyxessai?utm_source=qr&exln=b2tpaWQ1dTU3OGI0" target="_blank"><i class="fab fa-instagram"></i></a>
-                <a href="https://x.com/NishadSingcz" target="_blank"><i class="fab fa-twitter"></i></a>
-                <a href="https://www.linkedin.com/in/nishad-singh-970958420?utm_source=share_via&utm_content=profile&utm_medium=member_android" target="_blank"><i class="fab fa-linkedin"></i></a>
-                <a href="https://youtube.com/@clyxess?si=3tbvHiHfHQwYCbA2" target="_blank"><i class="fab fa-youtube"></i></a>
-            </div>
-            <div style="margin-top: 15px; margin-bottom: 10px;">
-                <a href="https://chhabin541-crypto.github.io/ClyxessAI/" target="_blank" style="color: #8b5cf6; text-decoration: none; font-size: 12px; margin: 0 5px;">Privacy Policy</a> |
-                <a href="https://chhabin541-crypto.github.io/ClyxessAI/terms.html" target="_blank" style="color: #8b5cf6; text-decoration: none; font-size: 12px; margin: 0 5px;">Terms of Service</a> |
-                <a href="https://chhabin541-crypto.github.io/ClyxessAI/cookie-policy.html" target="_blank" style="color: #8b5cf6; text-decoration: none; font-size: 12px; margin: 0 5px;">Cookie Policy</a> 
-                <a href="https://chhabin541-crypto.github.io/ClyxessAI/refund-cancellation.html" target="_blank" style="color: #8b5cf6; text-decoration: none; font-size: 12px; margin: 0 5px;">Refund & Cancellation</a>
-            <div class="copyright">
-                &copy; 2026 Clyxess AI. All rights reserved.
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
-
-        st.stop() # 🛑 Plan select kiye bina aage nahi jayega.
+        st.stop() 
 
     # ==========================================
-    # ✅ DASHBOARD (IF PLAN ACTIVE)
+    # ✅ DASHBOARD
     # ==========================================
     
-    # 🛠️ TESTING BUTTON (Isko baad mein hata dena)
-    if st.sidebar.button("🛠️ [Testing] Reset My Plan", use_container_width=True, key="btn_reset_plan"):
-        supabase.table("user_subscriptions").delete().eq("id", user_id).execute()
-        st.rerun()
-
     if st.sidebar.button("🚪 Log Out", use_container_width=True, key="btn_logout"):
         st.session_state.clear()
         st.rerun()
 
-    # Features Menu
     st.sidebar.markdown("### 📚 Select Mode")
     mode = st.sidebar.radio("", ["Normal Chat", "Cyber Security", "Homework"])
     
