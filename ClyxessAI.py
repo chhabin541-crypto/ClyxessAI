@@ -2884,16 +2884,6 @@ def render_login_signup():
     st.sidebar.markdown("### 📚 Select Mode")
     mode = st.sidebar.radio("", ["Normal Chat", "Cyber Security", "Homework"])
     
-    # 👇 YAHAN APNE PURANE MODULES CALL KARO
-    if mode == "Normal Chat":
-        st.write("Welcome to Normal Chat...")
-        # render_normal_chat()
-    elif mode == "Cyber Security":
-        st.write("Welcome to Cyber Security...")
-        # render_cyber_security()
-    elif mode == "Homework":
-        st.write("Welcome to Homework...")
-        # render_homework_test()
 
 def render_image_generator():
     import streamlit as st
