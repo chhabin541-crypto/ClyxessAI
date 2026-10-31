@@ -2460,7 +2460,6 @@ def render_login_signup():
     # 🎨 PREMIUM CSS (Hover Effects + Footer)
     st.markdown("""
     <style>
-        /* 👇 Yahan Font Awesome 5 (Old Version) wapas laga diya hai taaki Bird icon dikhe */
         @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css');
         
         .stApp { background: radial-gradient(circle at top right, #1e1b4b 0%, #050814 50%) !important; }
@@ -2509,7 +2508,6 @@ def render_login_signup():
             transition: all 0.3s ease-in-out; cursor: pointer;
         }
         
-        /* Hawa Style Hover Effect */
         .pricing-card:hover {
             transform: translateY(-10px);
             box-shadow: 0 20px 40px rgba(0,0,0,0.5);
@@ -2626,18 +2624,29 @@ def render_login_signup():
 
         tab1,tab2=st.tabs(["Log In","Sign Up"])
         
+        # ==========================================
+        # ✅ TAB 1: LOGIN (FIXED LOGIC)
+        # ==========================================
         with tab1:
             email=st.text_input("Email",key="login_email", placeholder="Enter your email", label_visibility="collapsed")
             password=st.text_input("Password",type="password",key="login_password", placeholder="Enter password", label_visibility="collapsed")
             
             if st.button("Log In ➔", type="primary", use_container_width=True, key="btn_login"):
-                with st.spinner("Logging you in..."):
-                    try:
-                        supabase.auth.sign_in_with_password({"email":email,"password":password})
-                        st.session_state.user_email=email
-                        st.session_state.logged_in = True
-                        st.rerun()
-                    except Exception as e: st.error(f"Login failed: {e}")
+                if not email or not password:
+                    st.error("❌ Please enter both Email and Password.")
+                else:
+                    with st.spinner("Logging you in..."):
+                        try:
+                            clean_email = email.strip().lower()
+                            supabase.auth.sign_in_with_password({"email": clean_email, "password": password})
+                            st.session_state.user_email = clean_email
+                            st.session_state.logged_in = True
+                            st.rerun()
+                        except Exception as e:
+                            if "Email not confirmed" in str(e):
+                                st.error("⚠️ Email verify nahi hui hai! Please apna email inbox check karein aur link par click karein.")
+                            else:
+                                st.error(f"Login failed: {e}")
             
             with st.expander("Forgot Password?"):
                 reset_email = st.text_input("Enter your registered email", key="reset_email")
@@ -2647,20 +2656,29 @@ def render_login_signup():
                         st.success("✅ Password reset link sent!")
                     except Exception as e: st.error(f"Error: {e}")
 
+        # ==========================================
+        # ✅ TAB 2: SIGN UP (FIXED LOGIC)
+        # ==========================================
         with tab2:
             name=st.text_input("Name",key="signup_name", placeholder="Your Name", label_visibility="collapsed")
             email=st.text_input("Email",key="signup_email", placeholder="Enter your email", label_visibility="collapsed")
             password=st.text_input("Password",type="password",key="signup_password", placeholder="Create password", label_visibility="collapsed")
             
             if st.button("Create Account ➔", use_container_width=True, key="btn_signup"):
-                with st.spinner("Creating your account..."):
-                    try:
-                        supabase.auth.sign_up({"email":email,"password":password,"options":{"data":{"name":name}}})
-                        st.success("✅ Account created! Please Log In to continue.")
-                    except Exception as e: st.error(f"Sign up failed: {e}")
+                if not name or not email or not password:
+                    st.error("❌ Please fill all the fields.")
+                else:
+                    with st.spinner("Creating your account..."):
+                        try:
+                            clean_email = email.strip().lower()
+                            supabase.auth.sign_up({"email": clean_email, "password": password, "options": {"data": {"name": name}}})
+                            st.success("✅ Account created successfully!")
+                            st.info("📧 Aapke email par ek verification link bheja gaya hai. Kripya usko click karein. Verify karne ke baad aap Log In kar sakte hain.")
+                        except Exception as e: 
+                            st.error(f"Sign up failed: {e}")
                 
         # ==========================================
-        # 👇 YAHAN LOGIN FOOTER UPDATE HUA HAI (fa-twitter wapas)
+        # 👇 LOGIN FOOTER
         # ==========================================
         st.markdown("""
         <div class="footer-pro">
@@ -2671,7 +2689,6 @@ def render_login_signup():
             </div> 
             <div class="social-links">
                 <a href="https://www.instagram.com/clyxessai?utm_source=qr&exln=b2tpaWQ1dTU3OGI0" target="_blank"><i class="fab fa-instagram"></i></a>
-                <!-- Yahan wapas purana Twitter Bird aa gaya -->
                 <a href="https://x.com/NishadSingcz" target="_blank"><i class="fab fa-twitter"></i></a>
                 <a href="https://www.linkedin.com/in/nishad-singh-970958420?utm_source=share_via&utm_content=profile&utm_medium=member_android" target="_blank"><i class="fab fa-linkedin"></i></a>
                 <a href="https://youtube.com/@clyxess?si=3tbvHiHfHQwYCbA2" target="_blank"><i class="fab fa-youtube"></i></a>
@@ -2687,7 +2704,6 @@ def render_login_signup():
             </div>
         </div>
         """, unsafe_allow_html=True)
-        # ==========================================
                 
         st.stop() # 🛑 Login ke bina aage nahi jayega
 
@@ -2837,7 +2853,7 @@ def render_login_signup():
                 st.rerun()
 
         # ==========================================
-        # 👇 YAHAN SUBSCRIPTION FOOTER UPDATE HUA HAI (fa-twitter wapas)
+        # 👇 SUBSCRIPTION FOOTER
         # ==========================================
         st.markdown("""
         <div class="footer-pro">
@@ -2848,7 +2864,6 @@ def render_login_signup():
             </div> 
             <div class="social-links">
                 <a href="https://www.instagram.com/clyxessai?utm_source=qr&exln=b2tpaWQ1dTU3OGI0" target="_blank"><i class="fab fa-instagram"></i></a>
-                <!-- Yahan wapas purana Twitter Bird aa gaya -->
                 <a href="https://x.com/NishadSingcz" target="_blank"><i class="fab fa-twitter"></i></a>
                 <a href="https://www.linkedin.com/in/nishad-singh-970958420?utm_source=share_via&utm_content=profile&utm_medium=member_android" target="_blank"><i class="fab fa-linkedin"></i></a>
                 <a href="https://youtube.com/@clyxess?si=3tbvHiHfHQwYCbA2" target="_blank"><i class="fab fa-youtube"></i></a>
@@ -2863,7 +2878,6 @@ def render_login_signup():
             </div>
         </div>
         """, unsafe_allow_html=True)
-        # ==========================================
 
         st.stop() # 🛑 Plan select kiye bina aage nahi jayega.
 
