@@ -2454,9 +2454,10 @@ def render_login_signup():
         st.warning("Add SUPABASE_URL and SUPABASE_KEY to Streamlit secrets.")
         st.stop()
 
-    # 🚨 1. APNE INSTAMOJO LINKS YAHAN DAALEIN 🚨
-    INSTAMOJO_MONTHLY_LINK = "https://imjo.in/AapkaMonthlyLinkYahan" 
-    INSTAMOJO_YEARLY_LINK = "https://imjo.in/AapkaYearlyLinkYahan"   
+    # 🚨 1. APNE RAZORPAY LINKS YAHAN DAALEIN 🚨
+    # (Abhi dono jagah ek hi link daala hai, Yearly ka link aane par wo badal lena)
+    RAZORPAY_MONTHLY_LINK = "https://rzp.io/rzp/nNI2b7Qd" 
+    RAZORPAY_YEARLY_LINK = "https://rzp.io/rzp/nNI2b7Qd"   
 
     # 🎨 PREMIUM CSS (Compact & Professional)
     st.markdown("""
@@ -2466,7 +2467,6 @@ def render_login_signup():
         header {visibility: hidden;} footer {visibility: hidden;}
         [data-testid="stSidebar"] { display: none !important; }
         
-        /* Login page ko beech mein aur chhota karne ke liye */
         .block-container { max-width: 1100px !important; padding-top: 2rem !important; }
         
         .stTextInput input {
@@ -2547,7 +2547,7 @@ def render_login_signup():
             st.query_params.clear()
 
     # ==========================================
-    # 🛑 2. PAYMENT SUCCESS LOGIC
+    # 🛑 2. PAYMENT SUCCESS LOGIC (Razorpay Redirect)
     # ==========================================
     if "status" in st.query_params and st.query_params["status"] == "success":
         if st.session_state.get("logged_in", False):
@@ -2582,7 +2582,6 @@ def render_login_signup():
     # ==========================================
     if not st.session_state.get("logged_in", False):
         
-        # Screen ko 3 columns mein baanta, beech wala column login ke liye
         _, center_col, _ = st.columns([1, 1.2, 1])
         
         with center_col:
@@ -2617,7 +2616,6 @@ def render_login_signup():
 
             tab1,tab2=st.tabs(["Log In","Sign Up"])
             
-            # 👇 FORM FIX FOR LOGIN 👇
             with tab1:
                 with st.form("login_form"):
                     email = st.text_input("Email", key="login_email", placeholder="Enter your email", label_visibility="collapsed")
@@ -2650,7 +2648,6 @@ def render_login_signup():
                             st.success("✅ Password reset link sent!")
                         except Exception as e: st.error(f"Error: {e}")
 
-            # 👇 FORM FIX FOR SIGNUP 👇
             with tab2:
                 with st.form("signup_form"):
                     name = st.text_input("Name", key="signup_name", placeholder="Your Name", label_visibility="collapsed")
@@ -2672,7 +2669,6 @@ def render_login_signup():
                                 except Exception as e: 
                                     st.error(f"Sign up failed: {e}")
 
-        # Footer (Centered)
         st.markdown("""
         <div class="footer-pro">
             <div class="contact-info">
@@ -2765,6 +2761,7 @@ def render_login_signup():
 
         col1, col2, col3 = st.columns(3, gap="medium")
         
+        # --- FREE TRIAL ---
         with col1:
             st.markdown("""
             <div class="pricing-card card-free">
@@ -2792,6 +2789,7 @@ def render_login_signup():
             else:
                 st.info("Aapne free trial pehle hi use kar liya hai.")
 
+        # --- MONTHLY ---
         with col2:
             st.markdown("""
             <div class="pricing-card card-monthly">
@@ -2807,10 +2805,12 @@ def render_login_signup():
             </div>
             """, unsafe_allow_html=True)
             
+            # RAZORPAY MONTHLY LINK
             if st.button("Buy Monthly ₹1499", use_container_width=True, key="btn_m"):
-                webbrowser.open_new_tab(INSTAMOJO_MONTHLY_LINK)
+                webbrowser.open_new_tab(RAZORPAY_MONTHLY_LINK)
                 st.info("Payment complete karein, uske baad page refresh hoga.")
 
+        # --- YEARLY ---
         with col3:
             st.markdown("""
             <div class="pricing-card card-yearly">
@@ -2826,8 +2826,9 @@ def render_login_signup():
             </div>
             """, unsafe_allow_html=True)
           
+            # RAZORPAY YEARLY LINK
             if st.button("Buy Yearly ₹1399", use_container_width=True, key="btn_y"):
-                webbrowser.open_new_tab(INSTAMOJO_YEARLY_LINK)
+                webbrowser.open_new_tab(RAZORPAY_YEARLY_LINK)
                 st.info("Payment complete karein, uske baad page refresh hoga.")
 
         st.stop() 
