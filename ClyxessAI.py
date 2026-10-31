@@ -2455,18 +2455,20 @@ def render_login_signup():
         st.stop()
 
     # 🚨 1. APNE INSTAMOJO LINKS YAHAN DAALEIN 🚨
-    # Instamojo par link banate waqt Redirect URL mein ?plan=monthly&status=success lagana
     INSTAMOJO_MONTHLY_LINK = "https://imjo.in/AapkaMonthlyLinkYahan" 
     INSTAMOJO_YEARLY_LINK = "https://imjo.in/AapkaYearlyLinkYahan"   
 
-    # 🎨 PREMIUM CSS
+    # 🎨 PREMIUM CSS (Compact & Professional)
     st.markdown("""
     <style>
         @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css');
         .stApp { background: radial-gradient(circle at top right, #1e1b4b 0%, #050814 50%) !important; }
         header {visibility: hidden;} footer {visibility: hidden;}
         [data-testid="stSidebar"] { display: none !important; }
-        .block-container { max-width: 1000px !important; padding-top: 2rem !important; }
+        
+        /* Login page ko beech mein aur chhota karne ke liye */
+        .block-container { max-width: 1100px !important; padding-top: 2rem !important; }
+        
         .stTextInput input {
             background-color: #0b0e17 !important; color: white !important;
             border: 1px solid #1c2538 !important; border-radius: 10px !important; padding: 12px !important;
@@ -2478,7 +2480,9 @@ def render_login_signup():
         
         .stButton button { width: 100% !important; border-radius: 10px !important; font-weight: 600 !important; padding: 10px !important; }
         div[data-testid="stButton"]:has(div:contains("Log In")) button,
-        div[data-testid="stButton"]:has(div:contains("Create Account")) button {
+        div[data-testid="stButton"]:has(div:contains("Create Account")) button,
+        div[data-testid="stFormSubmitButton"]:has(div:contains("Log In")) button,
+        div[data-testid="stFormSubmitButton"]:has(div:contains("Create Account")) button {
             background: linear-gradient(90deg, #3b82f6 0%, #8b5cf6 100%) !important;
             color: white !important; border: none !important;
         }
@@ -2516,7 +2520,7 @@ def render_login_signup():
     </style>
     """, unsafe_allow_html=True)
 
-    # 🪄 URL Token Cleaner (Email verify fix)
+    # 🪄 URL Token Cleaner
     components.html("""
         <script>
             var hash = window.location.hash;
@@ -2543,36 +2547,24 @@ def render_login_signup():
             st.query_params.clear()
 
     # ==========================================
-    # 🛑 2. PAYMENT SUCCESS LOGIC (Instamojo Redirect)
+    # 🛑 2. PAYMENT SUCCESS LOGIC
     # ==========================================
     if "status" in st.query_params and st.query_params["status"] == "success":
         if st.session_state.get("logged_in", False):
             try:
-                # Supabase se current logged-in user nikaalein
                 user_data = supabase.auth.get_user()
                 user_email = user_data.user.email
                 user_id = user_data.user.id
                 
-                # URL se plan type nikaalein (monthly ya yearly)
                 plan_type = st.query_params.get("plan", "monthly")
-                
-                # Din calculate karein
                 days = 30 if plan_type == "monthly" else 365
                 expiry = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(days=days)
                 
-                # Database Update karein
                 supabase.table("user_subscriptions").upsert({
-                    "id": user_id, 
-                    "email": user_email, 
-                    "plan_type": plan_type, 
-                    "expiry_date": expiry.isoformat(), 
-                    "is_paid": True
+                    "id": user_id, "email": user_email, "plan_type": plan_type, "expiry_date": expiry.isoformat(), "is_paid": True
                 }).execute()
                 
-                # URL clear karein
                 st.query_params.clear()
-                
-                # SUCCESS SCREEN
                 st.balloons()
                 st.success(f"🎉 Payment Successful! Welcome to Clyxess AI.")
                 st.markdown(f"### Aapka **{plan_type.capitalize()} Plan** activate ho gaya hai.")
@@ -2581,94 +2573,106 @@ def render_login_signup():
                 if st.button("Go to Dashboard 🚀", type="primary", use_container_width=True):
                     st.rerun()
                 st.stop()
-                
             except Exception as e:
                 st.error(f"Payment verification error: {e}")
                 st.query_params.clear()
 
     # ==========================================
-    # 🛑 3. LOGIN / SIGNUP UI
+    # 🛑 3. LOGIN / SIGNUP UI (COMPACT LAYOUT)
     # ==========================================
     if not st.session_state.get("logged_in", False):
-        st.markdown("""
-        <div style="text-align: center; margin-bottom: 30px;">
-            <h1 style="color: white; font-size: 34px; font-weight: 800; margin-bottom: 5px;">Clyxess <span style="color: #3b82f6;">AI</span></h1>
-            <p style="color: #9ca3af; font-size: 14px;">Learn future with Clyxess AI school</p>
-        </div>
-        """, unsafe_allow_html=True)
         
-        google_url, fb_url = "", ""
-        try:
-            r_google = supabase.auth.sign_in_with_oauth({"provider": "google", "options": {"redirect_to": st.secrets.get("SUPABASE_REDIRECT_URL", "")}})
-            google_url = r_google.url
-        except Exception: pass
-
-        try:
-            r_fb = supabase.auth.sign_in_with_oauth({"provider": "facebook", "options": {"redirect_to": st.secrets.get("SUPABASE_REDIRECT_URL", "")}})
-            fb_url = r_fb.url
-        except Exception: pass
-
-        st.markdown(f"""
-            <a href="{google_url}" target="_self" class="social-btn google-btn">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="G"> Continue with Google
-            </a>
-            <a href="{fb_url}" target="_self" class="social-btn facebook-btn">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/b/b9/2023_Facebook_icon.svg" alt="F"> Continue with Facebook
-            </a>
-        """, unsafe_allow_html=True)
-
-        st.markdown('<div class="divider">OR</div>', unsafe_allow_html=True)
-
-        tab1,tab2=st.tabs(["Log In","Sign Up"])
+        # Screen ko 3 columns mein baanta, beech wala column login ke liye
+        _, center_col, _ = st.columns([1, 1.2, 1])
         
-        with tab1:
-            email=st.text_input("Email",key="login_email", placeholder="Enter your email", label_visibility="collapsed")
-            password=st.text_input("Password",type="password",key="login_password", placeholder="Enter password", label_visibility="collapsed")
+        with center_col:
+            st.markdown("""
+            <div style="text-align: center; margin-bottom: 30px;">
+                <h1 style="color: white; font-size: 34px; font-weight: 800; margin-bottom: 5px;">Clyxess <span style="color: #3b82f6;">AI</span></h1>
+                <p style="color: #9ca3af; font-size: 14px;">Learn future with Clyxess AI school</p>
+            </div>
+            """, unsafe_allow_html=True)
             
-            if st.button("Log In ➔", type="primary", use_container_width=True, key="btn_login"):
-                if not email or not password:
-                    st.error("❌ Please enter both Email and Password.")
-                else:
-                    with st.spinner("Logging you in..."):
-                        try:
-                            clean_email = email.strip().lower()
-                            supabase.auth.sign_in_with_password({"email": clean_email, "password": password})
-                            st.session_state.user_email = clean_email
-                            st.session_state.logged_in = True
-                            st.rerun()
-                        except Exception as e:
-                            if "Email not confirmed" in str(e):
-                                st.error("⚠️ Email verify nahi hui hai! Inbox check karein.")
-                            else:
-                                st.error(f"Login failed: {e}")
-            
-            with st.expander("Forgot Password?"):
-                reset_email = st.text_input("Enter your registered email", key="reset_email")
-                if st.button("Send Reset Link", use_container_width=True, key="btn_reset"):
-                    try:
-                        supabase.auth.reset_password_for_email(reset_email, options={"redirect_to": st.secrets.get("SUPABASE_REDIRECT_URL", "")})
-                        st.success("✅ Password reset link sent!")
-                    except Exception as e: st.error(f"Error: {e}")
+            google_url, fb_url = "", ""
+            try:
+                r_google = supabase.auth.sign_in_with_oauth({"provider": "google", "options": {"redirect_to": st.secrets.get("SUPABASE_REDIRECT_URL", "")}})
+                google_url = r_google.url
+            except Exception: pass
 
-        with tab2:
-            name=st.text_input("Name",key="signup_name", placeholder="Your Name", label_visibility="collapsed")
-            email=st.text_input("Email",key="signup_email", placeholder="Enter your email", label_visibility="collapsed")
-            password=st.text_input("Password",type="password",key="signup_password", placeholder="Create password", label_visibility="collapsed")
-            
-            if st.button("Create Account ➔", use_container_width=True, key="btn_signup"):
-                if not name or not email or not password:
-                    st.error("❌ Please fill all the fields.")
-                else:
-                    with st.spinner("Creating your account..."):
-                        try:
-                            clean_email = email.strip().lower()
-                            supabase.auth.sign_up({"email": clean_email, "password": password, "options": {"data": {"name": name}}})
-                            st.success("✅ Account created successfully!")
-                            st.info("📧 Email par verification link bheja gaya hai. Kripya usko click karein.")
-                        except Exception as e: 
-                            st.error(f"Sign up failed: {e}")
+            try:
+                r_fb = supabase.auth.sign_in_with_oauth({"provider": "facebook", "options": {"redirect_to": st.secrets.get("SUPABASE_REDIRECT_URL", "")}})
+                fb_url = r_fb.url
+            except Exception: pass
 
-        # Footer (Aapka purana wala)
+            st.markdown(f"""
+                <a href="{google_url}" target="_self" class="social-btn google-btn">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="G"> Continue with Google
+                </a>
+                <a href="{fb_url}" target="_self" class="social-btn facebook-btn">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/b/b9/2023_Facebook_icon.svg" alt="F"> Continue with Facebook
+                </a>
+            """, unsafe_allow_html=True)
+
+            st.markdown('<div class="divider">OR</div>', unsafe_allow_html=True)
+
+            tab1,tab2=st.tabs(["Log In","Sign Up"])
+            
+            # 👇 FORM FIX FOR LOGIN 👇
+            with tab1:
+                with st.form("login_form"):
+                    email = st.text_input("Email", key="login_email", placeholder="Enter your email", label_visibility="collapsed")
+                    password = st.text_input("Password", type="password", key="login_password", placeholder="Enter password", label_visibility="collapsed")
+                    
+                    submit_login = st.form_submit_button("Log In ➔", use_container_width=True)
+                    
+                    if submit_login:
+                        if not email or not password:
+                            st.error("❌ Please enter both Email and Password.")
+                        else:
+                            with st.spinner("Logging you in..."):
+                                try:
+                                    clean_email = email.strip().lower()
+                                    supabase.auth.sign_in_with_password({"email": clean_email, "password": password})
+                                    st.session_state.user_email = clean_email
+                                    st.session_state.logged_in = True
+                                    st.rerun()
+                                except Exception as e:
+                                    if "Email not confirmed" in str(e):
+                                        st.error("⚠️ Email verify nahi hui hai! Inbox check karein.")
+                                    else:
+                                        st.error(f"Login failed: {e}")
+                
+                with st.expander("Forgot Password?"):
+                    reset_email = st.text_input("Enter your registered email", key="reset_email")
+                    if st.button("Send Reset Link", use_container_width=True, key="btn_reset"):
+                        try:
+                            supabase.auth.reset_password_for_email(reset_email, options={"redirect_to": st.secrets.get("SUPABASE_REDIRECT_URL", "")})
+                            st.success("✅ Password reset link sent!")
+                        except Exception as e: st.error(f"Error: {e}")
+
+            # 👇 FORM FIX FOR SIGNUP 👇
+            with tab2:
+                with st.form("signup_form"):
+                    name = st.text_input("Name", key="signup_name", placeholder="Your Name", label_visibility="collapsed")
+                    email = st.text_input("Email", key="signup_email", placeholder="Enter your email", label_visibility="collapsed")
+                    password = st.text_input("Password", type="password", key="signup_password", placeholder="Create password", label_visibility="collapsed")
+                    
+                    submit_signup = st.form_submit_button("Create Account ➔", use_container_width=True)
+                    
+                    if submit_signup:
+                        if not name or not email or not password:
+                            st.error("❌ Please fill all the fields.")
+                        else:
+                            with st.spinner("Creating your account..."):
+                                try:
+                                    clean_email = email.strip().lower()
+                                    supabase.auth.sign_up({"email": clean_email, "password": password, "options": {"data": {"name": name}}})
+                                    st.success("✅ Account created successfully!")
+                                    st.info("📧 Email par verification link bheja gaya hai. Kripya usko click karein.")
+                                except Exception as e: 
+                                    st.error(f"Sign up failed: {e}")
+
+        # Footer (Centered)
         st.markdown("""
         <div class="footer-pro">
             <div class="contact-info">
@@ -2711,7 +2715,7 @@ def render_login_signup():
     if len(res.data) == 0:
         show_plan_screen = True 
     else:
-        trial_used = True # User ne pehle kabhi koi plan liya hai (Free ya Paid)
+        trial_used = True 
         sub_data = res.data[0]
         expiry_str = sub_data["expiry_date"]
         
@@ -2725,7 +2729,6 @@ def render_login_signup():
             else:
                 show_plan_screen = False 
                 
-                # Sidebar Status (Agar Dashboard khula hai)
                 plan_type = sub_data["plan_type"]
                 plan_name = "Free Trial" if plan_type == "free" else ("Monthly Plan" if plan_type == "monthly" else "Yearly Plan")
                 color = "#3b82f6" if plan_type == "free" else ("#8b5cf6" if plan_type == "monthly" else "#f59e0b")
@@ -2746,11 +2749,10 @@ def render_login_signup():
                 """, unsafe_allow_html=True)
 
     # ==========================================
-    # 🛑 5. PLAN SELECTION SCREEN (Auto-Lock ya Naya User)
+    # 🛑 5. PLAN SELECTION SCREEN
     # ==========================================
     if show_plan_screen:
         
-        # Agar expired hai, toh warning dikhao
         if is_expired:
             st.warning("⚠️ Aapka plan expire ho gaya hai. Please koi naya plan kharidein.")
             
@@ -2763,7 +2765,6 @@ def render_login_signup():
 
         col1, col2, col3 = st.columns(3, gap="medium")
         
-        # --- FREE TRIAL ---
         with col1:
             st.markdown("""
             <div class="pricing-card card-free">
@@ -2779,7 +2780,6 @@ def render_login_signup():
             </div>
             """, unsafe_allow_html=True)
             
-            # Sirf tabhi dikhao jab user ne kabhi koi plan na liya ho
             if not trial_used:
                 if st.button("Start Free Trial", use_container_width=True, key="btn_free"):
                     with st.spinner("Activating Trial..."):
@@ -2792,7 +2792,6 @@ def render_login_signup():
             else:
                 st.info("Aapne free trial pehle hi use kar liya hai.")
 
-        # --- MONTHLY ---
         with col2:
             st.markdown("""
             <div class="pricing-card card-monthly">
@@ -2812,7 +2811,6 @@ def render_login_signup():
                 webbrowser.open_new_tab(INSTAMOJO_MONTHLY_LINK)
                 st.info("Payment complete karein, uske baad page refresh hoga.")
 
-        # --- YEARLY ---
         with col3:
             st.markdown("""
             <div class="pricing-card card-yearly">
