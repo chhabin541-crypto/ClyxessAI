@@ -2493,25 +2493,34 @@ def render_login_signup():
         .facebook-btn { background-color: #1877F2; color: #ffffff; border: none; }
         .facebook-btn:hover { background-color: #166fe5; color: #fff; }
 
-        /* Pricing Cards */
-        .pricing-card { background: #111827; border-radius: 20px; padding: 30px; border: 1px solid #1f2937; text-align: left; position: relative; height: 100%; min-height: 540px; display: flex; flex-direction: column; justify-content: space-between; transition: all 0.3s ease-in-out; cursor: pointer; }
+        /* 👇 FIX 1: CARD ALIGNMENT 👇 */
+        [data-testid="column"] {
+            display: flex;
+            flex-direction: column;
+        }
+        .pricing-card { 
+            background: #111827; border-radius: 20px; padding: 30px; border: 1px solid #1f2937; 
+            text-align: left; position: relative; height: 100%; /* Full height */
+            min-height: 550px; /* Height fix taaki sab barabar dikhein */
+            display: flex; flex-direction: column; justify-content: flex-start; 
+            transition: all 0.3s ease-in-out; cursor: pointer; 
+        }
         .pricing-card:hover { transform: translateY(-10px); box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
         .card-free { border-top: 4px solid #3b82f6; }
         .card-monthly { border-top: 4px solid #8b5cf6; border: 1px solid #8b5cf6; box-shadow: 0 0 30px rgba(139, 92, 246, 0.15); background: #15132b; }
         .card-yearly { border-top: 4px solid #f59e0b; }
+        
         .card-title { color: white; font-size: 22px; font-weight: 700; margin-bottom: 5px; }
         .card-price { color: white; font-size: 42px; font-weight: 800; margin: 15px 0 5px 0; }
         .card-price span { font-size: 14px; color: #9ca3af; font-weight: 400; }
         .badge-popular { position: absolute; top: -14px; right: 20px; background: #8b5cf6; color: white; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; }
         .badge-save { position: absolute; top: -14px; right: 20px; background: #f59e0b; color: white; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; }
         
-        /* Feature Lists */
         .feature-list { list-style: none; padding: 0; margin: 20px 0; color: #d1d5db; font-size: 13px; line-height: 1.5; }
         .feature-list li { margin-bottom: 8px; display: flex; align-items: flex-start; gap: 8px; }
         .feature-list li::before { content: "✔"; color: #10b981; font-weight: bold; font-size: 13px; margin-top: 2px; flex-shrink: 0; }
         .feature-list .highlight { color: white; font-weight: 600; }
 
-        /* Footer */
         .footer-pro { text-align: center; margin-top: 60px; padding-top: 30px; border-top: 1px solid #1f2937; color: #9ca3af; font-size: 14px; }
         .footer-pro .contact-info { display: flex; justify-content: center; gap: 30px; margin-bottom: 20px; flex-wrap: wrap; }
         .footer-pro .contact-info div { display: flex; align-items: center; gap: 8px; }
@@ -2521,87 +2530,52 @@ def render_login_signup():
         .footer-pro .social-links a:hover { color: #8b5cf6; transform: scale(1.2); }
         .footer-pro .copyright { font-size: 12px; color: #4b5563; }
         
-        /* Logo */
         .footer-logo { width: 70px; height: 70px; border-radius: 50%; margin-bottom: 15px; border: 2px solid #3b82f6; object-fit: cover; }
 
-        /* Multi-color Button */
         div[data-testid="stButton"]:has(div:contains("Buy Premium Plan")) button {
             background: linear-gradient(90deg, #3b82f6 0%, #8b5cf6 50%, #f59e0b 100%) !important;
-            color: white !important; border: none !important;
-            font-weight: bold !important;
-            font-size: 16px !important;
-            padding: 12px !important;
-            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4) !important;
-            transition: 0.3s;
+            color: white !important; border: none !important; font-weight: bold !important;
+            font-size: 16px !important; padding: 12px !important;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4) !important; transition: 0.3s;
         }
         div[data-testid="stButton"]:has(div:contains("Buy Premium Plan")) button:hover {
-            transform: scale(1.02);
-            box-shadow: 0 6px 20px rgba(139, 92, 246, 0.6) !important;
+            transform: scale(1.02); box-shadow: 0 6px 20px rgba(139, 92, 246, 0.6) !important;
         }
 
-        /* 👇 FIX: BUTTON ALIGNMENT & COLORS 👇 */
-        [data-testid="column"] {
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            height: 100%;
-        }
-
-        /* Monthly Button Color (Purple) */
+        /* 👇 FIX 2: BUTTON HOVER COLORS 👇 */
+        /* Monthly Button - Purple */
         div[data-testid="stLinkButton"]:has(div:contains("Buy Monthly")) a {
-            background-color: #8b5cf6 !important;
-            color: white !important;
-            border: none !important;
-            width: 100% !important;
-            display: flex;
-            justify-content: center;
-            font-weight: 600 !important;
-            margin-top: 15px;
-            transition: 0.3s;
+            background-color: #8b5cf6 !important; color: white !important;
+            border: none !important; width: 100% !important; display: flex; justify-content: center;
+            font-weight: 600 !important; margin-top: 15px; transition: 0.3s;
         }
         div[data-testid="stLinkButton"]:has(div:contains("Buy Monthly")) a:hover {
-            background-color: #7c3aed !important;
-            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4) !important;
+            background-color: #a855f7 !important; /* Lighter Purple */
+            box-shadow: 0 0 15px rgba(168, 85, 247, 0.6) !important;
         }
 
-        /* Yearly Button Color (Orange/Gold) */
+        /* Yearly Button - Gold */
         div[data-testid="stLinkButton"]:has(div:contains("Buy Yearly")) a {
-            background-color: #f59e0b !important;
-            color: white !important;
-            border: none !important;
-            width: 100% !important;
-            display: flex;
-            justify-content: center;
-            font-weight: 600 !important;
-            margin-top: 15px;
-            transition: 0.3s;
+            background-color: #f59e0b !important; color: white !important;
+            border: none !important; width: 100% !important; display: flex; justify-content: center;
+            font-weight: 600 !important; margin-top: 15px; transition: 0.3s;
         }
         div[data-testid="stLinkButton"]:has(div:contains("Buy Yearly")) a:hover {
-            background-color: #d97706 !important;
-            box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4) !important;
+            background-color: #fbbf24 !important; /* Lighter Gold */
+            box-shadow: 0 0 15px rgba(251, 191, 36, 0.6) !important;
         }
 
-        /* 👇 NAYA FIX: SEAMLESS MATH IMAGE 👇 */
-        .math-bg-container {
-            width: 100%;
-            text-align: center;
-            margin-top: -50px; /* Cards ke paas laane ke liye */
-            margin-bottom: 50px;
-            z-index: -1;
-            position: relative;
+        /* 👇 FIX 3: SEAMLESS COSMOS IMAGE (No Borders) 👇 */
+        .cosmos-bg {
+            width: 100vw; position: relative; left: 50%; right: 50%;
+            margin-left: -50vw; margin-right: -50vw;
+            margin-top: -30px; margin-bottom: 50px;
+            z-index: -1; pointer-events: none; text-align: center;
         }
-        .math-bg-image {
-            width: 100vw; /* Pura screen cover kare */
-            position: relative;
-            left: 50%;
-            right: 50%;
-            margin-left: -50vw;
-            margin-right: -50vw;
-            opacity: 0.4;
-            /* Upar se fade karega taaki pura page mein mix ho jaye */
-            mask-image: linear-gradient(to bottom, transparent 0%, black 40%, black 80%, transparent 100%);
-            -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 40%, black 80%, transparent 100%);
-            pointer-events: none;
+        .cosmos-img {
+            width: 100%; opacity: 0.4;
+            mask-image: linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%);
+            -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%);
         }
     </style>
     """, unsafe_allow_html=True)
@@ -2754,7 +2728,6 @@ def render_login_signup():
                                 except Exception as e: 
                                     st.error(f"Sign up failed: {e}")
 
-        # 👇 FOOTER 👇
         st.markdown("""
         <div class="footer-pro">
             <img src="https://chhabin541-crypto.github.io/ClyxessAI/logo.png" class="footer-logo" alt="Clyxess Logo">
@@ -2781,7 +2754,6 @@ def render_login_signup():
         </div>
         """, unsafe_allow_html=True)
         
-        # FOOTER MULTI-COLOR BUTTON
         st.markdown("<br>", unsafe_allow_html=True)
         col_btn1, col_btn2, col_btn3 = st.columns([1, 1.5, 1])
         with col_btn2:
@@ -2930,11 +2902,10 @@ def render_login_signup():
           
             st.link_button("Buy Yearly ₹1399", RAZORPAY_YEARLY_LINK, use_container_width=True)
 
-        # 👇 NAYA FIX: SEAMLESS MATH IMAGE YAHAN ADD KIYA HAI 👇
+        # 👇 COSMOS IMAGE YAHAN ADD KIYA HAI 👇
         st.markdown("""
-        <div class="math-bg-container">
-            <!-- Yahan maine aapki di hui math image ka direct link daala hai, aur usko CSS se blend kar diya hai -->
-            <img src="https://images.unsplash.com/photo-1635070041078-e363dbe005cb?q=80&w=2070&auto=format&fit=crop" class="math-bg-image" alt="Math Background">
+        <div class="cosmos-bg">
+            <img src="https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?q=80&w=2070&auto=format&fit=crop" class="cosmos-img" alt="Cosmos Math Background">
         </div>
         """, unsafe_allow_html=True)
 
