@@ -2458,45 +2458,76 @@ def render_login_signup():
     RAZORPAY_MONTHLY_LINK = "https://rzp.io/rzp/nNI2b7Qd" 
     RAZORPAY_YEARLY_LINK = "https://rzp.io/rzp/0mWgHct"   
 
-    # 🎨 CSS (Aapka pura CSS waisa hi rahega, maine ise chhota kar diya hai yahan dikhane ke liye)
+    # 🎨 PREMIUM CSS (Compact & Professional)
     st.markdown("""
     <style>
         @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css');
         .stApp { background: radial-gradient(circle at top right, #1e1b4b 0%, #050814 50%) !important; }
         header {visibility: hidden;} footer {visibility: hidden;}
+        [data-testid="stSidebar"] { display: none !important; }
+        
         .block-container { max-width: 1100px !important; padding-top: 2rem !important; }
-        .stTextInput input { background-color: #0b0e17 !important; color: white !important; border: 1px solid #1c2538 !important; border-radius: 10px !important; padding: 12px !important; }
+        
+        .stTextInput input {
+            background-color: #0b0e17 !important; color: white !important;
+            border: 1px solid #1c2538 !important; border-radius: 10px !important; padding: 12px !important;
+        }
         .stTextInput input:focus { border-color: #3b82f6 !important; box-shadow: 0 0 0 1px #3b82f6 !important; }
         .divider { display: flex; align-items: center; text-align: center; color: #4b5563; margin: 20px 0; font-size: 13px; font-weight: bold; }
         .divider::before, .divider::after { content: ''; flex: 1; border-bottom: 1px solid #1c2538; }
         .divider::before { margin-right: 15px; } .divider::after { margin-left: 15px; }
+        
         .stButton button { width: 100% !important; border-radius: 10px !important; font-weight: 600 !important; padding: 10px !important; }
         div[data-testid="stButton"]:has(div:contains("Log In")) button,
         div[data-testid="stButton"]:has(div:contains("Create Account")) button,
         div[data-testid="stFormSubmitButton"]:has(div:contains("Log In")) button,
         div[data-testid="stFormSubmitButton"]:has(div:contains("Create Account")) button {
-            background: linear-gradient(90deg, #3b82f6 0%, #8b5cf6 100%) !important; color: white !important; border: none !important;
+            background: linear-gradient(90deg, #3b82f6 0%, #8b5cf6 100%) !important;
+            color: white !important; border: none !important;
         }
+        
         .social-btn { display: flex; align-items: center; justify-content: center; width: 100%; padding: 10px; border-radius: 10px; font-weight: 600; font-size: 14px; text-decoration: none; margin-bottom: 10px; transition: 0.3s; }
         .social-btn img { width: 20px; height: 20px; margin-right: 10px; }
         .google-btn { background-color: #ffffff; color: #000000; border: 1px solid #ddd; }
         .google-btn:hover { background-color: #f3f4f6; color: #000; }
         .facebook-btn { background-color: #1877F2; color: #ffffff; border: none; }
         .facebook-btn:hover { background-color: #166fe5; color: #fff; }
-        .pricing-card { background: #111827; border-radius: 15px; padding: 20px 15px; border: 1px solid #1f2937; text-align: left; position: relative; height: 520px; display: flex; flex-direction: column; transition: all 0.3s ease-in-out; cursor: pointer; }
+
+        /* ==========================================
+           👇 FIX 1: PERFECT CARD & TEXT SIZE 👇
+           ========================================== */
+        .pricing-card { 
+            background: #111827; border-radius: 15px; 
+            padding: 20px 15px; /* Padding kam ki taaki text ko jagah mile */
+            border: 1px solid #1f2937; 
+            text-align: left; position: relative; 
+            height: 520px; /* Fixed height sabke liye barabar */
+            display: flex; flex-direction: column; 
+            transition: all 0.3s ease-in-out; cursor: pointer; 
+        }
         .pricing-card:hover { transform: translateY(-5px); box-shadow: 0 15px 30px rgba(0,0,0,0.5); }
         .card-free { border-top: 4px solid #3b82f6; }
         .card-monthly { border-top: 4px solid #8b5cf6; border: 1px solid #8b5cf6; box-shadow: 0 0 20px rgba(139, 92, 246, 0.15); background: #15132b; }
         .card-yearly { border-top: 4px solid #f59e0b; }
+        
         .card-title { color: white; font-size: 18px; font-weight: 700; margin-bottom: 5px; }
         .card-price { color: white; font-size: 32px; font-weight: 800; margin: 10px 0 5px 0; }
         .card-price span { font-size: 12px; color: #9ca3af; font-weight: 400; }
+        
         .badge-popular { position: absolute; top: -12px; right: 15px; background: #8b5cf6; color: white; padding: 3px 10px; border-radius: 15px; font-size: 10px; font-weight: 700; }
         .badge-save { position: absolute; top: -12px; right: 15px; background: #f59e0b; color: white; padding: 3px 10px; border-radius: 15px; font-size: 10px; font-weight: 700; }
-        .feature-list { list-style: none; padding: 0; margin: 10px 0; color: #d1d5db; font-size: 11.5px; line-height: 1.3; flex-grow: 1; }
+        
+        /* 👇 TEXT KO CHHOTA KAR DIYA HAI 👇 */
+        .feature-list { 
+            list-style: none; padding: 0; margin: 10px 0; 
+            color: #d1d5db; font-size: 11.5px; /* Font chhota kiya */
+            line-height: 1.3; /* Lines ke beech space kam kiya */
+            flex-grow: 1; /* Text ko bachi hui jagah lene do */
+        }
         .feature-list li { margin-bottom: 5px; display: flex; align-items: flex-start; gap: 6px; }
         .feature-list li::before { content: "✔"; color: #10b981; font-weight: bold; font-size: 11px; margin-top: 2px; flex-shrink: 0; }
         .feature-list .highlight { color: white; font-weight: 600; }
+
         .footer-pro { text-align: center; margin-top: 60px; padding-top: 30px; border-top: 1px solid #1f2937; color: #9ca3af; font-size: 14px; }
         .footer-pro .contact-info { display: flex; justify-content: center; gap: 30px; margin-bottom: 20px; flex-wrap: wrap; }
         .footer-pro .contact-info div { display: flex; align-items: center; gap: 8px; }
@@ -2505,15 +2536,64 @@ def render_login_signup():
         .footer-pro .social-links a { color: #9ca3af; font-size: 20px; transition: 0.3s; text-decoration: none; }
         .footer-pro .social-links a:hover { color: #8b5cf6; transform: scale(1.2); }
         .footer-pro .copyright { font-size: 12px; color: #4b5563; }
+        
         .footer-logo { width: 70px; height: 70px; border-radius: 50%; margin-bottom: 15px; border: 2px solid #3b82f6; object-fit: cover; }
+
         div[data-testid="stButton"]:has(div:contains("Buy Premium Plan")) button {
-            background: linear-gradient(90deg, #3b82f6 0%, #8b5cf6 50%, #f59e0b 100%) !important; color: white !important; border: none !important; font-weight: bold !important; font-size: 16px !important; padding: 12px !important; box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4) !important; transition: 0.3s;
+            background: linear-gradient(90deg, #3b82f6 0%, #8b5cf6 50%, #f59e0b 100%) !important;
+            color: white !important; border: none !important; font-weight: bold !important;
+            font-size: 16px !important; padding: 12px !important;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4) !important; transition: 0.3s;
         }
-        div[data-testid="stButton"]:has(div:contains("Buy Premium Plan")) button:hover { transform: scale(1.02); box-shadow: 0 6px 20px rgba(139, 92, 246, 0.6) !important; }
-        a[href*="nNI2b7Qd"] { background-color: #8b5cf6 !important; color: white !important; border: none !important; width: 100% !important; display: flex !important; justify-content: center !important; font-weight: 600 !important; border-radius: 10px !important; padding: 8px !important; margin-top: 10px !important; transition: 0.3s !important; font-size: 14px !important; }
-        a[href*="nNI2b7Qd"]:hover { background-color: #a855f7 !important; box-shadow: 0 0 15px rgba(168, 85, 247, 0.8) !important; }
-        a[href*="0mWgHct"] { background-color: #f59e0b !important; color: white !important; border: none !important; width: 100% !important; display: flex !important; justify-content: center !important; font-weight: 600 !important; border-radius: 10px !important; padding: 8px !important; margin-top: 10px !important; transition: 0.3s !important; font-size: 14px !important; }
-        a[href*="0mWgHct"]:hover { background-color: #fbbf24 !important; box-shadow: 0 0 15px rgba(251, 191, 36, 0.8) !important; }
+        div[data-testid="stButton"]:has(div:contains("Buy Premium Plan")) button:hover {
+            transform: scale(1.02); box-shadow: 0 6px 20px rgba(139, 92, 246, 0.6) !important;
+        }
+
+        /* ==========================================
+           👇 FIX 2: TARGETING BUTTONS BY URL FOR HOVER COLORS 👇
+           ========================================== */
+        /* Monthly Button - Purple Base */
+        a[href*="nNI2b7Qd"] {
+            background-color: #8b5cf6 !important;
+            color: white !important; border: none !important;
+            width: 100% !important; display: flex !important; justify-content: center !important;
+            font-weight: 600 !important; border-radius: 10px !important;
+            padding: 8px !important; margin-top: 10px !important; transition: 0.3s !important;
+            font-size: 14px !important;
+        }
+        a[href*="nNI2b7Qd"]:hover {
+            background-color: #a855f7 !important;
+            box-shadow: 0 0 15px rgba(168, 85, 247, 0.8) !important;
+        }
+
+        /* Yearly Button - Gold Base */
+        a[href*="0mWgHct"] {
+            background-color: #f59e0b !important;
+            color: white !important; border: none !important;
+            width: 100% !important; display: flex !important; justify-content: center !important;
+            font-weight: 600 !important; border-radius: 10px !important;
+            padding: 8px !important; margin-top: 10px !important; transition: 0.3s !important;
+            font-size: 14px !important;
+        }
+        a[href*="0mWgHct"]:hover {
+            background-color: #fbbf24 !important;
+            box-shadow: 0 0 15px rgba(251, 191, 36, 0.8) !important;
+        }
+
+        /* ==========================================
+           👇 FIX 3: SEAMLESS COSMOS IMAGE 👇
+           ========================================== */
+        .cosmos-container {
+            width: 100%; display: flex; justify-content: center;
+            margin-top: 20px; margin-bottom: 20px;
+        }
+        .cosmos-image {
+            width: 100%; max-width: 1000px;
+            mix-blend-mode: screen; 
+            opacity: 0.7;
+            mask-image: linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%);
+            -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%);
+        }
     </style>
     """, unsafe_allow_html=True)
 
@@ -2568,7 +2648,6 @@ def render_login_signup():
                 st.info(f"Plan valid till: {expiry.strftime('%d %b %Y')}")
                 
                 if st.button("Go to Dashboard 🚀", type="primary", use_container_width=True):
-                    st.session_state.show_pricing_modal = False
                     st.rerun()
                 st.stop()
             except Exception as e:
@@ -2594,6 +2673,7 @@ def render_login_signup():
                 r_google = supabase.auth.sign_in_with_oauth({"provider": "google", "options": {"redirect_to": st.secrets.get("SUPABASE_REDIRECT_URL", "")}})
                 google_url = r_google.url
             except Exception: pass
+
             try:
                 r_fb = supabase.auth.sign_in_with_oauth({"provider": "facebook", "options": {"redirect_to": st.secrets.get("SUPABASE_REDIRECT_URL", "")}})
                 fb_url = r_fb.url
@@ -2616,6 +2696,7 @@ def render_login_signup():
                 with st.form("login_form"):
                     email = st.text_input("Email", key="login_email", placeholder="Enter your email", label_visibility="collapsed")
                     password = st.text_input("Password", type="password", key="login_password", placeholder="Enter password", label_visibility="collapsed")
+                    
                     submit_login = st.form_submit_button("Log In ➔", use_container_width=True)
                     
                     if submit_login:
@@ -2648,6 +2729,7 @@ def render_login_signup():
                     name = st.text_input("Name", key="signup_name", placeholder="Your Name", label_visibility="collapsed")
                     email = st.text_input("Email", key="signup_email", placeholder="Enter your email", label_visibility="collapsed")
                     password = st.text_input("Password", type="password", key="signup_password", placeholder="Create password", label_visibility="collapsed")
+                    
                     submit_signup = st.form_submit_button("Create Account ➔", use_container_width=True)
                     
                     if submit_signup:
@@ -2660,7 +2742,8 @@ def render_login_signup():
                                     supabase.auth.sign_up({"email": clean_email, "password": password, "options": {"data": {"name": name}}})
                                     st.success("✅ Account created successfully!")
                                     st.info("📧 Email par verification link bheja gaya hai. Kripya usko click karein.")
-                                except Exception as e: st.error(f"Sign up failed: {e}")
+                                except Exception as e: 
+                                    st.error(f"Sign up failed: {e}")
 
         st.markdown("""
         <div class="footer-pro">
@@ -2700,59 +2783,56 @@ def render_login_signup():
     # 🛑 4. DATABASE CHECK & AUTO-LOCK LOGIC
     # ==========================================
     user_email = st.session_state.get("user_email", "")
+    user_id = supabase.auth.get_user().user.id
     
-    try:
-        user_data = supabase.auth.get_user()
-        user_id = user_data.user.id
-    except Exception:
-        st.session_state.clear()
-        st.rerun()
-
     res = supabase.table("user_subscriptions").select("*").eq("id", user_id).execute()
     
-    is_active = False
+    show_plan_screen = False
     trial_used = False
     is_expired = False
-    sub_data = None
     
-    if len(res.data) > 0:
+    if len(res.data) == 0:
+        show_plan_screen = True 
+    else:
         trial_used = True 
         sub_data = res.data[0]
-        expiry_str = sub_data.get("expiry_date") 
+        expiry_str = sub_data["expiry_date"]
         
         if expiry_str:
-            try:
-                expiry_date = datetime.datetime.fromisoformat(expiry_str.replace('Z', '+00:00'))
-                now = datetime.datetime.now(datetime.timezone.utc)
+            expiry_date = datetime.datetime.fromisoformat(expiry_str.replace('Z', '+00:00'))
+            now = datetime.datetime.now(datetime.timezone.utc)
+            
+            if expiry_date <= now:
+                show_plan_screen = True 
+                is_expired = True 
+            else:
+                show_plan_screen = False 
                 
-                if expiry_date > now:
-                    is_active = True 
-                    plan_type = sub_data["plan_type"]
-                    
-                    time_left = expiry_date - now
-                    days_left = time_left.days
-                    hours_left = time_left.seconds // 3600
-                else:
-                    is_expired = True
-            except Exception:
-                is_expired = True
-        else:
-            is_expired = True
+                plan_type = sub_data["plan_type"]
+                plan_name = "Free Trial" if plan_type == "free" else ("Monthly Plan" if plan_type == "monthly" else "Yearly Plan")
+                color = "#3b82f6" if plan_type == "free" else ("#8b5cf6" if plan_type == "monthly" else "#f59e0b")
+                
+                time_left = expiry_date - now
+                days_left = time_left.days
+                hours_left = time_left.seconds // 3600
 
-    # 🔥 MAIN APP KE LIYE DATA SAVE KARO
-    st.session_state.is_plan_active = is_active
+                st.sidebar.markdown(f"""
+                <div style="background: rgba(30, 27, 75, 0.4); border: 1px solid {color}; border-radius: 10px; padding: 15px; margin-bottom: 20px;">
+                    <p style="margin: 0; color: #9ca3af; font-size: 12px;">Logged in as</p>
+                    <h4 style="margin: 0 0 10px 0; color: white; font-size: 13px;">{user_email}</h4>
+                    <div style="background: {color}22; padding: 8px; border-radius: 8px; text-align: center;">
+                        <p style="margin: 0; color: {color}; font-weight: 700; font-size: 14px;">{plan_name}</p>
+                        <p style="margin: 0; color: #d1d5db; font-size: 11px;">⏳ {days_left}d {hours_left}h remaining</p>
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
 
     # ==========================================
-    # 🛑 5. PLAN SELECTION SCREEN (Lock Screen)
+    # 🛑 5. PLAN SELECTION SCREEN
     # ==========================================
-    if st.session_state.get("show_pricing_modal", False) or not trial_used:
+    if show_plan_screen:
         
-        if st.session_state.get("show_pricing_modal", False) and trial_used:
-            if st.button("⬅️ Back to Dashboard", type="secondary"):
-                st.session_state.show_pricing_modal = False
-                st.rerun()
-
-        if is_expired and not st.session_state.get("show_pricing_modal", False):
+        if is_expired:
             st.warning("⚠️ Aapka plan expire ho gaya hai. Please koi naya plan kharidein.")
             
         st.markdown("""
@@ -2764,6 +2844,7 @@ def render_login_signup():
 
         col1, col2, col3 = st.columns(3, gap="medium")
         
+        # --- FREE TRIAL ---
         with col1:
             st.markdown("""
             <div class="pricing-card card-free">
@@ -2789,11 +2870,11 @@ def render_login_signup():
                             "id": user_id, "email": user_email, "plan_type": "free", "expiry_date": expiry.isoformat(), "is_paid": False
                         }).execute()
                         time.sleep(1)
-                    st.session_state.show_pricing_modal = False
                     st.rerun()
             else:
                 st.info("Aapne free trial pehle hi use kar liya hai.")
 
+        # --- MONTHLY ---
         with col2:
             st.markdown("""
             <div class="pricing-card card-monthly">
@@ -2816,13 +2897,14 @@ def render_login_signup():
             
             st.link_button("Buy Monthly ₹1499", RAZORPAY_MONTHLY_LINK, use_container_width=True)
 
+        # --- YEARLY ---
         with col3:
             st.markdown("""
             <div class="pricing-card card-yearly">
                 <div class="badge-save">SAVE ₹1200/yr</div>
                 <div>
                     <div class="card-title">Yearly Premium</div>
-                    <div class="card-price">₹1399 <span>/ month</span></div>
+                    <div class="card-price">₹1399 <span>/ month annual billing 16788</span></div>
                     <ul class="feature-list">
                         <li class="highlight">FULL FAMILY PACKAGE - BEST VALUE</li>
                         <li>Monthly wale sab kuch + 12 Months Access</li>
@@ -2837,23 +2919,31 @@ def render_login_signup():
           
             st.link_button("Buy Yearly ₹1399", RAZORPAY_YEARLY_LINK, use_container_width=True)
 
+        # 👇 SEAMLESS COSMOS IMAGE 👇
+        st.markdown("""
+        <div class="cosmos-container">
+            <img src="https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?q=80&w=1000&auto=format&fit=crop" class="cosmos-image" alt="Cosmos Math Background">
+        </div>
+        """, unsafe_allow_html=True)
+
         st.stop() 
 
     # ==========================================
-    # ✅ DASHBOARD MAIN LOGIC
+    # ✅ DASHBOARD
     # ==========================================
-    # Agar yahan tak pahunche hain, matlab user logged in hai aur plan active hai.
+    
+    st.sidebar.markdown("---")
+    if st.sidebar.button("💎 Buy / Upgrade Premium", use_container_width=True, type="primary", key="btn_upgrade_premium"):
+        st.session_state.show_pricing_modal = True
+        st.rerun()
+    st.sidebar.markdown("---")
 
-    # 👇 SIDEBAR TOP: Website Name & New Chat 👇
-    with st.sidebar:
-        st.markdown("### 🤖 Clyxess AI")
-        if st.button("➕ New Chat", use_container_width=True, type="primary", key="top_new_chat"):
-            st.session_state.messages = []
-            st.session_state.current_chat_id = None
-            st.rerun()
-        st.divider()
+    if st.sidebar.button("🚪 Log Out", use_container_width=True, key="btn_logout"):
+        st.session_state.clear()
+        st.rerun()
 
-    # Note: Aapka baaki ka dashboard code yahan aayega. (Mode selection, chat area, etc.)
+    st.sidebar.markdown("### 📚 Select Mode")
+    mode = st.sidebar.radio("", ["Normal Chat", "Cyber Security", "Homework"])
     
 
 def render_image_generator():
