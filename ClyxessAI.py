@@ -2494,7 +2494,7 @@ def render_login_signup():
         .facebook-btn:hover { background-color: #166fe5; color: #fff; }
 
         /* Pricing Cards */
-        .pricing-card { background: #111827; border-radius: 20px; padding: 30px; border: 1px solid #1f2937; text-align: left; position: relative; height: 100%; min-height: 420px; display: flex; flex-direction: column; justify-content: space-between; transition: all 0.3s ease-in-out; cursor: pointer; }
+        .pricing-card { background: #111827; border-radius: 20px; padding: 30px; border: 1px solid #1f2937; text-align: left; position: relative; height: 100%; min-height: 540px; display: flex; flex-direction: column; justify-content: space-between; transition: all 0.3s ease-in-out; cursor: pointer; }
         .pricing-card:hover { transform: translateY(-10px); box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
         .card-free { border-top: 4px solid #3b82f6; }
         .card-monthly { border-top: 4px solid #8b5cf6; border: 1px solid #8b5cf6; box-shadow: 0 0 30px rgba(139, 92, 246, 0.15); background: #15132b; }
@@ -2521,19 +2521,8 @@ def render_login_signup():
         .footer-pro .social-links a:hover { color: #8b5cf6; transform: scale(1.2); }
         .footer-pro .copyright { font-size: 12px; color: #4b5563; }
         
-        /* Logo & Image */
+        /* Logo */
         .footer-logo { width: 70px; height: 70px; border-radius: 50%; margin-bottom: 15px; border: 2px solid #3b82f6; object-fit: cover; }
-        
-        /* 👇 FUTURISTIC IMAGE CSS (Plans ke niche) 👇 */
-        .futuristic-banner { 
-            width: 100%; 
-            max-width: 900px; 
-            border-radius: 20px; 
-            margin: 40px auto 20px auto; 
-            display: block; 
-            border: 2px solid #3b82f6; 
-            box-shadow: 0 0 30px rgba(59, 130, 246, 0.3), inset 0 0 20px rgba(59, 130, 246, 0.2); 
-        }
 
         /* Multi-color Button */
         div[data-testid="stButton"]:has(div:contains("Buy Premium Plan")) button {
@@ -2550,7 +2539,7 @@ def render_login_signup():
             box-shadow: 0 6px 20px rgba(139, 92, 246, 0.6) !important;
         }
 
-        /* FIX: BUTTON ALIGNMENT & COLORS */
+        /* 👇 FIX: BUTTON ALIGNMENT & COLORS 👇 */
         [data-testid="column"] {
             display: flex;
             flex-direction: column;
@@ -2568,9 +2557,11 @@ def render_login_signup():
             justify-content: center;
             font-weight: 600 !important;
             margin-top: 15px;
+            transition: 0.3s;
         }
         div[data-testid="stLinkButton"]:has(div:contains("Buy Monthly")) a:hover {
             background-color: #7c3aed !important;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4) !important;
         }
 
         /* Yearly Button Color (Orange/Gold) */
@@ -2583,9 +2574,34 @@ def render_login_signup():
             justify-content: center;
             font-weight: 600 !important;
             margin-top: 15px;
+            transition: 0.3s;
         }
         div[data-testid="stLinkButton"]:has(div:contains("Buy Yearly")) a:hover {
             background-color: #d97706 !important;
+            box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4) !important;
+        }
+
+        /* 👇 NAYA FIX: SEAMLESS MATH IMAGE 👇 */
+        .math-bg-container {
+            width: 100%;
+            text-align: center;
+            margin-top: -50px; /* Cards ke paas laane ke liye */
+            margin-bottom: 50px;
+            z-index: -1;
+            position: relative;
+        }
+        .math-bg-image {
+            width: 100vw; /* Pura screen cover kare */
+            position: relative;
+            left: 50%;
+            right: 50%;
+            margin-left: -50vw;
+            margin-right: -50vw;
+            opacity: 0.4;
+            /* Upar se fade karega taaki pura page mein mix ho jaye */
+            mask-image: linear-gradient(to bottom, transparent 0%, black 40%, black 80%, transparent 100%);
+            -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 40%, black 80%, transparent 100%);
+            pointer-events: none;
         }
     </style>
     """, unsafe_allow_html=True)
@@ -2738,7 +2754,7 @@ def render_login_signup():
                                 except Exception as e: 
                                     st.error(f"Sign up failed: {e}")
 
-        # 👇 FOOTER WITH LOGO AND FUTURISTIC IMAGE 👇
+        # 👇 FOOTER 👇
         st.markdown("""
         <div class="footer-pro">
             <img src="https://chhabin541-crypto.github.io/ClyxessAI/logo.png" class="footer-logo" alt="Clyxess Logo">
@@ -2914,10 +2930,11 @@ def render_login_signup():
           
             st.link_button("Buy Yearly ₹1399", RAZORPAY_YEARLY_LINK, use_container_width=True)
 
-        # 👇 FUTURISTIC IMAGE YAHAN ADD KIYA HAI 👇
+        # 👇 NAYA FIX: SEAMLESS MATH IMAGE YAHAN ADD KIYA HAI 👇
         st.markdown("""
-        <div style="text-align: center; margin-top: 30px;">
-            <img src="https://images.unsplash.com/photo-1677442136019-21780ecad995?q=80&w=1200&auto=format&fit=crop" class="futuristic-banner" alt="Future of AI Education">
+        <div class="math-bg-container">
+            <!-- Yahan maine aapki di hui math image ka direct link daala hai, aur usko CSS se blend kar diya hai -->
+            <img src="https://images.unsplash.com/photo-1635070041078-e363dbe005cb?q=80&w=2070&auto=format&fit=crop" class="math-bg-image" alt="Math Background">
         </div>
         """, unsafe_allow_html=True)
 
