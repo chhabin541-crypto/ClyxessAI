@@ -2780,33 +2780,37 @@ def render_login_signup():
         st.stop() 
 
     # ==========================================
-    # 🛑 4. DATABASE CHECK & AUTO-LOCK LOGIC
-    # ==========================================
-    user_email = st.session_state.get("user_email", "")
-    user_id = supabase.auth.get_user().user.id
+# 🛑 4. DATABASE CHECK & AUTO-LOCK LOGIC (BULLETPROOF)
+# ==========================================
+user_email = st.session_state.get("user_email", "")
+
+# 1. Safe User Check (Agar login session expire ho toh)
+try:
+    user_data = supabase.auth.get_user()
+    user_id = user_data.user.id
+except Exception:
+    st.session_state.clear()
+    st.rerun()
+
+res = supabase.table("user_subscriptions").select("*").eq("id", user_id).execute()
+
+is_active = False  # <--- SABSE BADA FIX: Default Locked
+trial_used = False
+is_expired = False
+
+if len(res.data) > 0:
+    trial_used = True 
+    sub_data = res.data[0]
+    expiry_str = sub_data.get("expiry_date") # Safe get
     
-    res = supabase.table("user_subscriptions").select("*").eq("id", user_id).execute()
-    
-    show_plan_screen = False
-    trial_used = False
-    is_expired = False
-    
-    if len(res.data) == 0:
-        show_plan_screen = True 
-    else:
-        trial_used = True 
-        sub_data = res.data[0]
-        expiry_str = sub_data["expiry_date"]
-        
-        if expiry_str:
+    if expiry_str:
+        try:
+            # 2. Safe Date Parsing
             expiry_date = datetime.datetime.fromisoformat(expiry_str.replace('Z', '+00:00'))
             now = datetime.datetime.now(datetime.timezone.utc)
             
-            if expiry_date <= now:
-                show_plan_screen = True 
-                is_expired = True 
-            else:
-                show_plan_screen = False 
+            if expiry_date > now:
+                is_active = True  # <--- SIRF TAB UNLOCK HOGA JAB DATE FUTURE MEIN HOGI
                 
                 plan_type = sub_data["plan_type"]
                 plan_name = "Free Trial" if plan_type == "free" else ("Monthly Plan" if plan_type == "monthly" else "Yearly Plan")
@@ -2826,111 +2830,116 @@ def render_login_signup():
                     </div>
                 </div>
                 """, unsafe_allow_html=True)
-
-    # ==========================================
-    # 🛑 5. PLAN SELECTION SCREEN
-    # ==========================================
-    if show_plan_screen:
-        
-        if is_expired:
-            st.warning("⚠️ Aapka plan expire ho gaya hai. Please koi naya plan kharidein.")
-            
-        st.markdown("""
-        <div style="text-align: center; margin-top: 1rem; margin-bottom: 2rem;">
-            <h1 style="color: white; font-size: 34px; font-weight: 800;">Choose Your Plan</h1>
-            <p style="color: #9ca3af; font-size: 15px;">Unlock all features to continue learning.</p>
-        </div>
-        """, unsafe_allow_html=True)
-
-        col1, col2, col3 = st.columns(3, gap="medium")
-        
-        # --- FREE TRIAL ---
-        with col1:
-            st.markdown("""
-            <div class="pricing-card card-free">
-                <div>
-                    <div class="card-title">Free Trial</div>
-                    <div class="card-price">₹0 <span>/ 24 hours</span></div>
-                    <ul class="feature-list">
-                        <li class="highlight">Try All 18 Labs for 1 Day</li>
-                        <li>Homework Helper, Coding, Math, Physics</li>
-                        <li>Creative Tools & AI Image Gen</li>
-                        <li>Parent Dashboard Access</li>
-                        <li>No Credit Card Needed</li>
-                    </ul>
-                </div>
-            </div>
-            """, unsafe_allow_html=True)
-            
-            if not trial_used:
-                if st.button("Start Free Trial", use_container_width=True, key="btn_free"):
-                    with st.spinner("Activating Trial..."):
-                        expiry = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(hours=24)
-                        supabase.table("user_subscriptions").insert({
-                            "id": user_id, "email": user_email, "plan_type": "free", "expiry_date": expiry.isoformat(), "is_paid": False
-                        }).execute()
-                        time.sleep(1)
-                    st.rerun()
             else:
-                st.info("Aapne free trial pehle hi use kar liya hai.")
+                is_expired = True
+        except Exception:
+            is_expired = True # Agar date kharab hai toh lock kardo
+    else:
+        is_expired = True # Agar date missing hai toh lock kardo
 
-        # --- MONTHLY ---
-        with col2:
-            st.markdown("""
-            <div class="pricing-card card-monthly">
-                <div class="badge-popular">MOST POPULAR</div>
-                <div>
-                    <div class="card-title">Monthly Premium</div>
-                    <div class="card-price">₹1499 <span>/ month</span></div>
-                    <ul class="feature-list">
-                        <li class="highlight">All 18 Premium Labs Unlocked for Full Family</li>
-                        <li>Normal Chat, Creative Lab (School Mode), Play & Learn</li>
-                        <li>Creative AI Image Generator, Vision Lab, Aero Lab</li>
-                        <li>Cyber Security, Art Machine Design, Peer Roleplay Modes</li>
-                        <li>Interactive Homework & Test Generator, Parent Dashboard</li>
-                        <li>Coding Lab, Learn AI, Physics Lab, Math Lab, Learn Finance, Data Science & Machine Learning</li>
-                        <li>Unlimited AI Chats & Explanations, Priority AI Speed, Safe School Mode, 24/7 Premium Support. Only ₹49/day.</li>
-                    </ul>
-                </div>
-            </div>
-            """, unsafe_allow_html=True)
-            
-            st.link_button("Buy Monthly ₹1499", RAZORPAY_MONTHLY_LINK, use_container_width=True)
+# ==========================================
+# 🛑 5. PLAN SELECTION SCREEN
+# ==========================================
+if not is_active: # <--- Yahan Lock lagega
+    
+    if is_expired:
+        st.warning("⚠️ Aapka plan expire ho gaya hai. Please koi naya plan kharidein.")
+        
+    st.markdown("""
+    <div style="text-align: center; margin-top: 1rem; margin-bottom: 2rem;">
+        <h1 style="color: white; font-size: 34px; font-weight: 800;">Choose Your Plan</h1>
+        <p style="color: #9ca3af; font-size: 15px;">Unlock all features to continue learning.</p>
+    </div>
+    """, unsafe_allow_html=True)
 
-        # --- YEARLY ---
-        with col3:
-            st.markdown("""
-            <div class="pricing-card card-yearly">
-                <div class="badge-save">SAVE ₹1200/yr</div>
-                <div>
-                    <div class="card-title">Yearly Premium</div>
-                    <div class="card-price">₹1399 <span>/ month annual billing 16788</span></div>
-                    <ul class="feature-list">
-                        <li class="highlight">FULL FAMILY PACKAGE - BEST VALUE</li>
-                        <li>Monthly wale sab kuch + 12 Months Access</li>
-                        <li>All 18 Labs: School Mode, Play & Learn, Homework & Test Maker, Coding, Physics, Math, Finance, Cyber Security, Aero & Vision Labs, AI Image Generator & More</li>
-                        <li>Advanced Parent Dashboard - Bache ki full progress dekho</li>
-                        <li>Highest Priority AI, Early Access to New Features, Dedicated Support</li>
-                        <li>Save ₹1200/year. Just ₹46/day.</li>
-                    </ul>
-                </div>
-            </div>
-            """, unsafe_allow_html=True)
-          
-            st.link_button("Buy Yearly ₹1399", RAZORPAY_YEARLY_LINK, use_container_width=True)
-
-        # 👇 SEAMLESS COSMOS IMAGE 👇
+    col1, col2, col3 = st.columns(3, gap="medium")
+    
+    # --- FREE TRIAL ---
+    with col1:
         st.markdown("""
-        <div class="cosmos-container">
-            <img src="https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?q=80&w=1000&auto=format&fit=crop" class="cosmos-image" alt="Cosmos Math Background">
+        <div class="pricing-card card-free">
+            <div>
+                <div class="card-title">Free Trial</div>
+                <div class="card-price">₹0 <span>/ 24 hours</span></div>
+                <ul class="feature-list">
+                    <li class="highlight">Try All 18 Labs for 1 Day</li>
+                    <li>Homework Helper, Coding, Math, Physics</li>
+                    <li>Creative Tools & AI Image Gen</li>
+                    <li>Parent Dashboard Access</li>
+                    <li>No Credit Card Needed</li>
+                </ul>
+            </div>
         </div>
         """, unsafe_allow_html=True)
+        
+        if not trial_used:
+            if st.button("Start Free Trial", use_container_width=True, key="btn_free"):
+                with st.spinner("Activating Trial..."):
+                    expiry = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(hours=24)
+                    supabase.table("user_subscriptions").insert({
+                        "id": user_id, "email": user_email, "plan_type": "free", "expiry_date": expiry.isoformat(), "is_paid": False
+                    }).execute()
+                    time.sleep(1)
+                st.rerun()
+        else:
+            st.info("Aapne free trial pehle hi use kar liya hai.")
 
-        st.stop() 
+    # --- MONTHLY ---
+    with col2:
+        st.markdown("""
+        <div class="pricing-card card-monthly">
+            <div class="badge-popular">MOST POPULAR</div>
+            <div>
+                <div class="card-title">Monthly Premium</div>
+                <div class="card-price">₹1499 <span>/ month</span></div>
+                <ul class="feature-list">
+                    <li class="highlight">All 18 Premium Labs Unlocked for Full Family</li>
+                    <li>Normal Chat, Creative Lab (School Mode), Play & Learn</li>
+                    <li>Creative AI Image Generator, Vision Lab, Aero Lab</li>
+                    <li>Cyber Security, Art Machine Design, Peer Roleplay Modes</li>
+                    <li>Interactive Homework & Test Generator, Parent Dashboard</li>
+                    <li>Coding Lab, Learn AI, Physics Lab, Math Lab, Learn Finance, Data Science & Machine Learning</li>
+                    <li>Unlimited AI Chats & Explanations, Priority AI Speed, Safe School Mode, 24/7 Premium Support. Only ₹49/day.</li>
+                </ul>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        st.link_button("Buy Monthly ₹1499", RAZORPAY_MONTHLY_LINK, use_container_width=True)
 
-    # ==========================================
-    # ✅ DASHBOARD
-    # ==========================================
+    # --- YEARLY ---
+    with col3:
+        st.markdown("""
+        <div class="pricing-card card-yearly">
+            <div class="badge-save">SAVE ₹1200/yr</div>
+            <div>
+                <div class="card-title">Yearly Premium</div>
+                <div class="card-price">₹1399 <span>/ month</span></div>
+                <ul class="feature-list">
+                    <li class="highlight">FULL FAMILY PACKAGE - BEST VALUE</li>
+                    <li>Monthly wale sab kuch + 12 Months Access</li>
+                    <li>All 18 Labs: School Mode, Play & Learn, Homework & Test Maker, Coding, Physics, Math, Finance, Cyber Security, Aero & Vision Labs, AI Image Generator & More</li>
+                    <li>Advanced Parent Dashboard - Bache ki full progress dekho</li>
+                    <li>Highest Priority AI, Early Access to New Features, Dedicated Support</li>
+                    <li>Save ₹1200/year. Just ₹46/day.</li>
+                </ul>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+      
+        st.link_button("Buy Yearly ₹1399", RAZORPAY_YEARLY_LINK, use_container_width=True)
+
+    st.markdown("""
+    <div class="cosmos-container">
+        <img src="https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?q=80&w=1000&auto=format&fit=crop" class="cosmos-image" alt="Cosmos Math Background">
+    </div>
+    """, unsafe_allow_html=True)
+
+    st.stop() # <--- YEH LINE PAKKA LOCK KAREGI
+
+# ==========================================
+# ✅ DASHBOARD (SIRF ACTIVE PLAN WALO KE LIYE)
+# ==========================================
     
     st.sidebar.markdown("---")
     if st.sidebar.button("💎 Buy / Upgrade Premium", use_container_width=True, type="primary", key="btn_upgrade_premium"):
