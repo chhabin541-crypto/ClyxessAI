@@ -2904,7 +2904,7 @@ def render_login_signup():
                 <div class="badge-save">SAVE ₹1200/yr</div>
                 <div>
                     <div class="card-title">Yearly Premium</div>
-                    <div class="card-price">₹1399 <span>/ month</span></div>
+                    <div class="card-price">₹1399 <span>/ month annual billing 16788</span></div>
                     <ul class="feature-list">
                         <li class="highlight">FULL FAMILY PACKAGE - BEST VALUE</li>
                         <li>Monthly wale sab kuch + 12 Months Access</li>
