@@ -2516,7 +2516,24 @@ def render_login_signup():
         .footer-pro .social-links a { color: #9ca3af; font-size: 20px; transition: 0.3s; text-decoration: none; }
         .footer-pro .social-links a:hover { color: #8b5cf6; transform: scale(1.2); }
         .footer-pro .copyright { font-size: 12px; color: #4b5563; }
+        
+        /* 👇 NAYA CSS: LOGO AUR MULTI-COLOR BUTTON 👇 */
         .footer-logo { width: 70px; height: 70px; border-radius: 50%; margin-bottom: 15px; border: 2px solid #3b82f6; object-fit: cover; }
+        
+        div[data-testid="stButton"]:has(div:contains("Buy Premium Plan")) button {
+            background: linear-gradient(90deg, #3b82f6 0%, #8b5cf6 50%, #f59e0b 100%) !important;
+            color: white !important; border: none !important;
+            font-weight: bold !important;
+            font-size: 16px !important;
+            padding: 12px !important;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4) !important;
+            transition: 0.3s;
+        }
+        div[data-testid="stButton"]:has(div:contains("Buy Premium Plan")) button:hover {
+            transform: scale(1.02);
+            box-shadow: 0 6px 20px rgba(139, 92, 246, 0.6) !important;
+        }
+        /* 👆 NAYA CSS KHATAM 👆 */
     </style>
     """, unsafe_allow_html=True)
 
@@ -2582,6 +2599,7 @@ def render_login_signup():
     # ==========================================
     if not st.session_state.get("logged_in", False):
         _, center_col, _ = st.columns([1, 1.2, 1])
+        
         with center_col:
             st.markdown("""
             <div style="text-align: center; margin-bottom: 30px;">
@@ -2667,9 +2685,9 @@ def render_login_signup():
                                 except Exception as e: 
                                     st.error(f"Sign up failed: {e}")
 
+        # 👇 FOOTER WITH LOGO 👇
         st.markdown("""
         <div class="footer-pro">
-            <!-- 🚨 APNE LOGO KA LINK YAHAN DAALEIN (Agar alag hai) 🚨 -->
             <img src="https://chhabin541-crypto.github.io/ClyxessAI/logo.png" class="footer-logo" alt="Clyxess Logo">
             <div class="contact-info">
                 <div><i class="fas fa-envelope"></i> <a href="mailto:infocarloxin24@gmail.com" style="color:#9ca3af; text-decoration:none;">infocarloxin24@gmail.com</a></div>
@@ -2694,13 +2712,13 @@ def render_login_signup():
         </div>
         """, unsafe_allow_html=True)
         
-        # 👇 YAHAN HAI FOOTER WALA PREMIUM BUTTON 👇
+        # 👇 FOOTER MULTI-COLOR BUTTON 👇
         st.markdown("<br>", unsafe_allow_html=True)
         col_btn1, col_btn2, col_btn3 = st.columns([1, 1.5, 1])
         with col_btn2:
-            if st.button("💎 Buy Premium Plan", use_container_width=True, type="primary", key="login_footer_buy"):
+            if st.button("💎 Buy Premium Plan", use_container_width=True, key="login_footer_buy"):
                 st.warning("⚠️ Please Log In or Sign Up first to purchase a plan.")
-        
+                
         st.stop() 
 
     # ==========================================
@@ -2754,13 +2772,8 @@ def render_login_signup():
     # ==========================================
     # 🛑 5. PLAN SELECTION SCREEN
     # ==========================================
-    if show_plan_screen or st.session_state.get("show_pricing_modal", False):
+    if show_plan_screen:
         
-        if st.session_state.get("show_pricing_modal", False) and not is_expired:
-            if st.button("⬅️ Back to Dashboard", type="secondary"):
-                st.session_state.show_pricing_modal = False
-                st.rerun()
-
         if is_expired:
             st.warning("⚠️ Aapka plan expire ho gaya hai. Please koi naya plan kharidein.")
             
@@ -2797,7 +2810,6 @@ def render_login_signup():
                             "id": user_id, "email": user_email, "plan_type": "free", "expiry_date": expiry.isoformat(), "is_paid": False
                         }).execute()
                         time.sleep(1)
-                    st.session_state.show_pricing_modal = False
                     st.rerun()
             else:
                 st.info("Aapne free trial pehle hi use kar liya hai.")
@@ -2818,9 +2830,8 @@ def render_login_signup():
             </div>
             """, unsafe_allow_html=True)
             
-            if st.button("Buy Monthly ₹1499", use_container_width=True, key="btn_m"):
-                webbrowser.open_new_tab(RAZORPAY_MONTHLY_LINK)
-                st.info("Payment complete karein, uske baad page refresh hoga.")
+            # ✅ FIX: Payment button ko st.link_button se replace kiya
+            st.link_button("Buy Monthly ₹1499", RAZORPAY_MONTHLY_LINK, use_container_width=True, type="primary")
 
         # --- YEARLY ---
         with col3:
@@ -2838,9 +2849,8 @@ def render_login_signup():
             </div>
             """, unsafe_allow_html=True)
           
-            if st.button("Buy Yearly ₹1399", use_container_width=True, key="btn_y"):
-                webbrowser.open_new_tab(RAZORPAY_YEARLY_LINK)
-                st.info("Payment complete karein, uske baad page refresh hoga.")
+            # ✅ FIX: Payment button ko st.link_button se replace kiya
+            st.link_button("Buy Yearly ₹1399", RAZORPAY_YEARLY_LINK, use_container_width=True, type="primary")
 
         st.stop() 
 
