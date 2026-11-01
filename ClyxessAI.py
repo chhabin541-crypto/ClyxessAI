@@ -2455,7 +2455,6 @@ def render_login_signup():
         st.stop()
 
     # 🚨 1. APNE RAZORPAY LINKS YAHAN DAALEIN 🚨
-    # (Abhi dono jagah ek hi link daala hai, Yearly ka link aane par wo badal lena)
     RAZORPAY_MONTHLY_LINK = "https://rzp.io/rzp/nNI2b7Qd" 
     RAZORPAY_YEARLY_LINK = "https://rzp.io/rzp/0mWgHct"   
 
@@ -2517,6 +2516,7 @@ def render_login_signup():
         .footer-pro .social-links a { color: #9ca3af; font-size: 20px; transition: 0.3s; text-decoration: none; }
         .footer-pro .social-links a:hover { color: #8b5cf6; transform: scale(1.2); }
         .footer-pro .copyright { font-size: 12px; color: #4b5563; }
+        .footer-logo { width: 70px; height: 70px; border-radius: 50%; margin-bottom: 15px; border: 2px solid #3b82f6; object-fit: cover; }
     </style>
     """, unsafe_allow_html=True)
 
@@ -2547,7 +2547,7 @@ def render_login_signup():
             st.query_params.clear()
 
     # ==========================================
-    # 🛑 2. PAYMENT SUCCESS LOGIC (Razorpay Redirect)
+    # 🛑 2. PAYMENT SUCCESS LOGIC
     # ==========================================
     if "status" in st.query_params and st.query_params["status"] == "success":
         if st.session_state.get("logged_in", False):
@@ -2578,12 +2578,10 @@ def render_login_signup():
                 st.query_params.clear()
 
     # ==========================================
-    # 🛑 3. LOGIN / SIGNUP UI (COMPACT LAYOUT)
+    # 🛑 3. LOGIN / SIGNUP UI
     # ==========================================
     if not st.session_state.get("logged_in", False):
-        
         _, center_col, _ = st.columns([1, 1.2, 1])
-        
         with center_col:
             st.markdown("""
             <div style="text-align: center; margin-bottom: 30px;">
@@ -2671,6 +2669,8 @@ def render_login_signup():
 
         st.markdown("""
         <div class="footer-pro">
+            <!-- 🚨 APNE LOGO KA LINK YAHAN DAALEIN (Agar alag hai) 🚨 -->
+            <img src="https://chhabin541-crypto.github.io/ClyxessAI/logo.png" class="footer-logo" alt="Clyxess Logo">
             <div class="contact-info">
                 <div><i class="fas fa-envelope"></i> <a href="mailto:infocarloxin24@gmail.com" style="color:#9ca3af; text-decoration:none;">infocarloxin24@gmail.com</a></div>
                 <div><i class="fas fa-phone"></i> +91 7647996793</div>
@@ -2693,7 +2693,14 @@ def render_login_signup():
             </div>
         </div>
         """, unsafe_allow_html=True)
-                
+        
+        # 👇 YAHAN HAI FOOTER WALA PREMIUM BUTTON 👇
+        st.markdown("<br>", unsafe_allow_html=True)
+        col_btn1, col_btn2, col_btn3 = st.columns([1, 1.5, 1])
+        with col_btn2:
+            if st.button("💎 Buy Premium Plan", use_container_width=True, type="primary", key="login_footer_buy"):
+                st.warning("⚠️ Please Log In or Sign Up first to purchase a plan.")
+        
         st.stop() 
 
     # ==========================================
@@ -2747,8 +2754,13 @@ def render_login_signup():
     # ==========================================
     # 🛑 5. PLAN SELECTION SCREEN
     # ==========================================
-    if show_plan_screen:
+    if show_plan_screen or st.session_state.get("show_pricing_modal", False):
         
+        if st.session_state.get("show_pricing_modal", False) and not is_expired:
+            if st.button("⬅️ Back to Dashboard", type="secondary"):
+                st.session_state.show_pricing_modal = False
+                st.rerun()
+
         if is_expired:
             st.warning("⚠️ Aapka plan expire ho gaya hai. Please koi naya plan kharidein.")
             
@@ -2785,6 +2797,7 @@ def render_login_signup():
                             "id": user_id, "email": user_email, "plan_type": "free", "expiry_date": expiry.isoformat(), "is_paid": False
                         }).execute()
                         time.sleep(1)
+                    st.session_state.show_pricing_modal = False
                     st.rerun()
             else:
                 st.info("Aapne free trial pehle hi use kar liya hai.")
@@ -2805,7 +2818,6 @@ def render_login_signup():
             </div>
             """, unsafe_allow_html=True)
             
-            # RAZORPAY MONTHLY LINK
             if st.button("Buy Monthly ₹1499", use_container_width=True, key="btn_m"):
                 webbrowser.open_new_tab(RAZORPAY_MONTHLY_LINK)
                 st.info("Payment complete karein, uske baad page refresh hoga.")
@@ -2826,7 +2838,6 @@ def render_login_signup():
             </div>
             """, unsafe_allow_html=True)
           
-            # RAZORPAY YEARLY LINK
             if st.button("Buy Yearly ₹1399", use_container_width=True, key="btn_y"):
                 webbrowser.open_new_tab(RAZORPAY_YEARLY_LINK)
                 st.info("Payment complete karein, uske baad page refresh hoga.")
@@ -2837,6 +2848,12 @@ def render_login_signup():
     # ✅ DASHBOARD
     # ==========================================
     
+    st.sidebar.markdown("---")
+    if st.sidebar.button("💎 Buy / Upgrade Premium", use_container_width=True, type="primary", key="btn_upgrade_premium"):
+        st.session_state.show_pricing_modal = True
+        st.rerun()
+    st.sidebar.markdown("---")
+
     if st.sidebar.button("🚪 Log Out", use_container_width=True, key="btn_logout"):
         st.session_state.clear()
         st.rerun()
