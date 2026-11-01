@@ -2457,7 +2457,7 @@ def render_login_signup():
     # 🚨 1. APNE RAZORPAY LINKS YAHAN DAALEIN 🚨
     # (Abhi dono jagah ek hi link daala hai, Yearly ka link aane par wo badal lena)
     RAZORPAY_MONTHLY_LINK = "https://rzp.io/rzp/nNI2b7Qd" 
-    RAZORPAY_YEARLY_LINK = "https://rzp.io/rzp/nNI2b7Qd"   
+    RAZORPAY_YEARLY_LINK = "https://rzp.io/rzp/0mWgHct"   
 
     # 🎨 PREMIUM CSS (Compact & Professional)
     st.markdown("""
