@@ -2494,29 +2494,38 @@ def render_login_signup():
         .facebook-btn:hover { background-color: #166fe5; color: #fff; }
 
         /* ==========================================
-           👇 FIX 1: PERFECT CARD ALIGNMENT 👇
+           👇 FIX 1: PERFECT CARD & TEXT SIZE 👇
            ========================================== */
         .pricing-card { 
-            background: #111827; border-radius: 20px; padding: 30px; border: 1px solid #1f2937; 
+            background: #111827; border-radius: 15px; 
+            padding: 20px 15px; /* Padding kam ki taaki text ko jagah mile */
+            border: 1px solid #1f2937; 
             text-align: left; position: relative; 
-            height: 520px; /* Fixed height for all cards */
+            height: 520px; /* Fixed height sabke liye barabar */
             display: flex; flex-direction: column; 
             transition: all 0.3s ease-in-out; cursor: pointer; 
         }
-        .pricing-card:hover { transform: translateY(-10px); box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
+        .pricing-card:hover { transform: translateY(-5px); box-shadow: 0 15px 30px rgba(0,0,0,0.5); }
         .card-free { border-top: 4px solid #3b82f6; }
-        .card-monthly { border-top: 4px solid #8b5cf6; border: 1px solid #8b5cf6; box-shadow: 0 0 30px rgba(139, 92, 246, 0.15); background: #15132b; }
+        .card-monthly { border-top: 4px solid #8b5cf6; border: 1px solid #8b5cf6; box-shadow: 0 0 20px rgba(139, 92, 246, 0.15); background: #15132b; }
         .card-yearly { border-top: 4px solid #f59e0b; }
         
-        .card-title { color: white; font-size: 22px; font-weight: 700; margin-bottom: 5px; }
-        .card-price { color: white; font-size: 42px; font-weight: 800; margin: 15px 0 5px 0; }
-        .card-price span { font-size: 14px; color: #9ca3af; font-weight: 400; }
-        .badge-popular { position: absolute; top: -14px; right: 20px; background: #8b5cf6; color: white; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; }
-        .badge-save { position: absolute; top: -14px; right: 20px; background: #f59e0b; color: white; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; }
+        .card-title { color: white; font-size: 18px; font-weight: 700; margin-bottom: 5px; }
+        .card-price { color: white; font-size: 32px; font-weight: 800; margin: 10px 0 5px 0; }
+        .card-price span { font-size: 12px; color: #9ca3af; font-weight: 400; }
         
-        .feature-list { list-style: none; padding: 0; margin: 20px 0; color: #d1d5db; font-size: 13px; line-height: 1.5; flex-grow: 1; }
-        .feature-list li { margin-bottom: 8px; display: flex; align-items: flex-start; gap: 8px; }
-        .feature-list li::before { content: "✔"; color: #10b981; font-weight: bold; font-size: 13px; margin-top: 2px; flex-shrink: 0; }
+        .badge-popular { position: absolute; top: -12px; right: 15px; background: #8b5cf6; color: white; padding: 3px 10px; border-radius: 15px; font-size: 10px; font-weight: 700; }
+        .badge-save { position: absolute; top: -12px; right: 15px; background: #f59e0b; color: white; padding: 3px 10px; border-radius: 15px; font-size: 10px; font-weight: 700; }
+        
+        /* 👇 TEXT KO CHHOTA KAR DIYA HAI 👇 */
+        .feature-list { 
+            list-style: none; padding: 0; margin: 10px 0; 
+            color: #d1d5db; font-size: 11.5px; /* Font chhota kiya */
+            line-height: 1.3; /* Lines ke beech space kam kiya */
+            flex-grow: 1; /* Text ko bachi hui jagah lene do */
+        }
+        .feature-list li { margin-bottom: 5px; display: flex; align-items: flex-start; gap: 6px; }
+        .feature-list li::before { content: "✔"; color: #10b981; font-weight: bold; font-size: 11px; margin-top: 2px; flex-shrink: 0; }
         .feature-list .highlight { color: white; font-weight: 600; }
 
         .footer-pro { text-align: center; margin-top: 60px; padding-top: 30px; border-top: 1px solid #1f2937; color: #9ca3af; font-size: 14px; }
@@ -2546,18 +2555,12 @@ def render_login_signup():
         /* Monthly Button - Purple Base */
         a[href*="nNI2b7Qd"] {
             background-color: #8b5cf6 !important;
-            color: white !important;
-            border: none !important;
-            width: 100% !important;
-            display: flex !important;
-            justify-content: center !important;
-            font-weight: 600 !important;
-            border-radius: 10px !important;
-            padding: 10px !important;
-            margin-top: 10px !important;
-            transition: 0.3s !important;
+            color: white !important; border: none !important;
+            width: 100% !important; display: flex !important; justify-content: center !important;
+            font-weight: 600 !important; border-radius: 10px !important;
+            padding: 8px !important; margin-top: 10px !important; transition: 0.3s !important;
+            font-size: 14px !important;
         }
-        /* Monthly Button Hover - Lighter Purple */
         a[href*="nNI2b7Qd"]:hover {
             background-color: #a855f7 !important;
             box-shadow: 0 0 15px rgba(168, 85, 247, 0.8) !important;
@@ -2566,43 +2569,30 @@ def render_login_signup():
         /* Yearly Button - Gold Base */
         a[href*="0mWgHct"] {
             background-color: #f59e0b !important;
-            color: white !important;
-            border: none !important;
-            width: 100% !important;
-            display: flex !important;
-            justify-content: center !important;
-            font-weight: 600 !important;
-            border-radius: 10px !important;
-            padding: 10px !important;
-            margin-top: 10px !important;
-            transition: 0.3s !important;
+            color: white !important; border: none !important;
+            width: 100% !important; display: flex !important; justify-content: center !important;
+            font-weight: 600 !important; border-radius: 10px !important;
+            padding: 8px !important; margin-top: 10px !important; transition: 0.3s !important;
+            font-size: 14px !important;
         }
-        /* Yearly Button Hover - Lighter Gold */
         a[href*="0mWgHct"]:hover {
             background-color: #fbbf24 !important;
             box-shadow: 0 0 15px rgba(251, 191, 36, 0.8) !important;
         }
 
         /* ==========================================
-           👇 FIX 3: SEAMLESS COSMOS IMAGE (No Borders) 👇
+           👇 FIX 3: SEAMLESS COSMOS IMAGE 👇
            ========================================== */
         .cosmos-container {
-            width: 100%;
-            display: flex;
-            justify-content: center;
-            margin-top: 40px;
-            margin-bottom: 20px;
+            width: 100%; display: flex; justify-content: center;
+            margin-top: 20px; margin-bottom: 20px;
         }
         .cosmos-image {
-            width: 100%;
-            max-width: 1000px;
-            border-radius: 20px;
-            /* mix-blend-mode screen makes black transparent */
+            width: 100%; max-width: 1000px;
             mix-blend-mode: screen; 
-            opacity: 0.8;
-            /* Fade out top and bottom for seamless blending */
-            mask-image: linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%);
-            -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%);
+            opacity: 0.7;
+            mask-image: linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%);
+            -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%);
         }
     </style>
     """, unsafe_allow_html=True)
@@ -2929,7 +2919,7 @@ def render_login_signup():
           
             st.link_button("Buy Yearly ₹1399", RAZORPAY_YEARLY_LINK, use_container_width=True)
 
-        # 👇 SEAMLESS COSMOS IMAGE (No borders, perfectly blended) 👇
+        # 👇 SEAMLESS COSMOS IMAGE 👇
         st.markdown("""
         <div class="cosmos-container">
             <img src="https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?q=80&w=1000&auto=format&fit=crop" class="cosmos-image" alt="Cosmos Math Background">
