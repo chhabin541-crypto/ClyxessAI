@@ -2458,7 +2458,7 @@ def render_login_signup():
     RAZORPAY_MONTHLY_LINK = "https://rzp.io/rzp/nNI2b7Qd" 
     RAZORPAY_YEARLY_LINK = "https://rzp.io/rzp/0mWgHct"   
 
-    # 🎨 PREMIUM CSS (Compact & Professional)
+    # 🎨 PREMIUM CSS
     st.markdown("""
     <style>
         @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css');
@@ -2492,15 +2492,7 @@ def render_login_signup():
         .facebook-btn { background-color: #1877F2; color: #ffffff; border: none; }
         .facebook-btn:hover { background-color: #166fe5; color: #fff; }
 
-        .pricing-card { 
-            background: #111827; border-radius: 15px; 
-            padding: 20px 15px; 
-            border: 1px solid #1f2937; 
-            text-align: left; position: relative; 
-            height: 520px; 
-            display: flex; flex-direction: column; 
-            transition: all 0.3s ease-in-out; cursor: pointer; 
-        }
+        .pricing-card { background: #111827; border-radius: 15px; padding: 20px 15px; border: 1px solid #1f2937; text-align: left; position: relative; height: 520px; display: flex; flex-direction: column; transition: all 0.3s ease-in-out; cursor: pointer; }
         .pricing-card:hover { transform: translateY(-5px); box-shadow: 0 15px 30px rgba(0,0,0,0.5); }
         .card-free { border-top: 4px solid #3b82f6; }
         .card-monthly { border-top: 4px solid #8b5cf6; border: 1px solid #8b5cf6; box-shadow: 0 0 20px rgba(139, 92, 246, 0.15); background: #15132b; }
@@ -2513,12 +2505,7 @@ def render_login_signup():
         .badge-popular { position: absolute; top: -12px; right: 15px; background: #8b5cf6; color: white; padding: 3px 10px; border-radius: 15px; font-size: 10px; font-weight: 700; }
         .badge-save { position: absolute; top: -12px; right: 15px; background: #f59e0b; color: white; padding: 3px 10px; border-radius: 15px; font-size: 10px; font-weight: 700; }
         
-        .feature-list { 
-            list-style: none; padding: 0; margin: 10px 0; 
-            color: #d1d5db; font-size: 11.5px; 
-            line-height: 1.3; 
-            flex-grow: 1; 
-        }
+        .feature-list { list-style: none; padding: 0; margin: 10px 0; color: #d1d5db; font-size: 11.5px; line-height: 1.3; flex-grow: 1; }
         .feature-list li { margin-bottom: 5px; display: flex; align-items: flex-start; gap: 6px; }
         .feature-list li::before { content: "✔"; color: #10b981; font-weight: bold; font-size: 11px; margin-top: 2px; flex-shrink: 0; }
         .feature-list .highlight { color: white; font-weight: 600; }
@@ -2531,7 +2518,6 @@ def render_login_signup():
         .footer-pro .social-links a { color: #9ca3af; font-size: 20px; transition: 0.3s; text-decoration: none; }
         .footer-pro .social-links a:hover { color: #8b5cf6; transform: scale(1.2); }
         .footer-pro .copyright { font-size: 12px; color: #4b5563; }
-        
         .footer-logo { width: 70px; height: 70px; border-radius: 50%; margin-bottom: 15px; border: 2px solid #3b82f6; object-fit: cover; }
 
         div[data-testid="stButton"]:has(div:contains("Buy Premium Plan")) button {
@@ -2545,30 +2531,18 @@ def render_login_signup():
         }
 
         a[href*="nNI2b7Qd"] {
-            background-color: #8b5cf6 !important;
-            color: white !important; border: none !important;
+            background-color: #8b5cf6 !important; color: white !important; border: none !important;
             width: 100% !important; display: flex !important; justify-content: center !important;
-            font-weight: 600 !important; border-radius: 10px !important;
-            padding: 8px !important; margin-top: 10px !important; transition: 0.3s !important;
-            font-size: 14px !important;
+            font-weight: 600 !important; border-radius: 10px !important; padding: 8px !important; margin-top: 10px !important; transition: 0.3s !important; font-size: 14px !important;
         }
-        a[href*="nNI2b7Qd"]:hover {
-            background-color: #a855f7 !important;
-            box-shadow: 0 0 15px rgba(168, 85, 247, 0.8) !important;
-        }
+        a[href*="nNI2b7Qd"]:hover { background-color: #a855f7 !important; box-shadow: 0 0 15px rgba(168, 85, 247, 0.8) !important; }
 
         a[href*="0mWgHct"] {
-            background-color: #f59e0b !important;
-            color: white !important; border: none !important;
+            background-color: #f59e0b !important; color: white !important; border: none !important;
             width: 100% !important; display: flex !important; justify-content: center !important;
-            font-weight: 600 !important; border-radius: 10px !important;
-            padding: 8px !important; margin-top: 10px !important; transition: 0.3s !important;
-            font-size: 14px !important;
+            font-weight: 600 !important; border-radius: 10px !important; padding: 8px !important; margin-top: 10px !important; transition: 0.3s !important; font-size: 14px !important;
         }
-        a[href*="0mWgHct"]:hover {
-            background-color: #fbbf24 !important;
-            box-shadow: 0 0 15px rgba(251, 191, 36, 0.8) !important;
-        }
+        a[href*="0mWgHct"]:hover { background-color: #fbbf24 !important; box-shadow: 0 0 15px rgba(251, 191, 36, 0.8) !important; }
     </style>
     """, unsafe_allow_html=True)
 
@@ -2623,6 +2597,7 @@ def render_login_signup():
                 st.info(f"Plan valid till: {expiry.strftime('%d %b %Y')}")
                 
                 if st.button("Go to Dashboard 🚀", type="primary", use_container_width=True):
+                    st.session_state.show_pricing_modal = False
                     st.rerun()
                 st.stop()
             except Exception as e:
@@ -2648,7 +2623,6 @@ def render_login_signup():
                 r_google = supabase.auth.sign_in_with_oauth({"provider": "google", "options": {"redirect_to": st.secrets.get("SUPABASE_REDIRECT_URL", "")}})
                 google_url = r_google.url
             except Exception: pass
-
             try:
                 r_fb = supabase.auth.sign_in_with_oauth({"provider": "facebook", "options": {"redirect_to": st.secrets.get("SUPABASE_REDIRECT_URL", "")}})
                 fb_url = r_fb.url
@@ -2768,9 +2742,10 @@ def render_login_signup():
 
     res = supabase.table("user_subscriptions").select("*").eq("id", user_id).execute()
     
-    is_active = False  # Default: Locked
+    is_active = False
     trial_used = False
     is_expired = False
+    sub_data = None
     
     if len(res.data) > 0:
         trial_used = True 
@@ -2783,11 +2758,8 @@ def render_login_signup():
                 now = datetime.datetime.now(datetime.timezone.utc)
                 
                 if expiry_date > now:
-                    is_active = True  # Plan Active
-                    
+                    is_active = True 
                     plan_type = sub_data["plan_type"]
-                    plan_display_name = "Monthly Plan (₹1499)" if plan_type == "monthly" else "Yearly Plan (₹16,788)" if plan_type == "yearly" else "Free Trial"
-                    color = "#3b82f6" if plan_type == "free" else ("#8b5cf6" if plan_type == "monthly" else "#f59e0b")
                     
                     time_left = expiry_date - now
                     days_left = time_left.days
@@ -2800,11 +2772,17 @@ def render_login_signup():
             is_expired = True
 
     # ==========================================
-    # 🛑 5. PLAN SELECTION SCREEN (LOCK SCREEN)
+    # 🛑 5. PLAN SELECTION SCREEN (Sirf tab dikhega jab user 'Buy' dabaye)
     # ==========================================
-    if not is_active:
+    if st.session_state.get("show_pricing_modal", False) or not trial_used:
         
-        if is_expired:
+        # Back button if user is just viewing plans
+        if st.session_state.get("show_pricing_modal", False) and trial_used:
+            if st.button("⬅️ Back to Dashboard", type="secondary"):
+                st.session_state.show_pricing_modal = False
+                st.rerun()
+
+        if is_expired and not st.session_state.get("show_pricing_modal", False):
             st.warning("⚠️ Aapka plan expire ho gaya hai. Please koi naya plan kharidein.")
             
         st.markdown("""
@@ -2842,6 +2820,7 @@ def render_login_signup():
                             "id": user_id, "email": user_email, "plan_type": "free", "expiry_date": expiry.isoformat(), "is_paid": False
                         }).execute()
                         time.sleep(1)
+                    st.session_state.show_pricing_modal = False
                     st.rerun()
             else:
                 st.info("Aapne free trial pehle hi use kar liya hai.")
@@ -2891,57 +2870,86 @@ def render_login_signup():
           
             st.link_button("Buy Yearly ₹1399", RAZORPAY_YEARLY_LINK, use_container_width=True)
 
-        # 👇 NAYA: PLAN KE NICHE CHHOTA SA LOGOUT BUTTON 👇
-        st.markdown("<br><hr style='border-color: #1f2937;'><br>", unsafe_allow_html=True)
-        col_empty1, col_btn_logout, col_empty2 = st.columns([1, 1, 1])
-        with col_btn_logout:
-            if st.button("🚪 Log Out / Switch Account", use_container_width=True, key="lock_screen_logout"):
-                st.session_state.clear()
-                st.rerun()
-
-        st.stop() # 🛑 YEH DASHBOARD KO ROKEGA
+        st.stop() 
 
     # ==========================================
-    # ✅ DASHBOARD (SIRF ACTIVE PLAN WALO KE LIYE)
+    # ✅ DASHBOARD
     # ==========================================
     
-    # 👇 SABSE PEHLE SIDEBAR MEIN "SELECT MODE" RAKHA HAI 👇
-    st.sidebar.markdown("### 📚 Select Mode")
-    mode = st.sidebar.radio("", ["Normal Chat", "Cyber Security", "Homework"])
-    
-    # 👇 SIDEBAR MEIN SPACE CHHODA TAAKI PROFILE NICHE DIKHE 👇
-    st.sidebar.markdown("<br>" * 8, unsafe_allow_html=True)
-    st.sidebar.markdown("---")
+    # 👇 1. SIDEBAR TOP (Time, Mode) 👇
+    with st.sidebar:
+        ist_time = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=5, minutes=30)))
+        time_str = ist_time.strftime("%A, %d %B %Y. %I:%M %p (IST)")
+        st.caption(f"IN India live time: {time_str}")
+        
+        if st.button("➕ New Chat", use_container_width=True, type="primary"):
+            st.session_state.messages = []
+            st.session_state.current_chat_id = None
+            st.rerun()
+            
+        st.divider()
 
-    # 👇 AB SAARA PROFILE, PLAN INFO, AUR LOGOUT SABSE NICHE HAI 👇
-    if is_active:
+        st.markdown("### 📚 Select Mode")
+        
+        # 🛑 MAIN FIX: Agar plan active nahi hai, toh radio button disabled ho jayega (click nahi hoga)
+        mode = st.radio("", ["Normal Chat", "Cyber Security", "Homework"], disabled=not is_active)
+
+    # 👇 2. MAIN AREA LOGIC 👇
+    if not is_active:
+        # Agar plan expired hai, toh main screen par warning aur buy button dikhao
+        st.error("⚠️ Aapka plan expire ho gaya hai. Features use karne ke liye please plan kharidein.")
+        if st.button("💎 Buy Plan Now", type="primary", use_container_width=True):
+            st.session_state.show_pricing_modal = True
+            st.rerun()
+    else:
+        # Agar plan active hai, toh normal content dikhao
+        st.markdown(f"### {mode} Mode")
+        st.write(f"Aapka plan active hai. Yahan {mode} ka content aayega...")
+        # (Aapka baaki dashboard code yahan aayega)
+
+    # 👇 3. SIDEBAR BOTTOM (Profile, Status, Logout) 👇
+    with st.sidebar:
+        st.divider()
+        
         plan_type = sub_data["plan_type"]
         plan_display_name = "Monthly Plan (₹1499)" if plan_type == "monthly" else "Yearly Plan (₹16,788)" if plan_type == "yearly" else "Free Trial"
         
-        # Timing logic
-        if plan_type == "free":
-            time_display = f"⏳ {hours_left} Hours Remaining" if hours_left > 0 else f"⏳ {time_left.seconds // 60} Mins Remaining"
-        else:
-            time_display = f"⏳ {days_left} Days Remaining"
-
-        st.sidebar.markdown(f"""
-        <div style="border: 1px solid #10b981; border-radius: 10px; padding: 12px; margin-top: 10px; margin-bottom: 15px; background: rgba(16, 185, 129, 0.05);">
-            <p style="margin: 0; color: #9ca3af; font-size: 11px;">👤 {user_email}</p>
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 5px; margin-bottom: 8px;">
-                <span style="color: #d1d5db; font-size: 13px; font-weight: 600;">{plan_display_name}</span>
-                <span style="color: #10b981; font-size: 10px; font-weight: bold; border: 1px solid #10b981; padding: 2px 6px; border-radius: 4px; background: rgba(16, 185, 129, 0.1);">Active</span>
+        if is_active:
+            if plan_type == "free":
+                time_display = f"⏳ {hours_left} Hours Remaining" if hours_left > 0 else f"⏳ {time_left.seconds // 60} Mins Remaining"
+            else:
+                time_display = f"⏳ {days_left} Days Remaining"
+            
+            st.markdown(f"""
+            <div style="border: 1px solid #10b981; border-radius: 10px; padding: 12px; margin-top: 10px; margin-bottom: 15px; background: rgba(16, 185, 129, 0.05);">
+                <p style="margin: 0; color: #9ca3af; font-size: 11px;">👤 {user_email}</p>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 5px; margin-bottom: 8px;">
+                    <span style="color: #d1d5db; font-size: 13px; font-weight: 600;">{plan_display_name}</span>
+                    <span style="color: #10b981; font-size: 10px; font-weight: bold; border: 1px solid #10b981; padding: 2px 6px; border-radius: 4px; background: rgba(16, 185, 129, 0.1);">Active</span>
+                </div>
+                <p style="color: white; font-size: 13px; margin: 0; font-weight: 600;">{time_display}</p>
             </div>
-            <p style="color: white; font-size: 13px; margin: 0; font-weight: 600;">{time_display}</p>
-        </div>
-        """, unsafe_allow_html=True)
+            """, unsafe_allow_html=True)
+        else:
+            # Expired Box
+            st.markdown(f"""
+            <div style="border: 1px solid #ef4444; border-radius: 10px; padding: 12px; margin-top: 10px; margin-bottom: 15px; background: rgba(239, 68, 68, 0.05);">
+                <p style="margin: 0; color: #9ca3af; font-size: 11px;">👤 {user_email}</p>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 5px; margin-bottom: 8px;">
+                    <span style="color: #d1d5db; font-size: 13px; font-weight: 600;">{plan_display_name}</span>
+                    <span style="color: #ef4444; font-size: 10px; font-weight: bold; border: 1px solid #ef4444; padding: 2px 6px; border-radius: 4px; background: rgba(239, 68, 68, 0.1);">Expired</span>
+                </div>
+                <p style="color: white; font-size: 13px; margin: 0; font-weight: 600;">⏳ 0 Days Remaining</p>
+            </div>
+            """, unsafe_allow_html=True)
 
-        if st.sidebar.button("💎 Buy / Upgrade Premium", use_container_width=True, type="primary", key="btn_upgrade_premium"):
+        if st.button("💎 Buy / Upgrade Premium", use_container_width=True, type="primary", key="btn_upgrade_premium"):
             st.session_state.show_pricing_modal = True
             st.rerun()
 
-        st.sidebar.markdown("---")
+        st.markdown("---")
 
-        if st.sidebar.button("🚪 Log Out", use_container_width=True, key="btn_logout"):
+        if st.button("🚪 Log Out", use_container_width=True, key="btn_logout"):
             st.session_state.clear()
             st.rerun()
     
