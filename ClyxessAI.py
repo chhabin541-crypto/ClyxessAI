@@ -2465,8 +2465,6 @@ def render_login_signup():
         .stApp { background: radial-gradient(circle at top right, #1e1b4b 0%, #050814 50%) !important; }
         header {visibility: hidden;} footer {visibility: hidden;}
         
-        /* Sidebar ko hide karne ka CSS yahan se hata diya taaki dashboard par dikhe */
-        
         .block-container { max-width: 1100px !important; padding-top: 2rem !important; }
         
         .stTextInput input {
@@ -2571,18 +2569,6 @@ def render_login_signup():
             background-color: #fbbf24 !important;
             box-shadow: 0 0 15px rgba(251, 191, 36, 0.8) !important;
         }
-
-        .cosmos-container {
-            width: 100%; display: flex; justify-content: center;
-            margin-top: 20px; margin-bottom: 20px;
-        }
-        .cosmos-image {
-            width: 100%; max-width: 1000px;
-            mix-blend-mode: screen; 
-            opacity: 0.7;
-            mask-image: linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%);
-            -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%);
-        }
     </style>
     """, unsafe_allow_html=True)
 
@@ -2644,7 +2630,7 @@ def render_login_signup():
                 st.query_params.clear()
 
     # ==========================================
-    # 🛑 3. LOGIN / SIGNUP UI (Fix 1: Already Logged In Check)
+    # 🛑 3. LOGIN / SIGNUP UI
     # ==========================================
     if not st.session_state.get("logged_in", False):
         _, center_col, _ = st.columns([1, 1.2, 1])
@@ -2769,11 +2755,10 @@ def render_login_signup():
         st.stop() 
 
     # ==========================================
-    # 🛑 4. DATABASE CHECK & AUTO-LOCK LOGIC (Fix 2, 3 & 4)
+    # 🛑 4. DATABASE CHECK & AUTO-LOCK LOGIC
     # ==========================================
     user_email = st.session_state.get("user_email", "")
     
-    # Safe check for user
     try:
         user_data = supabase.auth.get_user()
         user_id = user_data.user.id
@@ -2786,7 +2771,6 @@ def render_login_signup():
     is_active = False  # Default: Locked
     trial_used = False
     is_expired = False
-    sub_data = None # Safe initialization
     
     if len(res.data) > 0:
         trial_used = True 
@@ -2801,23 +2785,13 @@ def render_login_signup():
                 if expiry_date > now:
                     is_active = True  # Plan Active
                     
-                    # 👇 FIX 4: PROFESSIONAL SIDEBAR STATUS BOX 👇
                     plan_type = sub_data["plan_type"]
                     plan_display_name = "Monthly Plan (₹1499)" if plan_type == "monthly" else "Yearly Plan (₹16,788)" if plan_type == "yearly" else "Free Trial"
+                    color = "#3b82f6" if plan_type == "free" else ("#8b5cf6" if plan_type == "monthly" else "#f59e0b")
                     
                     time_left = expiry_date - now
                     days_left = time_left.days
                     hours_left = time_left.seconds // 3600
-
-                    st.sidebar.markdown(f"""
-                    <div style="border: 1px solid #10b981; border-radius: 10px; padding: 12px; margin-top: 10px; margin-bottom: 15px; background: rgba(16, 185, 129, 0.05);">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                            <span style="color: #d1d5db; font-size: 12px; font-weight: 600;">{plan_display_name}</span>
-                            <span style="color: #10b981; font-size: 10px; font-weight: bold; border: 1px solid #10b981; padding: 2px 6px; border-radius: 4px; background: rgba(16, 185, 129, 0.1);">Active</span>
-                        </div>
-                        <p style="color: white; font-size: 13px; margin: 0; font-weight: 600;">⏳ {days_left} Days Remaining</p>
-                    </div>
-                    """, unsafe_allow_html=True)
                 else:
                     is_expired = True
             except Exception:
@@ -2829,14 +2803,6 @@ def render_login_signup():
     # 🛑 5. PLAN SELECTION SCREEN (LOCK SCREEN)
     # ==========================================
     if not is_active:
-        
-        # 👇 FIX 2: SIDEBAR LOGOUT FOR EXPIRED USERS 👇
-        with st.sidebar:
-            st.markdown("---")
-            st.markdown(f"👤 **Logged in as:**\n`{user_email}`")
-            if st.button("🚪 Log Out", use_container_width=True, key="lock_logout"):
-                st.session_state.clear()
-                st.rerun()
         
         if is_expired:
             st.warning("⚠️ Aapka plan expire ho gaya hai. Please koi naya plan kharidein.")
@@ -2901,7 +2867,6 @@ def render_login_signup():
             </div>
             """, unsafe_allow_html=True)
             
-            # 👇 FIX 5: RAZORPAY LINKS 👇
             st.link_button("Buy Monthly ₹1499", RAZORPAY_MONTHLY_LINK, use_container_width=True)
 
         # --- YEARLY ---
@@ -2924,31 +2889,61 @@ def render_login_signup():
             </div>
             """, unsafe_allow_html=True)
           
-            # 👇 FIX 5: RAZORPAY LINKS 👇
             st.link_button("Buy Yearly ₹1399", RAZORPAY_YEARLY_LINK, use_container_width=True)
 
-        # 👇 SEAMLESS COSMOS IMAGE 👇
-        st.markdown("""
-        <div class="cosmos-container">
-            <img src="https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?q=80&w=1000&auto=format&fit=crop" class="cosmos-image" alt="Cosmos Math Background">
+        # 👇 NAYA: PLAN KE NICHE CHHOTA SA LOGOUT BUTTON 👇
+        st.markdown("<br><hr style='border-color: #1f2937;'><br>", unsafe_allow_html=True)
+        col_empty1, col_btn_logout, col_empty2 = st.columns([1, 1, 1])
+        with col_btn_logout:
+            if st.button("🚪 Log Out / Switch Account", use_container_width=True, key="lock_screen_logout"):
+                st.session_state.clear()
+                st.rerun()
+
+        st.stop() # 🛑 YEH DASHBOARD KO ROKEGA
+
+    # ==========================================
+    # ✅ DASHBOARD (SIRF ACTIVE PLAN WALO KE LIYE)
+    # ==========================================
+    
+    # 👇 SABSE PEHLE SIDEBAR MEIN "SELECT MODE" RAKHA HAI 👇
+    st.sidebar.markdown("### 📚 Select Mode")
+    mode = st.sidebar.radio("", ["Normal Chat", "Cyber Security", "Homework"])
+    
+    # 👇 SIDEBAR MEIN SPACE CHHODA TAAKI PROFILE NICHE DIKHE 👇
+    st.sidebar.markdown("<br>" * 8, unsafe_allow_html=True)
+    st.sidebar.markdown("---")
+
+    # 👇 AB SAARA PROFILE, PLAN INFO, AUR LOGOUT SABSE NICHE HAI 👇
+    if is_active:
+        plan_type = sub_data["plan_type"]
+        plan_display_name = "Monthly Plan (₹1499)" if plan_type == "monthly" else "Yearly Plan (₹16,788)" if plan_type == "yearly" else "Free Trial"
+        
+        # Timing logic
+        if plan_type == "free":
+            time_display = f"⏳ {hours_left} Hours Remaining" if hours_left > 0 else f"⏳ {time_left.seconds // 60} Mins Remaining"
+        else:
+            time_display = f"⏳ {days_left} Days Remaining"
+
+        st.sidebar.markdown(f"""
+        <div style="border: 1px solid #10b981; border-radius: 10px; padding: 12px; margin-top: 10px; margin-bottom: 15px; background: rgba(16, 185, 129, 0.05);">
+            <p style="margin: 0; color: #9ca3af; font-size: 11px;">👤 {user_email}</p>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 5px; margin-bottom: 8px;">
+                <span style="color: #d1d5db; font-size: 13px; font-weight: 600;">{plan_display_name}</span>
+                <span style="color: #10b981; font-size: 10px; font-weight: bold; border: 1px solid #10b981; padding: 2px 6px; border-radius: 4px; background: rgba(16, 185, 129, 0.1);">Active</span>
+            </div>
+            <p style="color: white; font-size: 13px; margin: 0; font-weight: 600;">{time_display}</p>
         </div>
         """, unsafe_allow_html=True)
 
-        st.stop() 
+        if st.sidebar.button("💎 Buy / Upgrade Premium", use_container_width=True, type="primary", key="btn_upgrade_premium"):
+            st.session_state.show_pricing_modal = True
+            st.rerun()
 
-    
-    st.sidebar.markdown("---")
-    if st.sidebar.button("💎 Buy / Upgrade Premium", use_container_width=True, type="primary", key="btn_upgrade_premium"):
-        st.session_state.show_pricing_modal = True
-        st.rerun()
-    st.sidebar.markdown("---")
+        st.sidebar.markdown("---")
 
-    if st.sidebar.button("🚪 Log Out", use_container_width=True, key="btn_logout"):
-        st.session_state.clear()
-        st.rerun()
-
-    st.sidebar.markdown("### 📚 Select Mode")
-    mode = st.sidebar.radio("", ["Normal Chat", "Cyber Security", "Homework"])
+        if st.sidebar.button("🚪 Log Out", use_container_width=True, key="btn_logout"):
+            st.session_state.clear()
+            st.rerun()
     
 
 def render_image_generator():
