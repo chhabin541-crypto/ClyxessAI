@@ -2493,16 +2493,14 @@ def render_login_signup():
         .facebook-btn { background-color: #1877F2; color: #ffffff; border: none; }
         .facebook-btn:hover { background-color: #166fe5; color: #fff; }
 
-        /* 👇 FIX 1: CARD ALIGNMENT 👇 */
-        [data-testid="column"] {
-            display: flex;
-            flex-direction: column;
-        }
+        /* ==========================================
+           👇 FIX 1: PERFECT CARD ALIGNMENT 👇
+           ========================================== */
         .pricing-card { 
             background: #111827; border-radius: 20px; padding: 30px; border: 1px solid #1f2937; 
-            text-align: left; position: relative; height: 100%; /* Full height */
-            min-height: 550px; /* Height fix taaki sab barabar dikhein */
-            display: flex; flex-direction: column; justify-content: flex-start; 
+            text-align: left; position: relative; 
+            height: 520px; /* Fixed height for all cards */
+            display: flex; flex-direction: column; 
             transition: all 0.3s ease-in-out; cursor: pointer; 
         }
         .pricing-card:hover { transform: translateY(-10px); box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
@@ -2516,7 +2514,7 @@ def render_login_signup():
         .badge-popular { position: absolute; top: -14px; right: 20px; background: #8b5cf6; color: white; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; }
         .badge-save { position: absolute; top: -14px; right: 20px; background: #f59e0b; color: white; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; }
         
-        .feature-list { list-style: none; padding: 0; margin: 20px 0; color: #d1d5db; font-size: 13px; line-height: 1.5; }
+        .feature-list { list-style: none; padding: 0; margin: 20px 0; color: #d1d5db; font-size: 13px; line-height: 1.5; flex-grow: 1; }
         .feature-list li { margin-bottom: 8px; display: flex; align-items: flex-start; gap: 8px; }
         .feature-list li::before { content: "✔"; color: #10b981; font-weight: bold; font-size: 13px; margin-top: 2px; flex-shrink: 0; }
         .feature-list .highlight { color: white; font-weight: 600; }
@@ -2542,38 +2540,67 @@ def render_login_signup():
             transform: scale(1.02); box-shadow: 0 6px 20px rgba(139, 92, 246, 0.6) !important;
         }
 
-        /* 👇 FIX 2: BUTTON HOVER COLORS 👇 */
-        /* Monthly Button - Purple */
-        div[data-testid="stLinkButton"]:has(div:contains("Buy Monthly")) a {
-            background-color: #8b5cf6 !important; color: white !important;
-            border: none !important; width: 100% !important; display: flex; justify-content: center;
-            font-weight: 600 !important; margin-top: 15px; transition: 0.3s;
+        /* ==========================================
+           👇 FIX 2: TARGETING BUTTONS BY URL FOR HOVER COLORS 👇
+           ========================================== */
+        /* Monthly Button - Purple Base */
+        a[href*="nNI2b7Qd"] {
+            background-color: #8b5cf6 !important;
+            color: white !important;
+            border: none !important;
+            width: 100% !important;
+            display: flex !important;
+            justify-content: center !important;
+            font-weight: 600 !important;
+            border-radius: 10px !important;
+            padding: 10px !important;
+            margin-top: 10px !important;
+            transition: 0.3s !important;
         }
-        div[data-testid="stLinkButton"]:has(div:contains("Buy Monthly")) a:hover {
-            background-color: #a855f7 !important; /* Lighter Purple */
-            box-shadow: 0 0 15px rgba(168, 85, 247, 0.6) !important;
+        /* Monthly Button Hover - Lighter Purple */
+        a[href*="nNI2b7Qd"]:hover {
+            background-color: #a855f7 !important;
+            box-shadow: 0 0 15px rgba(168, 85, 247, 0.8) !important;
         }
 
-        /* Yearly Button - Gold */
-        div[data-testid="stLinkButton"]:has(div:contains("Buy Yearly")) a {
-            background-color: #f59e0b !important; color: white !important;
-            border: none !important; width: 100% !important; display: flex; justify-content: center;
-            font-weight: 600 !important; margin-top: 15px; transition: 0.3s;
+        /* Yearly Button - Gold Base */
+        a[href*="0mWgHct"] {
+            background-color: #f59e0b !important;
+            color: white !important;
+            border: none !important;
+            width: 100% !important;
+            display: flex !important;
+            justify-content: center !important;
+            font-weight: 600 !important;
+            border-radius: 10px !important;
+            padding: 10px !important;
+            margin-top: 10px !important;
+            transition: 0.3s !important;
         }
-        div[data-testid="stLinkButton"]:has(div:contains("Buy Yearly")) a:hover {
-            background-color: #fbbf24 !important; /* Lighter Gold */
-            box-shadow: 0 0 15px rgba(251, 191, 36, 0.6) !important;
+        /* Yearly Button Hover - Lighter Gold */
+        a[href*="0mWgHct"]:hover {
+            background-color: #fbbf24 !important;
+            box-shadow: 0 0 15px rgba(251, 191, 36, 0.8) !important;
         }
 
-        /* 👇 FIX 3: SEAMLESS COSMOS IMAGE (No Borders) 👇 */
-        .cosmos-bg {
-            width: 100vw; position: relative; left: 50%; right: 50%;
-            margin-left: -50vw; margin-right: -50vw;
-            margin-top: -30px; margin-bottom: 50px;
-            z-index: -1; pointer-events: none; text-align: center;
+        /* ==========================================
+           👇 FIX 3: SEAMLESS COSMOS IMAGE (No Borders) 👇
+           ========================================== */
+        .cosmos-container {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            margin-top: 40px;
+            margin-bottom: 20px;
         }
-        .cosmos-img {
-            width: 100%; opacity: 0.4;
+        .cosmos-image {
+            width: 100%;
+            max-width: 1000px;
+            border-radius: 20px;
+            /* mix-blend-mode screen makes black transparent */
+            mix-blend-mode: screen; 
+            opacity: 0.8;
+            /* Fade out top and bottom for seamless blending */
             mask-image: linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%);
             -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%);
         }
@@ -2902,10 +2929,10 @@ def render_login_signup():
           
             st.link_button("Buy Yearly ₹1399", RAZORPAY_YEARLY_LINK, use_container_width=True)
 
-        # 👇 COSMOS IMAGE YAHAN ADD KIYA HAI 👇
+        # 👇 SEAMLESS COSMOS IMAGE (No borders, perfectly blended) 👇
         st.markdown("""
-        <div class="cosmos-bg">
-            <img src="https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?q=80&w=2070&auto=format&fit=crop" class="cosmos-img" alt="Cosmos Math Background">
+        <div class="cosmos-container">
+            <img src="https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?q=80&w=1000&auto=format&fit=crop" class="cosmos-image" alt="Cosmos Math Background">
         </div>
         """, unsafe_allow_html=True)
 
