@@ -2523,7 +2523,17 @@ def render_login_signup():
         
         /* Logo & Image */
         .footer-logo { width: 70px; height: 70px; border-radius: 50%; margin-bottom: 15px; border: 2px solid #3b82f6; object-fit: cover; }
-        .futuristic-img { width: 100%; max-width: 800px; border-radius: 20px; margin-top: 30px; box-shadow: 0 10px 30px rgba(59, 130, 246, 0.2); border: 1px solid #3b82f6; }
+        
+        /* 👇 FUTURISTIC IMAGE CSS (Plans ke niche) 👇 */
+        .futuristic-banner { 
+            width: 100%; 
+            max-width: 900px; 
+            border-radius: 20px; 
+            margin: 40px auto 20px auto; 
+            display: block; 
+            border: 2px solid #3b82f6; 
+            box-shadow: 0 0 30px rgba(59, 130, 246, 0.3), inset 0 0 20px rgba(59, 130, 246, 0.2); 
+        }
 
         /* Multi-color Button */
         div[data-testid="stButton"]:has(div:contains("Buy Premium Plan")) button {
@@ -2540,7 +2550,7 @@ def render_login_signup():
             box-shadow: 0 6px 20px rgba(139, 92, 246, 0.6) !important;
         }
 
-        /* 👇 FIX: BUTTON ALIGNMENT & COLORS 👇 */
+        /* FIX: BUTTON ALIGNMENT & COLORS */
         [data-testid="column"] {
             display: flex;
             flex-direction: column;
@@ -2577,7 +2587,6 @@ def render_login_signup():
         div[data-testid="stLinkButton"]:has(div:contains("Buy Yearly")) a:hover {
             background-color: #d97706 !important;
         }
-        /* 👆 FIX KHATAM 👆 */
     </style>
     """, unsafe_allow_html=True)
 
@@ -2753,9 +2762,6 @@ def render_login_signup():
             <div class="copyright">
                 &copy; 2026 Clyxess AI. All rights reserved.
             </div>
-            
-            <!-- FUTURISTIC IMAGE -->
-            <img src="https://images.unsplash.com/photo-1677442136019-21780ecad995?q=80&w=1200&auto=format&fit=crop" class="futuristic-img" alt="Futuristic AI Education">
         </div>
         """, unsafe_allow_html=True)
         
@@ -2907,6 +2913,13 @@ def render_login_signup():
             """, unsafe_allow_html=True)
           
             st.link_button("Buy Yearly ₹1399", RAZORPAY_YEARLY_LINK, use_container_width=True)
+
+        # 👇 FUTURISTIC IMAGE YAHAN ADD KIYA HAI 👇
+        st.markdown("""
+        <div style="text-align: center; margin-top: 30px;">
+            <img src="https://images.unsplash.com/photo-1677442136019-21780ecad995?q=80&w=1200&auto=format&fit=crop" class="futuristic-banner" alt="Future of AI Education">
+        </div>
+        """, unsafe_allow_html=True)
 
         st.stop() 
 
