@@ -2464,7 +2464,8 @@ def render_login_signup():
         @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css');
         .stApp { background: radial-gradient(circle at top right, #1e1b4b 0%, #050814 50%) !important; }
         header {visibility: hidden;} footer {visibility: hidden;}
-        [data-testid="stSidebar"] { display: none !important; }
+        
+        /* Sidebar ko hide karne ka CSS yahan se hata diya taaki dashboard par dikhe */
         
         .block-container { max-width: 1100px !important; padding-top: 2rem !important; }
         
@@ -2493,15 +2494,12 @@ def render_login_signup():
         .facebook-btn { background-color: #1877F2; color: #ffffff; border: none; }
         .facebook-btn:hover { background-color: #166fe5; color: #fff; }
 
-        /* ==========================================
-           👇 FIX 1: PERFECT CARD & TEXT SIZE 👇
-           ========================================== */
         .pricing-card { 
             background: #111827; border-radius: 15px; 
-            padding: 20px 15px; /* Padding kam ki taaki text ko jagah mile */
+            padding: 20px 15px; 
             border: 1px solid #1f2937; 
             text-align: left; position: relative; 
-            height: 520px; /* Fixed height sabke liye barabar */
+            height: 520px; 
             display: flex; flex-direction: column; 
             transition: all 0.3s ease-in-out; cursor: pointer; 
         }
@@ -2517,12 +2515,11 @@ def render_login_signup():
         .badge-popular { position: absolute; top: -12px; right: 15px; background: #8b5cf6; color: white; padding: 3px 10px; border-radius: 15px; font-size: 10px; font-weight: 700; }
         .badge-save { position: absolute; top: -12px; right: 15px; background: #f59e0b; color: white; padding: 3px 10px; border-radius: 15px; font-size: 10px; font-weight: 700; }
         
-        /* 👇 TEXT KO CHHOTA KAR DIYA HAI 👇 */
         .feature-list { 
             list-style: none; padding: 0; margin: 10px 0; 
-            color: #d1d5db; font-size: 11.5px; /* Font chhota kiya */
-            line-height: 1.3; /* Lines ke beech space kam kiya */
-            flex-grow: 1; /* Text ko bachi hui jagah lene do */
+            color: #d1d5db; font-size: 11.5px; 
+            line-height: 1.3; 
+            flex-grow: 1; 
         }
         .feature-list li { margin-bottom: 5px; display: flex; align-items: flex-start; gap: 6px; }
         .feature-list li::before { content: "✔"; color: #10b981; font-weight: bold; font-size: 11px; margin-top: 2px; flex-shrink: 0; }
@@ -2549,10 +2546,6 @@ def render_login_signup():
             transform: scale(1.02); box-shadow: 0 6px 20px rgba(139, 92, 246, 0.6) !important;
         }
 
-        /* ==========================================
-           👇 FIX 2: TARGETING BUTTONS BY URL FOR HOVER COLORS 👇
-           ========================================== */
-        /* Monthly Button - Purple Base */
         a[href*="nNI2b7Qd"] {
             background-color: #8b5cf6 !important;
             color: white !important; border: none !important;
@@ -2566,7 +2559,6 @@ def render_login_signup():
             box-shadow: 0 0 15px rgba(168, 85, 247, 0.8) !important;
         }
 
-        /* Yearly Button - Gold Base */
         a[href*="0mWgHct"] {
             background-color: #f59e0b !important;
             color: white !important; border: none !important;
@@ -2580,9 +2572,6 @@ def render_login_signup():
             box-shadow: 0 0 15px rgba(251, 191, 36, 0.8) !important;
         }
 
-        /* ==========================================
-           👇 FIX 3: SEAMLESS COSMOS IMAGE 👇
-           ========================================== */
         .cosmos-container {
             width: 100%; display: flex; justify-content: center;
             margin-top: 20px; margin-bottom: 20px;
@@ -2655,7 +2644,7 @@ def render_login_signup():
                 st.query_params.clear()
 
     # ==========================================
-    # 🛑 3. LOGIN / SIGNUP UI
+    # 🛑 3. LOGIN / SIGNUP UI (Fix 1: Already Logged In Check)
     # ==========================================
     if not st.session_state.get("logged_in", False):
         _, center_col, _ = st.columns([1, 1.2, 1])
@@ -2780,166 +2769,173 @@ def render_login_signup():
         st.stop() 
 
     # ==========================================
-# 🛑 4. DATABASE CHECK & AUTO-LOCK LOGIC (BULLETPROOF)
-# ==========================================
-user_email = st.session_state.get("user_email", "")
-
-# 1. Safe User Check (Agar login session expire ho toh)
-try:
-    user_data = supabase.auth.get_user()
-    user_id = user_data.user.id
-except Exception:
-    st.session_state.clear()
-    st.rerun()
-
-res = supabase.table("user_subscriptions").select("*").eq("id", user_id).execute()
-
-is_active = False  # <--- SABSE BADA FIX: Default Locked
-trial_used = False
-is_expired = False
-
-if len(res.data) > 0:
-    trial_used = True 
-    sub_data = res.data[0]
-    expiry_str = sub_data.get("expiry_date") # Safe get
+    # 🛑 4. DATABASE CHECK & AUTO-LOCK LOGIC (Fix 2, 3 & 4)
+    # ==========================================
+    user_email = st.session_state.get("user_email", "")
     
-    if expiry_str:
-        try:
-            # 2. Safe Date Parsing
-            expiry_date = datetime.datetime.fromisoformat(expiry_str.replace('Z', '+00:00'))
-            now = datetime.datetime.now(datetime.timezone.utc)
-            
-            if expiry_date > now:
-                is_active = True  # <--- SIRF TAB UNLOCK HOGA JAB DATE FUTURE MEIN HOGI
-                
-                plan_type = sub_data["plan_type"]
-                plan_name = "Free Trial" if plan_type == "free" else ("Monthly Plan" if plan_type == "monthly" else "Yearly Plan")
-                color = "#3b82f6" if plan_type == "free" else ("#8b5cf6" if plan_type == "monthly" else "#f59e0b")
-                
-                time_left = expiry_date - now
-                days_left = time_left.days
-                hours_left = time_left.seconds // 3600
+    # Safe check for user
+    try:
+        user_data = supabase.auth.get_user()
+        user_id = user_data.user.id
+    except Exception:
+        st.session_state.clear()
+        st.rerun()
 
-                st.sidebar.markdown(f"""
-                <div style="background: rgba(30, 27, 75, 0.4); border: 1px solid {color}; border-radius: 10px; padding: 15px; margin-bottom: 20px;">
-                    <p style="margin: 0; color: #9ca3af; font-size: 12px;">Logged in as</p>
-                    <h4 style="margin: 0 0 10px 0; color: white; font-size: 13px;">{user_email}</h4>
-                    <div style="background: {color}22; padding: 8px; border-radius: 8px; text-align: center;">
-                        <p style="margin: 0; color: {color}; font-weight: 700; font-size: 14px;">{plan_name}</p>
-                        <p style="margin: 0; color: #d1d5db; font-size: 11px;">⏳ {days_left}d {hours_left}h remaining</p>
+    res = supabase.table("user_subscriptions").select("*").eq("id", user_id).execute()
+    
+    is_active = False  # Default: Locked
+    trial_used = False
+    is_expired = False
+    sub_data = None # Safe initialization
+    
+    if len(res.data) > 0:
+        trial_used = True 
+        sub_data = res.data[0]
+        expiry_str = sub_data.get("expiry_date") 
+        
+        if expiry_str:
+            try:
+                expiry_date = datetime.datetime.fromisoformat(expiry_str.replace('Z', '+00:00'))
+                now = datetime.datetime.now(datetime.timezone.utc)
+                
+                if expiry_date > now:
+                    is_active = True  # Plan Active
+                    
+                    # 👇 FIX 4: PROFESSIONAL SIDEBAR STATUS BOX 👇
+                    plan_type = sub_data["plan_type"]
+                    plan_display_name = "Monthly Plan (₹1499)" if plan_type == "monthly" else "Yearly Plan (₹16,788)" if plan_type == "yearly" else "Free Trial"
+                    
+                    time_left = expiry_date - now
+                    days_left = time_left.days
+                    hours_left = time_left.seconds // 3600
+
+                    st.sidebar.markdown(f"""
+                    <div style="border: 1px solid #10b981; border-radius: 10px; padding: 12px; margin-top: 10px; margin-bottom: 15px; background: rgba(16, 185, 129, 0.05);">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                            <span style="color: #d1d5db; font-size: 12px; font-weight: 600;">{plan_display_name}</span>
+                            <span style="color: #10b981; font-size: 10px; font-weight: bold; border: 1px solid #10b981; padding: 2px 6px; border-radius: 4px; background: rgba(16, 185, 129, 0.1);">Active</span>
+                        </div>
+                        <p style="color: white; font-size: 13px; margin: 0; font-weight: 600;">⏳ {days_left} Days Remaining</p>
                     </div>
-                </div>
-                """, unsafe_allow_html=True)
-            else:
+                    """, unsafe_allow_html=True)
+                else:
+                    is_expired = True
+            except Exception:
                 is_expired = True
-        except Exception:
-            is_expired = True # Agar date kharab hai toh lock kardo
-    else:
-        is_expired = True # Agar date missing hai toh lock kardo
-
-# ==========================================
-# 🛑 5. PLAN SELECTION SCREEN
-# ==========================================
-if not is_active: # <--- Yahan Lock lagega
-    
-    if is_expired:
-        st.warning("⚠️ Aapka plan expire ho gaya hai. Please koi naya plan kharidein.")
-        
-    st.markdown("""
-    <div style="text-align: center; margin-top: 1rem; margin-bottom: 2rem;">
-        <h1 style="color: white; font-size: 34px; font-weight: 800;">Choose Your Plan</h1>
-        <p style="color: #9ca3af; font-size: 15px;">Unlock all features to continue learning.</p>
-    </div>
-    """, unsafe_allow_html=True)
-
-    col1, col2, col3 = st.columns(3, gap="medium")
-    
-    # --- FREE TRIAL ---
-    with col1:
-        st.markdown("""
-        <div class="pricing-card card-free">
-            <div>
-                <div class="card-title">Free Trial</div>
-                <div class="card-price">₹0 <span>/ 24 hours</span></div>
-                <ul class="feature-list">
-                    <li class="highlight">Try All 18 Labs for 1 Day</li>
-                    <li>Homework Helper, Coding, Math, Physics</li>
-                    <li>Creative Tools & AI Image Gen</li>
-                    <li>Parent Dashboard Access</li>
-                    <li>No Credit Card Needed</li>
-                </ul>
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
-        
-        if not trial_used:
-            if st.button("Start Free Trial", use_container_width=True, key="btn_free"):
-                with st.spinner("Activating Trial..."):
-                    expiry = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(hours=24)
-                    supabase.table("user_subscriptions").insert({
-                        "id": user_id, "email": user_email, "plan_type": "free", "expiry_date": expiry.isoformat(), "is_paid": False
-                    }).execute()
-                    time.sleep(1)
-                st.rerun()
         else:
-            st.info("Aapne free trial pehle hi use kar liya hai.")
+            is_expired = True
 
-    # --- MONTHLY ---
-    with col2:
-        st.markdown("""
-        <div class="pricing-card card-monthly">
-            <div class="badge-popular">MOST POPULAR</div>
-            <div>
-                <div class="card-title">Monthly Premium</div>
-                <div class="card-price">₹1499 <span>/ month</span></div>
-                <ul class="feature-list">
-                    <li class="highlight">All 18 Premium Labs Unlocked for Full Family</li>
-                    <li>Normal Chat, Creative Lab (School Mode), Play & Learn</li>
-                    <li>Creative AI Image Generator, Vision Lab, Aero Lab</li>
-                    <li>Cyber Security, Art Machine Design, Peer Roleplay Modes</li>
-                    <li>Interactive Homework & Test Generator, Parent Dashboard</li>
-                    <li>Coding Lab, Learn AI, Physics Lab, Math Lab, Learn Finance, Data Science & Machine Learning</li>
-                    <li>Unlimited AI Chats & Explanations, Priority AI Speed, Safe School Mode, 24/7 Premium Support. Only ₹49/day.</li>
-                </ul>
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
+    # ==========================================
+    # 🛑 5. PLAN SELECTION SCREEN (LOCK SCREEN)
+    # ==========================================
+    if not is_active:
         
-        st.link_button("Buy Monthly ₹1499", RAZORPAY_MONTHLY_LINK, use_container_width=True)
-
-    # --- YEARLY ---
-    with col3:
+        # 👇 FIX 2: SIDEBAR LOGOUT FOR EXPIRED USERS 👇
+        with st.sidebar:
+            st.markdown("---")
+            st.markdown(f"👤 **Logged in as:**\n`{user_email}`")
+            if st.button("🚪 Log Out", use_container_width=True, key="lock_logout"):
+                st.session_state.clear()
+                st.rerun()
+        
+        if is_expired:
+            st.warning("⚠️ Aapka plan expire ho gaya hai. Please koi naya plan kharidein.")
+            
         st.markdown("""
-        <div class="pricing-card card-yearly">
-            <div class="badge-save">SAVE ₹1200/yr</div>
-            <div>
-                <div class="card-title">Yearly Premium</div>
-                <div class="card-price">₹1399 <span>/ month</span></div>
-                <ul class="feature-list">
-                    <li class="highlight">FULL FAMILY PACKAGE - BEST VALUE</li>
-                    <li>Monthly wale sab kuch + 12 Months Access</li>
-                    <li>All 18 Labs: School Mode, Play & Learn, Homework & Test Maker, Coding, Physics, Math, Finance, Cyber Security, Aero & Vision Labs, AI Image Generator & More</li>
-                    <li>Advanced Parent Dashboard - Bache ki full progress dekho</li>
-                    <li>Highest Priority AI, Early Access to New Features, Dedicated Support</li>
-                    <li>Save ₹1200/year. Just ₹46/day.</li>
-                </ul>
-            </div>
+        <div style="text-align: center; margin-top: 1rem; margin-bottom: 2rem;">
+            <h1 style="color: white; font-size: 34px; font-weight: 800;">Choose Your Plan</h1>
+            <p style="color: #9ca3af; font-size: 15px;">Unlock all features to continue learning.</p>
         </div>
         """, unsafe_allow_html=True)
-      
-        st.link_button("Buy Yearly ₹1399", RAZORPAY_YEARLY_LINK, use_container_width=True)
 
-    st.markdown("""
-    <div class="cosmos-container">
-        <img src="https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?q=80&w=1000&auto=format&fit=crop" class="cosmos-image" alt="Cosmos Math Background">
-    </div>
-    """, unsafe_allow_html=True)
+        col1, col2, col3 = st.columns(3, gap="medium")
+        
+        # --- FREE TRIAL ---
+        with col1:
+            st.markdown("""
+            <div class="pricing-card card-free">
+                <div>
+                    <div class="card-title">Free Trial</div>
+                    <div class="card-price">₹0 <span>/ 24 hours</span></div>
+                    <ul class="feature-list">
+                        <li class="highlight">Try All 18 Labs for 1 Day</li>
+                        <li>Homework Helper, Coding, Math, Physics</li>
+                        <li>Creative Tools & AI Image Gen</li>
+                        <li>Parent Dashboard Access</li>
+                        <li>No Credit Card Needed</li>
+                    </ul>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+            
+            if not trial_used:
+                if st.button("Start Free Trial", use_container_width=True, key="btn_free"):
+                    with st.spinner("Activating Trial..."):
+                        expiry = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(hours=24)
+                        supabase.table("user_subscriptions").insert({
+                            "id": user_id, "email": user_email, "plan_type": "free", "expiry_date": expiry.isoformat(), "is_paid": False
+                        }).execute()
+                        time.sleep(1)
+                    st.rerun()
+            else:
+                st.info("Aapne free trial pehle hi use kar liya hai.")
 
-    st.stop() # <--- YEH LINE PAKKA LOCK KAREGI
+        # --- MONTHLY ---
+        with col2:
+            st.markdown("""
+            <div class="pricing-card card-monthly">
+                <div class="badge-popular">MOST POPULAR</div>
+                <div>
+                    <div class="card-title">Monthly Premium</div>
+                    <div class="card-price">₹1499 <span>/ month</span></div>
+                    <ul class="feature-list">
+                        <li class="highlight">All 18 Premium Labs Unlocked for Full Family</li>
+                        <li>Normal Chat, Creative Lab (School Mode), Play & Learn</li>
+                        <li>Creative AI Image Generator, Vision Lab, Aero Lab</li>
+                        <li>Cyber Security, Art Machine Design, Peer Roleplay Modes</li>
+                        <li>Interactive Homework & Test Generator, Parent Dashboard</li>
+                        <li>Coding Lab, Learn AI, Physics Lab, Math Lab, Learn Finance, Data Science & Machine Learning</li>
+                        <li>Unlimited AI Chats & Explanations, Priority AI Speed, Safe School Mode, 24/7 Premium Support. Only ₹49/day.</li>
+                    </ul>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+            
+            # 👇 FIX 5: RAZORPAY LINKS 👇
+            st.link_button("Buy Monthly ₹1499", RAZORPAY_MONTHLY_LINK, use_container_width=True)
 
-# ==========================================
-# ✅ DASHBOARD (SIRF ACTIVE PLAN WALO KE LIYE)
-# ==========================================
+        # --- YEARLY ---
+        with col3:
+            st.markdown("""
+            <div class="pricing-card card-yearly">
+                <div class="badge-save">SAVE ₹1200/yr</div>
+                <div>
+                    <div class="card-title">Yearly Premium</div>
+                    <div class="card-price">₹1399 <span>/ month</span></div>
+                    <ul class="feature-list">
+                        <li class="highlight">FULL FAMILY PACKAGE - BEST VALUE</li>
+                        <li>Monthly wale sab kuch + 12 Months Access</li>
+                        <li>All 18 Labs: School Mode, Play & Learn, Homework & Test Maker, Coding, Physics, Math, Finance, Cyber Security, Aero & Vision Labs, AI Image Generator & More</li>
+                        <li>Advanced Parent Dashboard - Bache ki full progress dekho</li>
+                        <li>Highest Priority AI, Early Access to New Features, Dedicated Support</li>
+                        <li>Save ₹1200/year. Just ₹46/day.</li>
+                    </ul>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+          
+            # 👇 FIX 5: RAZORPAY LINKS 👇
+            st.link_button("Buy Yearly ₹1399", RAZORPAY_YEARLY_LINK, use_container_width=True)
+
+        # 👇 SEAMLESS COSMOS IMAGE 👇
+        st.markdown("""
+        <div class="cosmos-container">
+            <img src="https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?q=80&w=1000&auto=format&fit=crop" class="cosmos-image" alt="Cosmos Math Background">
+        </div>
+        """, unsafe_allow_html=True)
+
+        st.stop() 
+
     
     st.sidebar.markdown("---")
     if st.sidebar.button("💎 Buy / Upgrade Premium", use_container_width=True, type="primary", key="btn_upgrade_premium"):
