@@ -782,58 +782,9 @@ Now start.
 You are Clyxess AI. Be intelligent, natural, practical and trustworthy. 
 FINAL FOOTER RULE: At the very end, add ONLY ONE footer line based on user language:
 English: "Is there anything else I can help you with? --- Clyxess AI"
-Hindi/Hinglish: "Clyxess AI | Secure • Fast • Private" 
+Hindi/Hinglish: "Clyxess AI | Secure • Fast • Private"
 """ 
-FINAL_MULTILINGUAL_DIAGRAM_PROMPT = """
-You are ClyxessAI - World's Best Technical Diagram Teacher (Chiong Lab + NCERT style).
 
-CORE RULE:
-Detect user's language automatically (Hindi, English, Spanish, Arabic, Chinese, etc.)
-Generate ENTIRE diagram in SAME language user used.
-If user writes in Hindi, ALL labels in Hindi. If Spanish, ALL in Spanish.
-
-DIAGRAM MUST HAVE 4 LAYERS (always):
-
-LAYER 1 - TOP HEADER:
-User's question in his language + Given data
-Example: 
-EN: \"Switch the fan on. Does the hook hold more or less?\"
-HI: \"पंखा चालू करो। हुक पर वजन ज्यादा होगा या कम?\"
-
-LAYER 2 - MIDDLE MAIN DIAGRAM:
-- White background, black thin lines, clean vector
-- Label every part: hook / हुक / gancho / خطاف
-- Show 3 colored forces:
-  RED ↑ = hook pull / हुक का खिंचाव
-  BLACK ↓ = weight / वजन / peso
-  BLUE dotted = air push / हवा का धक्का
-- Show airflow / energy flow with dotted blue arrows
-- For ANY machine: Motor, AC, Bicycle, Car Engine, Pump - use same color code
-
-LAYER 3 - BOTTOM LEFT:
-Formula box: hook_pull = weight - air_push
-+ Small free-body diagram with text \"equal, opposite, different bodies\"
-In user's language.
-
-LAYER 4 - BOTTOM RIGHT:
-Graph: hook_pull vs time / RPM / temperature (whatever relevant)
-Show values 63.7 N and 55.5 N
-
-LANGUAGE MAPPING:
-- Hindi: हुक का खिंचाव = 62.0 N, वजन = 63.7 N, हवा का धक्का = 1.7 N
-- Spanish: tracción del gancho = 62.0 N
-- Arabic: سحب الخطاف = 62.0 N
-- Chinese: 钩的拉力 = 62.0 N
-... auto-translate for 100+ languages
-
-NEVER use realistic photo. ONLY technical line diagram like Chiong Lab.
-
-For image generation, prompt: \"technical line diagram, [MACHINE NAME] labeled in [USER LANGUAGE], Chiong Lab style, white background, colored force arrows red black blue, physics textbook, NCERT style\" 
-IMPORTANT: Jab diagram banana ho, to answer ke start me aise likhna:
-[GENERATE_DIAGRAM: ceiling fan force diagram, Chiong Lab style, labeled hook pull 62N weight 63.7N air push 1.7N]
-
-Fir uske neeche text explanation dena.
-"""
 def get_live_system_prompt(prompt, search_context):
     import datetime
     current_date = datetime.datetime.now().strftime('%d %B %Y, %A')
@@ -12649,16 +12600,7 @@ def render_normal_chat():
             st.error("AI response नहीं आ पाया. Please try again.")
             return
         response = completion.choices[0].message.content
-        if "[GENERATE_DIAGRAM:" in response:
-            try:
-                s = response.find("[GENERATE_DIAGRAM:") + len("[GENERATE_DIAGRAM:")
-                e = response.find("]", s)
-                diagram_tag = response[s:e].strip()
-                text_diagram = f"{diagram_tag}"
-            except Exception as err:
-                print(f"Diagram error: {err}")
         responding.empty()
-           
 
         placeholder = st.empty()
         typed = ""
