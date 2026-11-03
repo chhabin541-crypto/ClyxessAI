@@ -12649,36 +12649,13 @@ def render_normal_chat():
             st.error("AI response नहीं आ पाया. Please try again.")
             return
         response = completion.choices[0].message.content 
-        # --- YAHAN SE INSERT START ---
-        diagram_path = None
-        if "[GENERATE_DIAGRAM:" in response:
-            try:
-                s = response.find("[GENERATE_DIAGRAM:") + len("[GENERATE_DIAGRAM:")
-                e = response.find("]", s)
-                diagram_tag = response[s:e].strip()
-                
-                # Simple image generation
-                import matplotlib.pyplot as plt
-                import matplotlib.patches as patches
-                import time
-                fig, ax = plt.subplots(figsize=(8, 5))
-                ax.set_xlim(0, 100); ax.set_ylim(0, 100); ax.axis('off')
-                fig.patch.set_facecolor('white')
-                ax.text(50, 85, diagram_tag, ha='center', fontsize=10, fontweight='bold')
-                ax.plot([50, 50], [75, 55], color='black', lw=2)
-                rect = patches.Rectangle((40, 45), 20, 10, linewidth=2, edgecolor='black', facecolor='lightgray')
-                ax.add_patch(rect)
-                ax.text(50, 50, "MOTOR", ha='center')
-                path = f"/tmp/diag_{int(time.time())}.png"
-                plt.savefig(path, dpi=150, bbox_inches='tight')
-                plt.close()
-                diagram_path = path
-                
-                # Tag ko response se hata do
-                response = response.replace(f"[GENERATE_DIAGRAM: {diagram_tag}]", "").replace(f"[GENERATE_DIAGRAM:{diagram_tag}]", "").strip()
-            except Exception as err:
-                print(f"Diagram error: {err}")
-        # --- INSERT END ---
+        # Tag hatao aur text diagram jodo
+            clean_part = response.replace(f"[GENERATE_DIAGRAM: {diagram_tag}]", "").replace(f"[GENERATE_DIAGRAM:{diagram_tag}]", "").strip()
+            response = clean_part + "\n\n" + text_diagram
+            
+        except Exception as err:
+            print(f"Diagram error: {err}")
+    # --- INSERT END ---
         responding.empty()
            
 
