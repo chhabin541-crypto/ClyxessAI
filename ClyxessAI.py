@@ -12680,7 +12680,7 @@ def render_normal_chat():
                 print(f"Diagram error: {err}")
         # --- INSERT END ---
         responding.empty()
-            responding.empty()
+           
 
         placeholder = st.empty()
         typed = ""
