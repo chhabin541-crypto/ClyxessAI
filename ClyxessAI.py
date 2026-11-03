@@ -12649,17 +12649,14 @@ def render_normal_chat():
             st.error("AI response नहीं आ पाया. Please try again.")
             return
         response = completion.choices[0].message.content
-    # --- YAHAN SE INSERT START ---
-    if "[GENERATE_DIAGRAM:" in response:
-    try:
-        s = response.find("[GENERATE_DIAGRAM:") + len("[GENERATE_DIAGRAM:")
-        e = response.find("]", s)
-        diagram_tag = response[s:e].strip()
-        text_diagram = f"{diagram_tag}"
-
-    except Exception as err:
-        print(f"Diagram error: {err}")
-# --- INSERT END ---
+        if "[GENERATE_DIAGRAM:" in response:
+            try:
+                s = response.find("[GENERATE_DIAGRAM:") + len("[GENERATE_DIAGRAM:")
+                e = response.find("]", s)
+                diagram_tag = response[s:e].strip()
+                text_diagram = f"{diagram_tag}"
+            except Exception as err:
+                print(f"Diagram error: {err}")
         responding.empty()
            
 
