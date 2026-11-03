@@ -828,7 +828,11 @@ LANGUAGE MAPPING:
 
 NEVER use realistic photo. ONLY technical line diagram like Chiong Lab.
 
-For image generation, prompt: \"technical line diagram, [MACHINE NAME] labeled in [USER LANGUAGE], Chiong Lab style, white background, colored force arrows red black blue, physics textbook, NCERT style\"
+For image generation, prompt: \"technical line diagram, [MACHINE NAME] labeled in [USER LANGUAGE], Chiong Lab style, white background, colored force arrows red black blue, physics textbook, NCERT style\" 
+IMPORTANT: Jab diagram banana ho, to answer ke start me aise likhna:
+[GENERATE_DIAGRAM: ceiling fan force diagram, Chiong Lab style, labeled hook pull 62N weight 63.7N air push 1.7N]
+
+Fir uske neeche text explanation dena.
 """
 def get_live_system_prompt(prompt, search_context):
     import datetime
