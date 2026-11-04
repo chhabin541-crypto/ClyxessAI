@@ -2917,7 +2917,7 @@ def render_login_signup():
             </div>
             """, unsafe_allow_html=True)
           
-            st.link_button("Buy Yearly ₹1399", RAZORPAY_YEARLY_LINK, use_container_width=True)
+            st.link_button("Buy Yearly ₹16788", RAZORPAY_YEARLY_LINK, use_container_width=True)
 
         # 👇 SEAMLESS COSMOS IMAGE 👇
         st.markdown("""
