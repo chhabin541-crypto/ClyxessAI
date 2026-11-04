@@ -2880,7 +2880,7 @@ def render_login_signup():
             <div class="pricing-card card-monthly">
                 <div class="badge-popular">MOST POPULAR</div>
                 <div>
-                    <div class="card-title">Monthly Premium</div>
+                    <div class="card-title">Monthly Plan</div>
                     <div class="card-price">₹1499 <span>/ month</span></div>
                     <ul class="feature-list">
                         <li class="highlight">All 18 Premium Labs Unlocked for Full Family</li>
@@ -2903,7 +2903,7 @@ def render_login_signup():
             <div class="pricing-card card-yearly">
                 <div class="badge-save">SAVE ₹1200/yr</div>
                 <div>
-                    <div class="card-title">Yearly Premium</div>
+                    <div class="card-title">Yearly Plan</div>
                     <div class="card-price">₹1399 <span>/ month annual billing 16788</span></div>
                     <ul class="feature-list">
                         <li class="highlight">FULL FAMILY PACKAGE - BEST VALUE</li>
