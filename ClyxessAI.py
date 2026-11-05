@@ -2442,35 +2442,49 @@ def load_latest_chat_cloud():
         pass
 
 def render_login_signup():
+    # 🛠️ Imports
     import streamlit as st
     import streamlit.components.v1 as components
-    import datetime, urllib.parse, time
+    import datetime
+    import urllib.parse
+    import webbrowser
+    import time 
 
     if not supabase:
         st.warning("Add SUPABASE_URL and SUPABASE_KEY to Streamlit secrets.")
         st.stop()
 
-    RAZORPAY_MONTHLY_LINK = "https://rzp.io/rzp/nNI2b7Qd"
-    RAZORPAY_YEARLY_LINK = "https://rzp.io/rzp/0mWgHct"
+    RAZORPAY_MONTHLY_LINK = "https://rzp.io/rzp/nNI2b7Qd" 
+    RAZORPAY_YEARLY_LINK = "https://rzp.io/rzp/0mWgHct"   
 
+    # 🎨 PREMIUM CSS
     st.markdown("""
     <style>
+        @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css');
         .stApp { background: radial-gradient(circle at top right, #1e1b4b 0%, #050814 50%) !important; }
         header {visibility: hidden;} footer {visibility: hidden;}
         [data-testid="stSidebar"] { display: none !important; }
         .block-container { max-width: 1100px !important; padding-top: 2rem !important; }
         .stTextInput input { background-color: #0b0e17 !important; color: white !important; border: 1px solid #1c2538 !important; border-radius: 10px !important; padding: 12px !important; }
+        .stTextInput input:focus { border-color: #3b82f6 !important; box-shadow: 0 0 0 1px #3b82f6 !important; }
         .divider { display: flex; align-items: center; text-align: center; color: #4b5563; margin: 20px 0; font-size: 13px; font-weight: bold; }
         .divider::before, .divider::after { content: ''; flex: 1; border-bottom: 1px solid #1c2538; }
         .divider::before { margin-right: 15px; } .divider::after { margin-left: 15px; }
         .stButton button { width: 100% !important; border-radius: 10px !important; font-weight: 600 !important; padding: 10px !important; }
-        .social-btn { display: flex; align-items: center; justify-content: center; width: 100%; padding: 10px; border-radius: 10px; font-weight: 600; font-size: 14px; text-decoration: none; margin-bottom: 10px; }
+        div[data-testid="stButton"]:has(div:contains("Log In")) button,
+        div[data-testid="stButton"]:has(div:contains("Create Account")) button,
+        div[data-testid="stFormSubmitButton"]:has(div:contains("Log In")) button,
+        div[data-testid="stFormSubmitButton"]:has(div:contains("Create Account")) button { background: linear-gradient(90deg, #3b82f6 0%, #8b5cf6 100%) !important; color: white !important; border: none !important; }
+        .social-btn { display: flex; align-items: center; justify-content: center; width: 100%; padding: 10px; border-radius: 10px; font-weight: 600; font-size: 14px; text-decoration: none; margin-bottom: 10px; transition: 0.3s; }
         .social-btn img { width: 20px; height: 20px; margin-right: 10px; }
         .google-btn { background-color: #ffffff; color: #000000; border: 1px solid #ddd; }
+        .google-btn:hover { background-color: #f3f4f6; color: #000; }
         .facebook-btn { background-color: #1877F2; color: #ffffff; border: none; }
-        .pricing-card { background: #111827; border-radius: 15px; padding: 20px 15px; border: 1px solid #1f2937; text-align: left; position: relative; height: 520px; display: flex; flex-direction: column; }
+        .facebook-btn:hover { background-color: #166fe5; color: #fff; }
+        .pricing-card { background: #111827; border-radius: 15px; padding: 20px 15px; border: 1px solid #1f2937; text-align: left; position: relative; height: 520px; display: flex; flex-direction: column; transition: all 0.3s ease-in-out; cursor: pointer; }
+        .pricing-card:hover { transform: translateY(-5px); box-shadow: 0 15px 30px rgba(0,0,0,0.5); }
         .card-free { border-top: 4px solid #3b82f6; }
-        .card-monthly { border-top: 4px solid #8b5cf6; border: 1px solid #8b5cf6; background: #15132b; }
+        .card-monthly { border-top: 4px solid #8b5cf6; border: 1px solid #8b5cf6; box-shadow: 0 0 20px rgba(139, 92, 246, 0.15); background: #15132b; }
         .card-yearly { border-top: 4px solid #f59e0b; }
         .card-title { color: white; font-size: 18px; font-weight: 700; margin-bottom: 5px; }
         .card-price { color: white; font-size: 32px; font-weight: 800; margin: 10px 0 5px 0; }
@@ -2479,16 +2493,38 @@ def render_login_signup():
         .badge-save { position: absolute; top: -12px; right: 15px; background: #f59e0b; color: white; padding: 3px 10px; border-radius: 15px; font-size: 10px; font-weight: 700; }
         .feature-list { list-style: none; padding: 0; margin: 10px 0; color: #d1d5db; font-size: 11.5px; line-height: 1.3; flex-grow: 1; }
         .feature-list li { margin-bottom: 5px; display: flex; align-items: flex-start; gap: 6px; }
-        .feature-list li::before { content: "✔"; color: #10b981; font-weight: bold; font-size: 11px; margin-top: 2px; }
+        .feature-list li::before { content: "✔"; color: #10b981; font-weight: bold; font-size: 11px; margin-top: 2px; flex-shrink: 0; }
         .feature-list .highlight { color: white; font-weight: 600; }
-        a[href*="nNI2b7Qd"] { background-color: #8b5cf6 !important; color: white !important; width: 100% !important; display: flex !important; justify-content: center !important; font-weight: 600 !important; border-radius: 10px !important; padding: 8px !important; margin-top: 10px !important; font-size: 14px !important; }
-        a[href*="0mWgHct"] { background-color: #f59e0b !important; color: white !important; width: 100% !important; display: flex !important; justify-content: center !important; font-weight: 600 !important; border-radius: 10px !important; padding: 8px !important; margin-top: 10px !important; font-size: 14px !important; }
+        .footer-pro { text-align: center; margin-top: 60px; padding-top: 30px; border-top: 1px solid #1f2937; color: #9ca3af; font-size: 14px; }
+        .footer-pro .contact-info { display: flex; justify-content: center; gap: 30px; margin-bottom: 20px; flex-wrap: wrap; }
+        .footer-pro .contact-info div { display: flex; align-items: center; gap: 8px; }
+        .footer-pro .contact-info i { color: #8b5cf6; font-size: 16px; }
+        .footer-pro .social-links { display: flex; justify-content: center; gap: 15px; margin-bottom: 20px; }
+        .footer-pro .social-links a { color: #9ca3af; font-size: 20px; transition: 0.3s; text-decoration: none; }
+        .footer-pro .social-links a:hover { color: #8b5cf6; transform: scale(1.2); }
+        .footer-pro .copyright { font-size: 12px; color: #4b5563; }
+        .footer-logo { width: 70px; height: 70px; border-radius: 50%; margin-bottom: 15px; border: 2px solid #3b82f6; object-fit: cover; }
+        div[data-testid="stButton"]:has(div:contains("Buy Premium Plan")) button { background: linear-gradient(90deg, #3b82f6 0%, #8b5cf6 50%, #f59e0b 100%) !important; color: white !important; border: none !important; font-weight: bold !important; font-size: 16px !important; padding: 12px !important; box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4) !important; transition: 0.3s; }
+        div[data-testid="stButton"]:has(div:contains("Buy Premium Plan")) button:hover { transform: scale(1.02); box-shadow: 0 6px 20px rgba(139, 92, 246, 0.6) !important; }
+        a[href*="nNI2b7Qd"] { background-color: #8b5cf6 !important; color: white !important; border: none !important; width: 100% !important; display: flex !important; justify-content: center !important; font-weight: 600 !important; border-radius: 10px !important; padding: 8px !important; margin-top: 10px !important; transition: 0.3s !important; font-size: 14px !important; }
+        a[href*="nNI2b7Qd"]:hover { background-color: #a855f7 !important; box-shadow: 0 0 15px rgba(168, 85, 247, 0.8) !important; }
+        a[href*="0mWgHct"] { background-color: #f59e0b !important; color: white !important; border: none !important; width: 100% !important; display: flex !important; justify-content: center !important; font-weight: 600 !important; border-radius: 10px !important; padding: 8px !important; margin-top: 10px !important; transition: 0.3s !important; font-size: 14px !important; }
+        a[href*="0mWgHct"]:hover { background-color: #fbbf24 !important; box-shadow: 0 0 15px rgba(251, 191, 36, 0.8) !important; }
+        .cosmos-container { width: 100%; display: flex; justify-content: center; margin-top: 20px; margin-bottom: 20px; }
+        .cosmos-image { width: 100%; max-width: 1000px; mix-blend-mode: screen; opacity: 0.7; mask-image: linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%); -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%); }
     </style>
     """, unsafe_allow_html=True)
 
-    components.html("""<script>var hash=window.location.hash; if(hash && hash.includes('access_token')){window.history.replaceState(null,null,window.location.pathname+window.location.search);}</script>""", height=0)
+    components.html("""
+        <script>
+            var hash = window.location.hash;
+            if (hash && hash.includes('access_token')) {
+                window.history.replaceState(null, null, window.location.pathname + window.location.search);
+            }
+        </script>
+    """, height=0)
 
-    # 1. EMAIL VERIFY
+    # 1. EMAIL VERIFICATION
     if "access_token" in st.query_params:
         try:
             access_token = urllib.parse.unquote(st.query_params["access_token"])
@@ -2515,7 +2551,9 @@ def render_login_signup():
                 supabase.table("user_subscriptions").upsert({"id": user_id, "email": user_email, "plan_type": plan_type, "expiry_date": expiry.isoformat(), "is_paid": True}).execute()
                 st.query_params.clear()
                 st.balloons()
-                st.success("🎉 Payment Successful!")
+                st.success(f"🎉 Payment Successful! Welcome to Clyxess AI.")
+                st.markdown(f"### Aapka **{plan_type.capitalize()} Plan** activate ho gaya hai.")
+                st.info(f"Plan valid till: {expiry.strftime('%d %b %Y')}")
                 if st.button("Go to Dashboard 🚀", type="primary", use_container_width=True):
                     st.rerun()
                 st.stop()
@@ -2523,36 +2561,44 @@ def render_login_signup():
                 st.error(f"Payment verification error: {e}")
                 st.query_params.clear()
 
-    # 3. LOGIN / SIGNUP
+    # 3. LOGIN / SIGNUP UI
     if not st.session_state.get("logged_in", False):
         _, center_col, _ = st.columns([1, 1.2, 1])
         with center_col:
-            st.markdown("""<div style="text-align:center;"><h1 style="color:white;">Clyxess <span style="color:#3b82f6;">AI</span></h1><p style="color:#9ca3af;">Learn future with Clyxess AI school</p></div>""", unsafe_allow_html=True)
+            st.markdown("""<div style="text-align: center; margin-bottom: 30px;"><h1 style="color: white; font-size: 34px; font-weight: 800; margin-bottom: 5px;">Clyxess <span style="color: #3b82f6;">AI</span></h1><p style="color: #9ca3af; font-size: 14px;">Learn future with Clyxess AI school</p></div>""", unsafe_allow_html=True)
             google_url, fb_url = "", ""
             try:
-                google_url = supabase.auth.sign_in_with_oauth({"provider": "google", "options": {"redirect_to": st.secrets.get("SUPABASE_REDIRECT_URL", "")}}).url
+                r_google = supabase.auth.sign_in_with_oauth({"provider": "google", "options": {"redirect_to": st.secrets.get("SUPABASE_REDIRECT_URL", "")}})
+                google_url = r_google.url
             except Exception: pass
             try:
-                fb_url = supabase.auth.sign_in_with_oauth({"provider": "facebook", "options": {"redirect_to": st.secrets.get("SUPABASE_REDIRECT_URL", "")}}).url
+                r_fb = supabase.auth.sign_in_with_oauth({"provider": "facebook", "options": {"redirect_to": st.secrets.get("SUPABASE_REDIRECT_URL", "")}})
+                fb_url = r_fb.url
             except Exception: pass
-            st.markdown(f"""<a href="{google_url}" target="_self" class="social-btn google-btn"><img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg"> Continue with Google</a><a href="{fb_url}" target="_self" class="social-btn facebook-btn"><img src="https://upload.wikimedia.org/wikipedia/commons/b/b9/2023_Facebook_icon.svg"> Continue with Facebook</a>""", unsafe_allow_html=True)
+            st.markdown(f"""<a href="{google_url}" target="_self" class="social-btn google-btn"><img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="G"> Continue with Google</a><a href="{fb_url}" target="_self" class="social-btn facebook-btn"><img src="https://upload.wikimedia.org/wikipedia/commons/b/b9/2023_Facebook_icon.svg" alt="F"> Continue with Facebook</a>""", unsafe_allow_html=True)
             st.markdown('<div class="divider">OR</div>', unsafe_allow_html=True)
-            tab1, tab2 = st.tabs(["Log In", "Sign Up"])
+            tab1,tab2=st.tabs(["Log In","Sign Up"])
             with tab1:
                 with st.form("login_form"):
                     email = st.text_input("Email", key="login_email", placeholder="Enter your email", label_visibility="collapsed")
                     password = st.text_input("Password", type="password", key="login_password", placeholder="Enter password", label_visibility="collapsed")
-                    if st.form_submit_button("Log In ➔", use_container_width=True):
+                    submit_login = st.form_submit_button("Log In ➔", use_container_width=True)
+                    if submit_login:
                         if not email or not password:
                             st.error("❌ Please enter both Email and Password.")
                         else:
-                            try:
-                                supabase.auth.sign_in_with_password({"email": email.strip().lower(), "password": password})
-                                st.session_state.user_email = email.strip().lower()
-                                st.session_state.logged_in = True
-                                st.rerun()
-                            except Exception as e:
-                                st.error(f"Login failed: {e}")
+                            with st.spinner("Logging you in..."):
+                                try:
+                                    clean_email = email.strip().lower()
+                                    supabase.auth.sign_in_with_password({"email": clean_email, "password": password})
+                                    st.session_state.user_email = clean_email
+                                    st.session_state.logged_in = True
+                                    st.rerun()
+                                except Exception as e:
+                                    if "Email not confirmed" in str(e):
+                                        st.error("⚠️ Email verify nahi hui hai! Inbox check karein.")
+                                    else:
+                                        st.error(f"Login failed: {e}")
                 with st.expander("Forgot Password?"):
                     reset_email = st.text_input("Enter your registered email", key="reset_email")
                     if st.button("Send Reset Link", use_container_width=True, key="btn_reset"):
@@ -2565,48 +2611,54 @@ def render_login_signup():
                     name = st.text_input("Name", key="signup_name", placeholder="Your Name", label_visibility="collapsed")
                     email = st.text_input("Email", key="signup_email", placeholder="Enter your email", label_visibility="collapsed")
                     password = st.text_input("Password", type="password", key="signup_password", placeholder="Create password", label_visibility="collapsed")
-                    if st.form_submit_button("Create Account ➔", use_container_width=True):
+                    submit_signup = st.form_submit_button("Create Account ➔", use_container_width=True)
+                    if submit_signup:
                         if not name or not email or not password:
                             st.error("❌ Please fill all the fields.")
                         else:
-                            try:
-                                supabase.auth.sign_up({"email": email.strip().lower(), "password": password, "options": {"data": {"name": name}}})
-                                st.success("✅ Account created! Email verify karo.")
-                            except Exception as e: st.error(f"Sign up failed: {e}")
+                            with st.spinner("Creating your account..."):
+                                try:
+                                    clean_email = email.strip().lower()
+                                    supabase.auth.sign_up({"email": clean_email, "password": password, "options": {"data": {"name": name}}})
+                                    st.success("✅ Account created successfully!")
+                                    st.info("📧 Email par verification link bheja gaya hai. Kripya usko click karein.")
+                                except Exception as e: 
+                                    st.error(f"Sign up failed: {e}")
+        st.markdown("""<div class="footer-pro"><img src="https://chhabin541-crypto.github.io/ClyxessAI/logo.png" class="footer-logo" alt="Clyxess Logo"><div class="contact-info"><div><i class="fas fa-envelope"></i> <a href="mailto:infocarloxin24@gmail.com" style="color:#9ca3af; text-decoration:none;">infocarloxin24@gmail.com</a></div><div><i class="fas fa-phone"></i> +91 7647996793</div><div><i class="fas fa-map-marker-alt"></i> Raipur 493221, India</div></div><div class="social-links"><a href="https://www.instagram.com/clyxessai?utm_source=qr&exln=b2tpaWQ1dTU3OGI0" target="_blank"><i class="fab fa-instagram"></i></a><a href="https://x.com/NishadSingcz" target="_blank"><i class="fab fa-twitter"></i></a><a href="https://www.linkedin.com/in/nishad-singh-970958420?utm_source=share_via&utm_content=profile&utm_medium=member_android" target="_blank"><i class="fab fa-linkedin"></i></a><a href="https://youtube.com/@clyxess?si=3tbvHiHfHQwYCbA2" target="_blank"><i class="fab fa-youtube"></i></a></div><div style="margin-top: 15px; margin-bottom: 10px;"><a href="https://chhabin541-crypto.github.io/ClyxessAI/" target="_blank" style="color: #8b5cf6; text-decoration: none; font-size: 12px; margin: 0 5px;">Privacy Policy</a> | <a href="https://chhabin541-crypto.github.io/ClyxessAI/terms.html" target="_blank" style="color: #8b5cf6; text-decoration: none; font-size: 12px; margin: 0 5px;">Terms of Service</a> | <a href="https://chhabin541-crypto.github.io/ClyxessAI/cookie-policy.html" target="_blank" style="color: #8b5cf6; text-decoration: none; font-size: 12px; margin: 0 5px;">Cookie Policy</a> <a href="https://chhabin541-crypto.github.io/ClyxessAI/refund-cancellation.html" target="_blank" style="color: #8b5cf6; text-decoration: none; font-size: 12px; margin: 0 5px;">Refund & Cancellation</a></div><div class="copyright">&copy; 2026 Clyxess AI. All rights reserved.</div></div>""", unsafe_allow_html=True)
         st.markdown("<br>", unsafe_allow_html=True)
-        _, c2, _ = st.columns([1, 1.5, 1])
-        with c2:
+        col_btn1, col_btn2, col_btn3 = st.columns([1, 1.5, 1])
+        with col_btn2:
             if st.button("💎 Buy Premium Plan", use_container_width=True, key="login_footer_buy"):
-                st.warning("⚠️ Please Log In or Sign Up first.")
-        st.stop()
+                st.warning("⚠️ Please Log In or Sign Up first to purchase a plan.")
+        st.stop() 
 
-    # 4. DATABASE CHECK - FINAL LOCK (YEHI ASLI FIX HAI)
+    # ==========================================
+    # 🛑 4. DATABASE CHECK & AUTO-LOCK - FIXED
+    # ==========================================
     user_email = st.session_state.get("user_email", "")
     try:
         user_id = supabase.auth.get_user().user.id
     except:
         user_id = ""
-
+    
     res = supabase.table("user_subscriptions").select("*").eq("id", user_id).execute()
-
+    
     show_plan_screen = False
     trial_used = False
     is_expired = False
     plan_box_html = ""
-    is_locked = True  # Default LOCK - pehle se lock maan lo
 
     if len(res.data) == 0:
         show_plan_screen = True
-        is_locked = True
     else:
-        trial_used = True
+        trial_used = True 
         sub_data = res.data[0]
-        expiry_str = sub_data.get("expiry_date")
-
+        expiry_str = sub_data.get("expiry_date") if isinstance(sub_data, dict) else None
+        
+        # FIX: expiry khali hai to bhi LOCK maan lo
         if not expiry_str:
             show_plan_screen = True
             is_expired = True
-            is_locked = True
         else:
             try:
                 expiry_date = datetime.datetime.fromisoformat(expiry_str.replace('Z', '+00:00'))
@@ -2616,76 +2668,89 @@ def render_login_signup():
             except:
                 show_plan_screen = True
                 is_expired = True
-                is_locked = True
                 now = datetime.datetime.now(datetime.timezone.utc)
                 expiry_date = now
 
             if expiry_date <= now:
-                show_plan_screen = True
+                show_plan_screen = True 
                 is_expired = True
-                is_locked = True
             else:
-                show_plan_screen = False
-                is_locked = False
+                show_plan_screen = False 
                 plan_type = sub_data.get("plan_type", "free")
                 plan_name = "Free Trial" if plan_type == "free" else ("Monthly Plan" if plan_type == "monthly" else "Yearly Plan")
                 color = "#3b82f6" if plan_type == "free" else ("#8b5cf6" if plan_type == "monthly" else "#f59e0b")
                 time_left = expiry_date - now
                 days_left = time_left.days
                 hours_left = time_left.seconds // 3600
+                # FIX: Plan box ko turant sidebar me nahi dikhaya, variable me rakha hai
                 plan_box_html = f"""
-                <div style="background: rgba(30,27,75,0.4); border: 1px solid {color}; border-radius: 10px; padding: 15px; margin-bottom: 20px;">
-                    <p style="margin:0; color:#9ca3af; font-size:12px;">CURRENT PLAN</p>
-                    <div style="background:{color}22; padding:8px; border-radius:8px; text-align:center; margin-top:8px;">
-                        <p style="margin:0; color:{color}; font-weight:700; font-size:14px;">{plan_name} 🟢 Active</p>
-                        <p style="margin:0; color:#d1d5db; font-size:11px;">⏳ {days_left}d {hours_left}h remaining</p>
+                <div style="background: rgba(30, 27, 75, 0.4); border: 1px solid {color}; border-radius: 10px; padding: 15px; margin-bottom: 20px;">
+                    <p style="margin: 0; color: #9ca3af; font-size: 12px;">Logged in as</p>
+                    <h4 style="margin: 0 0 10px 0; color: white; font-size: 13px;">{user_email}</h4>
+                    <div style="background: {color}22; padding: 8px; border-radius: 8px; text-align: center;">
+                        <p style="margin: 0; color: {color}; font-weight: 700; font-size: 14px;">{plan_name} 🟢 Active</p>
+                        <p style="margin: 0; color: #d1d5db; font-size: 11px;">⏳ {days_left}d {hours_left}h remaining</p>
                     </div>
-                </div>"""
+                </div>
+                """
+    # LOCK flag save kar diya - 12017 wali line isse check karegi
+    st.session_state["plan_locked"] = show_plan_screen
 
-    st.session_state["plan_locked"] = is_locked
-
-    # 5. PLAN SCREEN - EXPIRE HUA TO YAHIN ATKEGA, AAGE NAHI JAYEGA
+    # ==========================================
+    # 🛑 5. PLAN SELECTION SCREEN - LOCK YAHIN HAI
+    # ==========================================
     if show_plan_screen:
         if is_expired:
-            st.error("🔒 Aapka plan expire ho gaya hai. Naya plan lo tabhi aage badhoge.")
-        st.markdown("""<div style="text-align:center;"><h1 style="color:white;">Choose Your Plan</h1><p style="color:#9ca3af;">Learn future with Clyxess AI</p></div>""", unsafe_allow_html=True)
+            st.error("🔒 Plan Expired! Naya Plan lo tabhi Chat chalega.")
+        st.markdown("""<div style="text-align: center; margin-top: 1rem; margin-bottom: 2rem;"><h1 style="color: white; font-size: 34px; font-weight: 800;">Choose Your Plan</h1><p style="color: #9ca3af; font-size: 15px;">Learn future with Clyxess AI Unlock all features for your child better education learning.</p></div>""", unsafe_allow_html=True)
         col1, col2, col3 = st.columns(3, gap="medium")
         with col1:
             st.markdown("""<div class="pricing-card card-free"><div><div class="card-title">Free Trial</div><div class="card-price">₹0 <span>/ 24 hours</span></div><ul class="feature-list"><li class="highlight">Try All 18 Labs for 1 Day</li><li>Homework Helper, Coding, Math, Physics</li><li>Creative Tools & AI Image Gen</li><li>Parent Dashboard Access</li><li>No Credit Card Needed</li></ul></div></div>""", unsafe_allow_html=True)
             if not trial_used:
                 if st.button("Start Free Trial", use_container_width=True, key="btn_free"):
-                    expiry = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(hours=24)
-                    supabase.table("user_subscriptions").insert({"id": user_id, "email": user_email, "plan_type": "free", "expiry_date": expiry.isoformat(), "is_paid": False}).execute()
-                    time.sleep(1)
+                    with st.spinner("Activating Trial..."):
+                        expiry = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(hours=24)
+                        supabase.table("user_subscriptions").insert({"id": user_id, "email": user_email, "plan_type": "free", "expiry_date": expiry.isoformat(), "is_paid": False}).execute()
+                        time.sleep(1)
                     st.rerun()
             else:
                 st.info("Aapne free trial pehle hi use kar liya hai.")
         with col2:
-            st.markdown("""<div class="pricing-card card-monthly"><div class="badge-popular">MOST POPULAR</div><div><div class="card-title">Monthly Plan</div><div class="card-price">₹1499 <span>/ month</span></div><ul class="feature-list"><li class="highlight">All 18 Premium Labs Unlocked</li><li>Normal Chat, Creative Lab, Play & Learn</li><li>AI Image Generator, Vision, Aero Lab</li><li>Coding, Physics, Math, Finance, Cyber Security</li><li>Unlimited Chats, Priority Speed, Safe Mode. Only ₹49/day.</li></ul></div></div>""", unsafe_allow_html=True)
+            st.markdown("""<div class="pricing-card card-monthly"><div class="badge-popular">MOST POPULAR</div><div><div class="card-title">Monthly Plan</div><div class="card-price">₹1499 <span>/ month</span></div><ul class="feature-list"><li class="highlight">All 18 Premium Labs Unlocked for Full Family</li><li>Normal Chat, Creative Lab (School Mode), Play & Learn</li><li>Creative AI Image Generator, Vision Lab, Aero Lab</li><li>Cyber Security, Art Machine Design, Peer Roleplay Modes</li><li>Interactive Homework & Test Generator, Parent Dashboard</li><li>Coding Lab, Learn AI, Physics Lab, Math Lab, Learn Finance, Data Science & Machine Learning</li><li>Unlimited AI Chats & Explanations, Priority AI Speed, Safe School Mode, 24/7 Premium Support. Only ₹49/day.</li></ul></div></div>""", unsafe_allow_html=True)
             st.link_button("Buy Monthly ₹1499", RAZORPAY_MONTHLY_LINK, use_container_width=True)
         with col3:
-            st.markdown("""<div class="pricing-card card-yearly"><div class="badge-save">SAVE ₹1200/yr</div><div><div class="card-title">Yearly Plan</div><div class="card-price">₹1399 <span>/ month annual billing 16788</span></div><ul class="feature-list"><li class="highlight">FULL FAMILY PACKAGE - BEST VALUE</li><li>Monthly wale sab kuch + 12 Months</li><li>All 18 Labs + Parent Dashboard</li><li>Highest Priority AI, Early Access</li><li>Save ₹1200/year. Just ₹46/day.</li></ul></div></div>""", unsafe_allow_html=True)
+            st.markdown("""<div class="pricing-card card-yearly"><div class="badge-save">SAVE ₹1200/yr</div><div><div class="card-title">Yearly Plan</div><div class="card-price">₹1399 <span>/ month annual billing 16788</span></div><ul class="feature-list"><li class="highlight">FULL FAMILY PACKAGE - BEST VALUE</li><li>Monthly wale sab kuch + 12 Months Access</li><li>All 18 Labs: School Mode, Play & Learn, Homework & Test Maker, Coding, Physics, Math, Finance, Cyber Security, Aero & Vision Labs, AI Image Generator & More</li><li>Advanced Parent Dashboard - Bache ki full progress dekho</li><li>Highest Priority AI, Early Access to New Features, Dedicated Support</li><li>Save ₹1200/year. Just ₹46/day.</li></ul></div></div>""", unsafe_allow_html=True)
             st.link_button("Buy Yearly ₹16788", RAZORPAY_YEARLY_LINK, use_container_width=True)
-        st.stop()
+        st.markdown("""<div class="cosmos-container"><img src="https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?q=80&w=1000&auto=format&fit=crop" class="cosmos-image" alt="Cosmos Math Background"></div>""", unsafe_allow_html=True)
+        st.stop() 
 
-    # 6. DASHBOARD - SIRF JAB PLAN ACTIVE HAI
-    if is_locked:
-        st.error("🔒 Plan Expired! Please Buy Premium.")
-        st.stop()
-
+    # ==========================================
+    # ✅ DASHBOARD - FIXED ORDER
+    # ==========================================
+    # 1. SABSE UPAR - MODE
     st.sidebar.markdown("### 📚 Select Mode")
-    mode = st.sidebar.radio("", ["Normal Chat", "Cyber Security", "Homework"], key="sidebar_mode_radio")
+    mode = st.sidebar.radio("", ["Normal Chat", "Cyber Security", "Homework"])
+
+    # 2. BEECH ME - PLAN BOX
     if plan_box_html:
         st.sidebar.markdown(plan_box_html, unsafe_allow_html=True)
-    st.sidebar.markdown("<div style='height:120px;'></div>", unsafe_allow_html=True)
+
+    # 3. GAP - Niche dhakelne ke liye
+    st.sidebar.markdown("<div style='height:100px;'></div>", unsafe_allow_html=True)
     st.sidebar.markdown("---")
+
+    # 4. SABSE NICHE - EMAIL + LOG OUT + BUY PLAN
     st.sidebar.markdown(f'<div style="text-align:center; color:#a7f3d0; font-size:13px; font-weight:600; word-break:break-all; margin-bottom:10px;">👤 {user_email}</div>', unsafe_allow_html=True)
+
     if st.sidebar.button("🚪 Log Out", use_container_width=True, key="btn_logout"):
         st.session_state.clear()
         st.rerun()
-    if st.sidebar.button("💎 Buy / Upgrade Premium", use_container_width=True, type="primary", key="btn_upgrade_premium"):
+
+    # Chota sa Buy Plan - Log Out ke niche
+    if st.sidebar.button("💎 Buy Plan", use_container_width=True, type="primary", key="btn_upgrade_premium"):
         st.session_state.show_pricing_modal = True
         st.rerun()
+
     return mode
 
 def render_image_generator():
