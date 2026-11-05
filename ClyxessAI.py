@@ -12075,31 +12075,23 @@ with st.sidebar:
     except Exception:
         logged_user = None
 
-    # Upar se Email + Log Out dono hata diye - yahan kuch nahi dikhega
+    # Upar se Login / Sign Up button AUR Log Out button dono HATA DIYE
+    # Upar se Email bhi hata diya - ab upar kuch nahi dikhega
 
-    # ... beech me tera New Chat, India Time, Select Mode wala code jaisa hai waisa hi rehne de ...
+    # --- Beech wala code jaisa hai waisa hi rehne de ---
+    # New Chat button
+    # India live time
+    # Select Mode
 
     # --- SABSE NICHE ---
-    st.markdown("<div style='height:80px;'></div>", unsafe_allow_html=True)
+    st.markdown("<div style='height:100px;'></div>", unsafe_allow_html=True)
     st.markdown("---")
 
-    # Login hone ke baad Email neeche dikhega - Sign Up ke paas
+    # Login hai to Email sabse neeche, Login nahi hai to ye text sabse neeche
     if logged_user:
         st.markdown(f'<div style="text-align:center; color:#a7f3d0; font-size:13px; font-weight:600; word-break:break-all;">👤 {logged_user.email}</div>', unsafe_allow_html=True)
     else:
         st.caption("Not logged in — sign in to save chats and view parent progress.")
-
-    # Sirf 1 button - Login / Sign Up
-    # Login hai to click karne pe Log Out hoke Login Page pe jayega
-    if st.button("🔐 Login / Sign Up", use_container_width=True, key="btn_login_signup_bottom"):
-        if logged_user:
-            try:
-                supabase.auth.sign_out()
-            except Exception:
-                pass
-            st.session_state.clear()
-            st.session_state["logged_in"] = False
-        st.rerun()
 
     import time
 import uuid
