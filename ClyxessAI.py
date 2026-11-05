@@ -6336,13 +6336,108 @@ Rules:
     elif mode == "📊 Project":
         st.info("Project module coming soon!")
 
-
 def render_learn_finance(client):
     import json
     import re
     import random
-    import time  # Typewriter aur delay ke liye naya import
+    import time  
+    import math
+    from typing import Dict, Any, List
 
+    # ============================================================
+    # 🚀 AAPKI CLASS (Saare Advanced Features ke sath)
+    # ============================================================
+    class ClyxessAdvancedFinTechSection:
+        def __init__(self):
+            self.version = "5.0.0_PROD"
+
+        def execute_advanced_lab_action(self, action_type: str, frontend_inputs: Dict[str, Any]) -> Dict[str, Any]:
+            action = action_type.lower().strip()
+            if action in ["class_5_7", "class_5", "class_6", "class_7"]:
+                return self._japanese_kakeibo_engine(frontend_inputs)
+            elif action in ["class_8_10", "class_8", "class_9", "class_10"]:
+                return self._chinese_wechat_microbusiness_factory(frontend_inputs)
+            elif action in ["class_11_12", "class_11", "class_12"]:
+                return self._korean_chaebol_growth_matrix(frontend_inputs)
+            elif action in ["university", "college", "18_plus"]:
+                return self._tokyo_shanghai_macro_cfo_engine(frontend_inputs)
+            elif action in ["compare_banks", "bank_comparison", "loan_trap_analysis"]:
+                return self._compare_two_banks_trap(frontend_inputs)
+            else:
+                return {"status": "error", "message": f"'{action_type}' module nahi mila."}
+
+        def _calculate_single_bank_metrics(self, principal: float, stated_rate: float, years: int, p_fee: float, insurance: float, doc_charges: float) -> Dict[str, Any]:
+            total_upfront_charges = p_fee + insurance + doc_charges
+            actual_money_received = principal - total_upfront_charges
+            monthly_rate = (stated_rate / 100.0) / 12
+            total_months = years * 12
+            
+            if monthly_rate == 0: monthly_emi = principal / total_months
+            else: monthly_emi = (principal * monthly_rate * math.pow(1 + monthly_rate, total_months)) / (math.pow(1 + monthly_rate, total_months) - 1)
+
+            total_repayment = monthly_emi * total_months
+            total_interest_paid = total_repayment - principal
+            total_cost_of_loan = total_interest_paid + total_upfront_charges
+            real_effective_apr = (total_cost_of_loan / actual_money_received) / years * 100 if actual_money_received > 0 else 0
+
+            return {
+                "monthly_emi": round(monthly_emi, 2),
+                "total_upfront_hidden_charges": round(total_upfront_charges, 2),
+                "total_money_drained": round(total_cost_of_loan, 2)
+            }
+
+        def _compare_two_banks_trap(self, data: Dict[str, Any]) -> Dict[str, Any]:
+            principal = float(data.get("loan_amount", 1000000))
+            bank_a = self._calculate_single_bank_metrics(principal, float(data.get("bank_a_stated_apr", 10.0)), int(data.get("bank_a_term_years", 5)), float(data.get("bank_a_processing_fee", 0)), float(data.get("bank_a_hidden_insurance", 0)), float(data.get("bank_a_documentation_charges", 0)))
+            bank_b = self._calculate_single_bank_metrics(principal, float(data.get("bank_b_stated_apr", 9.5)), int(data.get("bank_b_term_years", 5)), float(data.get("bank_b_processing_fee", 0)), float(data.get("bank_b_hidden_insurance", 0)), float(data.get("bank_b_documentation_charges", 0)))
+
+            if bank_a["total_money_drained"] < bank_b["total_money_drained"]:
+                diff = bank_b["total_money_drained"] - bank_a["total_money_drained"]
+                ai_advice = f"Bank B ka interest rate kam lag raha tha, par hidden charges zyada hain. Bank A chunne par ₹{round(diff, 2)} bachenge!"
+            elif bank_b["total_money_drained"] < bank_a["total_money_drained"]:
+                diff = bank_a["total_money_drained"] - bank_b["total_money_drained"]
+                ai_advice = f"Bank B ka deal asliyat mein sasta hai. Bank B chunne par ₹{round(diff, 2)} ki bachat hogi!"
+            else:
+                ai_advice = "Dono banks ka kul kharcha barabar hai."
+
+            return {"bank_a_analysis": bank_a, "bank_b_analysis": bank_b, "ai_comparative_verdict": {"ai_strategic_analysis": ai_advice}}
+
+        def _japanese_kakeibo_engine(self, data: Dict[str, Any]) -> Dict[str, Any]:
+            income = float(data.get("income", 1000))
+            spent = float(data.get("expenses", 0))
+            balance = income - spent
+            return {"tier_name": "Japanese Kakeibo", "balance": balance, "feedback": "Kaizen! Budget sahi hai." if balance >= (income * 0.25) else "Dhyan dein! Savings target se peeche."}
+
+        def _chinese_wechat_microbusiness_factory(self, data: Dict[str, Any]) -> Dict[str, Any]:
+            material = float(data.get("material_cost", 10))
+            rent = float(data.get("rent", 500))
+            price = float(data.get("price", 30))
+            volume = int(data.get("volume", 50))
+            revenue = price * volume
+            cost = rent + (material * volume)
+            profit = revenue - cost
+            return {"tier_name": "WeChat Microbusiness", "profit": profit, "status": "PROFITABLE" if profit > 0 else "LOSS"}
+
+        def _korean_chaebol_growth_matrix(self, data: Dict[str, Any]) -> Dict[str, Any]:
+            seed = float(data.get("seed", 50000))
+            sip = float(data.get("sip", 2000))
+            years = int(data.get("years", 5))
+            rate = 0.12 / 12
+            months = years * 12
+            fv_seed = seed * math.pow((1 + rate), months)
+            fv_sip = sip * ((math.pow((1 + rate), months) - 1) / rate)
+            return {"tier_name": "Korean Chaebol", "total_wealth": round(fv_seed + fv_sip, 2)}
+
+        def _tokyo_shanghai_macro_cfo_engine(self, data: Dict[str, Any]) -> Dict[str, Any]:
+            revenue = float(data.get("revenue", 1000000))
+            ebitda = float(data.get("ebitda", 200000))
+            ev = ebitda * 8
+            return {"tier_name": "Macro CFO", "enterprise_value": ev}
+
+
+    # ============================================================
+    # 🎨 AAPKA PURANA UI CODE
+    # ============================================================
     def clean_json_text(text):
         text = text.strip()
         text = re.sub(r"^```(?:json)?\s*", "", text, flags=re.IGNORECASE)
@@ -6351,59 +6446,37 @@ def render_learn_finance(client):
         if start != -1 and end != -1: return text[start:end + 1].strip()
         return text
 
-    # Typewriter Effect function
     def typewriter_effect(text):
         placeholder = st.empty()
         typed_text = ""
         for char in text:
             typed_text += char
-            # Cursor '▌' dikhane ke liye
             placeholder.markdown(typed_text + "▌")
-            time.sleep(0.01) # Speed yahan adjust kar sakte hain
+            time.sleep(0.01)
         placeholder.markdown(typed_text)
 
-    # ============================================================
-    # 1. 50+ LANGUAGES LIST (Waisa hi rakha hai)
-    # ============================================================
     LANGUAGES = {
         "🇬🇧 English": "en", "🇮🇳 हिंदी (Hindi)": "hi", "🇮🇳 বাংলা (Bengali)": "bn", "🇮🇳 मराठी (Marathi)": "mr",
         "🇮🇳 తెలుగు (Telugu)": "te", "🇮🇳 தமிழ் (Tamil)": "ta", "🇮🇳 ગુજરાતી (Gujarati)": "gu", "🇮🇳 ಕನ್ನಡ (Kannada)": "kn",
         "🇮🇳 മലയാളം (Malayalam)": "ml", "🇮🇳 ଓଡ଼ିଆ (Odia)": "or", "🇮🇳 ਪੰਜਾਬੀ (Punjabi)": "pa", "🇮🇳 অসমীয়া (Assamese)": "as",
-        "🇮🇳 اردو (Urdu)": "ur", "🇨🇳 中文 (Chinese)": "zh", "🇯🇵 日本語 (Japanese)": "ja", "🇰🇷 한국어 (Korean)": "ko",
-        "🇪🇸 Español (Spanish)": "es", "🇫🇷 Français (French)": "fr", "🇩🇪 Deutsch (German)": "de", "🇸🇦 العربية (Arabic)": "ar",
-        "🇵🇹 Português (Portuguese)": "pt", "🇷🇺 Русский (Russian)": "ru", "🇮🇹 Italiano (Italian)": "it", "🇹🇷 Türkçe (Turkish)": "tr",
-        "🇮🇩 Bahasa Indonesia": "id", "🇲🇾 Bahasa Melayu": "ms", "🇹🇭 ไทย (Thai)": "th", "🇻🇳 Tiếng Việt (Vietnamese)": "vi",
-        "🇳🇱 Nederlands (Dutch)": "nl", "🇵🇱 Polski (Polish)": "pl", "🇺🇦 Українська (Ukrainian)": "uk", "🇮🇷 فارسی (Persian)": "fa",
-        "🇵🇭 Tagalog (Filipino)": "tl", "🇲🇲 မြန်မာ (Burmese)": "my", "🇬🇷 Ελληνικά (Greek)": "el", "🇸🇪 Svenska (Swedish)": "sv",
-        "🇳🇴 Norsk (Norwegian)": "no", "🇩🇰 Dansk (Danish)": "da", "🇫🇮 Suomi (Finnish)": "fi", "🇷🇴 Română (Romanian)": "ro",
-        "🇭🇺 Magyar (Hungarian)": "hu", "🇨🇿 Čeština (Czech)": "cs", "🇮🇱 עברית (Hebrew)": "he", "🇿🇦 Zulu": "zu",
-        "🇰🇪 Swahili": "sw", "🇳🇬 Yoruba": "yo", "🇵🇰 پښتو (Pashto)": "ps", "🇱🇰 සිංහල (Sinhala)": "si", "🇳🇵 नेपाली (Nepali)": "ne"
+        "🇨🇳 中文 (Chinese)": "zh", "🇯🇵 日本語 (Japanese)": "ja", "🇪🇸 Español (Spanish)": "es", "🇫🇷 Français (French)": "fr", "🇸🇦 العربية (Arabic)": "ar"
     }
 
     UI_TEXTS = {
-        "en": {"title": "FinTech Lab", "learn": "Learn Finance", "market": "Virtual Stock Market", "banking": "Banking System", "startup": "Startup & Web3", "cash": "Cash Balance", "portfolio": "Portfolio Value", "networth": "Net Worth", "deposit": "Deposit", "withdraw": "Withdraw", "loan": "Take Loan", "repay": "Repay Loan", "buy": "Buy", "sell": "Sell", "lang": "Language"},
-        "hi": {"title": "फिनटेक लैब", "learn": "फाइनेंस सीखें", "market": "वर्चुअल स्टॉक मार्केट", "banking": "बैंकिंग सिस्टम", "startup": "स्टार्टअप और वेब3", "cash": "कैश बैलेंस", "portfolio": "पोर्टफोलियो वैल्यू", "networth": "कुल संपत्ति", "deposit": "जमा करें", "withdraw": "निकालें", "loan": "लोन लें", "repay": "लोन चुकाएं", "buy": "खरीदें", "sell": "बेचें", "lang": "भाषा"},
-        # ... (Baki languages waisi hi rakhi hain)
+        "en": {"title": "FinTech Lab", "learn": "Learn Finance", "market": "Virtual Stock Market", "banking": "Banking System", "startup": "Startup & Web3", "advanced": "Advanced Lab", "cash": "Cash Balance", "portfolio": "Portfolio Value", "networth": "Net Worth", "deposit": "Deposit", "withdraw": "Withdraw", "loan": "Take Loan", "repay": "Repay Loan", "buy": "Buy", "sell": "Sell", "lang": "Language"},
+        "hi": {"title": "फिनटेक लैब", "learn": "फाइनेंस सीखें", "market": "वर्चुअल स्टॉक मार्केट", "banking": "बैंकिंग सिस्टम", "startup": "स्टार्टअप और वेब3", "advanced": "एडवांस्ड लैब", "cash": "कैश बैलेंस", "portfolio": "पोर्टफोलियो वैल्यू", "networth": "कुल संपत्ति", "deposit": "जमा करें", "withdraw": "निकालें", "loan": "लोन लें", "repay": "लोन चुकाएं", "buy": "खरीदें", "sell": "बेचें", "lang": "भाषा"},
     }
 
-    # ============================================================
-    # 2. DROPDOWNS (Level, Currency, Language) - UPDATE with AGE
-    # ============================================================
     col1, col2, col3 = st.columns(3)
     
     with col1:
-        # YAHAN AGE ADD KIYA HAI
         level_options = [
             "Class 5-8 (Basics) - Age 10-13", 
             "Class 9-10 (Intermediate) - Age 14-15", 
             "Class 11-12 (Advanced) - Age 16-17", 
             "College / University (Professional) - Age 18+"
         ]
-        class_level = st.selectbox(
-            "🎓 Select Your Level",
-            level_options,
-            key="fin_class_level"
-        )
+        class_level = st.selectbox("🎓 Select Your Level", level_options, key="fin_class_level")
     
     with col2:
         CURRENCIES = {
@@ -6427,18 +6500,13 @@ def render_learn_finance(client):
     t = UI_TEXTS.get(lang_code, UI_TEXTS["en"])
     curr = CURRENCIES[curr_label]
     sym, rate = curr["symbol"], curr["rate"]
-
-    # is_junior logic ko update kiya hai taaki naye age text ke sath bhi kaam kare
     is_junior = "Class 5-8" in class_level
 
-    # ============================================================
-    # 3. ADAPTIVE CSS
-    # ============================================================
     if is_junior:
         st.markdown("""
         <style>
         .stApp { background-color: #F0F8FF; }
-        .fin-header { background: linear-gradient(90deg, #FF9A9E 0%, #FECFEF 99%, #FECFEF 100%); padding: 15px; border-radius: 15px; color: #333; text-align: center; }
+        .fin-header { background: linear-gradient(90deg, #FF9A9E 0%, #FECFEF 100%); padding: 15px; border-radius: 15px; color: #333; text-align: center; }
         .fin-card { background: #FFFFFF; border: 2px solid #FFD700; border-radius: 15px; padding: 15px; text-align: center; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
         .fin-value { font-size: 24px; font-weight: bold; color: #FF5722; }
         </style>
@@ -6453,74 +6521,35 @@ def render_learn_finance(client):
         </style>
         """, unsafe_allow_html=True)
 
-    # Header text logic updated for new dropdown text
     st.markdown(f'<div class="fin-header"><h1>💰 {t["title"]} - {class_level.split("-")[0].strip()}</h1></div>', unsafe_allow_html=True)
 
-    # ============================================================
-    # 4. STATE MANAGEMENT
-    # ============================================================
     if "fin_cash_usd" not in st.session_state: st.session_state.fin_cash_usd = 10000.0 if is_junior else 50000.0
     if "fin_loan_usd" not in st.session_state: st.session_state.fin_loan_usd = 0.0
     if "fin_portfolio" not in st.session_state: st.session_state.fin_portfolio = {"TECH": 0, "AI": 0, "EDU": 0, "CRYPTO": 0}
-    if "fin_stock_prices_usd" not in st.session_state: 
-        st.session_state.fin_stock_prices_usd = {"TECH": 150.0, "AI": 320.0, "EDU": 80.0, "CRYPTO": 500.0}
+    if "fin_stock_prices_usd" not in st.session_state: st.session_state.fin_stock_prices_usd = {"TECH": 150.0, "AI": 320.0, "EDU": 80.0, "CRYPTO": 500.0}
 
     def format_money(usd_val): return f"{sym}{usd_val * rate:,.2f}"
 
-    # ============================================================
-    # 5. TABS
-    # ============================================================
-    tab1, tab2, tab3, tab4 = st.tabs([f"📖 {t['learn']}", f"📈 {t['market']}", f"🏦 {t['banking']}", f"🚀 {t['startup']}"])
+    # 👇 YAHAN 5TH TAB ADD KIYA HAI 👇
+    tab1, tab2, tab3, tab4, tab5 = st.tabs([f"📖 {t['learn']}", f"📈 {t['market']}", f"🏦 {t['banking']}", f"🚀 {t['startup']}", f"⚔️ Advanced Lab"])
 
-    # --- TAB 1: LEARN FINANCE (SUPER AGENT) ---
     with tab1:
         st.subheader(f"📖 {t['learn']}")
-        
-        # UNLIMITED TOPICS ADDED HERE (Finance + Stock + Banking + Cyber Security)
-        topics = [
-            # Finance
-            "Money Basics & Saving", "Personal Budgeting", "Understanding Taxes", "What is Inflation?",
-            # Stock Market
-            "Stock Market Basics", "Primary vs Secondary Market", "Understanding IPOs", "Mutual Funds & ETFs", 
-            "Technical vs Fundamental Analysis", "Bull vs Bear Market",
-            # Banking System
-            "Types of Banks", "How Banks Work & Interest", "Digital Banking & UPI", "Central Bank & RBI", "Loans and EMI",
-            # Cyber Security & Fraud
-            "Net Banking Safety", "Cyber Fraud Awareness", "Safe vs Unsafe Transactions", 
-            "Phishing and OTP Scams", "How to Protect Your Money Online"
-        ]
-        
-        # Agar junior hai toh thode simple topics dikhao, warna saare
-        if is_junior: 
-            topics = topics[:5] + topics[10:12] + topics[15:18] # Chhote bacchon ke liye selected topics
-        
+        topics = ["Money Basics & Saving", "Personal Budgeting", "Understanding Taxes", "What is Inflation?", "Stock Market Basics", "Primary vs Secondary Market", "Understanding IPOs", "Mutual Funds & ETFs", "Technical vs Fundamental Analysis", "Bull vs Bear Market", "Types of Banks", "How Banks Work & Interest", "Digital Banking & UPI", "Central Bank & RBI", "Loans and EMI", "Net Banking Safety", "Cyber Fraud Awareness", "Safe vs Unsafe Transactions", "Phishing and OTP Scams", "How to Protect Your Money Online"]
+        if is_junior: topics = topics[:5] + topics[10:12] + topics[15:18]
         topic = st.selectbox("Select Topic:", topics)
-        
         if st.button("🚀 Explain this Topic"):
             with st.spinner("AI analyzing..."):
-                time.sleep(2) # 2 second ka thinking delay
-                
-                # China/Global updated syllabus ka prompt
-                tone = "very simple, fun, and with real-life examples for a young kid" if is_junior else "professional, analytical, and updated with modern global standards (including AI in finance, Web3, and China's advanced fintech curriculum)"
-                
-                prompt = f"You are an expert FinTech educator. Explain the topic '{topic}' to a student of level '{class_level}'. " \
-                         f"Language: {selected_lang_label}. " \
-                         f"Tone: {tone}. " \
-                         f"Provide a comprehensive explanation with practical examples. " \
-                         f"If the topic is about Cyber Security or Fraud, specifically explain safe vs unsafe transactions, how to avoid OTP/Phishing scams, and how to protect net banking."
-                
+                time.sleep(2)
+                tone = "very simple, fun, and with real-life examples for a young kid" if is_junior else "professional, analytical, and updated with modern global standards"
+                prompt = f"You are an expert FinTech educator. Explain the topic '{topic}' to a student of level '{class_level}'. Language: {selected_lang_label}. Tone: {tone}. Provide a comprehensive explanation with practical examples."
                 try:
                     response = client.chat.completions.create(model="openai/gpt-oss-120b", messages=[{"role": "user", "content": prompt}], temperature=0.7, max_tokens=1500)
-                    st.success("AI Response:")
-                    # Typewriter effect apply kiya
                     typewriter_effect(response.choices[0].message.content)
-                except Exception as e:
-                    st.error(f"Explanation नहीं आ पाया। Error: {str(e)}")
+                except Exception as e: st.error(f"Error: {str(e)}")
 
-    # --- TAB 2: VIRTUAL STOCK MARKET ---
     with tab2:
         st.subheader(f"📈 {t['market']}")
-        
         for stock in st.session_state.fin_stock_prices_usd:
             change = random.uniform(-0.05, 0.05)
             st.session_state.fin_stock_prices_usd[stock] = max(10.0, round(st.session_state.fin_stock_prices_usd[stock] * (1 + change), 2))
@@ -6536,24 +6565,18 @@ def render_learn_finance(client):
         st.divider()
         for stock, price_usd in st.session_state.fin_stock_prices_usd.items():
             col_a, col_b, col_c = st.columns([2, 1, 1])
-            with col_a:
-                st.markdown(f'**{stock}** | Price: {format_money(price_usd)} | Owned: {st.session_state.fin_portfolio[stock]}')
+            with col_a: st.markdown(f'**{stock}** | Price: {format_money(price_usd)} | Owned: {st.session_state.fin_portfolio[stock]}')
             with col_b:
                 if st.button(f"{t['buy']}", key=f"buy_{stock}"):
                     if st.session_state.fin_cash_usd >= price_usd:
-                        st.session_state.fin_cash_usd -= price_usd
-                        st.session_state.fin_portfolio[stock] += 1
-                        st.rerun()
+                        st.session_state.fin_cash_usd -= price_usd; st.session_state.fin_portfolio[stock] += 1; st.rerun()
                     else: st.error("पैसे कम हैं!")
             with col_c:
                 if st.button(f"{t['sell']}", key=f"sell_{stock}"):
                     if st.session_state.fin_portfolio[stock] > 0:
-                        st.session_state.fin_cash_usd += price_usd
-                        st.session_state.fin_portfolio[stock] -= 1
-                        st.rerun()
+                        st.session_state.fin_cash_usd += price_usd; st.session_state.fin_portfolio[stock] -= 1; st.rerun()
                     else: st.error("शेयर नहीं हैं!")
 
-    # --- TAB 3: BANKING SYSTEM ---
     with tab3:
         st.subheader(f"🏦 {t['banking']}")
         st.write(f"{t['cash']}: **{format_money(st.session_state.fin_cash_usd)}**")
@@ -6562,75 +6585,134 @@ def render_learn_finance(client):
         col1, col2 = st.columns(2)
         with col1:
             amt = st.number_input("Amount:", min_value=100, value=1000)
-            amt_usd = amt / rate
-            if st.button(f"📥 {t['deposit']}"):
-                st.session_state.fin_cash_usd += amt_usd
-                st.rerun()
+            if st.button(f"📥 {t['deposit']}"): st.session_state.fin_cash_usd += amt / rate; st.rerun()
             if st.button(f"📤 {t['withdraw']}"):
-                if st.session_state.fin_cash_usd >= amt_usd:
-                    st.session_state.fin_cash_usd -= amt_usd
-                    st.rerun()
+                if st.session_state.fin_cash_usd >= amt / rate: st.session_state.fin_cash_usd -= amt / rate; st.rerun()
                 else: st.error("बैलेंस कम है!")
-
         with col2:
             loan_amt = st.number_input("Loan Amount:", min_value=500, value=5000)
-            loan_usd = loan_amt / rate
-            if st.button(f"📝 {t['loan']}"):
-                st.session_state.fin_cash_usd += loan_usd
-                st.session_state.fin_loan_usd += loan_usd
-                st.rerun()
+            if st.button(f"📝 {t['loan']}"): st.session_state.fin_cash_usd += loan_amt / rate; st.session_state.fin_loan_usd += loan_amt / rate; st.rerun()
             if st.button(f"✅ {t['repay']}"):
-                if st.session_state.fin_cash_usd >= loan_usd:
-                    st.session_state.fin_cash_usd -= loan_usd
-                    st.session_state.fin_loan_usd = max(0.0, st.session_state.fin_loan_usd - loan_usd)
-                    st.rerun()
+                if st.session_state.fin_cash_usd >= loan_amt / rate:
+                    st.session_state.fin_cash_usd -= loan_amt / rate; st.session_state.fin_loan_usd = max(0.0, st.session_state.fin_loan_usd - loan_amt / rate); st.rerun()
                 else: st.error("पैसे कम हैं!")
 
-    # --- TAB 4: STARTUP & WEB3 ---
     with tab4:
         st.subheader(f"🚀 {t['startup']}")
-        
-        if is_junior:
-            st.info("यह सेक्शन आपकी क्लास के लिए अभी थोड़ा एडवांस है, लेकिन आप इसे पढ़ सकते हैं!")
-        
         col1, col2 = st.columns(2)
         with col1:
             st.markdown("### 📊 Startup Valuation Calculator")
             revenue = st.number_input(f"Annual Revenue ({sym}):", min_value=1000, value=50000)
             growth = st.slider("Growth Rate (%):", 1, 100, 20)
-            valuation = (revenue * (1 + growth/100) * 5) / 5
-            st.metric(label="Estimated Valuation", value=f"{sym}{valuation:,.2f}")
-
+            st.metric(label="Estimated Valuation", value=f"{sym}{(revenue * (1 + growth/100) * 5):,.2f}")
         with col2:
-            st.markdown("### 🤖 Ask AI (FinTech & Web3 Expert)")
+            st.markdown("### 🤖 Ask AI (Web3 Expert)")
             if st.button("Ask AI"):
                 with st.spinner("AI सोच रहा है..."):
-                    time.sleep(2) # 2 second ka thinking delay
-                    
-                    # Prompt update kiya taaki 4 sections ka general knowledge de
-                    prompt = f"You are a FinTech and Web3 expert. Provide a brief, informative general knowledge overview of these 4 topics: " \
-                             f"1. Finance, 2. Stock Market, 3. Banking System, 4. Startup & Web3. " \
-                             f"Target Audience: A student of level '{class_level}'. Language: {selected_lang_label}. " \
-                             f"Keep it engaging and modern (include AI in finance, Web3, etc.)."
-                    
+                    time.sleep(2)
+                    prompt = f"You are a FinTech and Web3 expert. Explain Startup & Web3 to a student of level '{class_level}' in {selected_lang_label}."
                     try:
                         response = client.chat.completions.create(model="openai/gpt-oss-120b", messages=[{"role": "user", "content": prompt}], temperature=0.7, max_tokens=1000)
-                        st.info("AI Response:")
-                        # Typewriter effect apply kiya
                         typewriter_effect(response.choices[0].message.content)
-                    except Exception as e: 
-                        st.error(f"AI Error: {str(e)}")
+                    except Exception as e: st.error(f"AI Error: {str(e)}")
 
     # ============================================================
-    # 6. FOOTER (NEW ADDITION)
+    # 👇 NAYA TAB 5: ADVANCED LAB (Saare Naye Features Yahan Hain) 👇
     # ============================================================
+    with tab5:
+        st.subheader("⚔️ Advanced FinTech Lab")
+        st.write("Explore global financial models & compare bank loans to find hidden traps!")
+        
+        engine = ClyxessAdvancedFinTechSection()
+        
+        # 1. Class-Based Advanced Engine
+        st.markdown("### 🎓 Level-Specific Advanced Model")
+        st.info(f"Aapne upar **{class_level}** select kiya hai. Niche button dabakar us level ka advanced model chalaen.")
+        
+        if st.button("Run Advanced Level Engine", type="primary"):
+            with st.spinner("Processing Advanced Model..."):
+                time.sleep(1)
+                
+                if "Class 5-8" in class_level:
+                    inputs = {"income": 1000, "expenses": 800}
+                    res = engine.execute_advanced_lab_action("class_5_7", inputs)
+                    st.success(f"Result: {res['tier_name']}")
+                    st.metric("Your Balance", f"₹{res['balance']}")
+                    st.write(f"**AI Feedback:** {res['feedback']}")
+                    
+                elif "Class 9-10" in class_level:
+                    inputs = {"material_cost": 10, "rent": 500, "price": 30, "volume": 50}
+                    res = engine.execute_advanced_lab_action("class_8_10", inputs)
+                    st.success(f"Result: {res['tier_name']}")
+                    st.metric("Net Profit", f"₹{res['profit']}")
+                    st.write(f"**Status:** {res['status']}")
+                    
+                elif "Class 11-12" in class_level:
+                    inputs = {"seed": 50000, "sip": 2000, "years": 5}
+                    res = engine.execute_advanced_lab_action("class_11_12", inputs)
+                    st.success(f"Result: {res['tier_name']}")
+                    st.metric("Projected Wealth", f"₹{res['total_wealth']}")
+                    
+                elif "College" in class_level:
+                    inputs = {"revenue": 1000000, "ebitda": 200000}
+                    res = engine.execute_advanced_lab_action("university", inputs)
+                    st.success(f"Result: {res['tier_name']}")
+                    st.metric("Enterprise Value (8x)", f"₹{res['enterprise_value']}")
+
+        st.divider()
+        
+        # 2. Dual Bank Loan Trap Comparator
+        st.markdown("### 🏦 Dual-Bank Loan Trap Comparator")
+        st.write("Compare 2 banks and find out which one is actually cheaper after hidden charges!")
+        
+        loan_amount = st.number_input("Loan Amount (₹):", min_value=10000, value=500000, step=10000)
+        
+        st.markdown("#### Bank A Details")
+        colA1, colA2, colA3, colA4, colA5 = st.columns(5)
+        with colA1: rate_a = st.number_input("Bank A Rate (%)", value=10.0)
+        with colA2: years_a = st.number_input("Tenure (Years) A", value=5)
+        with colA3: fee_a = st.number_input("Processing Fee A (₹)", value=5000)
+        with colA4: ins_a = st.number_input("Hidden Insurance A (₹)", value=10000)
+        with colA5: doc_a = st.number_input("Doc Charges A (₹)", value=1000)
+
+        st.markdown("#### Bank B Details")
+        colB1, colB2, colB3, colB4, colB5 = st.columns(5)
+        with colB1: rate_b = st.number_input("Bank B Rate (%)", value=9.5) 
+        with colB2: years_b = st.number_input("Tenure (Years) B", value=5)
+        with colB3: fee_b = st.number_input("Processing Fee B (₹)", value=15000)
+        with colB4: ins_b = st.number_input("Hidden Insurance B (₹)", value=25000)
+        with colB5: doc_b = st.number_input("Doc Charges B (₹)", value=2000)
+
+        if st.button("🔍 Analyze Both Banks", type="primary", use_container_width=True):
+            with st.spinner("Calculating hidden traps..."):
+                time.sleep(1)
+                inputs = {
+                    "loan_amount": loan_amount,
+                    "bank_a_stated_apr": rate_a, "bank_a_term_years": years_a, "bank_a_processing_fee": fee_a, "bank_a_hidden_insurance": ins_a, "bank_a_documentation_charges": doc_a,
+                    "bank_b_stated_apr": rate_b, "bank_b_term_years": years_b, "bank_b_processing_fee": fee_b, "bank_b_hidden_insurance": ins_b, "bank_b_documentation_charges": doc_b
+                }
+                result = engine.execute_advanced_lab_action("compare_banks", inputs)
+                
+                st.success("Analysis Complete!")
+                
+                c1, c2 = st.columns(2)
+                with c1:
+                    st.markdown(f"#### Bank A (Rate: {rate_a}%)")
+                    st.metric("Monthly EMI", f"₹{result['bank_a_analysis']['monthly_emi']}")
+                    st.metric("Total Hidden Charges", f"₹{result['bank_a_analysis']['total_upfront_hidden_charges']}", delta_color="inverse")
+                    st.metric("Total Money Drained", f"₹{result['bank_a_analysis']['total_money_drained']}")
+                    
+                with c2:
+                    st.markdown(f"#### Bank B (Rate: {rate_b}%)")
+                    st.metric("Monthly EMI", f"₹{result['bank_b_analysis']['monthly_emi']}")
+                    st.metric("Total Hidden Charges", f"₹{result['bank_b_analysis']['total_upfront_hidden_charges']}", delta_color="inverse")
+                    st.metric("Total Money Drained", f"₹{result['bank_b_analysis']['total_money_drained']}")
+                    
+                st.info(f"🤖 **AI Strategic Verdict:**\n\n{result['ai_comparative_verdict']['ai_strategic_analysis']}")
+
     st.markdown("---")
-    st.markdown(
-        "<div style='text-align: center; color: #888888; font-size: 14px; padding: 10px;'>"
-        "🔒 Clyxess AI secure fast private"
-        "</div>", 
-        unsafe_allow_html=True
-    )                              
+    st.markdown("<div style='text-align: center; color: #888888; font-size: 14px; padding: 10px;'>🔒 Clyxess AI secure fast private</div>", unsafe_allow_html=True)
+                             
 # ============================================================
 # PHYSICS LAB MODULE (DAY 2 - FULL ADVANCED GLOBAL EDITION)
 # Features: Quantum, Space, Robotics, Renewable Energy, 3D Mechanics
