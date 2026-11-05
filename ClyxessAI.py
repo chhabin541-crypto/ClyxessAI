@@ -2442,7 +2442,6 @@ def load_latest_chat_cloud():
         pass
 
 def render_login_signup():
-    # 🛠️ Imports
     import streamlit as st
     import streamlit.components.v1 as components
     import datetime
@@ -2457,7 +2456,6 @@ def render_login_signup():
     RAZORPAY_MONTHLY_LINK = "https://rzp.io/rzp/nNI2b7Qd" 
     RAZORPAY_YEARLY_LINK = "https://rzp.io/rzp/0mWgHct"   
 
-    # 🎨 PREMIUM CSS
     st.markdown("""
     <style>
         @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css');
@@ -2505,7 +2503,6 @@ def render_login_signup():
         .footer-pro .copyright { font-size: 12px; color: #4b5563; }
         .footer-logo { width: 70px; height: 70px; border-radius: 50%; margin-bottom: 15px; border: 2px solid #3b82f6; object-fit: cover; }
         div[data-testid="stButton"]:has(div:contains("Buy Premium Plan")) button { background: linear-gradient(90deg, #3b82f6 0%, #8b5cf6 50%, #f59e0b 100%) !important; color: white !important; border: none !important; font-weight: bold !important; font-size: 16px !important; padding: 12px !important; box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4) !important; transition: 0.3s; }
-        div[data-testid="stButton"]:has(div:contains("Buy Premium Plan")) button:hover { transform: scale(1.02); box-shadow: 0 6px 20px rgba(139, 92, 246, 0.6) !important; }
         a[href*="nNI2b7Qd"] { background-color: #8b5cf6 !important; color: white !important; border: none !important; width: 100% !important; display: flex !important; justify-content: center !important; font-weight: 600 !important; border-radius: 10px !important; padding: 8px !important; margin-top: 10px !important; transition: 0.3s !important; font-size: 14px !important; }
         a[href*="nNI2b7Qd"]:hover { background-color: #a855f7 !important; box-shadow: 0 0 15px rgba(168, 85, 247, 0.8) !important; }
         a[href*="0mWgHct"] { background-color: #f59e0b !important; color: white !important; border: none !important; width: 100% !important; display: flex !important; justify-content: center !important; font-weight: 600 !important; border-radius: 10px !important; padding: 8px !important; margin-top: 10px !important; transition: 0.3s !important; font-size: 14px !important; }
@@ -2632,30 +2629,23 @@ def render_login_signup():
                 st.warning("⚠️ Please Log In or Sign Up first to purchase a plan.")
         st.stop() 
 
-    # ==========================================
-    # 🛑 4. DATABASE CHECK & AUTO-LOCK - FIXED
-    # ==========================================
+    # 4. DATABASE CHECK
     user_email = st.session_state.get("user_email", "")
     try:
         user_id = supabase.auth.get_user().user.id
     except:
         user_id = ""
-    
     res = supabase.table("user_subscriptions").select("*").eq("id", user_id).execute()
-    
     show_plan_screen = False
     trial_used = False
     is_expired = False
     plan_box_html = ""
-
     if len(res.data) == 0:
         show_plan_screen = True
     else:
         trial_used = True 
         sub_data = res.data[0]
         expiry_str = sub_data.get("expiry_date") if isinstance(sub_data, dict) else None
-        
-        # FIX: expiry khali hai to bhi LOCK maan lo
         if not expiry_str:
             show_plan_screen = True
             is_expired = True
@@ -2670,7 +2660,6 @@ def render_login_signup():
                 is_expired = True
                 now = datetime.datetime.now(datetime.timezone.utc)
                 expiry_date = now
-
             if expiry_date <= now:
                 show_plan_screen = True 
                 is_expired = True
@@ -2682,23 +2671,18 @@ def render_login_signup():
                 time_left = expiry_date - now
                 days_left = time_left.days
                 hours_left = time_left.seconds // 3600
-                # FIX: Plan box ko turant sidebar me nahi dikhaya, variable me rakha hai
+                # FIX: Plan box me se Email hata diya - Email ab sirf sabse neeche dikhega
                 plan_box_html = f"""
                 <div style="background: rgba(30, 27, 75, 0.4); border: 1px solid {color}; border-radius: 10px; padding: 15px; margin-bottom: 20px;">
-                    <p style="margin: 0; color: #9ca3af; font-size: 12px;">Logged in as</p>
-                    <h4 style="margin: 0 0 10px 0; color: white; font-size: 13px;">{user_email}</h4>
                     <div style="background: {color}22; padding: 8px; border-radius: 8px; text-align: center;">
-                        <p style="margin: 0; color: {color}; font-weight: 700; font-size: 14px;">{plan_name} 🟢 Active</p>
+                        <p style="margin: 0; color: {color}; font-weight: 700; font-size: 14px;">{plan_name}</p>
                         <p style="margin: 0; color: #d1d5db; font-size: 11px;">⏳ {days_left}d {hours_left}h remaining</p>
                     </div>
                 </div>
                 """
-    # LOCK flag save kar diya - 12017 wali line isse check karegi
     st.session_state["plan_locked"] = show_plan_screen
 
-    # ==========================================
-    # 🛑 5. PLAN SELECTION SCREEN - LOCK YAHIN HAI
-    # ==========================================
+    # 5. PLAN SELECTION SCREEN
     if show_plan_screen:
         if is_expired:
             st.error("🔒 Plan Expired! Naya Plan lo tabhi Chat chalega.")
@@ -2725,28 +2709,39 @@ def render_login_signup():
         st.stop() 
 
     # ==========================================
-    # ✅ DASHBOARD - FIXED ORDER
+    # ✅ DASHBOARD - FINAL FIX
+    # Log Out button HATA DIYA, Email SABSE NICHE
     # ==========================================
-    # 1. SABSE UPAR - MODE
     st.sidebar.markdown("### 📚 Select Mode")
     mode = st.sidebar.radio("", ["Normal Chat", "Cyber Security", "Homework"])
 
-    # 2. BEECH ME - PLAN BOX
     if plan_box_html:
         st.sidebar.markdown(plan_box_html, unsafe_allow_html=True)
 
-    # 3. GAP - Niche dhakelne ke liye
+    # --- SABSE NICHE ---
     st.sidebar.markdown("<div style='height:100px;'></div>", unsafe_allow_html=True)
     st.sidebar.markdown("---")
 
+    # Login hone ke baad Email yahan neeche dikhega - Sign Up ke paas
+    st.sidebar.markdown(f'<div style="text-align:center; color:#a7f3d0; font-size:13px; font-weight:600; word-break:break-all; margin-bottom:10px;">👤 {user_email}</div>', unsafe_allow_html=True)
 
-    # Chota sa Buy Plan - Log Out ke niche
+    # Sirf 1 button - Login / Sign Up - Login hai to click karne pe Log Out hoke Login Page pe jayega
+    if st.sidebar.button("🔐 Login / Sign Up", use_container_width=True, key="btn_login_signup_bottom"):
+        try:
+            supabase.auth.sign_out()
+        except Exception:
+            pass
+        st.session_state.clear()
+        st.session_state["logged_in"] = False
+        st.rerun()
+
+    # Buy Plan - Login / Sign Up ke neeche
     if st.sidebar.button("💎 Buy Plan", use_container_width=True, type="primary", key="btn_upgrade_premium"):
         st.session_state.show_pricing_modal = True
         st.rerun()
 
     return mode
-
+ 
 def render_image_generator():
     import streamlit as st
     import urllib.parse
