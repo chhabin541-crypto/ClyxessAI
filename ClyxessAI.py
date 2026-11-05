@@ -2458,13 +2458,12 @@ def render_login_signup():
     RAZORPAY_MONTHLY_LINK = "https://rzp.io/rzp/nNI2b7Qd" 
     RAZORPAY_YEARLY_LINK = "https://rzp.io/rzp/0mWgHct"   
 
-    # 🎨 PREMIUM CSS (Compact & Professional)
+    # 🎨 PREMIUM CSS (Waisa hi hai, koi change nahi)
     st.markdown("""
     <style>
         @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css');
         .stApp { background: radial-gradient(circle at top right, #1e1b4b 0%, #050814 50%) !important; }
         header {visibility: hidden;} footer {visibility: hidden;}
-        [data-testid="stSidebar"] { display: none !important; }
         
         .block-container { max-width: 1100px !important; padding-top: 2rem !important; }
         
@@ -2493,15 +2492,12 @@ def render_login_signup():
         .facebook-btn { background-color: #1877F2; color: #ffffff; border: none; }
         .facebook-btn:hover { background-color: #166fe5; color: #fff; }
 
-        /* ==========================================
-           👇 FIX 1: PERFECT CARD & TEXT SIZE 👇
-           ========================================== */
         .pricing-card { 
             background: #111827; border-radius: 15px; 
-            padding: 20px 15px; /* Padding kam ki taaki text ko jagah mile */
+            padding: 20px 15px; 
             border: 1px solid #1f2937; 
             text-align: left; position: relative; 
-            height: 520px; /* Fixed height sabke liye barabar */
+            height: 520px; 
             display: flex; flex-direction: column; 
             transition: all 0.3s ease-in-out; cursor: pointer; 
         }
@@ -2517,12 +2513,11 @@ def render_login_signup():
         .badge-popular { position: absolute; top: -12px; right: 15px; background: #8b5cf6; color: white; padding: 3px 10px; border-radius: 15px; font-size: 10px; font-weight: 700; }
         .badge-save { position: absolute; top: -12px; right: 15px; background: #f59e0b; color: white; padding: 3px 10px; border-radius: 15px; font-size: 10px; font-weight: 700; }
         
-        /* 👇 TEXT KO CHHOTA KAR DIYA HAI 👇 */
         .feature-list { 
             list-style: none; padding: 0; margin: 10px 0; 
-            color: #d1d5db; font-size: 11.5px; /* Font chhota kiya */
-            line-height: 1.3; /* Lines ke beech space kam kiya */
-            flex-grow: 1; /* Text ko bachi hui jagah lene do */
+            color: #d1d5db; font-size: 11.5px; 
+            line-height: 1.3; 
+            flex-grow: 1; 
         }
         .feature-list li { margin-bottom: 5px; display: flex; align-items: flex-start; gap: 6px; }
         .feature-list li::before { content: "✔"; color: #10b981; font-weight: bold; font-size: 11px; margin-top: 2px; flex-shrink: 0; }
@@ -2549,10 +2544,6 @@ def render_login_signup():
             transform: scale(1.02); box-shadow: 0 6px 20px rgba(139, 92, 246, 0.6) !important;
         }
 
-        /* ==========================================
-           👇 FIX 2: TARGETING BUTTONS BY URL FOR HOVER COLORS 👇
-           ========================================== */
-        /* Monthly Button - Purple Base */
         a[href*="nNI2b7Qd"] {
             background-color: #8b5cf6 !important;
             color: white !important; border: none !important;
@@ -2566,7 +2557,6 @@ def render_login_signup():
             box-shadow: 0 0 15px rgba(168, 85, 247, 0.8) !important;
         }
 
-        /* Yearly Button - Gold Base */
         a[href*="0mWgHct"] {
             background-color: #f59e0b !important;
             color: white !important; border: none !important;
@@ -2580,9 +2570,6 @@ def render_login_signup():
             box-shadow: 0 0 15px rgba(251, 191, 36, 0.8) !important;
         }
 
-        /* ==========================================
-           👇 FIX 3: SEAMLESS COSMOS IMAGE 👇
-           ========================================== */
         .cosmos-container {
             width: 100%; display: flex; justify-content: center;
             margin-top: 20px; margin-bottom: 20px;
@@ -2807,25 +2794,11 @@ def render_login_signup():
                 is_expired = True 
             else:
                 show_plan_screen = False 
-                
+                # Variables jo sidebar mein use honge
                 plan_type = sub_data["plan_type"]
-                plan_name = "Free Trial" if plan_type == "free" else ("Monthly Plan" if plan_type == "monthly" else "Yearly Plan")
-                color = "#3b82f6" if plan_type == "free" else ("#8b5cf6" if plan_type == "monthly" else "#f59e0b")
-                
                 time_left = expiry_date - now
                 days_left = time_left.days
                 hours_left = time_left.seconds // 3600
-
-                st.sidebar.markdown(f"""
-                <div style="background: rgba(30, 27, 75, 0.4); border: 1px solid {color}; border-radius: 10px; padding: 15px; margin-bottom: 20px;">
-                    <p style="margin: 0; color: #9ca3af; font-size: 12px;">Logged in as</p>
-                    <h4 style="margin: 0 0 10px 0; color: white; font-size: 13px;">{user_email}</h4>
-                    <div style="background: {color}22; padding: 8px; border-radius: 8px; text-align: center;">
-                        <p style="margin: 0; color: {color}; font-weight: 700; font-size: 14px;">{plan_name}</p>
-                        <p style="margin: 0; color: #d1d5db; font-size: 11px;">⏳ {days_left}d {hours_left}h remaining</p>
-                    </div>
-                </div>
-                """, unsafe_allow_html=True)
 
     # ==========================================
     # 🛑 5. PLAN SELECTION SCREEN
@@ -2932,18 +2905,40 @@ def render_login_signup():
     # ✅ DASHBOARD
     # ==========================================
     
+    # 1. Sidebar Top: Select Mode
+    st.sidebar.markdown("### 📚 Select Mode")
+    mode = st.sidebar.radio("", ["Normal Chat", "Cyber Security", "Homework"])
+
     st.sidebar.markdown("---")
+
+    # 2. Sidebar Bottom: Profile, Status, Logout
+    # Plan details calculate karein
+    plan_type = sub_data["plan_type"]
+    plan_display_name = "Monthly Plan (₹1499)" if plan_type == "monthly" else "Yearly Plan (₹16,788)" if plan_type == "yearly" else "Free Trial"
+
+    if plan_type == "free":
+        time_display = f"⏳ {hours_left} Hours Remaining" if hours_left > 0 else f"⏳ {time_left.seconds // 60} Mins Remaining"
+    else:
+        time_display = f"⏳ {days_left} Days Remaining"
+
+    st.sidebar.markdown(f"""
+    <div style="border: 1px solid #10b981; border-radius: 10px; padding: 12px; margin-top: 10px; margin-bottom: 15px; background: rgba(16, 185, 129, 0.05);">
+        <p style="margin: 0 0 5px 0; color: #d1d5db; font-size: 12px;">👤 {user_email}</p>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+            <span style="color: #d1d5db; font-size: 13px; font-weight: 600;">{plan_display_name}</span>
+            <span style="color: #10b981; font-size: 10px; font-weight: bold; border: 1px solid #10b981; padding: 2px 6px; border-radius: 4px; background: rgba(16, 185, 129, 0.1);">🟢 Active</span>
+        </div>
+        <p style="color: white; font-size: 13px; margin: 0; font-weight: 600;">{time_display}</p>
+    </div>
+    """, unsafe_allow_html=True)
+
     if st.sidebar.button("💎 Buy / Upgrade Premium", use_container_width=True, type="primary", key="btn_upgrade_premium"):
         st.session_state.show_pricing_modal = True
         st.rerun()
-    st.sidebar.markdown("---")
 
     if st.sidebar.button("🚪 Log Out", use_container_width=True, key="btn_logout"):
         st.session_state.clear()
         st.rerun()
-
-    st.sidebar.markdown("### 📚 Select Mode")
-    mode = st.sidebar.radio("", ["Normal Chat", "Cyber Security", "Homework"])
     
 
 def render_image_generator():
