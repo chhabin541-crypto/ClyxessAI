@@ -2739,12 +2739,6 @@ def render_login_signup():
     st.sidebar.markdown("<div style='height:100px;'></div>", unsafe_allow_html=True)
     st.sidebar.markdown("---")
 
-    # 4. SABSE NICHE - EMAIL + LOG OUT + BUY PLAN
-    st.sidebar.markdown(f'<div style="text-align:center; color:#a7f3d0; font-size:13px; font-weight:600; word-break:break-all; margin-bottom:10px;">👤 {user_email}</div>', unsafe_allow_html=True)
-
-    if st.sidebar.button("🚪 Log Out", use_container_width=True, key="btn_logout"):
-        st.session_state.clear()
-        st.rerun()
 
     # Chota sa Buy Plan - Log Out ke niche
     if st.sidebar.button("💎 Buy Plan", use_container_width=True, type="primary", key="btn_upgrade_premium"):
