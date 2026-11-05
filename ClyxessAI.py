@@ -6474,7 +6474,7 @@ def render_learn_finance(client):
         def _tokyo_shanghai_macro_cfo_engine(self, data: Dict[str, Any]) -> Dict[str, Any]: return {"founder_equity": 83.3, "investor_equity": 16.7}
 
     # ============================================================
-    # 🎨 11 LANGUAGES DICTIONARY
+    # 🎨 LANGUAGES & CURRENCIES
     # ============================================================
     def typewriter_effect(text):
         placeholder = st.empty()
@@ -6514,15 +6514,52 @@ def render_learn_finance(client):
     }
 
     col1, col2, col3 = st.columns(3)
-    with col1: class_level = st.selectbox("🎓 Select Your Level", ["Class 5-8 (Basics) - Age 10-13", "Class 9-10 (Intermediate) - Age 14-15", "Class 11-12 (Advanced) - Age 16-17", "College / University (Professional) - Age 18+"], key="fin_class_level")
+    with col1: 
+        class_level = st.selectbox("🎓 Select Your Level", ["Class 5-8 (Basics) - Age 10-13", "Class 9-10 (Intermediate) - Age 14-15", "Class 11-12 (Advanced) - Age 16-17", "College / University (Professional) - Age 18+"], key="fin_class_level")
+    
     with col2:
-        CURRENCIES = {"🇮🇳 INR (₹)": {"symbol": "₹", "rate": 83.0}, "🇺🇸 USD ($)": {"symbol": "$", "rate": 1.0}, "🇪🇺 EUR (€)": {"symbol": "€", "rate": 0.92}}
-        if "fin_currency" not in st.session_state: st.session_state.fin_currency = "🇮🇳 INR (₹)"
-        curr_label = st.selectbox("🌐 Select Currency", list(CURRENCIES.keys()), index=list(CURRENCIES.keys()).index(st.session_state.fin_currency))
+        # 👇 YAHAN SAARI DUNIYA KI CURRENCIES WAPAS ADD KAR DI HAIN 👇
+        CURRENCIES = {
+            "🇮🇳 INR (₹)": {"symbol": "₹", "rate": 83.0}, 
+            "🇺🇸 USD ($)": {"symbol": "$", "rate": 1.0},
+            "🇪🇺 EUR (€)": {"symbol": "€", "rate": 0.92}, 
+            "🇬🇧 GBP (£)": {"symbol": "£", "rate": 0.79},
+            "🇯🇵 JPY (¥)": {"symbol": "¥", "rate": 150.0}, 
+            "🇨🇳 CNY (¥)": {"symbol": "¥", "rate": 7.2}, 
+            "🇦🇪 AED (د.إ)": {"symbol": "د.إ", "rate": 3.67}, 
+            "🇵🇰 PKR (₨)": {"symbol": "₨", "rate": 278.0},
+            "🇧🇩 BDT (৳)": {"symbol": "৳", "rate": 110.0}, 
+            "🇷🇺 RUB (₽)": {"symbol": "₽", "rate": 92.0},
+            "🇿🇦 ZAR (R)": {"symbol": "R", "rate": 18.5}, 
+            "🇧🇷 BRL (R$)": {"symbol": "R$", "rate": 5.0},
+            "🇨🇦 CAD ($)": {"symbol": "C$", "rate": 1.35},
+            "🇦🇺 AUD ($)": {"symbol": "A$", "rate": 1.52},
+            "🇨🇭 CHF (Fr)": {"symbol": "Fr", "rate": 0.88},
+            "🇸🇬 SGD ($)": {"symbol": "S$", "rate": 1.34},
+            "🇭🇰 HKD ($)": {"symbol": "HK$", "rate": 7.82},
+            "🇳🇿 NZD ($)": {"symbol": "NZ$", "rate": 1.64},
+            "🇰🇷 KRW (₩)": {"symbol": "₩", "rate": 1330.0},
+            "🇲🇾 MYR (RM)": {"symbol": "RM", "rate": 4.72},
+            "🇹🇭 THB (฿)": {"symbol": "฿", "rate": 35.8},
+            "🇮🇩 IDR (Rp)": {"symbol": "Rp", "rate": 15600.0},
+            "🇸🇦 SAR (﷼)": {"symbol": "﷼", "rate": 3.75},
+            "🇹🇷 TRY (₺)": {"symbol": "₺", "rate": 30.5},
+            "🇲🇽 MXN ($)": {"symbol": "Mex$", "rate": 17.1}
+        }
+        available_currs = list(CURRENCIES.keys())
+        
+        if "fin_currency" not in st.session_state or st.session_state.fin_currency not in available_currs:
+            st.session_state.fin_currency = "🇮🇳 INR (₹)"
+        
+        curr_label = st.selectbox("🌐 Select Currency", available_currs, index=available_currs.index(st.session_state.fin_currency))
         st.session_state.fin_currency = curr_label
+        
     with col3:
-        if "fin_lang" not in st.session_state: st.session_state.fin_lang = "🇬🇧 English"
-        selected_lang_label = st.selectbox("🌍 Select Language", list(LANGUAGES.keys()), index=list(LANGUAGES.keys()).index(st.session_state.fin_lang))
+        available_langs = list(LANGUAGES.keys())
+        if "fin_lang" not in st.session_state or st.session_state.fin_lang not in available_langs:
+            st.session_state.fin_lang = "🇬🇧 English"
+            
+        selected_lang_label = st.selectbox("🌍 Select Language", available_langs, index=available_langs.index(st.session_state.fin_lang))
         st.session_state.fin_lang = selected_lang_label
         lang_code = LANGUAGES[selected_lang_label]
 
