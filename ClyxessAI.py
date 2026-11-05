@@ -6530,7 +6530,7 @@ def render_learn_finance(client):
 
     def format_money(usd_val): return f"{sym}{usd_val * rate:,.2f}"
 
-    # 👇 YAHAN 5TH TAB ADD KIYA HAI 👇
+    # 5 TABS
     tab1, tab2, tab3, tab4, tab5 = st.tabs([f"📖 {t['learn']}", f"📈 {t['market']}", f"🏦 {t['banking']}", f"🚀 {t['startup']}", f"⚔️ Advanced Lab"])
 
     with tab1:
@@ -6617,98 +6617,96 @@ def render_learn_finance(client):
                     except Exception as e: st.error(f"AI Error: {str(e)}")
 
     # ============================================================
-    # 👇 NAYA TAB 5: ADVANCED LAB (Saare Naye Features Yahan Hain) 👇
+    # 👇 NAYA TAB 5: ADVANCED LAB (Saare 4 Features Direct Visible) 👇
     # ============================================================
     with tab5:
-        st.subheader("⚔️ Advanced FinTech Lab")
-        st.write("Explore global financial models & compare bank loans to find hidden traps!")
+        st.subheader("⚔️ Advanced Global FinTech Lab")
+        st.write("Explore all 4 advanced financial models below:")
         
         engine = ClyxessAdvancedFinTechSection()
         
-        # 1. Class-Based Advanced Engine
-        st.markdown("### 🎓 Level-Specific Advanced Model")
-        st.info(f"Aapne upar **{class_level}** select kiya hai. Niche button dabakar us level ka advanced model chalaen.")
+        # --- FEATURE 1: Kakeibo ---
+        st.markdown("### 1️⃣ 🇯🇵 Japanese Kakeibo Budgeting (Class 5-7)")
+        col1, col2, col3, col4, col5 = st.columns(5)
+        with col1: k_income = st.number_input("Income (₹)", value=1000, key="k_inc")
+        with col2: k_survival = st.number_input("Survival (Khana)", value=300, key="k_sur")
+        with col3: k_wants = st.number_input("Wants (Toys)", value=200, key="k_wan")
+        with col4: k_culture = st.number_input("Learning", value=100, key="k_cul")
+        with col5: k_unexpected = st.number_input("Emergency", value=50, key="k_une")
         
-        if st.button("Run Advanced Level Engine", type="primary"):
-            with st.spinner("Processing Advanced Model..."):
-                time.sleep(1)
-                
-                if "Class 5-8" in class_level:
-                    inputs = {"income": 1000, "expenses": 800}
-                    res = engine.execute_advanced_lab_action("class_5_7", inputs)
-                    st.success(f"Result: {res['tier_name']}")
-                    st.metric("Your Balance", f"₹{res['balance']}")
-                    st.write(f"**AI Feedback:** {res['feedback']}")
-                    
-                elif "Class 9-10" in class_level:
-                    inputs = {"material_cost": 10, "rent": 500, "price": 30, "volume": 50}
-                    res = engine.execute_advanced_lab_action("class_8_10", inputs)
-                    st.success(f"Result: {res['tier_name']}")
-                    st.metric("Net Profit", f"₹{res['profit']}")
-                    st.write(f"**Status:** {res['status']}")
-                    
-                elif "Class 11-12" in class_level:
-                    inputs = {"seed": 50000, "sip": 2000, "years": 5}
-                    res = engine.execute_advanced_lab_action("class_11_12", inputs)
-                    st.success(f"Result: {res['tier_name']}")
-                    st.metric("Projected Wealth", f"₹{res['total_wealth']}")
-                    
-                elif "College" in class_level:
-                    inputs = {"revenue": 1000000, "ebitda": 200000}
-                    res = engine.execute_advanced_lab_action("university", inputs)
-                    st.success(f"Result: {res['tier_name']}")
-                    st.metric("Enterprise Value (8x)", f"₹{res['enterprise_value']}")
+        if st.button("Calculate Kakeibo", key="btn_kakeibo", type="primary"):
+            inputs = {"income": k_income, "expenses": k_survival + k_wants + k_culture + k_unexpected}
+            res = engine.execute_advanced_lab_action("class_5_7", inputs)
+            st.success(f"Balance: ₹{res['balance']} | Feedback: {res['feedback']}")
 
         st.divider()
+
+        # --- FEATURE 2: Micro-Factory ---
+        st.markdown("### 2️⃣ 🇨🇳 Chinese WeChat Micro-Factory (Class 8-10)")
+        col1, col2, col3, col4 = st.columns(4)
+        with col1: f_material = st.number_input("Material Cost (₹)", value=10, key="f_mat")
+        with col2: f_rent = st.number_input("Factory Rent (₹)", value=500, key="f_rent")
+        with col3: f_price = st.number_input("Selling Price (₹)", value=30, key="f_price")
+        with col4: f_volume = st.number_input("Units Sold", value=50, key="f_vol")
         
-        # 2. Dual Bank Loan Trap Comparator
-        st.markdown("### 🏦 Dual-Bank Loan Trap Comparator")
-        st.write("Compare 2 banks and find out which one is actually cheaper after hidden charges!")
+        if st.button("Run Virtual Factory", key="btn_factory", type="primary"):
+            inputs = {"material_cost": f_material, "rent": f_rent, "price": f_price, "volume": f_volume}
+            res = engine.execute_advanced_lab_action("class_8_10", inputs)
+            st.success(f"Net Profit: ₹{res['profit']} | Status: {res['status']}")
+
+        st.divider()
+
+        # --- FEATURE 3: Wealth Matrix ---
+        st.markdown("### 3️⃣ 🇰🇷 Korean Chaebol Wealth Matrix (Class 11-12)")
+        col1, col2, col3 = st.columns(3)
+        with col1: w_seed = st.number_input("Seed Capital (₹)", value=50000, key="w_seed")
+        with col2: w_sip = st.number_input("Monthly SIP (₹)", value=2000, key="w_sip")
+        with col3: w_years = st.number_input("Years", value=5, key="w_years")
         
-        loan_amount = st.number_input("Loan Amount (₹):", min_value=10000, value=500000, step=10000)
+        if st.button("Calculate Future Wealth", key="btn_wealth", type="primary"):
+            inputs = {"seed": w_seed, "sip": w_sip, "years": w_years}
+            res = engine.execute_advanced_lab_action("class_11_12", inputs)
+            st.success(f"Total Projected Wealth: ₹{res['total_wealth']}")
+
+        st.divider()
+
+        # --- FEATURE 4: Bank Comparator ---
+        st.markdown("### 4️⃣ 🏦 Dual-Bank Loan Trap Comparator (All Levels)")
+        loan_amount = st.number_input("Loan Amount (₹):", min_value=10000, value=500000, step=10000, key="b_amt")
         
-        st.markdown("#### Bank A Details")
         colA1, colA2, colA3, colA4, colA5 = st.columns(5)
-        with colA1: rate_a = st.number_input("Bank A Rate (%)", value=10.0)
-        with colA2: years_a = st.number_input("Tenure (Years) A", value=5)
-        with colA3: fee_a = st.number_input("Processing Fee A (₹)", value=5000)
-        with colA4: ins_a = st.number_input("Hidden Insurance A (₹)", value=10000)
-        with colA5: doc_a = st.number_input("Doc Charges A (₹)", value=1000)
+        with colA1: b_rate_a = st.number_input("Rate (%) A", value=10.0, key="ra")
+        with colA2: b_years_a = st.number_input("Tenure A", value=5, key="ya")
+        with colA3: b_fee_a = st.number_input("Fee A (₹)", value=5000, key="fa")
+        with colA4: b_ins_a = st.number_input("Insurance A (₹)", value=10000, key="ia")
+        with colA5: b_doc_a = st.number_input("Doc A (₹)", value=1000, key="da")
 
-        st.markdown("#### Bank B Details")
         colB1, colB2, colB3, colB4, colB5 = st.columns(5)
-        with colB1: rate_b = st.number_input("Bank B Rate (%)", value=9.5) 
-        with colB2: years_b = st.number_input("Tenure (Years) B", value=5)
-        with colB3: fee_b = st.number_input("Processing Fee B (₹)", value=15000)
-        with colB4: ins_b = st.number_input("Hidden Insurance B (₹)", value=25000)
-        with colB5: doc_b = st.number_input("Doc Charges B (₹)", value=2000)
+        with colB1: b_rate_b = st.number_input("Rate (%) B", value=9.5, key="rb") 
+        with colB2: b_years_b = st.number_input("Tenure B", value=5, key="yb")
+        with colB3: b_fee_b = st.number_input("Fee B (₹)", value=15000, key="fb")
+        with colB4: b_ins_b = st.number_input("Insurance B (₹)", value=25000, key="ib")
+        with colB5: b_doc_b = st.number_input("Doc B (₹)", value=2000, key="db")
 
-        if st.button("🔍 Analyze Both Banks", type="primary", use_container_width=True):
-            with st.spinner("Calculating hidden traps..."):
-                time.sleep(1)
-                inputs = {
-                    "loan_amount": loan_amount,
-                    "bank_a_stated_apr": rate_a, "bank_a_term_years": years_a, "bank_a_processing_fee": fee_a, "bank_a_hidden_insurance": ins_a, "bank_a_documentation_charges": doc_a,
-                    "bank_b_stated_apr": rate_b, "bank_b_term_years": years_b, "bank_b_processing_fee": fee_b, "bank_b_hidden_insurance": ins_b, "bank_b_documentation_charges": doc_b
-                }
-                result = engine.execute_advanced_lab_action("compare_banks", inputs)
+        if st.button("Analyze Both Banks", type="primary", use_container_width=True, key="btn_bank"):
+            inputs = {
+                "loan_amount": loan_amount,
+                "bank_a_stated_apr": b_rate_a, "bank_a_term_years": b_years_a, "bank_a_processing_fee": b_fee_a, "bank_a_hidden_insurance": b_ins_a, "bank_a_documentation_charges": b_doc_a,
+                "bank_b_stated_apr": b_rate_b, "bank_b_term_years": b_years_b, "bank_b_processing_fee": b_fee_b, "bank_b_hidden_insurance": b_ins_b, "bank_b_documentation_charges": b_doc_b
+            }
+            result = engine.execute_advanced_lab_action("compare_banks", inputs)
+            
+            c1, c2 = st.columns(2)
+            with c1:
+                st.markdown(f"**Bank A (Rate: {b_rate_a}%)**")
+                st.metric("Monthly EMI", f"₹{result['bank_a_analysis']['monthly_emi']}")
+                st.metric("Hidden Charges", f"₹{result['bank_a_analysis']['total_upfront_hidden_charges']}", delta_color="inverse")
+            with c2:
+                st.markdown(f"**Bank B (Rate: {b_rate_b}%)**")
+                st.metric("Monthly EMI", f"₹{result['bank_b_analysis']['monthly_emi']}")
+                st.metric("Hidden Charges", f"₹{result['bank_b_analysis']['total_upfront_hidden_charges']}", delta_color="inverse")
                 
-                st.success("Analysis Complete!")
-                
-                c1, c2 = st.columns(2)
-                with c1:
-                    st.markdown(f"#### Bank A (Rate: {rate_a}%)")
-                    st.metric("Monthly EMI", f"₹{result['bank_a_analysis']['monthly_emi']}")
-                    st.metric("Total Hidden Charges", f"₹{result['bank_a_analysis']['total_upfront_hidden_charges']}", delta_color="inverse")
-                    st.metric("Total Money Drained", f"₹{result['bank_a_analysis']['total_money_drained']}")
-                    
-                with c2:
-                    st.markdown(f"#### Bank B (Rate: {rate_b}%)")
-                    st.metric("Monthly EMI", f"₹{result['bank_b_analysis']['monthly_emi']}")
-                    st.metric("Total Hidden Charges", f"₹{result['bank_b_analysis']['total_upfront_hidden_charges']}", delta_color="inverse")
-                    st.metric("Total Money Drained", f"₹{result['bank_b_analysis']['total_money_drained']}")
-                    
-                st.info(f"🤖 **AI Strategic Verdict:**\n\n{result['ai_comparative_verdict']['ai_strategic_analysis']}")
+            st.info(f"🤖 **AI Verdict:** {result['ai_comparative_verdict']['ai_strategic_analysis']}")
 
     st.markdown("---")
     st.markdown("<div style='text-align: center; color: #888888; font-size: 14px; padding: 10px;'>🔒 Clyxess AI secure fast private</div>", unsafe_allow_html=True)
