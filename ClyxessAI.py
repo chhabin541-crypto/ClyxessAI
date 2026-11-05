@@ -12076,7 +12076,7 @@ with st.sidebar:
         logged_user = None
     if logged_user:
         st.success(f"👤 {logged_user.email}")
-        if st.button("🚪 Log Out", use_container_width=True):
+    
             try: supabase.auth.sign_out()
             except Exception: pass
             st.rerun()
