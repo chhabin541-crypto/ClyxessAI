@@ -6345,7 +6345,7 @@ def render_learn_finance(client):
     from typing import Dict, Any, List
 
     # ============================================================
-    # 🚀 AAPKI CLASS (Mera Advanced Engine jisme Dropdown wala Bank hai)
+    # 🚀 ADVANCED ENGINE
     # ============================================================
     class ClyxessUltimateFinTechSuite:
         def __init__(self):
@@ -6481,7 +6481,7 @@ def render_learn_finance(client):
         placeholder.markdown(typed_text)
 
     # ============================================================
-    # 🌍 8 LANGUAGES ONLY (Indian hatakar aapke bataye hue 8)
+    # 🌍 8 LANGUAGES ONLY
     # ============================================================
     LANGUAGES = {
         "🇬🇧 English": "en", "🇮🇳 हिंदी (Hindi)": "hi", 
@@ -6505,12 +6505,9 @@ def render_learn_finance(client):
     
     with col1:
         level_options = ["Class 5-8 (Basics) - Age 10-13", "Class 9-10 (Intermediate) - Age 14-15", "Class 11-12 (Advanced) - Age 16-17", "College / University (Professional) - Age 18+"]
-        class_level = st.selectbox("🎓 Select Your Level", level_options, key="fin_class_level")
+        class_level = st.selectbox("🎓 Select Your Level", level_options, key="fin_class_level_v3")
     
     with col2:
-        # ============================================================
-        # 💱 22 STOCK MARKET WALE DESHON KI CURRENCY
-        # ============================================================
         CURRENCIES = {
             "🇮🇳 INR (₹)": {"symbol": "₹", "rate": 83.0}, "🇺🇸 USD ($)": {"symbol": "$", "rate": 1.0},
             "🇪🇺 EUR (€)": {"symbol": "€", "rate": 0.92}, "🇬🇧 GBP (£)": {"symbol": "£", "rate": 0.79},
@@ -6524,14 +6521,12 @@ def render_learn_finance(client):
             "🇧🇩 BDT (৳)": {"symbol": "৳", "rate": 110.0}, "🇲🇾 MYR (RM)": {"symbol": "RM", "rate": 4.7},
             "🇹🇭 THB (฿)": {"symbol": "฿", "rate": 36.0}, "🇮🇩 IDR (Rp)": {"symbol": "Rp", "rate": 15600.0}
         }
-        if "fin_currency" not in st.session_state: st.session_state.fin_currency = "🇮🇳 INR (₹)"
-        curr_label = st.selectbox("🌐 Select Currency", list(CURRENCIES.keys()), index=list(CURRENCIES.keys()).index(st.session_state.fin_currency))
-        st.session_state.fin_currency = curr_label
+        # 👇 Key fix: Double click issue solved
+        curr_label = st.selectbox("🌐 Select Currency", list(CURRENCIES.keys()), key="fin_currency_v3")
 
     with col3:
-        if "fin_lang" not in st.session_state: st.session_state.fin_lang = "🇬🇧 English"
-        selected_lang_label = st.selectbox("🌍 Select Language", list(LANGUAGES.keys()), index=list(LANGUAGES.keys()).index(st.session_state.fin_lang))
-        st.session_state.fin_lang = selected_lang_label
+        # 👇 Key fix: Double click issue solved
+        selected_lang_label = st.selectbox("🌍 Select Language", list(LANGUAGES.keys()), key="fin_lang_v3")
         lang_code = LANGUAGES[selected_lang_label]
 
     t = UI_TEXTS.get(lang_code, UI_TEXTS["en"])
@@ -6546,10 +6541,11 @@ def render_learn_finance(client):
 
     st.markdown(f'<div class="fin-header"><h1>💰 {t["title"]} - {class_level.split("-")[0].strip()}</h1></div>', unsafe_allow_html=True)
 
-    if "fin_cash_usd" not in st.session_state: st.session_state.fin_cash_usd = 10000.0 if is_junior else 50000.0
-    if "fin_loan_usd" not in st.session_state: st.session_state.fin_loan_usd = 0.0
-    if "fin_portfolio" not in st.session_state: st.session_state.fin_portfolio = {"TECH": 0, "AI": 0, "EDU": 0, "CRYPTO": 0}
-    if "fin_stock_prices_usd" not in st.session_state: st.session_state.fin_stock_prices_usd = {"TECH": 150.0, "AI": 320.0, "EDU": 80.0, "CRYPTO": 500.0}
+    # 👇 SESSION STATE RESET (Purana Euro ka data clear karne ke liye _v3 variables)
+    if "fin_cash_usd_v3" not in st.session_state: st.session_state.fin_cash_usd_v3 = 1000.0
+    if "fin_loan_usd_v3" not in st.session_state: st.session_state.fin_loan_usd_v3 = 0.0
+    if "fin_portfolio_v3" not in st.session_state: st.session_state.fin_portfolio_v3 = {"TECH": 0, "AI": 0, "EDU": 0, "CRYPTO": 0}
+    if "fin_stock_prices_usd_v3" not in st.session_state: st.session_state.fin_stock_prices_usd_v3 = {"TECH": 150.0, "AI": 320.0, "EDU": 80.0, "CRYPTO": 500.0}
 
     def format_money(usd_val): return f"{sym}{usd_val * rate:,.2f}"
 
@@ -6559,7 +6555,7 @@ def render_learn_finance(client):
         st.subheader(f"📖 {t['learn']}")
         topics = ["Money Basics & Saving", "Personal Budgeting", "Understanding Taxes", "What is Inflation?", "Stock Market Basics", "Primary vs Secondary Market", "Understanding IPOs", "Mutual Funds & ETFs", "Technical vs Fundamental Analysis", "Bull vs Bear Market", "Types of Banks", "How Banks Work & Interest", "Digital Banking & UPI", "Central Bank & RBI", "Loans and EMI", "Net Banking Safety", "Cyber Fraud Awareness", "Safe vs Unsafe Transactions", "Phishing and OTP Scams", "How to Protect Your Money Online"]
         if is_junior: topics = topics[:5] + topics[10:12] + topics[15:18]
-        topic = st.selectbox("Select Topic:", topics)
+        topic = st.selectbox("Select Topic:", topics, key="topic_select_v3")
         if st.button("🚀 Explain this Topic"):
             with st.spinner("AI analyzing..."):
                 time.sleep(2)
@@ -6572,51 +6568,51 @@ def render_learn_finance(client):
 
     with tab2:
         st.subheader(f"📈 {t['market']}")
-        for stock in st.session_state.fin_stock_prices_usd:
+        for stock in st.session_state.fin_stock_prices_usd_v3:
             change = random.uniform(-0.05, 0.05)
-            st.session_state.fin_stock_prices_usd[stock] = max(10.0, round(st.session_state.fin_stock_prices_usd[stock] * (1 + change), 2))
+            st.session_state.fin_stock_prices_usd_v3[stock] = max(10.0, round(st.session_state.fin_stock_prices_usd_v3[stock] * (1 + change), 2))
 
-        total_portfolio_value_usd = sum(st.session_state.fin_portfolio[s] * st.session_state.fin_stock_prices_usd[s] for s in st.session_state.fin_portfolio)
-        total_net_worth_usd = st.session_state.fin_cash_usd + total_portfolio_value_usd - st.session_state.fin_loan_usd
+        total_portfolio_value_usd = sum(st.session_state.fin_portfolio_v3[s] * st.session_state.fin_stock_prices_usd_v3[s] for s in st.session_state.fin_portfolio_v3)
+        total_net_worth_usd = st.session_state.fin_cash_usd_v3 + total_portfolio_value_usd - st.session_state.fin_loan_usd_v3
 
         c1, c2, c3 = st.columns(3)
-        with c1: st.markdown(f'<div class="fin-card">💵 {t["cash"]}<br><span class="fin-value">{format_money(st.session_state.fin_cash_usd)}</span></div>', unsafe_allow_html=True)
+        with c1: st.markdown(f'<div class="fin-card">💵 {t["cash"]}<br><span class="fin-value">{format_money(st.session_state.fin_cash_usd_v3)}</span></div>', unsafe_allow_html=True)
         with c2: st.markdown(f'<div class="fin-card">📊 {t["portfolio"]}<br><span class="fin-value">{format_money(total_portfolio_value_usd)}</span></div>', unsafe_allow_html=True)
         with c3: st.markdown(f'<div class="fin-card">🏆 {t["networth"]}<br><span class="fin-value">{format_money(total_net_worth_usd)}</span></div>', unsafe_allow_html=True)
 
         st.divider()
-        for stock, price_usd in st.session_state.fin_stock_prices_usd.items():
+        for stock, price_usd in st.session_state.fin_stock_prices_usd_v3.items():
             col_a, col_b, col_c = st.columns([2, 1, 1])
-            with col_a: st.markdown(f'**{stock}** | Price: {format_money(price_usd)} | Owned: {st.session_state.fin_portfolio[stock]}')
+            with col_a: st.markdown(f'**{stock}** | Price: {format_money(price_usd)} | Owned: {st.session_state.fin_portfolio_v3[stock]}')
             with col_b:
-                if st.button(f"{t['buy']}", key=f"buy_{stock}"):
-                    if st.session_state.fin_cash_usd >= price_usd:
-                        st.session_state.fin_cash_usd -= price_usd; st.session_state.fin_portfolio[stock] += 1; st.rerun()
+                if st.button(f"{t['buy']}", key=f"buy_{stock}_v3"):
+                    if st.session_state.fin_cash_usd_v3 >= price_usd:
+                        st.session_state.fin_cash_usd_v3 -= price_usd; st.session_state.fin_portfolio_v3[stock] += 1; st.rerun()
                     else: st.error("Not enough cash!")
             with col_c:
-                if st.button(f"{t['sell']}", key=f"sell_{stock}"):
-                    if st.session_state.fin_portfolio[stock] > 0:
-                        st.session_state.fin_cash_usd += price_usd; st.session_state.fin_portfolio[stock] -= 1; st.rerun()
+                if st.button(f"{t['sell']}", key=f"sell_{stock}_v3"):
+                    if st.session_state.fin_portfolio_v3[stock] > 0:
+                        st.session_state.fin_cash_usd_v3 += price_usd; st.session_state.fin_portfolio_v3[stock] -= 1; st.rerun()
                     else: st.error("No shares owned!")
 
     with tab3:
         st.subheader(f"🏦 {t['banking']}")
-        st.write(f"{t['cash']}: **{format_money(st.session_state.fin_cash_usd)}**")
-        st.write(f"{t['loan']}: **{format_money(st.session_state.fin_loan_usd)}**")
+        st.write(f"{t['cash']}: **{format_money(st.session_state.fin_cash_usd_v3)}**")
+        st.write(f"{t['loan']}: **{format_money(st.session_state.fin_loan_usd_v3)}**")
 
         col1, col2 = st.columns(2)
         with col1:
-            amt = st.number_input("Amount:", min_value=100, value=1000)
-            if st.button(f"📥 {t['deposit']}"): st.session_state.fin_cash_usd += amt / rate; st.rerun()
-            if st.button(f"📤 {t['withdraw']}"):
-                if st.session_state.fin_cash_usd >= amt / rate: st.session_state.fin_cash_usd -= amt / rate; st.rerun()
+            amt = st.number_input("Amount:", min_value=100.0, value=1000.0, step=100.0, key="amt_v3")
+            if st.button(f"📥 {t['deposit']}", key="dep_v3"): st.session_state.fin_cash_usd_v3 += amt / rate; st.rerun()
+            if st.button(f"📤 {t['withdraw']}", key="wd_v3"):
+                if st.session_state.fin_cash_usd_v3 >= amt / rate: st.session_state.fin_cash_usd_v3 -= amt / rate; st.rerun()
                 else: st.error("Low balance!")
         with col2:
-            loan_amt = st.number_input("Loan Amount:", min_value=500, value=5000)
-            if st.button(f"📝 {t['loan']}"): st.session_state.fin_cash_usd += loan_amt / rate; st.session_state.fin_loan_usd += loan_amt / rate; st.rerun()
-            if st.button(f"✅ {t['repay']}"):
-                if st.session_state.fin_cash_usd >= loan_amt / rate:
-                    st.session_state.fin_cash_usd -= loan_amt / rate; st.session_state.fin_loan_usd = max(0.0, st.session_state.fin_loan_usd - loan_amt / rate); st.rerun()
+            loan_amt = st.number_input("Loan Amount:", min_value=500.0, value=5000.0, step=500.0, key="loan_amt_v3")
+            if st.button(f"📝 {t['loan']}", key="loan_v3"): st.session_state.fin_cash_usd_v3 += loan_amt / rate; st.session_state.fin_loan_usd_v3 += loan_amt / rate; st.rerun()
+            if st.button(f"✅ {t['repay']}", key="repay_v3"):
+                if st.session_state.fin_cash_usd_v3 >= loan_amt / rate:
+                    st.session_state.fin_cash_usd_v3 -= loan_amt / rate; st.session_state.fin_loan_usd_v3 = max(0.0, st.session_state.fin_loan_usd_v3 - loan_amt / rate); st.rerun()
                 else: st.error("Not enough cash!")
 
     with tab4:
@@ -6624,12 +6620,12 @@ def render_learn_finance(client):
         col1, col2 = st.columns(2)
         with col1:
             st.markdown("### 📊 Startup Valuation Calculator")
-            revenue = st.number_input(f"Annual Revenue ({sym}):", min_value=1000, value=50000)
-            growth = st.slider("Growth Rate (%):", 1, 100, 20)
+            revenue = st.number_input(f"Annual Revenue ({sym}):", min_value=1000.0, value=50000.0, key="rev_v3")
+            growth = st.slider("Growth Rate (%):", 1, 100, 20, key="growth_v3")
             st.metric(label="Estimated Valuation", value=f"{sym}{(revenue * (1 + growth/100) * 5):,.2f}")
         with col2:
             st.markdown("### 🤖 Ask AI (Web3 Expert)")
-            if st.button("Ask AI"):
+            if st.button("Ask AI", key="ask_ai_v3"):
                 with st.spinner("AI is thinking..."):
                     time.sleep(2)
                     prompt = f"You are a FinTech and Web3 expert. Explain Startup & Web3 to a student of level '{class_level}' in {selected_lang_label}."
@@ -6639,25 +6635,24 @@ def render_learn_finance(client):
                     except Exception as e: st.error(f"AI Error: {str(e)}")
 
     # ============================================================
-    # 👇 TAB 5: ADVANCED LAB (Aapka UI waisa hi, bas Bank replace)
+    # 👇 TAB 5: ADVANCED LAB
     # ============================================================
     with tab5:
         st.subheader(f"⚔️ {t['advanced']}")
         st.write("Explore all 5 advanced financial models below:")
         
-        # Engine change karke humne apna wala laga diya hai
         engine = ClyxessUltimateFinTechSuite()
         
         # --- FEATURE 1: Kakeibo ---
         st.markdown("#### 1️⃣ 🇯🇵 Japanese Kakeibo (Class 5-7)")
         c1, c2, c3, c4, c5 = st.columns(5)
-        with c1: k_income = st.number_input("Income (₹)", value=1000, key="k_inc", label_visibility="collapsed")
-        with c2: k_survival = st.number_input("Khana (₹)", value=300, key="k_sur")
-        with c3: k_wants = st.number_input("Toys (₹)", value=200, key="k_wan")
-        with c4: k_culture = st.number_input("Learning (₹)", value=100, key="k_cul")
-        with c5: k_unexpected = st.number_input("Emergency (₹)", value=50, key="k_une")
+        with c1: k_income = st.number_input("Income (₹)", value=1000, key="k_inc_v3", label_visibility="collapsed")
+        with c2: k_survival = st.number_input("Khana (₹)", value=300, key="k_sur_v3")
+        with c3: k_wants = st.number_input("Toys (₹)", value=200, key="k_wan_v3")
+        with c4: k_culture = st.number_input("Learning (₹)", value=100, key="k_cul_v3")
+        with c5: k_unexpected = st.number_input("Emergency (₹)", value=50, key="k_une_v3")
         
-        if st.button("Calculate Kakeibo", key="btn_kakeibo", type="primary", use_container_width=True):
+        if st.button("Calculate Kakeibo", key="btn_kakeibo_v3", type="primary", use_container_width=True):
             inputs = {"allowance_or_income": k_income, "spent_survival_needs": k_survival, "spent_optional_wants": k_wants, "spent_culture_learning": k_culture, "spent_unexpected": k_unexpected}
             res = engine.execute_advanced_lab_action("class_5_7", inputs)
             st.success(f"Balance: ₹{res['balance']} | Feedback: {res['feedback']}")
@@ -6668,12 +6663,12 @@ def render_learn_finance(client):
         # --- FEATURE 2: Micro-Factory ---
         st.markdown("#### 2️⃣ 🇨🇳 Chinese WeChat Micro-Factory (Class 8-10)")
         c1, c2, c3, c4 = st.columns(4)
-        with c1: f_material = st.number_input("Material Cost (₹)", value=10, key="f_mat")
-        with c2: f_rent = st.number_input("Factory Rent (₹)", value=500, key="f_rent")
-        with c3: f_price = st.number_input("Selling Price (₹)", value=30, key="f_price")
-        with c4: f_volume = st.number_input("Units Sold", value=50, key="f_vol")
+        with c1: f_material = st.number_input("Material Cost (₹)", value=10, key="f_mat_v3")
+        with c2: f_rent = st.number_input("Factory Rent (₹)", value=500, key="f_rent_v3")
+        with c3: f_price = st.number_input("Selling Price (₹)", value=30, key="f_price_v3")
+        with c4: f_volume = st.number_input("Units Sold", value=50, key="f_vol_v3")
         
-        if st.button("Run Virtual Factory", key="btn_factory", type="primary", use_container_width=True):
+        if st.button("Run Virtual Factory", key="btn_factory_v3", type="primary", use_container_width=True):
             inputs = {"raw_material_cost": f_material, "fixed_factory_overhead": f_rent, "unit_selling_price": f_price, "total_units_sold": f_volume}
             res = engine.execute_advanced_lab_action("class_8_10", inputs)
             st.success(f"Net Profit: ₹{res['profit']} | Status: {res['status']}")
@@ -6684,11 +6679,11 @@ def render_learn_finance(client):
         # --- FEATURE 3: Wealth Matrix ---
         st.markdown("#### 3️⃣ 🇰🇷 Korean Chaebol Wealth Matrix (Class 11-12)")
         c1, c2, c3 = st.columns(3)
-        with c1: w_seed = st.number_input("Seed Capital (₹)", value=50000, key="w_seed")
-        with c2: w_sip = st.number_input("Monthly SIP (₹)", value=2000, key="w_sip")
-        with c3: w_years = st.number_input("Years", value=5, key="w_years")
+        with c1: w_seed = st.number_input("Seed Capital (₹)", value=50000, key="w_seed_v3")
+        with c2: w_sip = st.number_input("Monthly SIP (₹)", value=2000, key="w_sip_v3")
+        with c3: w_years = st.number_input("Years", value=5, key="w_years_v3")
         
-        if st.button("Calculate Future Wealth", key="btn_wealth", type="primary", use_container_width=True):
+        if st.button("Calculate Future Wealth", key="btn_wealth_v3", type="primary", use_container_width=True):
             inputs = {"seed_capital": w_seed, "monthly_sip_investment": w_sip, "investment_duration_years": w_years}
             res = engine.execute_advanced_lab_action("class_11_12", inputs)
             st.success(f"Total Projected Wealth: ₹{res['total_wealth']:,}")
@@ -6699,10 +6694,10 @@ def render_learn_finance(client):
         # --- FEATURE 4: CFO Lab ---
         st.markdown("#### 4️⃣ 🏢 Tokyo-Shanghai Macro CFO (College)")
         c1, c2 = st.columns(2)
-        with c1: pre_money = st.number_input("Pre-Money Valuation (₹)", value=5000000, key="cfo_pre")
-        with c2: investment = st.number_input("Investment Raised (₹)", value=1000000, key="cfo_inv")
+        with c1: pre_money = st.number_input("Pre-Money Valuation (₹)", value=5000000, key="cfo_pre_v3")
+        with c2: investment = st.number_input("Investment Raised (₹)", value=1000000, key="cfo_inv_v3")
         
-        if st.button("Calculate Dilution", key="btn_cfo", type="primary", use_container_width=True):
+        if st.button("Calculate Dilution", key="btn_cfo_v3", type="primary", use_container_width=True):
             inputs = {"startup_pre_money_valuation": pre_money, "funding_capital_raised": investment}
             res = engine.execute_advanced_lab_action("university", inputs)
             st.success(f"Founder Equity: {res['founder_equity']}% | Investor Equity: {res['investor_equity']}%")
@@ -6710,7 +6705,7 @@ def render_learn_finance(client):
 
         st.divider()
 
-        # --- FEATURE 5: Mera Naya Dropdown Bank ---
+        # --- FEATURE 5: Dropdown Bank (Fully Fixed) ---
         st.markdown("#### 5️⃣ 🔻 Dropdown Instrument Comparator (All Levels)")
         
         _inst_map = {
@@ -6719,23 +6714,23 @@ def render_learn_finance(client):
             "gold_loan": "🥇 Gold Loan",
             "mutual_fund": "📈 Mutual Fund",
         }
-        inst_key = st.selectbox("Instrument chuno:", list(_inst_map.keys()), format_func=lambda x: _inst_map[x], key="adv_instrument")
+        inst_key = st.selectbox("Instrument chuno:", list(_inst_map.keys()), format_func=lambda x: _inst_map[x], key="adv_instrument_v3")
 
         if inst_key == "loan_compare":
-            l_amt = st.number_input("💰 Loan Amount (₹)", value=500000, step=10000, key="adv_l_amt")
+            l_amt = st.number_input("💰 Loan Amount (₹)", value=500000.0, step=10000.0, key="adv_l_amt_v3")
             ca, cb = st.columns(2)
             with ca:
                 st.caption("🏦 **Bank A**")
-                a_apr = st.number_input("APR %", value=10.0, step=0.1, key="adv_a_apr")
-                a_pf  = st.number_input("Processing Fee ₹", value=5000, step=100.0, key="adv_a_pf")
-                a_ins = st.number_input("Hidden Insurance ₹", value=10000, step=100.0, key="adv_a_ins")
+                a_apr = st.number_input("APR %", value=10.0, step=0.1, key="adv_a_apr_v3")
+                a_pf  = st.number_input("Processing Fee ₹", value=5000.0, step=100.0, key="adv_a_pf_v3")       
+                a_ins = st.number_input("Hidden Insurance ₹", value=10000.0, step=100.0, key="adv_a_ins_v3")  
             with cb:
                 st.caption("🏦 **Bank B**")
-                b_apr = st.number_input("APR %", value=9.5, step=0.1, key="adv_b_apr")
-                b_pf  = st.number_input("Processing Fee ₹", value=15000, step=100.0, key="adv_b_pf")
-                b_ins = st.number_input("Hidden Insurance ₹", value=25000, step=100.0, key="adv_b_ins")
+                b_apr = st.number_input("APR %", value=9.5, step=0.1, key="adv_b_apr_v3")
+                b_pf  = st.number_input("Processing Fee ₹", value=15000.0, step=100.0, key="adv_b_pf_v3")     
+                b_ins = st.number_input("Hidden Insurance ₹", value=25000.0, step=100.0, key="adv_b_ins_v3")  
             
-            if st.button("🔍 Compare Banks", key="adv_run_loan", use_container_width=True):
+            if st.button("🔍 Compare Banks", key="adv_run_loan_v3", use_container_width=True):
                 r = engine.execute_advanced_lab_action("instrument_selector", {
                     "dropdown_selection": "loan_compare", "loan_amount": l_amt,
                     "bank_a_stated_apr": a_apr, "bank_a_processing_fee": a_pf, "bank_a_hidden_insurance": a_ins,
@@ -6753,13 +6748,13 @@ def render_learn_finance(client):
         elif inst_key == "fixed_deposit":
             f1, f2 = st.columns(2)
             with f1:
-                fd_amt = st.number_input("FD Amount (₹)", value=100000.0, step=10000.0, key="adv_fd_amt")
-                fd_rate = st.number_input("Interest Rate %", value=7.0, step=0.1, key="adv_fd_rate")
+                fd_amt = st.number_input("FD Amount (₹)", value=100000.0, step=10000.0, key="adv_fd_amt_v3")
+                fd_rate = st.number_input("Interest Rate %", value=7.0, step=0.1, key="adv_fd_rate_v3")
             with f2:
-                fd_yrs = st.number_input("Duration (Years)", value=5.0, step=1.0, key="adv_fd_yrs")
-                fd_inf = st.number_input("Inflation %", value=6.0, step=0.1, key="adv_fd_inf")
+                fd_yrs = st.number_input("Duration (Years)", value=5.0, step=1.0, key="adv_fd_yrs_v3")
+                fd_inf = st.number_input("Inflation %", value=6.0, step=0.1, key="adv_fd_inf_v3")
             
-            if st.button("🔍 Analyze FD Trap", key="adv_run_fd", use_container_width=True):
+            if st.button("🔍 Analyze FD Trap", key="adv_run_fd_v3", use_container_width=True):
                 r = engine.execute_advanced_lab_action("instrument_selector", {
                     "dropdown_selection": "fixed_deposit", "fd_amount": fd_amt,
                     "fd_interest_rate": fd_rate, "fd_duration_years": fd_yrs, "current_inflation_rate": fd_inf
@@ -6773,13 +6768,13 @@ def render_learn_finance(client):
         elif inst_key == "gold_loan":
             g1, g2 = st.columns(2)
             with g1:
-                g_wt = st.number_input("Gold Weight (g)", value=50.0, step=1.0, key="adv_g_wt")
-                g_rate = st.number_input("Gold Rate/g (₹)", value=7000.0, step=100.0, key="adv_g_rate")
+                g_wt = st.number_input("Gold Weight (g)", value=50.0, step=1.0, key="adv_g_wt_v3")
+                g_rate = st.number_input("Gold Rate/g (₹)", value=7000.0, step=100.0, key="adv_g_rate_v3")
             with g2:
-                g_apr = st.number_input("APR %", value=12.0, step=0.1, key="adv_g_apr")
-                g_yrs = st.number_input("Duration (Years)", value=2.0, step=1.0, key="adv_g_yrs")
+                g_apr = st.number_input("APR %", value=12.0, step=0.1, key="adv_g_apr_v3")
+                g_yrs = st.number_input("Duration (Years)", value=2.0, step=1.0, key="adv_g_yrs_v3")
             
-            if st.button("🔍 Analyze Gold Loan", key="adv_run_g", use_container_width=True):
+            if st.button("🔍 Analyze Gold Loan", key="adv_run_g_v3", use_container_width=True):
                 r = engine.execute_advanced_lab_action("instrument_selector", {
                     "dropdown_selection": "gold_loan", "gold_weight_grams": g_wt,
                     "live_gold_rate_per_gram": g_rate, "gold_loan_apr": g_apr, "loan_duration_years": g_yrs
@@ -6793,13 +6788,13 @@ def render_learn_finance(client):
         elif inst_key == "mutual_fund":
             mf1, mf2 = st.columns(2)
             with mf1:
-                mf_sip = st.number_input("Monthly SIP (₹)", value=5000.0, step=500.0, key="adv_mf_sip")
-                mf_yrs = st.number_input("Investment Years", value=20, step=1, key="adv_mf_yrs")
+                mf_sip = st.number_input("Monthly SIP (₹)", value=5000.0, step=500.0, key="adv_mf_sip_v3")
+                mf_yrs = st.number_input("Investment Years", value=20, step=1, key="adv_mf_yrs_v3")
             with mf2:
-                mf_ret = st.number_input("Expected Return %", value=15.0, step=0.5, key="adv_mf_ret")
-                mf_exp = st.number_input("Expense Ratio %", value=1.5, step=0.1, key="adv_mf_exp")
+                mf_ret = st.number_input("Expected Return %", value=15.0, step=0.5, key="adv_mf_ret_v3")
+                mf_exp = st.number_input("Expense Ratio %", value=1.5, step=0.1, key="adv_mf_exp_v3")
             
-            if st.button("🔍 Analyze MF Leakage", key="adv_run_mf", use_container_width=True):
+            if st.button("🔍 Analyze MF Leakage", key="adv_run_mf_v3", use_container_width=True):
                 r = engine.execute_advanced_lab_action("instrument_selector", {
                     "dropdown_selection": "mutual_fund", "monthly_sip_amount": mf_sip,
                     "expected_return_rate": mf_ret, "investment_years": mf_yrs, "expense_ratio_percent": mf_exp
