@@ -6480,6 +6480,9 @@ def render_learn_finance(client):
             time.sleep(0.01)
         placeholder.markdown(typed_text)
 
+    # ============================================================
+    # 🌍 8 LANGUAGES ONLY
+    # ============================================================
     LANGUAGES = {
         "🇬🇧 English": "en", "🇮🇳 हिंदी (Hindi)": "hi", 
         "🇯🇵 日本語 (Japanese)": "ja", "🇨🇳 中文 (Chinese)": "zh",
@@ -6528,19 +6531,23 @@ def render_learn_finance(client):
     curr = CURRENCIES[curr_label]
     sym, rate = curr["symbol"], curr["rate"]
     
-    # 👇 CLASS CHECK VARIABLES
     is_junior = "Class 5-8" in class_level
     is_intermediate = "Class 9-10" in class_level
     is_advanced = "Class 11-12" in class_level
     is_university = "College" in class_level
 
-    # 👇 COLORFUL LIGHT THEME FOR KIDS, DARK THEME FOR OTHERS
+    # 👇 TRANSPARENT TEXT FIX & LIGHT THEME FOR KIDS
     if is_junior:
         st.markdown("""
         <style>
         .stApp { background-color: #E0F7FA; } /* Light Cyan/Blue */
         .fin-header { background: linear-gradient(90deg, #FF9A9E 0%, #FECFEF 100%); padding: 15px; border-radius: 15px; color: #333; text-align: center; font-weight: bold;}
         .fin-card { background: #FFFFFF; border: 3px dashed #FFB6C1; border-radius: 20px; padding: 15px; color: #333; text-align: center; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        
+        /* FIX: Transparent text ko Black aur Bold karne ke liye */
+        div[data-testid="stWidgetLabel"] p, label { color: #000000 !important; font-weight: 600 !important; }
+        .stMarkdown p, p, span { color: #000000 !important; }
+        button[data-baseweb="tab"] p { color: #000000 !important; font-weight: bold !important; }
         </style>
         """, unsafe_allow_html=True)
     else:
@@ -6554,6 +6561,7 @@ def render_learn_finance(client):
 
     st.markdown(f'<div class="fin-header"><h1>💰 {t["title"]} - {class_level.split("-")[0].strip()}</h1></div>', unsafe_allow_html=True)
 
+    # 👇 SESSION STATE RESET
     if "fin_cash_usd_v3" not in st.session_state: st.session_state.fin_cash_usd_v3 = 1000.0
     if "fin_loan_usd_v3" not in st.session_state: st.session_state.fin_loan_usd_v3 = 0.0
     if "fin_portfolio_v3" not in st.session_state: st.session_state.fin_portfolio_v3 = {"TECH": 0, "AI": 0, "EDU": 0, "CRYPTO": 0}
@@ -6563,21 +6571,10 @@ def render_learn_finance(client):
 
     tab1, tab2, tab3, tab4, tab5 = st.tabs([f"📖 {t['learn']}", f"📈 {t['market']}", f"🏦 {t['banking']}", f"🚀 {t['startup']}", f"⚔️ {t['advanced']}"])
 
-    # ============================================================
-    # TAB 1: LEARN FINANCE
-    # ============================================================
     with tab1:
         st.subheader(f"📖 {t['learn']}")
-        
-        if is_junior:
-            topics = ["Needs vs Wants (Zaroori vs Shauk)", "Save, Spend, Share (Bachat, Kharch, Daan)", "Counting Money & Coins", "Smart Shopping"]
-        elif is_intermediate:
-            topics = ["Personal Budgeting", "Understanding Taxes", "Stock Market Basics", "Mutual Funds & ETFs", "Cyber Fraud Awareness"]
-        elif is_advanced:
-            topics = ["Technical vs Fundamental Analysis", "Bull vs Bear Market", "Digital Banking & UPI", "Types of Banks", "Loans and EMI"]
-        else:
-            topics = ["Primary vs Secondary Market", "Understanding IPOs", "How Banks Work & Interest", "Central Bank & RBI", "Phishing and OTP Scams"]
-
+        topics = ["Money Basics & Saving", "Personal Budgeting", "Understanding Taxes", "What is Inflation?", "Stock Market Basics", "Primary vs Secondary Market", "Understanding IPOs", "Mutual Funds & ETFs", "Technical vs Fundamental Analysis", "Bull vs Bear Market", "Types of Banks", "How Banks Work & Interest", "Digital Banking & UPI", "Central Bank & RBI", "Loans and EMI", "Net Banking Safety", "Cyber Fraud Awareness", "Safe vs Unsafe Transactions", "Phishing and OTP Scams", "How to Protect Your Money Online"]
+        if is_junior: topics = topics[:5] + topics[10:12] + topics[15:18]
         topic = st.selectbox("Select Topic:", topics, key="topic_select_v3")
         if st.button("🚀 Explain this Topic"):
             with st.spinner("AI analyzing..."):
@@ -6589,14 +6586,8 @@ def render_learn_finance(client):
                     typewriter_effect(response.choices[0].message.content)
                 except Exception as e: st.error(f"Error: {str(e)}")
 
-    # ============================================================
-    # TAB 2: VIRTUAL STOCK MARKET
-    # ============================================================
     with tab2:
         st.subheader(f"📈 {t['market']}")
-        if is_junior:
-            st.info("👶 Yeh section aapki class ke liye thoda advanced hai. Yahan aap dekh sakte hain ki company ke shares kaise kharide jaate hain!")
-
         for stock in st.session_state.fin_stock_prices_usd_v3:
             change = random.uniform(-0.05, 0.05)
             st.session_state.fin_stock_prices_usd_v3[stock] = max(10.0, round(st.session_state.fin_stock_prices_usd_v3[stock] * (1 + change), 2))
@@ -6624,79 +6615,58 @@ def render_learn_finance(client):
                         st.session_state.fin_cash_usd_v3 += price_usd; st.session_state.fin_portfolio_v3[stock] -= 1; st.rerun()
                     else: st.error("No shares owned!")
 
-    # ============================================================
-    # TAB 3: BANKING SYSTEM (Piggy Bank + 3 Choices)
-    # ============================================================
     with tab3:
-        if is_junior:
-            st.subheader("🐷 मेरा गुल्लक (My Piggy Bank)")
-            
-            # 👇 3 Money Choices from Image 4
-            st.markdown("""
-            <div style='background-color: #FFF9C4; padding: 15px; border-radius: 10px; margin-bottom: 15px;'>
-            <h4 style='color: #F57F17; text-align:center;'>The 3 Money Choices 💰</h4>
-            <div style='display: flex; justify-content: space-around; text-align: center;'>
-                <div><b>🟢 SAVE</b><br>Bachat karo<br><small>(Save for a toy)</small></div>
-                <div><b>🔵 SPEND</b><br>Kharch karo<br><small>(Buy a snack)</small></div>
-                <div><b>🟣 SHARE</b><br>Baanto<br><small>(Donate/Help)</small></div>
-            </div>
-            </div>
-            """, unsafe_allow_html=True)
-            
-            st.write(f"Aapke paas abhi itne paise hain: **{format_money(st.session_state.fin_cash_usd_v3)}**")
-            amt = st.number_input("Gullak mein paise daalein (Save):", min_value=10.0, value=100.0, step=50.0, key="piggy_amt")
-            if st.button("💰 Save Money", key="piggy_save"):
-                st.session_state.fin_cash_usd_v3 += amt / rate
-                st.balloons()
-                st.success("Shabash! Aapne paise bachaaye.")
-                st.rerun()
-        else:
-            st.subheader(f"🏦 {t['banking']}")
-            st.write(f"{t['cash']}: **{format_money(st.session_state.fin_cash_usd_v3)}**")
-            st.write(f"{t['loan']}: **{format_money(st.session_state.fin_loan_usd_v3)}**")
+        st.subheader(f"🏦 {t['banking']}")
+        st.write(f"{t['cash']}: **{format_money(st.session_state.fin_cash_usd_v3)}**")
+        st.write(f"{t['loan']}: **{format_money(st.session_state.fin_loan_usd_v3)}**")
 
-            col1, col2 = st.columns(2)
-            with col1:
-                amt = st.number_input("Amount:", min_value=100.0, value=1000.0, step=100.0, key="amt_v3")
-                if st.button(f"📥 {t['deposit']}", key="dep_v3"): st.session_state.fin_cash_usd_v3 += amt / rate; st.rerun()
-                if st.button(f"📤 {t['withdraw']}", key="wd_v3"):
-                    if st.session_state.fin_cash_usd_v3 >= amt / rate: st.session_state.fin_cash_usd_v3 -= amt / rate; st.rerun()
-                    else: st.error("Low balance!")
-            with col2:
-                loan_amt = st.number_input("Loan Amount:", min_value=500.0, value=5000.0, step=500.0, key="loan_amt_v3")
-                if st.button(f"📝 {t['loan']}", key="loan_v3"): st.session_state.fin_cash_usd_v3 += loan_amt / rate; st.session_state.fin_loan_usd_v3 += loan_amt / rate; st.rerun()
-                if st.button(f"✅ {t['repay']}", key="repay_v3"):
-                    if st.session_state.fin_cash_usd_v3 >= loan_amt / rate:
-                        st.session_state.fin_cash_usd_v3 -= loan_amt / rate; st.session_state.fin_loan_usd_v3 = max(0.0, st.session_state.fin_loan_usd_v3 - loan_amt / rate); st.rerun()
-                    else: st.error("Not enough cash!")
+        col1, col2 = st.columns(2)
+        with col1:
+            amt = st.number_input("Amount:", min_value=100.0, value=1000.0, step=100.0, key="amt_v3")
+            if st.button(f"📥 {t['deposit']}", key="dep_v3"): st.session_state.fin_cash_usd_v3 += amt / rate; st.rerun()
+            if st.button(f"📤 {t['withdraw']}", key="wd_v3"):
+                if st.session_state.fin_cash_usd_v3 >= amt / rate: st.session_state.fin_cash_usd_v3 -= amt / rate; st.rerun()
+                else: st.error("Low balance!")
+        with col2:
+            loan_amt = st.number_input("Loan Amount:", min_value=500.0, value=5000.0, step=500.0, key="loan_amt_v3")
+            if st.button(f"📝 {t['loan']}", key="loan_v3"): st.session_state.fin_cash_usd_v3 += loan_amt / rate; st.session_state.fin_loan_usd_v3 += loan_amt / rate; st.rerun()
+            if st.button(f"✅ {t['repay']}", key="repay_v3"):
+                if st.session_state.fin_cash_usd_v3 >= loan_amt / rate:
+                    st.session_state.fin_cash_usd_v3 -= loan_amt / rate; st.session_state.fin_loan_usd_v3 = max(0.0, st.session_state.fin_loan_usd_v3 - loan_amt / rate); st.rerun()
+                else: st.error("Not enough cash!")
 
-    # ============================================================
-    # TAB 4: STARTUP & WEB3 (The $15 Grocery Game for Kids)
-    # ============================================================
     with tab4:
         st.subheader(f"🚀 {t['startup']}")
         
+        # 👇 KIDS GROCERY GAME ADDED HERE
         if is_junior:
             st.markdown("### 🛒 The $15 Grocery Game!")
             st.write("Can you shop without going over budget? Choose exactly 4 items!")
             
-            # 👇 Items from Image 1
-            items = {
-                "🍎 Apples ($3.49)": 3.49,
-                "🥛 Milk ($3.89)": 3.89,
-                "🍞 Bread ($2.59)": 2.59,
-                "🥚 Eggs ($3.29)": 3.29,
-                "🍌 Bananas ($1.29)": 1.29,
-                "🥕 Baby Carrots ($1.79)": 1.79
-            }
+            c1, c2, c3 = st.columns(3)
+            with c1:
+                i1 = st.checkbox("🍎 Apples ($3.49)", key="g1")
+                i4 = st.checkbox("🥚 Eggs ($3.29)", key="g4")
+            with c2:
+                i2 = st.checkbox("🥛 Milk ($3.89)", key="g2")
+                i5 = st.checkbox("🍌 Bananas ($1.29)", key="g5")
+            with c3:
+                i3 = st.checkbox("🍞 Bread ($2.59)", key="g3")
+                i6 = st.checkbox("🥕 Baby Carrots ($1.79)", key="g6")
+                
+            selected_prices = []
+            if i1: selected_prices.append(3.49)
+            if i2: selected_prices.append(3.89)
+            if i3: selected_prices.append(2.59)
+            if i4: selected_prices.append(3.29)
+            if i5: selected_prices.append(1.29)
+            if i6: selected_prices.append(1.79)
             
-            selected_items = st.multiselect("Select 4 items from the grocery store:", list(items.keys()), key="grocery_game")
-            
-            if st.button("🛒 Checkout & Calculate Total"):
-                if len(selected_items) != 4:
+            if st.button("🛒 Checkout & Calculate Total", key="btn_grocery", type="primary"):
+                if len(selected_prices) != 4:
                     st.warning("Bhai/Behen, exactly 4 items select karo!")
                 else:
-                    total_cost = sum(items[item] for item in selected_items)
+                    total_cost = sum(selected_prices)
                     st.markdown(f"### Your Total: **${total_cost:.2f}**")
                     
                     if total_cost <= 15.00:
@@ -6704,7 +6674,6 @@ def render_learn_finance(client):
                         st.success(f"Yay! 🎉 Aap budget ke andar hain. Aapne ${15.00 - total_cost:.2f} bacha liye!")
                     else:
                         st.error(f"Oh no! 😢 Aap budget se ${total_cost - 15.00:.2f} zyada kharch kar rahe hain. Kuch items hatao.")
-
         else:
             col1, col2 = st.columns(2)
             with col1:
@@ -6724,7 +6693,7 @@ def render_learn_finance(client):
                         except Exception as e: st.error(f"AI Error: {str(e)}")
 
     # ============================================================
-    # TAB 5: ADVANCED LAB
+    # 👇 TAB 5: ADVANCED LAB (Class ke hisaab se badlega)
     # ============================================================
     with tab5:
         st.subheader(f"⚔️ {t['advanced']}")
@@ -6732,6 +6701,7 @@ def render_learn_finance(client):
         
         engine = ClyxessUltimateFinTechSuite()
         
+        # 👇 YAHAN CLASS KE HISAAB SE SIRF EK FEATURE DIKHEGA
         if is_junior:
             st.markdown("#### 1️⃣ 🇯🇵 Japanese Kakeibo (Class 5-8)")
             c1, c2, c3, c4, c5 = st.columns(5)
