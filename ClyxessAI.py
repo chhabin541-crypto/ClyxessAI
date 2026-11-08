@@ -6536,7 +6536,7 @@ def render_learn_finance(client):
     is_advanced = "Class 11-12" in class_level
     is_university = "College" in class_level
 
-    # 👇 TRANSPARENT TEXT FIX & LIGHT THEME FOR KIDS (100% BLACK FIX)
+    # 👇 TRANSPARENT TEXT FIX & LIGHT THEME FOR KIDS (FULLY FIXED)
 if is_junior:
     st.markdown("""
     <style>
@@ -6545,24 +6545,24 @@ if is_junior:
     .fin-header { background: linear-gradient(90deg, #FF9A9E 0%, #FECFEF 100%); padding: 15px; border-radius: 15px; color: #333; text-align: center; font-weight: bold;}
     .fin-card { background: #FFFFFF; border: 3px dashed #FFB6C1; border-radius: 20px; padding: 15px; color: #333; text-align: center; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
     
-    /* FIX 1: AI ke response ke HAR EK TEXT ko Black karne ke liye */
-    div[data-testid="stMarkdownContainer"] *,
-    div[data-testid="stChatMessage"] *,
+    /* FIX 1: AI ke response, Chat, Tables, aur Lists ke HAR EK TEXT ko 100% Black karne ke liye */
+    div[data-testid="stMarkdownContainer"] *, 
+    div[data-testid="stChatMessage"] *, 
     div[data-testid="stAlert"] *,
-    label, p, span, li, h1, h2, h3, h4, h5, h6, th, td, strong, em, i, b { 
+    div[data-testid="stWidgetLabel"] p, 
+    label, p, span, li, h1, h2, h3, h4, h5, h6, th, td, tr, strong, em, i, b { 
         color: #000000 !important; 
     }
     
-    /* FIX 2: Table ki lines (Borders) ko Black karne ke liye */
-    div[data-testid="stMarkdownContainer"] table,
+    /* FIX 2: Table ki borders ko black karne ke liye */
+    div[data-testid="stMarkdownContainer"] table, 
     div[data-testid="stMarkdownContainer"] th, 
-    div[data-testid="stMarkdownContainer"] td { 
+    div[data-testid="stMarkdownContainer"] td, 
+    div[data-testid="stMarkdownContainer"] tr { 
         border-color: #000000 !important; 
-        border-width: 1px !important;
-        border-style: solid !important;
     }
-    
-    /* FIX 3: Tabs (Learn Finance, etc.) */
+
+    /* FIX 3: Tabs */
     button[data-baseweb="tab"] p { color: #000000 !important; font-weight: bold !important; }
     
     /* FIX 4: Buttons (Colorful with White Text) */
@@ -6576,7 +6576,7 @@ if is_junior:
     button[data-testid="baseButton-secondary"] p, button[kind="secondary"] p {
         color: #FFFFFF !important; 
     }
-    
+
     button[data-testid="baseButton-primary"], button[kind="primary"] {
         background-color: #E94560 !important; 
         color: #FFFFFF !important;
