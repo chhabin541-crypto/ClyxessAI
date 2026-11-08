@@ -6536,60 +6536,67 @@ def render_learn_finance(client):
     is_advanced = "Class 11-12" in class_level
     is_university = "College" in class_level
 
-    # 👇 TRANSPARENT TEXT FIX & LIGHT THEME FOR KIDS (FULLY FIXED)
-    if is_junior:
-        st.markdown("""
-        <style>
-        /* Light Background for Kids */
-        .stApp { background-color: #E0F7FA; } 
-        .fin-header { background: linear-gradient(90deg, #FF9A9E 0%, #FECFEF 100%); padding: 15px; border-radius: 15px; color: #333; text-align: center; font-weight: bold;}
-        .fin-card { background: #FFFFFF; border: 3px dashed #FFB6C1; border-radius: 20px; padding: 15px; color: #333; text-align: center; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
-        
-        /* FIX 1: Saare text, AI response, aur Labels ko Black karne ke liye */
-        div[data-testid="stWidgetLabel"] p, label { color: #000000 !important; font-weight: 600 !important; }
-        .stMarkdown p, div[data-testid="stMarkdownContainer"] p, div[data-testid="stMarkdownContainer"] span, p, span { color: #000000 !important; }
-        button[data-baseweb="tab"] p { color: #000000 !important; font-weight: bold !important; }
-        
-        /* FIX 2: Tables aur Chat/Alerts ka text black karne ke liye */
-        div[data-testid="stDataFrame"] * { color: #000000 !important; }
-        div[data-testid="stTable"] * { color: #000000 !important; }
-        div[data-testid="stChatMessage"] * { color: #000000 !important; }
-        div[data-testid="stAlert"] * { color: #000000 !important; }
-        div[data-testid="stMetricValue"] { color: #000000 !important; }
-        div[data-testid="stMarkdownContainer"] table, div[data-testid="stMarkdownContainer"] th, div[data-testid="stMarkdownContainer"] td, div[data-testid="stMarkdownContainer"] tr { color: #000000 !important; border-color: #000000 !important; }
-        /* FIX 3: Buttons ko Colorful Box banane ke liye (White Text ke sath) */
-        button[data-testid="baseButton-secondary"], button[kind="secondary"] {
-            background-color: #4A00E0 !important; /* Dark Purple */
-            color: #FFFFFF !important;
-            border: none !important;
-            border-radius: 10px !important;
-            font-weight: bold !important;
-        }
-        button[data-testid="baseButton-secondary"] p, button[kind="secondary"] p {
-            color: #FFFFFF !important; /* Button ka text White */
-        }
+    # 👇 TRANSPARENT TEXT FIX & LIGHT THEME FOR KIDS (100% BLACK FIX)
+if is_junior:
+    st.markdown("""
+    <style>
+    /* Light Background for Kids */
+    .stApp { background-color: #E0F7FA; } 
+    .fin-header { background: linear-gradient(90deg, #FF9A9E 0%, #FECFEF 100%); padding: 15px; border-radius: 15px; color: #333; text-align: center; font-weight: bold;}
+    .fin-card { background: #FFFFFF; border: 3px dashed #FFB6C1; border-radius: 20px; padding: 15px; color: #333; text-align: center; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
     
-        /* Primary Buttons (Explain this Topic, Calculate, etc.) */
-        button[data-testid="baseButton-primary"], button[kind="primary"] {
-            background-color: #E94560 !important; /* Red/Pink */
-            color: #FFFFFF !important;
-            border: none !important;
-            border-radius: 10px !important;
-            font-weight: bold !important;
-        }
-        button[data-testid="baseButton-primary"] p, button[kind="primary"] p {
-            color: #FFFFFF !important; /* Button ka text White */
-        }
-        </style>
-        """, unsafe_allow_html=True)
-    else:
-        st.markdown("""
-        <style>
-        .stApp { background-color: #0B0E14; } 
-        .fin-header { background: linear-gradient(90deg, #0F2027, #203A43, #2C5364); padding: 20px; border-radius: 10px; border-bottom: 3px solid #00FFAA; color: white; text-align: center; } 
-        .fin-card { background: #1A202C; border: 1px solid #2D3748; border-radius: 10px; padding: 15px; color: #A0AEC0; text-align: center; } 
-        </style>
-        """, unsafe_allow_html=True)
+    /* FIX 1: AI ke response ke HAR EK TEXT ko Black karne ke liye */
+    div[data-testid="stMarkdownContainer"] *,
+    div[data-testid="stChatMessage"] *,
+    div[data-testid="stAlert"] *,
+    label, p, span, li, h1, h2, h3, h4, h5, h6, th, td, strong, em, i, b { 
+        color: #000000 !important; 
+    }
+    
+    /* FIX 2: Table ki lines (Borders) ko Black karne ke liye */
+    div[data-testid="stMarkdownContainer"] table,
+    div[data-testid="stMarkdownContainer"] th, 
+    div[data-testid="stMarkdownContainer"] td { 
+        border-color: #000000 !important; 
+        border-width: 1px !important;
+        border-style: solid !important;
+    }
+    
+    /* FIX 3: Tabs (Learn Finance, etc.) */
+    button[data-baseweb="tab"] p { color: #000000 !important; font-weight: bold !important; }
+    
+    /* FIX 4: Buttons (Colorful with White Text) */
+    button[data-testid="baseButton-secondary"], button[kind="secondary"] {
+        background-color: #4A00E0 !important; 
+        color: #FFFFFF !important;
+        border: none !important;
+        border-radius: 10px !important;
+        font-weight: bold !important;
+    }
+    button[data-testid="baseButton-secondary"] p, button[kind="secondary"] p {
+        color: #FFFFFF !important; 
+    }
+    
+    button[data-testid="baseButton-primary"], button[kind="primary"] {
+        background-color: #E94560 !important; 
+        color: #FFFFFF !important;
+        border: none !important;
+        border-radius: 10px !important;
+        font-weight: bold !important;
+    }
+    button[data-testid="baseButton-primary"] p, button[kind="primary"] p {
+        color: #FFFFFF !important; 
+    }
+    </style>
+    """, unsafe_allow_html=True)
+else:
+    st.markdown("""
+    <style>
+    .stApp { background-color: #0B0E14; } 
+    .fin-header { background: linear-gradient(90deg, #0F2027, #203A43, #2C5364); padding: 20px; border-radius: 10px; border-bottom: 3px solid #00FFAA; color: white; text-align: center; } 
+    .fin-card { background: #1A202C; border: 1px solid #2D3748; border-radius: 10px; padding: 15px; color: #A0AEC0; text-align: center; } 
+    </style>
+    """, unsafe_allow_html=True)
 
     st.markdown(f'<div class="fin-header"><h1>💰 {t["title"]} - {class_level.split("-")[0].strip()}</h1></div>', unsafe_allow_html=True)
 
