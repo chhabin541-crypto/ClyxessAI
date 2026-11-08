@@ -6545,7 +6545,7 @@ if is_junior:
     .fin-header { background: linear-gradient(90deg, #FF9A9E 0%, #FECFEF 100%); padding: 15px; border-radius: 15px; color: #333; text-align: center; font-weight: bold;}
     .fin-card { background: #FFFFFF; border: 3px dashed #FFB6C1; border-radius: 20px; padding: 15px; color: #333; text-align: center; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
     
-    /* FIX 1: AI ke response, Chat, Tables, aur Lists ke HAR EK TEXT ko 100% Black karne ke liye */
+    /* FIX 1: AI ka chat, table, bold, list sab 100% Black karne ke liye */
     div[data-testid="stMarkdownContainer"] *, 
     div[data-testid="stChatMessage"] *, 
     div[data-testid="stAlert"] *,
@@ -6554,38 +6554,39 @@ if is_junior:
         color: #000000 !important; 
     }
     
-    /* FIX 2: Table ki borders ko black karne ke liye */
+    /* FIX 2: Table ki borders black karne ke liye */
     div[data-testid="stMarkdownContainer"] table, 
     div[data-testid="stMarkdownContainer"] th, 
-    div[data-testid="stMarkdownContainer"] td, 
-    div[data-testid="stMarkdownContainer"] tr { 
+    div[data-testid="stMarkdownContainer"] td { 
         border-color: #000000 !important; 
+        border-width: 1px !important;
+        border-style: solid !important;
     }
-
-    /* FIX 3: Tabs */
+    
     button[data-baseweb="tab"] p { color: #000000 !important; font-weight: bold !important; }
     
-    /* FIX 4: Buttons (Colorful with White Text) */
+    /* FIX 3: Buttons ko Colorful Box banane ke liye (White Text ke sath) */
     button[data-testid="baseButton-secondary"], button[kind="secondary"] {
-        background-color: #4A00E0 !important; 
+        background-color: #4A00E0 !important; /* Dark Purple */
         color: #FFFFFF !important;
         border: none !important;
         border-radius: 10px !important;
         font-weight: bold !important;
     }
     button[data-testid="baseButton-secondary"] p, button[kind="secondary"] p {
-        color: #FFFFFF !important; 
+        color: #FFFFFF !important; /* Button ka text White */
     }
 
+    /* Primary Buttons (Explain this Topic, Calculate, etc.) */
     button[data-testid="baseButton-primary"], button[kind="primary"] {
-        background-color: #E94560 !important; 
+        background-color: #E94560 !important; /* Red/Pink */
         color: #FFFFFF !important;
         border: none !important;
         border-radius: 10px !important;
         font-weight: bold !important;
     }
     button[data-testid="baseButton-primary"] p, button[kind="primary"] p {
-        color: #FFFFFF !important; 
+        color: #FFFFFF !important; /* Button ka text White */
     }
     </style>
     """, unsafe_allow_html=True)
@@ -6597,6 +6598,7 @@ else:
     .fin-card { background: #1A202C; border: 1px solid #2D3748; border-radius: 10px; padding: 15px; color: #A0AEC0; text-align: center; } 
     </style>
     """, unsafe_allow_html=True)
+        
 
     st.markdown(f'<div class="fin-header"><h1>💰 {t["title"]} - {class_level.split("-")[0].strip()}</h1></div>', unsafe_allow_html=True)
 
