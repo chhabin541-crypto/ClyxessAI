@@ -6556,7 +6556,7 @@ def render_learn_finance(client):
         div[data-testid="stChatMessage"] * { color: #000000 !important; }
         div[data-testid="stAlert"] * { color: #000000 !important; }
         div[data-testid="stMetricValue"] { color: #000000 !important; }
-
+        div[data-testid="stMarkdownContainer"] table, div[data-testid="stMarkdownContainer"] th, div[data-testid="stMarkdownContainer"] td, div[data-testid="stMarkdownContainer"] tr { color: #000000 !important; border-color: #000000 !important; }
         /* FIX 3: Buttons ko Colorful Box banane ke liye (White Text ke sath) */
         button[data-testid="baseButton-secondary"], button[kind="secondary"] {
             background-color: #4A00E0 !important; /* Dark Purple */
