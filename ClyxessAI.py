@@ -8557,35 +8557,36 @@ Now write ENTIRELY in {language}:"""
 
         lesson_text = st.session_state.em_lesson.replace("\\", "\\\\").replace("`", "\\`").replace("$", "\\$")
 
-        typewriter_html = f"""
+        # 👇 Yahan f-string hatakar normal string use ki hai taaki {} ka error na aaye
+        typewriter_html = """
         <!DOCTYPE html>
         <html>
         <head>
         <style>
-            body {{ margin: 0; padding: 0; background: transparent; font-family: 'Inter', system-ui, sans-serif; }}
-            .lesson-container {{
+            body { margin: 0; padding: 0; background: transparent; font-family: 'Inter', system-ui, sans-serif; }
+            .lesson-container {
                 background: rgba(15,23,42,0.7);
                 border: 1px solid #334155;
                 border-radius: 16px;
                 padding: 24px;
                 max-height: 620px;
                 overflow-y: auto;
-            }}
-            .lesson-header {{
+            }
+            .lesson-header {
                 display: flex; align-items: center; gap: 8px;
                 padding-bottom: 12px; border-bottom: 1px solid #334155; margin-bottom: 16px;
-            }}
-            .lesson-header .dot {{
+            }
+            .lesson-header .dot {
                 width: 8px; height: 8px; border-radius: 50%;
                 background: #10b981; box-shadow: 0 0 10px #10b981;
                 animation: pulse 1.5s infinite;
-            }}
-            @keyframes pulse {{ 0%,100% {{ opacity: 1; }} 50% {{ opacity: 0.4; }} }}
-            .lesson-header .title {{
+            }
+            @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+            .lesson-header .title {
                 color: #10b981; font-size: 12px; font-weight: 800;
                 text-transform: uppercase; letter-spacing: 1px;
             }
-            .responding-status {{
+            .responding-status {
                 display: flex; align-items: center; gap: 10px;
                 padding: 12px 16px;
                 background: linear-gradient(90deg, rgba(16,185,129,0.08), rgba(6,182,212,0.08));
@@ -8593,34 +8594,34 @@ Now write ENTIRELY in {language}:"""
                 border-radius: 12px;
                 margin-bottom: 18px;
                 animation: fadeIn 0.4s ease;
-            }}
-            @keyframes fadeIn {{ from {{ opacity:0; transform: translateY(-6px); }} to {{ opacity:1; transform: translateY(0); }} }}
-            .responding-status .pulse-dot {{
+            }
+            @keyframes fadeIn { from { opacity:0; transform: translateY(-6px); } to { opacity:1; transform: translateY(0); } }
+            .responding-status .pulse-dot {
                 width: 10px; height: 10px; border-radius: 50%;
                 background: #10b981; box-shadow: 0 0 12px #10b981;
                 animation: strongPulse 1.2s infinite;
-            }}
-            @keyframes strongPulse {{ 0%,100% {{ transform: scale(1); opacity: 1; }} 50% {{ transform: scale(1.4); opacity: 0.5; }} }}
-            .responding-status .status-text {{ color: #10b981; font-size: 13px; font-weight: 700; letter-spacing: 0.3px; }}
-            .responding-status .shimmer {{
+            }
+            @keyframes strongPulse { 0%,100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.4); opacity: 0.5; } }
+            .responding-status .status-text { color: #10b981; font-size: 13px; font-weight: 700; letter-spacing: 0.3px; }
+            .responding-status .shimmer {
                 background: linear-gradient(90deg, #10b981 0%, #6ee7b7 50%, #10b981 100%);
                 background-size: 200% auto;
                 -webkit-background-clip: text;
                 -webkit-text-fill-color: transparent;
                 animation: shimmer 2s linear infinite;
-            }}
-            @keyframes shimmer {{ to {{ background-position: 200% center; }} }}
-            .lesson-content {{ color: #e2e8f0; font-size: 14.5px; line-height: 1.8; white-space: pre-wrap; word-wrap: break-word; }}
-            .cursor {{ color: #10b981; font-weight: bold; animation: blink 1s infinite; }}
-            @keyframes blink {{ 0%,50% {{ opacity: 1; }} 51%,100% {{ opacity: 0; }} }}
-            .footer {{
+            }
+            @keyframes shimmer { to { background-position: 200% center; } }
+            .lesson-content { color: #e2e8f0; font-size: 14.5px; line-height: 1.8; white-space: pre-wrap; word-wrap: break-word; }
+            .cursor { color: #10b981; font-weight: bold; animation: blink 1s infinite; }
+            @keyframes blink { 0%,50% { opacity: 1; } 51%,100% { opacity: 0; } }
+            .footer {
                 margin-top: 20px; padding-top: 12px; border-top: 1px solid #334155;
                 text-align: center; color: #10b981; font-size: 11px; font-weight: 700;
                 letter-spacing: 1px; opacity: 0; transition: opacity 0.5s ease;
-            }}
-            .footer.show {{ opacity: 1; }}
-            ::-webkit-scrollbar {{ width: 6px; }}
-            ::-webkit-scrollbar-thumb {{ background: #334155; border-radius: 3px; }}
+            }
+            .footer.show { opacity: 1; }
+            ::-webkit-scrollbar { width: 6px; }
+            ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
         </style>
         </head>
         <body>
@@ -8637,7 +8638,7 @@ Now write ENTIRELY in {language}:"""
             <div class="footer" id="footer">🛡️ Clyxess AI | Secure • Fast • Private</div>
         </div>
         <script>
-            const fullText = `{lesson_text}`;
+            const fullText = `__LESSON_TEXT__`;
             let i = 0;
             const target = document.getElementById('typed');
             const cursor = document.getElementById('cursor');
@@ -8645,28 +8646,31 @@ Now write ENTIRELY in {language}:"""
             const footer = document.getElementById('footer');
             const respondingBox = document.getElementById('respondingBox');
 
-            function type() {{
-                if (i < fullText.length) {{
+            function type() {
+                if (i < fullText.length) {
                     target.innerHTML = fullText.substring(0, i + 1);
                     container.scrollTop = container.scrollHeight;
                     i++;
                     const delay = fullText[i-1] === '\\n' ? 5 : 12;
                     setTimeout(type, delay);
-                }} else {{
+                } else {
                     cursor.style.display = 'none';
                     respondingBox.style.transition = 'opacity 0.4s, transform 0.4s';
                     respondingBox.style.opacity = '0';
                     respondingBox.style.transform = 'translateY(-6px)';
-                    setTimeout(() => {{ respondingBox.style.display = 'none'; }}, 400);
+                    setTimeout(() => { respondingBox.style.display = 'none'; }, 400);
                     footer.classList.add('show');
                     container.scrollTop = container.scrollHeight;
-                }}
-            }}
+                }
+            }
             setTimeout(type, 400);
         </script>
         </body>
         </html>
         """
+        
+        # Yahan hum text ko replace kar rahe hain
+        typewriter_html = typewriter_html.replace("__LESSON_TEXT__", lesson_text)
 
         components.html(typewriter_html, height=700, scrolling=False)
 
@@ -8683,7 +8687,7 @@ Now write ENTIRELY in {language}:"""
                 file_name=f"{st.session_state.em_topic.replace(' ', '_')}_lesson.txt",
                 mime="text/plain",
                 use_container_width=True
-            )       
+            )     
  
 def render_math_lab(client):
     """
