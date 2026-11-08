@@ -8350,8 +8350,6 @@ You MUST reply ONLY in {language}.
 - If language is "English" → reply ONLY in English (no Hindi words at all)
 - If language is "Hindi" → reply ONLY in Hindi (Devanagari script)
 - If language is "Hinglish" → reply in Hindi+English mix
-- If language is "Tamil" → reply ONLY in Tamil
-- If language is "Spanish" → reply ONLY in Spanish
 - Same for ALL other languages.
 
 DO NOT switch languages. DO NOT default to Hindi. 
@@ -8408,7 +8406,7 @@ Now write ENTIRELY in {language}:"""
                 )
                 text = res.choices[0].message.content.strip()
                 if len(text) > 100:
-                    if "ClyxessChat AI | Secure" not in text:
+                    if "Clyxess AI | Secure" not in text:
                         text = text.rstrip() + "\n\n--- Clyxess AI | Secure • Fast • Private"
                     return text, None
                 last_error = f"{model}: short output"
@@ -8440,15 +8438,6 @@ Now write ENTIRELY in {language}:"""
         margin: 0;
     }
     .clyx-header p { color: #94a3b8; font-size: 13px; margin: 6px 0 0 0; }
-    .stat-card {
-        background: rgba(15,23,42,0.7);
-        border: 1px solid #334155;
-        border-radius: 16px;
-        padding: 16px;
-        text-align: center;
-    }
-    .stat-card .label { color: #64748b; font-size: 11px; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; }
-    .stat-card .value { color: #10b981; font-size: 24px; font-weight: 900; margin-top: 4px; }
     </style>
     """, unsafe_allow_html=True)
 
@@ -8458,17 +8447,6 @@ Now write ENTIRELY in {language}:"""
         <p>Personalized AI learning — language apni chuno, jawab usi mein milega</p>
     </div>
     """, unsafe_allow_html=True)
-
-    # STATS
-    c1, c2, c3 = st.columns(3)
-    with c1:
-        st.markdown('<div class="stat-card"><div class="label">Lessons</div><div class="value">0</div></div>', unsafe_allow_html=True)
-    with c2:
-        st.markdown('<div class="stat-card"><div class="label">Level</div><div class="value">1</div></div>', unsafe_allow_html=True)
-    with c3:
-        st.markdown('<div class="stat-card"><div class="label">Streak</div><div class="value">0</div></div>', unsafe_allow_html=True)
-
-    st.markdown("<br>", unsafe_allow_html=True)
 
     # ============================================================
     # INPUT SECTION
@@ -8498,28 +8476,13 @@ Now write ENTIRELY in {language}:"""
         language_label = st.selectbox(
             "Language",
             [
-                "English",
-                "हिंदी (Hindi)",
-                "Hinglish (Hindi + English)",
-                "मराठी (Marathi)",
-                "বাংলা (Bengali)",
-                "தமிழ் (Tamil)",
-                "తెలుగు (Telugu)",
-                "ગુજરાતી (Gujarati)",
-                "ಕನ್ನಡ (Kannada)",
-                "മലയാളം (Malayalam)",
-                "ਪੰਜਾਬੀ (Punjabi)",
-                "ଓଡ଼ିଆ (Odia)",
-                "اردو (Urdu)",
-                "Español (Spanish)",
-                "Français (French)",
-                "Deutsch (German)",
-                "日本語 (Japanese)",
-                "中文 (Chinese)",
-                "العربية (Arabic)",
-                "Português (Portuguese)",
-                "Русский (Russian)",
-                "한국어 (Korean)"
+                "English", "हिंदी (Hindi)", "Hinglish (Hindi + English)",
+                "मराठी (Marathi)", "বাংলা (Bengali)", "தமிழ் (Tamil)",
+                "తెలుగు (Telugu)", "ગુજરાતી (Gujarati)", "ಕನ್ನಡ (Kannada)",
+                "മലയാളം (Malayalam)", "ਪੰਜਾਬੀ (Punjabi)", "ଓଡ଼ିଆ (Odia)",
+                "اردو (Urdu)", "Español (Spanish)", "Français (French)",
+                "Deutsch (German)", "日本語 (Japanese)", "中文 (Chinese)",
+                "العربية (Arabic)", "Português (Portuguese)", "Русский (Russian)", "한국어 (Korean)"
             ],
             label_visibility="collapsed",
             key="em_lang_sel"
@@ -8531,15 +8494,9 @@ Now write ENTIRELY in {language}:"""
         topic = st.selectbox(
             "Topic",
             [
-                "Data Science",
-                "Machine Learning",
-                "Neural Networks",
-                "Deep Learning",
-                "Python for Data Science",
-                "Statistics",
-                "AI Ethics",
-                "Computer Vision",
-                "Natural Language Processing",
+                "Data Science", "Machine Learning", "Neural Networks",
+                "Deep Learning", "Python for Data Science", "Statistics",
+                "AI Ethics", "Computer Vision", "Natural Language Processing",
                 "Reinforcement Learning"
             ],
             label_visibility="collapsed",
@@ -8627,13 +8584,9 @@ Now write ENTIRELY in {language}:"""
             .lesson-header .title {{
                 color: #10b981; font-size: 12px; font-weight: 800;
                 text-transform: uppercase; letter-spacing: 1px;
-            }}
-
-            /* ⭐ Clyxess is responding status */
+            }
             .responding-status {{
-                display: flex;
-                align-items: center;
-                gap: 10px;
+                display: flex; align-items: center; gap: 10px;
                 padding: 12px 16px;
                 background: linear-gradient(90deg, rgba(16,185,129,0.08), rgba(6,182,212,0.08));
                 border: 1px solid rgba(16,185,129,0.25);
@@ -8644,20 +8597,11 @@ Now write ENTIRELY in {language}:"""
             @keyframes fadeIn {{ from {{ opacity:0; transform: translateY(-6px); }} to {{ opacity:1; transform: translateY(0); }} }}
             .responding-status .pulse-dot {{
                 width: 10px; height: 10px; border-radius: 50%;
-                background: #10b981;
-                box-shadow: 0 0 12px #10b981;
+                background: #10b981; box-shadow: 0 0 12px #10b981;
                 animation: strongPulse 1.2s infinite;
             }}
-            @keyframes strongPulse {{
-                0%,100% {{ transform: scale(1); opacity: 1; }}
-                50% {{ transform: scale(1.4); opacity: 0.5; }}
-            }}
-            .responding-status .status-text {{
-                color: #10b981;
-                font-size: 13px;
-                font-weight: 700;
-                letter-spacing: 0.3px;
-            }}
+            @keyframes strongPulse {{ 0%,100% {{ transform: scale(1); opacity: 1; }} 50% {{ transform: scale(1.4); opacity: 0.5; }} }}
+            .responding-status .status-text {{ color: #10b981; font-size: 13px; font-weight: 700; letter-spacing: 0.3px; }}
             .responding-status .shimmer {{
                 background: linear-gradient(90deg, #10b981 0%, #6ee7b7 50%, #10b981 100%);
                 background-size: 200% auto;
@@ -8666,24 +8610,13 @@ Now write ENTIRELY in {language}:"""
                 animation: shimmer 2s linear infinite;
             }}
             @keyframes shimmer {{ to {{ background-position: 200% center; }} }}
-
-            .lesson-content {{
-                color: #e2e8f0; font-size: 14.5px;
-                line-height: 1.8; white-space: pre-wrap; word-wrap: break-word;
-            }}
+            .lesson-content {{ color: #e2e8f0; font-size: 14.5px; line-height: 1.8; white-space: pre-wrap; word-wrap: break-word; }}
             .cursor {{ color: #10b981; font-weight: bold; animation: blink 1s infinite; }}
             @keyframes blink {{ 0%,50% {{ opacity: 1; }} 51%,100% {{ opacity: 0; }} }}
             .footer {{
-                margin-top: 20px;
-                padding-top: 12px;
-                border-top: 1px solid #334155;
-                text-align: center;
-                color: #10b981;
-                font-size: 11px;
-                font-weight: 700;
-                letter-spacing: 1px;
-                opacity: 0;
-                transition: opacity 0.5s ease;
+                margin-top: 20px; padding-top: 12px; border-top: 1px solid #334155;
+                text-align: center; color: #10b981; font-size: 11px; font-weight: 700;
+                letter-spacing: 1px; opacity: 0; transition: opacity 0.5s ease;
             }}
             .footer.show {{ opacity: 1; }}
             ::-webkit-scrollbar {{ width: 6px; }}
@@ -8696,13 +8629,10 @@ Now write ENTIRELY in {language}:"""
                 <div class="dot"></div>
                 <div class="title">AI Teacher Response</div>
             </div>
-
-            <!-- Clyxess is responding status -->
             <div class="responding-status" id="respondingBox">
                 <div class="pulse-dot"></div>
                 <div class="status-text">Clyxess is responding<span class="shimmer">...</span></div>
             </div>
-
             <div class="lesson-content"><span id="typed"></span><span class="cursor" id="cursor">▊</span></div>
             <div class="footer" id="footer">🛡️ Clyxess AI | Secure • Fast • Private</div>
         </div>
