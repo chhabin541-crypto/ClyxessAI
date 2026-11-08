@@ -6537,7 +6537,7 @@ def render_learn_finance(client):
     is_university = "College" in class_level
 
     # 👇 TRANSPARENT TEXT FIX & LIGHT THEME FOR KIDS (FULLY FIXED)
-if is_junior:
+    if is_junior:
     st.markdown("""
     <style>
     /* Light Background for Kids */
