@@ -8723,7 +8723,7 @@ Now write ENTIRELY in {language}:"""
 def render_math_lab(client):
     """
     🧮 ClyxessChat Math Lab — ULTIMATE EDITION
-    Class 1 → University • All Puzzles • Real Math • Black Board
+    Class 3 → 12 • All Puzzles • Real Math • Black Board
     """
     import json, re, random, html, math
     import streamlit as st
@@ -8779,15 +8779,14 @@ def render_math_lab(client):
     with col2:
         class_level = st.selectbox(
             "🎓 Select Your Level",
-            ["Class 1-2", "Class 3-5", "Class 6-8", "Class 9-10",
-             "Class 11-12", "University"],
+            ["Class 3-5 (Age 8-10)", "Class 6-8 (Age 11-13)", "Class 9-10 (Age 14-15)", "Class 11-12 (Age 16-18)"],
             key="ml_class_sel"
         )
 
     t = UI.get(lang_code, UI["en"])
-    is_junior = class_level.startswith(("Class 1-2", "Class 3-5", "Class 6-8"))
-    is_senior = class_level in ["Class 11-12", "University"]
-    is_university = class_level == "University"
+    is_junior = class_level.startswith(("Class 3-5", "Class 6-8"))
+    is_middle = class_level.startswith("Class 9-10")
+    is_senior = class_level.startswith("Class 11-12")
 
     st.markdown("""
     <style>
@@ -8811,7 +8810,7 @@ def render_math_lab(client):
     st.markdown(f"""
         <div class="ml-hero">
             <h1>🧮 {t['title']} — Clyxess AI</h1>
-            <p>Puzzles • Real Math • Design Board • Class 1 → University</p>
+            <p>Puzzles • Real Math • Design Board • Class 3 → 12</p>
         </div>
     """, unsafe_allow_html=True)
 
@@ -9039,19 +9038,19 @@ def render_math_lab(client):
                 "solution": f"{a} × {b} = {real} (shown: {shown})"}
 
     PUZZLES = {
-        "count_obj": {"icon": "🔢", "name": "Count Objects", "gen": p_count_objects, "range": ["Class 1-2"]},
-        "add": {"icon": "➕", "name": "Addition", "gen": p_addition_simple, "range": ["Class 1-2", "Class 3-5"]},
-        "sub": {"icon": "➖", "name": "Subtraction", "gen": p_subtraction_simple, "range": ["Class 1-2", "Class 3-5"]},
+        "count_obj": {"icon": "🔢", "name": "Count Objects", "gen": p_count_objects, "range": ["Class 3-5"]},
+        "add": {"icon": "➕", "name": "Addition", "gen": p_addition_simple, "range": ["Class 3-5"]},
+        "sub": {"icon": "➖", "name": "Subtraction", "gen": p_subtraction_simple, "range": ["Class 3-5"]},
         "mul": {"icon": "✖️", "name": "Multiplication", "gen": p_multiplication, "range": ["Class 3-5", "Class 6-8"]},
-        "missing": {"icon": "❓", "name": "Find Missing", "gen": p_missing_number, "range": ["Class 1-2", "Class 3-5"]},
-        "tf": {"icon": "⚡", "name": "True/False", "gen": p_true_false, "range": ["Class 3-5", "Class 6-8"]},
-        "pattern": {"icon": "🔷", "name": "Number Pattern", "gen": p_pattern_complete, "range": ["Class 1-2", "Class 3-5", "Class 6-8"]},
-        "odd": {"icon": "🎯", "name": "Odd One Out", "gen": p_odd_one, "range": ["Class 3-5", "Class 6-8"]},
-        "shape": {"icon": "🎨", "name": "Shape Pattern", "gen": p_shape_match, "range": ["Class 1-2", "Class 3-5"]},
+        "missing": {"icon": "❓", "name": "Find Missing", "gen": p_missing_number, "range": ["Class 3-5"]},
+        "tf": {"icon": "⚡", "name": "True/False", "gen": p_true_false, "range": ["Class 6-8", "Class 9-10"]},
+        "pattern": {"icon": "🔷", "name": "Number Pattern", "gen": p_pattern_complete, "range": ["Class 3-5", "Class 6-8"]},
+        "odd": {"icon": "🎯", "name": "Odd One Out", "gen": p_odd_one, "range": ["Class 6-8", "Class 9-10"]},
+        "shape": {"icon": "🎨", "name": "Shape Pattern", "gen": p_shape_match, "range": ["Class 3-5"]},
         "fruit": {"icon": "🍎", "name": "Fruit Math", "gen": p_fruit_equation, "range": ["Class 3-5", "Class 6-8", "Class 9-10"]},
-        "sports": {"icon": "⚽", "name": "Sports Ball", "gen": p_sports_equation, "range": ["Class 3-5", "Class 6-8"]},
-        "vehicles": {"icon": "🚗", "name": "Vehicle Math", "gen": p_vehicles_equation, "range": ["Class 3-5", "Class 6-8", "Class 9-10"]},
-        "animals": {"icon": "🐕", "name": "Animal Weights", "gen": p_animal_weights, "range": ["Class 3-5", "Class 6-8", "Class 9-10"]},
+        "sports": {"icon": "⚽", "name": "Sports Ball", "gen": p_sports_equation, "range": ["Class 6-8", "Class 9-10"]},
+        "vehicles": {"icon": "🚗", "name": "Vehicle Math", "gen": p_vehicles_equation, "range": ["Class 6-8", "Class 9-10"]},
+        "animals": {"icon": "🐕", "name": "Animal Weights", "gen": p_animal_weights, "range": ["Class 6-8", "Class 9-10"]},
         "animals2": {"icon": "🦝", "name": "Pet Weights", "gen": p_animal_weights2, "range": ["Class 6-8", "Class 9-10"]},
         "triangles": {"icon": "🔺", "name": "Count Triangles", "gen": p_triangles_count, "range": ["Class 6-8", "Class 9-10"]},
         "cubes": {"icon": "🧊", "name": "Count Cubes", "gen": p_count_cubes, "range": ["Class 6-8", "Class 9-10"]},
@@ -9061,72 +9060,132 @@ def render_math_lab(client):
         "parrot": {"icon": "🦜", "name": "Height Puzzle", "gen": p_parrot_height, "range": ["Class 3-5", "Class 6-8"]},
     }
 
-    UNIVERSITY = {
-        "Calculus I — Derivatives": {"concept": "Limits, Rate of Change",
-            "theory": "**dy/dx = lim(Δx→0) [f(x+Δx) − f(x)]/Δx = f'(x)**",
-            "examples": [{"q": "d/dx (x³ + 2x² − 5x + 7)", "steps": "Power rule", "ans": "3x² + 4x − 5"},
-                         {"q": "d/dx (sin x · cos x)", "steps": "Product rule", "ans": "cos(2x)"},
-                         {"q": "lim(x→2) (x²−4)/(x−2)", "steps": "Factor", "ans": "4"}]},
-        "Calculus II — Integrals": {"concept": "Integration",
-            "theory": "**∫xⁿ dx = xⁿ⁺¹/(n+1) + C**",
-            "examples": [{"q": "∫(2x+3)dx", "steps": "Split", "ans": "x² + 3x + C"},
-                         {"q": "∫x² dx", "steps": "Power rule", "ans": "x³/3 + C"},
-                         {"q": "∫sin x dx", "steps": "Standard", "ans": "−cos x + C"}]},
-        "Probability": {"concept": "P(E|F) = P(E∩F)/P(F)",
-            "theory": "**P(E∩F) = P(E)·P(F|E)**",
-            "examples": [{"q": "2 heads in 3 flips", "steps": "C(3,2)(1/2)³", "ans": "3/8"},
-                         {"q": "E[X] for die", "steps": "Mean", "ans": "3.5"}]},
-        "Linear Algebra": {"concept": "det(A) = ad − bc",
-            "theory": "**Av = λv → det(A − λI) = 0**",
-            "examples": [{"q": "det([[2,3],[1,4]])", "steps": "8 − 3", "ans": "5"},
-                         {"q": "Eigenvalues of [[2,0],[0,3]]", "steps": "Diagonal", "ans": "2, 3"}]},
-        "Differential Equations": {"concept": "dy/dx + P(x)y = Q(x)",
-            "theory": "**Aux: ar² + br + c = 0**",
-            "examples": [{"q": "dy/dx = 2x", "steps": "Integrate", "ans": "y = x² + C"},
-                         {"q": "dy/dx + y = 0", "steps": "Separate", "ans": "y = Ce⁻ˣ"}]},
-        "Real Analysis": {"concept": "Σ1/n² = π²/6",
-            "theory": "**Bolzano-Weierstrass, IVT, MVT, Taylor**",
-            "examples": [{"q": "Σ(1/n²)", "steps": "Basel", "ans": "π²/6"},
-                         {"q": "Σ(1/n)", "steps": "Harmonic", "ans": "Divergent"}]},
-        "Complex Analysis": {"concept": "e^(iθ) = cos θ + i·sin θ",
-            "theory": "**e^(iπ) + 1 = 0**",
-            "examples": [{"q": "e^(iπ)", "steps": "Euler", "ans": "−1"},
-                         {"q": "|3 + 4i|", "steps": "√25", "ans": "5"}]},
-        "Number Theory": {"concept": "RSA: c = m^e mod n",
-            "theory": "**a^(φ(n)) ≡ 1 (mod n)**",
-            "examples": [{"q": "RSA p=3,q=11,e=3", "steps": "n=33, φ=20", "ans": "n=33, φ=20"},
-                         {"q": "gcd(48,36)", "steps": "Euclidean", "ans": "12"}]},
-        "Numerical Methods": {"concept": "xₙ₊₁ = xₙ − f(xₙ)/f'(xₙ)",
-            "theory": "**Bisection: mid = (a+b)/2**",
-            "examples": [{"q": "Newton x²−2=0", "steps": "Iterate", "ans": "1.5"},
-                         {"q": "Bisection [1,2]", "steps": "mid", "ans": "1.5"}]},
+    ADVANCED_MATH = {
+        "Gravity & Spacetime (3D Visualization)": {
+            "concept": "Mass curves spacetime, creating gravity.",
+            "theory": "**Einstein's Field Equations:** \(G_{\mu\nu} + \Lambda g_{\mu\nu} = \frac{8\pi G}{c^4} T_{\mu\nu}\)\n\n**Newton's Law:** \(F = G \frac{m_1 m_2}{r^2}\)",
+            "examples": [
+                {"q": "Calculate gravity between Earth (5.97x10^24 kg) and Moon (7.34x10^22 kg) separated by 3.84x10^8 m.", "steps": "Use \(F = G \frac{m_1 m_2}{r^2}\) where G = 6.67x10^-11", "ans": "\(F \approx 1.98 \times 10^{20} N\)"}
+            ]
+        },
+        "Centrifugal & Centripetal Force (3D)": {
+            "concept": "Force required to keep an object moving in a circle.",
+            "theory": "**Centripetal Force (Inward):** \(F_c = \frac{mv^2}{r} = m \omega^2 r\)\n\n**Centrifugal Force (Outward - Pseudo force):** \(F_{cf} = m \omega^2 r\)",
+            "examples": [
+                {"q": "A 1000 kg car takes a 50m radius turn at 20 m/s. What is the centripetal force?", "steps": "\(F_c = \frac{1000 \times 20^2}{50}\)", "ans": "\(F_c = 8000 N\)"}
+            ]
+        },
+        "Projectile Motion (3D)": {
+            "concept": "Motion of an object thrown into the air under gravity.",
+            "theory": "**Horizontal:** \(x = v_0 t \cos(\theta)\)\n\n**Vertical:** \(y = v_0 t \sin(\theta) - \frac{1}{2}gt^2\)\n\n**Max Height:** \(H = \frac{v_0^2 \sin^2\theta}{2g}\)",
+            "examples": [
+                {"q": "A ball is thrown at 30 m/s at 45 degrees. Find max height (g=9.8).", "steps": "\(H = \frac{30^2 \times \sin^2(45)}{2 \times 9.8}\)", "ans": "\(H \approx 22.96\) meters"}
+            ]
+        },
+        "Calculus - Limits & Derivatives": {
+            "concept": "Rate of change and instantaneous velocity.",
+            "theory": "\(f'(x) = \lim_{h \to 0} \frac{f(x+h) - f(x)}{h}\)\n\n**Power Rule:** \(d/dx(x^n) = nx^{n-1}\)",
+            "examples": [
+                {"q": "Find derivative of \(f(x) = 3x^4 - 2x^2 + 7x\).", "steps": "Apply power rule to each term.", "ans": "\(f'(x) = 12x^3 - 4x + 7\)"}
+            ]
+        },
+        "Calculus - Integration": {
+            "concept": "Area under the curve.",
+            "theory": "\(\int x^n dx = \frac{x^{n+1}}{n+1} + C\)\n\n**Definite Integral:** \(\int_a^b f(x)dx = F(b) - F(a)\)",
+            "examples": [
+                {"q": "Evaluate \(\int (2x + 3) dx\).", "steps": "Integrate each term separately.", "ans": "\(x^2 + 3x + C\)"}
+            ]
+        },
+        "Vectors & 3D Geometry": {
+            "concept": "Quantities with direction and magnitude.",
+            "theory": "**Dot Product:** \(\vec{a} \cdot \vec{b} = |a||b| \cos\theta\)\n\n**Cross Product:** \(\vec{a} \times \vec{b} = |a||b| \sin\theta \hat{n}\)",
+            "examples": [
+                {"q": "Find dot product of \(\vec{A} = 2\hat{i} + 3\hat{j}\) and \(\vec{B} = 4\hat{i} - 1\hat{j}\).", "steps": "Multiply corresponding components and add.", "ans": "\((2)(4) + (3)(-1) = 5\)"}
+            ]
+        },
+        "Matrices & Determinants": {
+            "concept": "Linear transformations and solving systems.",
+            "theory": "**2x2 Determinant:** \(det(A) = ad - bc\)\n\n**Inverse:** \(A^{-1} = \frac{1}{det(A)} adj(A)\)",
+            "examples": [
+                {"q": "Find determinant of \(\begin{bmatrix} 3 & 4 \\ 2 & 5 \end{bmatrix}\).", "steps": "\(3 \times 5 - 4 \times 2\)", "ans": "\(15 - 8 = 7\)"}
+            ]
+        },
+        "Probability & Statistics": {
+            "concept": "Chance of events and data analysis.",
+            "theory": "**Bayes Theorem:** \(P(A|B) = \frac{P(B|A)P(A)}{P(B)}\)\n\n**Mean:** \(\mu = \frac{\sum x}{n}\)",
+            "examples": [
+                {"q": "Probability of getting 2 heads in 3 coin tosses.", "steps": "Binomial distribution: \(P(X=2) = \binom{3}{2} (0.5)^2 (0.5)^1\)", "ans": "\(3 \times 0.125 = 0.375\) or \(3/8\)"}
+            ]
+        },
+        "Trigonometry - Advanced": {
+            "concept": "Relationships between angles and sides.",
+            "theory": "**Euler's Formula:** \(e^{i\theta} = \cos\theta + i\sin\theta\)\n\n**Double Angle:** \(\sin(2\theta) = 2\sin\theta\cos\theta\)",
+            "examples": [
+                {"q": "If \(\sin\theta = 3/5\), find \(\sin(2\theta)\) (assume acute angle).", "steps": "\(\cos\theta = 4/5\). \(\sin(2\theta) = 2(3/5)(4/5)\)", "ans": "\(24/25\)"}
+            ]
+        },
+        "Complex Numbers": {
+            "concept": "Numbers with real and imaginary parts.",
+            "theory": "\(z = a + ib\)\n\n**Magnitude:** \(|z| = \sqrt{a^2 + b^2}\)",
+            "examples": [
+                {"q": "Find magnitude of \(z = 3 + 4i\).", "steps": "\(|z| = \sqrt{3^2 + 4^2}\)", "ans": "\(\sqrt{25} = 5\)"}
+            ]
+        },
+        "Differential Equations": {
+            "concept": "Equations involving derivatives.",
+            "theory": "**Linear First Order:** \(\frac{dy}{dx} + P(x)y = Q(x)\)\n\n**Integrating Factor:** \(IF = e^{\int P dx}\)",
+            "examples": [
+                {"q": "Solve \(\frac{dy}{dx} = 2x\).", "steps": "Integrate both sides.", "ans": "\(y = x^2 + C\)"}
+            ]
+        },
+        "Permutations & Combinations": {
+            "concept": "Arrangements and selections.",
+            "theory": "\(^nP_r = \frac{n!}{(n-r)!}\)\n\n\(^nC_r = \frac{n!}{r!(n-r)!}\)",
+            "examples": [
+                {"q": "How many ways to choose 3 books from 5?", "steps": "\(^5C_3\)", "ans": "\(10\)"}
+            ]
+        },
+        "Series & Sequences": {
+            "concept": "Sum of numbers following a pattern.",
+            "theory": "**Arithmetic Progression:** \(S_n = \frac{n}{2}(2a + (n-1)d)\)\n\n**Geometric Progression:** \(S_n = a\frac{r^n - 1}{r - 1}\)",
+            "examples": [
+                {"q": "Sum of first 10 terms of AP: 2, 5, 8...", "steps": "a=2, d=3. \(S_{10} = \frac{10}{2}(2(2) + 9(3))\)", "ans": "\(5 \times (4 + 27) = 155\)"}
+            ]
+        },
+        "Conic Sections": {
+            "concept": "Curves formed by intersecting a cone.",
+            "theory": "**Parabola:** \(y^2 = 4ax\)\n\n**Ellipse:** \(\frac{x^2}{a^2} + \frac{y^2}{b^2} = 1\)\n\n**Hyperbola:** \(\frac{x^2}{a^2} - \frac{y^2}{b^2} = 1\)",
+            "examples": [
+                {"q": "Eccentricity of ellipse if a=5, b=4.", "steps": "\(e = \sqrt{1 - b^2/a^2}\)", "ans": "\(\sqrt{1 - 16/25} = 3/5 = 0.6\)"}
+            ]
+        },
+        "3D Geometry (Planes & Lines)": {
+            "concept": "Math in three dimensions.",
+            "theory": "**Equation of Line:** \(\frac{x-x_1}{a} = \frac{y-y_1}{b} = \frac{z-z_1}{c}\)\n\n**Equation of Plane:** \(ax + by + cz = d\)",
+            "examples": [
+                {"q": "Distance of point (1,2,3) from plane \(2x - 3y + 6z = 14\).", "steps": "\(d = \frac{|2(1) - 3(2) + 6(3) - 14|}{\sqrt{2^2 + (-3)^2 + 6^2}}\)", "ans": "\(\frac{|2-6+18-14|}{7} = \frac{0}{7} = 0\) (Point lies on plane)"}
+            ]
+        }
     }
 
     # ============ MODE SELECTOR ============
     if st.session_state.ml_mode is None:
         st.markdown(f"### 🎯 {t['mode']}")
+        
         if is_senior:
-            c1, c2, c3, c4 = st.columns(4)
+            c1, c2 = st.columns(2)
             with c1:
-                st.markdown('<div class="ml-mode-card"><h1>📐</h1><h4>Real Math</h4><p>Calculus • Linear Algebra</p></div>', unsafe_allow_html=True)
+                st.markdown('<div class="ml-mode-card"><h1>📐</h1><h4>Real Math</h4><p>Calculus • Physics</p></div>', unsafe_allow_html=True)
                 if st.button("▶️ Real Math", use_container_width=True, type="primary", key="m_rm"):
                     st.session_state.ml_mode = "real"; st.rerun()
             with c2:
-                st.markdown('<div class="ml-mode-card"><h1>🎮</h1><h4>Puzzles</h4><p>Brain teasers</p></div>', unsafe_allow_html=True)
-                if st.button("▶️ Puzzles", use_container_width=True, key="m_pz"):
-                    st.session_state.ml_mode = "puzzle"; st.rerun()
-            with c3:
-                st.markdown('<div class="ml-mode-card"><h1>🎨</h1><h4>Design Board</h4><p>117+ Tools</p></div>', unsafe_allow_html=True)
-                if st.button("▶️ Board", use_container_width=True, key="m_bd"):
-                    st.session_state.ml_mode = "board"; st.rerun()
-            with c4:
                 st.markdown('<div class="ml-mode-card"><h1>📋</h1><h4>Formulas</h4><p>Quick reference</p></div>', unsafe_allow_html=True)
                 if st.button("▶️ Formulas", use_container_width=True, key="m_fm"):
                     st.session_state.ml_mode = "formula"; st.rerun()
         else:
             c1, c2, c3 = st.columns(3)
             with c1:
-                st.markdown('<div class="ml-mode-card"><h1>🎮</h1><h4>Puzzle Games</h4><p>20+ Fun Puzzles</p></div>', unsafe_allow_html=True)
+                st.markdown('<div class="ml-mode-card"><h1>🎮</h1><h4>Puzzle Games</h4><p>Fun Puzzles</p></div>', unsafe_allow_html=True)
                 if st.button("▶️ Puzzles", use_container_width=True, type="primary", key="m_pz2"):
                     st.session_state.ml_mode = "puzzle"; st.rerun()
             with c2:
@@ -9149,7 +9208,12 @@ def render_math_lab(client):
     if st.session_state.ml_mode == "puzzle":
         if st.session_state.ml_gtype is None:
             st.markdown("### 🎮 Choose Puzzle Game")
-            available = [(k, v) for k, v in PUZZLES.items() if class_level in v["range"]]
+            available = []
+            for k, v in PUZZLES.items():
+                for r in v["range"]:
+                    if class_level.startswith(r):
+                        available.append((k, v))
+                        break
             if not available:
                 st.warning("इस class के लिए puzzles जल्द आएँगे!"); return
             cols = st.columns(3)
@@ -9223,9 +9287,9 @@ def render_math_lab(client):
 
     # ============ REAL MATH ============
     if st.session_state.ml_mode == "real":
-        st.markdown(f"### 📐 Real Math — {class_level}")
-        topic = st.selectbox("📚 Choose Topic", list(UNIVERSITY.keys()), key="rm_topic_sel")
-        data = UNIVERSITY[topic]
+        st.markdown(f"### 📐 Advanced Math — {class_level}")
+        topic = st.selectbox("📚 Choose Topic", list(ADVANCED_MATH.keys()), key="rm_topic_sel")
+        data = ADVANCED_MATH[topic]
         st.markdown(f'<div class="ml-concept"><h3>📖 {topic}</h3><p><b>{data["concept"]}</b></p></div>', unsafe_allow_html=True)
         with st.expander("📚 Complete Theory", expanded=True):
             st.markdown(data["theory"])
@@ -9248,386 +9312,207 @@ def render_math_lab(client):
     if st.session_state.ml_mode == "formula":
         st.markdown(f"### 📋 Formula Reference — {class_level}")
         formulas = {
-            "Class 1-2": ["a + b = b + a", "a × 1 = a", "0 + a = a", "Perimeter of square = 4 × side"],
             "Class 3-5": ["Area of triangle = ½ × b × h", "1 km = 1000 m", "(a+b)² = a² + 2ab + b²"],
             "Class 6-8": ["LCM × HCF = a × b", "Circle Area = πr²", "Circumference = 2πr", "SI = PRT/100", "a² − b² = (a+b)(a−b)"],
             "Class 9-10": ["Quadratic: x = [−b ± √(b²−4ac)]/2a", "sin²θ + cos²θ = 1", "Distance = √[(x₂−x₁)² + (y₂−y₁)²]", "Sphere V = (4/3)πr³"],
             "Class 11-12": ["d/dx(xⁿ) = nxⁿ⁻¹", "d/dx(sin x) = cos x", "∫xⁿ dx = xⁿ⁺¹/(n+1) + C", "nPr = n!/(n−r)!", "nCr = n!/(r!(n−r)!)"],
-            "University": ["Cauchy-Schwarz", "Taylor Series", "Euler-Lagrange", "Fourier Series", "Stokes", "Gauss", "RSA"],
         }
-        for f in formulas.get(class_level, []):
+        active_formulas = []
+        for k, v in formulas.items():
+            if class_level.startswith(k):
+                active_formulas = v
+                break
+        for f in active_formulas:
             st.markdown(f'<div class="ml-formula">📐 {f}</div>', unsafe_allow_html=True)
         return
 
-   # ============ BOARD MODE — 117+ TOOLS (FIXED) ============
+    # ============ BOARD MODE — FIXED DRAW BOARD ============
     if st.session_state.ml_mode == "board":
-        st.markdown("### 🎨 Ultimate Design Board — 117+ Tools")
-
+        st.markdown("### 🎨 Ultimate Design Board")
+        
         board_html = """
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
-* { box-sizing: border-box; font-family: Arial, sans-serif; }
-#app { display: flex; height: 720px; gap: 6px; background: #F1F5F9; padding: 6px; border-radius: 12px; }
-#sidebar { width: 200px; background: #FFF; border-radius: 12px; overflow-y: auto; padding: 8px; border: 1px solid #E2E8F0; flex-shrink: 0; }
-.side-section { margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid #E2E8F0; }
-.side-title { font-size: 10px; font-weight: 800; color: #1E293B; margin-bottom: 4px; text-transform: uppercase; }
-.side-btn { display: block; width: 100%; padding: 5px 7px; margin: 2px 0; background: #F8FAFC; border: 1px solid #CBD5E1; border-radius: 5px; cursor: pointer; font-size: 11px; font-weight: 600; color: #1E293B; text-align: left; }
-.side-btn:hover { background: #E0E7FF; }
-#center { flex: 1; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
-#topbar { background: #FFF; border-radius: 10px; padding: 6px; border: 1px solid #E2E8F0; display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }
-.tool-btn { padding: 5px 8px; border: 1px solid #CBD5E1; background: #FFF; border-radius: 5px; cursor: pointer; font-size: 11px; font-weight: 700; color: #1E293B; }
-.tool-btn:hover { background: #E0E7FF; }
-.tool-btn.danger { background: #FEE2E2; color: #991B1B; }
-.tool-btn.success { background: #DCFCE7; color: #166534; }
-.tool-btn.share { background: #FEF3C7; color: #78350F; }
-.divider { width: 1px; height: 22px; background: #CBD5E1; margin: 0 3px; }
-#canvasWrap { flex: 1; position: relative; background: #FFFFFF; border: 2px solid #1E293B; border-radius: 10px; overflow: hidden; background-image: linear-gradient(rgba(0,0,0,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.06) 1px, transparent 1px); background-size: 25px 25px; touch-action: none; }
-#drawLayer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 5; pointer-events: none; cursor: crosshair; }
-.obj { position: absolute; cursor: move; user-select: none; }
-.obj.selected { box-shadow: 0 0 0 2px #0EA5E9; }
-.handle { position: absolute; width: 11px; height: 11px; background: #0EA5E9; border: 2px solid #FFF; border-radius: 50%; z-index: 100; }
-.handle-br { bottom: -6px; right: -6px; cursor: nwse-resize; }
-#rightbar { width: 180px; background: #FFF; border-radius: 12px; padding: 8px; border: 1px solid #E2E8F0; overflow-y: auto; flex-shrink: 0; }
-.color-input { width: 100%; height: 26px; border: 1px solid #CBD5E1; border-radius: 6px; }
-.layer-item { padding: 4px 6px; margin: 2px 0; background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 5px; font-size: 10px; cursor: pointer; }
-.layer-item.selected { background: #6366F1; color: #FFF; }
+body { margin:0; font-family: sans-serif; background: #f0f0f0; }
+#container { display: flex; height: 100vh; }
+#sidebar { width: 200px; background: #fff; padding: 10px; overflow-y: auto; border-right: 1px solid #ccc; }
+#main { flex: 1; position: relative; background: #fff; overflow: hidden; }
+canvas { display: block; cursor: crosshair; }
+.tool-btn { display: block; width: 100%; margin-bottom: 5px; padding: 8px; border: 1px solid #ddd; background: #fafafa; cursor: pointer; border-radius: 4px; text-align: left; }
+.tool-btn:hover { background: #e0e0e0; }
+.tool-btn.active { background: #007bff; color: white; border-color: #0056b3; }
+.color-picker { width: 100%; height: 40px; margin-bottom: 10px; border: none; cursor: pointer; }
 </style>
 </head>
 <body>
-<div id="app">
-    <div id="sidebar">
-        <div class="side-section"><div class="side-title">SELECT</div>
-            <button class="side-btn" onclick="setTool('select')">🖱️ Select / Move</button>
-            <button class="side-btn" onclick="setTool('pan')">✋ Hand Pan</button>
-        </div>
-        <div class="side-section"><div class="side-title">DRAW</div>
-            <button class="side-btn" onclick="setTool('pencil')">✏️ Pencil</button>
-            <button class="side-btn" onclick="setTool('pen')">🖊️ Smooth Pen</button>
-            <button class="side-btn" onclick="setTool('highlighter')">🖍️ Highlighter</button>
-            <button class="side-btn" onclick="setTool('line')">📏 Line</button>
-            <button class="side-btn" onclick="setTool('arrow')">→ Arrow</button>
-            <button class="side-btn" onclick="setTool('eraser')">🧽 Eraser</button>
-        </div>
-        <div class="side-section"><div class="side-title">SHAPES</div>
-            <button class="side-btn" onclick="addShape('square')">◼ Square</button>
-            <button class="side-btn" onclick="addShape('rect')">▭ Rectangle</button>
-            <button class="side-btn" onclick="addShape('circle')">● Circle</button>
-            <button class="side-btn" onclick="addShape('oval')">⬭ Oval</button>
-            <button class="side-btn" onclick="addShape('triangle')">▲ Triangle</button>
-            <button class="side-btn" onclick="addShape('pentagon')">⬟ Pentagon</button>
-            <button class="side-btn" onclick="addShape('hexagon')">⬢ Hexagon</button>
-            <button class="side-btn" onclick="addShape('star')">★ Star</button>
-            <button class="side-btn" onclick="addShape('diamond')">◆ Diamond</button>
-        </div>
-        <div class="side-section"><div class="side-title">3D</div>
-            <button class="side-btn" onclick="add3D('cube')">🧊 Cube</button>
-            <button class="side-btn" onclick="add3D('sphere')">⚪ Sphere</button>
-            <button class="side-btn" onclick="add3D('cylinder')">🛢️ Cylinder</button>
-            <button class="side-btn" onclick="add3D('cone')">🔺 Cone</button>
-        </div>
-        <div class="side-section"><div class="side-title">TEXT</div>
-            <button class="side-btn" onclick="addText('title')">📢 Title</button>
-            <button class="side-btn" onclick="addText('heading')">H Heading</button>
-            <button class="side-btn" onclick="addText('text')">🅣 Text</button>
-            <button class="side-btn" onclick="addSticky()">📒 Sticky</button>
-            <button class="side-btn" onclick="addCallout()">💬 Callout</button>
-            <button class="side-btn" onclick="addNumbering()">1️⃣ Number</button>
-            <button class="side-btn" onclick="addLettering()">🅰️ Letter</button>
-        </div>
-        <div class="side-section"><div class="side-title">MATH</div>
-            <button class="side-btn" onclick="addMath('&int;')">∫ Integral</button>
-            <button class="side-btn" onclick="addMath('&sum;')">∑ Sigma</button>
-            <button class="side-btn" onclick="addMath('&radic;')">√ Root</button>
-            <button class="side-btn" onclick="addMath('&pi;')">π Pi</button>
-            <button class="side-btn" onclick="addMath('&theta;')">θ Theta</button>
-            <button class="side-btn" onclick="addMath('&infin;')">∞ Infinity</button>
-            <button class="side-btn" onclick="addMath('&part;')">∂ Partial</button>
-            <button class="side-btn" onclick="addMath('&nabla;')">∇ Nabla</button>
-            <button class="side-btn" onclick="plotFunction()">📈 Plot Graph</button>
-        </div>
-        <div class="side-section"><div class="side-title">PHYSICS</div>
-            <button class="side-btn" onclick="addEmoji('BAT')">🔋 Battery</button>
-            <button class="side-btn" onclick="addEmoji('BULB')">💡 Bulb</button>
-            <button class="side-btn" onclick="addEmoji('SWITCH')">🔌 Switch</button>
-            <button class="side-btn" onclick="addEmoji('MAG')">🧲 Magnet</button>
-            <button class="side-btn" onclick="addEmoji('RES')">⚡ Resistor</button>
-            <button class="side-btn" onclick="addWave()">〰️ Sine Wave</button>
-            <button class="side-btn" onclick="addSpring()">🌀 Spring</button>
-        </div>
-        <div class="side-section"><div class="side-title">CHEMISTRY</div>
-            <button class="side-btn" onclick="addEmoji('TUBE')">🧪 Test Tube</button>
-            <button class="side-btn" onclick="addEmoji('FLASK')">⚗️ Flask</button>
-            <button class="side-btn" onclick="addEmoji('BEAK')">🥼 Beaker</button>
-            <button class="side-btn" onclick="addEmoji('BURN')">🔥 Burner</button>
-            <button class="side-btn" onclick="addBond('single')">— Single Bond</button>
-            <button class="side-btn" onclick="addBond('double')">= Double Bond</button>
-            <button class="side-btn" onclick="addBenzene()">⬡ Benzene</button>
-        </div>
-        <div class="side-section"><div class="side-title">BIOLOGY</div>
-            <button class="side-btn" onclick="addEmoji('HEART')">❤️ Heart</button>
-            <button class="side-btn" onclick="addEmoji('BRAIN')">🧠 Brain</button>
-            <button class="side-btn" onclick="addEmoji('LUNG')">🫁 Lungs</button>
-            <button class="side-btn" onclick="addEmoji('DNA')">🧬 DNA</button>
-            <button class="side-btn" onclick="addEmoji('CELL')">🦠 Cell</button>
-            <button class="side-btn" onclick="addEmoji('LEAF')">🌿 Leaf</button>
-            <button class="side-btn" onclick="addBranch()">🌳 Branch</button>
-        </div>
-        <div class="side-section"><div class="side-title">CHARTS</div>
-            <button class="side-btn" onclick="addChart('bar')">📊 Bar</button>
-            <button class="side-btn" onclick="addChart('line')">📈 Line</button>
-            <button class="side-btn" onclick="addChart('pie')">🥧 Pie</button>
-        </div>
-    </div>
-
-    <div id="center">
-        <div id="topbar">
-            <button class="tool-btn" onclick="undo()">↶ Undo</button>
-            <button class="tool-btn" onclick="redo()">↷ Redo</button>
-            <div class="divider"></div>
-            <button class="tool-btn" onclick="bringForward()">⬆ Fwd</button>
-            <button class="tool-btn" onclick="sendBackward()">⬇ Bwd</button>
-            <button class="tool-btn" onclick="duplicateObj()">📋 Copy</button>
-            <button class="tool-btn" onclick="toggleLock()">🔒 Lock</button>
-            <button class="tool-btn" onclick="alignCenter()">⊥ Center</button>
-            <div class="divider"></div>
-            <button class="tool-btn success" onclick="saveProject()">💾 Save</button>
-            <button class="tool-btn" onclick="loadProject()">📂 Load</button>
-            <button class="tool-btn success" onclick="downloadBoard()">📥 Download</button>
-            <button class="tool-btn share" onclick="shareBoard()">📤 Share</button>
-            <button class="tool-btn danger" onclick="deleteObj()">🗑 Del</button>
-            <button class="tool-btn danger" onclick="clearAll()">✖ Clear</button>
-        </div>
-        <div id="canvasWrap"><canvas id="drawLayer"></canvas></div>
-    </div>
-
-    <div id="rightbar">
-        <div class="side-section"><div class="side-title">COLOR</div>
-            <input type="color" class="color-input" id="colorPicker" value="#2563EB" onchange="setColor(this.value)">
-            <div style="display:flex;flex-wrap:wrap;gap:3px;margin-top:5px;">
-                <div onclick="setColor('#000000')" style="width:20px;height:20px;background:#000;border-radius:50%;cursor:pointer;border:2px solid #FFF;"></div>
-                <div onclick="setColor('#DC2626')" style="width:20px;height:20px;background:#DC2626;border-radius:50%;cursor:pointer;border:2px solid #FFF;"></div>
-                <div onclick="setColor('#2563EB')" style="width:20px;height:20px;background:#2563EB;border-radius:50%;cursor:pointer;border:2px solid #FFF;"></div>
-                <div onclick="setColor('#16A34A')" style="width:20px;height:20px;background:#16A34A;border-radius:50%;cursor:pointer;border:2px solid #FFF;"></div>
-                <div onclick="setColor('#CA8A04')" style="width:20px;height:20px;background:#CA8A04;border-radius:50%;cursor:pointer;border:2px solid #FFF;"></div>
-                <div onclick="setColor('#9333EA')" style="width:20px;height:20px;background:#9333EA;border-radius:50%;cursor:pointer;border:2px solid #FFF;"></div>
-                <div onclick="setColor('#EA580C')" style="width:20px;height:20px;background:#EA580C;border-radius:50%;cursor:pointer;border:2px solid #FFF;"></div>
-                <div onclick="setColor('#EC4899')" style="width:20px;height:20px;background:#EC4899;border-radius:50%;cursor:pointer;border:2px solid #FFF;"></div>
-            </div>
-        </div>
-        <div class="side-section"><div class="side-title">STYLE</div>
-            <button class="side-btn" onclick="setStrokeStyle('solid')">▬ Solid</button>
-            <button class="side-btn" onclick="setStrokeStyle('dashed')">▬▬ Dashed</button>
-            <button class="side-btn" onclick="setStrokeStyle('dotted')">•• Dotted</button>
-            <button class="side-btn" onclick="setFillMode('fill')">🟦 Fill</button>
-            <button class="side-btn" onclick="setFillMode('outline')">⬜ Outline</button>
-        </div>
-        <div class="side-section"><div class="side-title">ROTATE</div>
-            <button class="side-btn" onclick="rotateBy(-15)">↺ 15°</button>
-            <button class="side-btn" onclick="rotateBy(15)">↻ 15°</button>
-            <button class="side-btn" onclick="rotateBy(90)">↻ 90°</button>
-        </div>
-        <div class="side-section"><div class="side-title">LAYERS</div>
-            <div id="layersList"></div>
-        </div>
-    </div>
+<div id="container">
+  <div id="sidebar">
+    <h3 style="margin-top:0;">Tools</h3>
+    <button class="tool-btn active" onclick="setTool('select')">🖱️ Select / Move</button>
+    <button class="tool-btn" onclick="setTool('pencil')">✏️ Pencil</button>
+    <button class="tool-btn" onclick="setTool('line')">📏 Line</button>
+    <button class="tool-btn" onclick="setTool('rect')">▭ Rectangle</button>
+    <button class="tool-btn" onclick="setTool('circle')">● Circle</button>
+    <button class="tool-btn" onclick="setTool('eraser')">🧽 Eraser</button>
+    <hr>
+    <h3>Color</h3>
+    <input type="color" id="color" class="color-picker" value="#000000">
+    <hr>
+    <h3>Actions</h3>
+    <button class="tool-btn" onclick="clearCanvas()">🗑️ Clear All</button>
+    <button class="tool-btn" onclick="undo()">↶ Undo</button>
+  </div>
+  <div id="main">
+    <canvas id="canvas"></canvas>
+  </div>
 </div>
-
 <script>
-var wrap=document.getElementById('canvasWrap'),canvas=document.getElementById('drawLayer'),ctx=canvas.getContext('2d');
-var currentColor='#2563EB',fillMode='fill',strokeStyle='solid',currentTool='select',zIndexCounter=100,selectedObj=null,numberingCounter=1,letterCounter=0,snapEnabled=true;
-var history=[],historyIdx=-1,isDrawing=false,offsetX=0,offsetY=0,isResizing=false,startW=0,startH=0,sX=0,sY=0,drawingPaths=[],currentPath=null;
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+const main = document.getElementById('main');
 
-function resizeCanvas(){canvas.width=wrap.offsetWidth;canvas.height=wrap.offsetHeight;redrawCanvas();}
-window.addEventListener('load',resizeCanvas);window.addEventListener('resize',resizeCanvas);
+let tool = 'select';
+let color = '#000000';
+let isDrawing = false;
+let startX = 0, startY = 0;
+let objects = [];
+let currentObj = null;
+let selectedObj = null;
 
-function setTool(tool){currentTool=tool;if(tool==='select'||tool==='pan'){canvas.style.pointerEvents='none';wrap.style.cursor=tool==='pan'?'grab':'default';}else{canvas.style.pointerEvents='auto';canvas.style.cursor='crosshair';}}
+function resize() {
+  canvas.width = main.clientWidth;
+  canvas.height = main.clientHeight;
+  redraw();
+}
+window.addEventListener('resize', resize);
+setTimeout(resize, 100);
 
-function getCP(e){var r=canvas.getBoundingClientRect();var cx=e.touches?e.touches[0].clientX:e.clientX;var cy=e.touches?e.touches[0].clientY:e.clientY;return{x:cx-r.left,y:cy-r.top};}
-function startDraw(e){if(currentTool==='select'||currentTool==='pan')return;e.preventDefault();isDrawing=true;var p=getCP(e);currentPath={tool:currentTool,color:currentTool==='eraser'?'#FFFFFF':currentColor,size:currentTool==='highlighter'?20:3,style:strokeStyle,points:[{x:p.x,y:p.y}],alpha:currentTool==='highlighter'?0.35:1};}
-function drawMove(e){if(!isDrawing||!currentPath)return;e.preventDefault();var p=getCP(e);currentPath.points.push({x:p.x,y:p.y});redrawCanvas();drawPath(currentPath);}
-function endDraw(){if(!isDrawing||!currentPath)return;isDrawing=false;if(currentPath.points.length>1)drawingPaths.push(currentPath);currentPath=null;saveHistory();redrawCanvas();}
-canvas.addEventListener('mousedown',startDraw);canvas.addEventListener('mousemove',drawMove);canvas.addEventListener('mouseup',endDraw);canvas.addEventListener('mouseleave',endDraw);
-canvas.addEventListener('touchstart',startDraw,{passive:false});canvas.addEventListener('touchmove',drawMove,{passive:false});canvas.addEventListener('touchend',endDraw);
+function setTool(t) {
+  tool = t;
+  document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+  if(t !== 'select') selectedObj = null;
+  redraw();
+}
 
-function drawPath(p){var pts=p.points;if(pts.length<2)return;ctx.globalAlpha=p.alpha||1;ctx.strokeStyle=p.color;ctx.fillStyle=p.color;ctx.lineWidth=p.size;ctx.lineCap='round';ctx.lineJoin='round';
-if(p.style==='dashed')ctx.setLineDash([10,5]);else if(p.style==='dotted')ctx.setLineDash([2,5]);else ctx.setLineDash([]);
-if(p.tool==='pencil'||p.tool==='eraser'||p.tool==='highlighter'){ctx.globalCompositeOperation=p.tool==='eraser'?'destination-out':'source-over';ctx.beginPath();ctx.moveTo(pts[0].x,pts[0].y);for(var i=1;i<pts.length;i++)ctx.lineTo(pts[i].x,pts[i].y);ctx.lineWidth=p.tool==='eraser'?20:p.size;ctx.stroke();ctx.globalCompositeOperation='source-over';}
-else if(p.tool==='pen'){ctx.beginPath();ctx.moveTo(pts[0].x,pts[0].y);for(var i=1;i<pts.length-1;i++){var xc=(pts[i].x+pts[i+1].x)/2,yc=(pts[i].y+pts[i+1].y)/2;ctx.quadraticCurveTo(pts[i].x,pts[i].y,xc,yc);}ctx.stroke();}
-else if(p.tool==='line'){ctx.beginPath();ctx.moveTo(pts[0].x,pts[0].y);ctx.lineTo(pts[pts.length-1].x,pts[pts.length-1].y);ctx.stroke();}
-else if(p.tool==='arrow'){var l=pts[pts.length-1];ctx.beginPath();ctx.moveTo(pts[0].x,pts[0].y);ctx.lineTo(l.x,l.y);ctx.stroke();var a=Math.atan2(l.y-pts[0].y,l.x-pts[0].x);ctx.beginPath();ctx.moveTo(l.x,l.y);ctx.lineTo(l.x-15*Math.cos(a-Math.PI/6),l.y-15*Math.sin(a-Math.PI/6));ctx.moveTo(l.x,l.y);ctx.lineTo(l.x-15*Math.cos(a+Math.PI/6),l.y-15*Math.sin(a+Math.PI/6));ctx.stroke();}
-ctx.setLineDash([]);ctx.globalAlpha=1;}
-function redrawCanvas(){ctx.clearRect(0,0,canvas.width,canvas.height);drawingPaths.forEach(drawPath);}
+document.getElementById('color').addEventListener('input', (e) => {
+  color = e.target.value;
+  if(selectedObj) {
+    selectedObj.color = color;
+    redraw();
+  }
+});
 
-function addShape(type){var o=document.createElement('div');o.className='obj';o.dataset.type=type;o.dataset.rotation=0;o.dataset.color=currentColor;
-var w=90,h=90;if(type==='rect'){w=140;h=80;}if(type==='oval'){w=130;h=80;}
-o.style.width=w+'px';o.style.height=h+'px';o.style.left=(60+Math.random()*250)+'px';o.style.top=(60+Math.random()*250)+'px';o.style.position='absolute';o.style.zIndex=++zIndexCounter;
-if(type==='square'||type==='rect')o.style.borderRadius='6px';if(type==='circle'||type==='oval')o.style.borderRadius='50%';
-applyShapeStyle(o,currentColor);addHandles(o);o.addEventListener('mousedown',startDrag);o.addEventListener('touchstart',startDrag,{passive:false});wrap.appendChild(o);selectObj(o);saveHistory();}
+canvas.addEventListener('mousedown', (e) => {
+  const rect = canvas.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
 
-function applyShapeStyle(o,c){o.dataset.color=c;var t=o.dataset.type;o.innerHTML='';o.style.background='transparent';o.style.border='none';
-var isFill=fillMode==='fill';var fill=isFill?c:'none';var stroke=c;var d='0';if(strokeStyle==='dashed')d='10,5';else if(strokeStyle==='dotted')d='2,5';
-if(t==='triangle')o.innerHTML='<svg width="100%" height="100%" viewBox="0 0 100 100"><polygon points="50,5 95,95 5,95" fill="'+fill+'" stroke="'+stroke+'" stroke-width="3" stroke-dasharray="'+d+'"/></svg>';
-else if(t==='star')o.innerHTML='<svg width="100%" height="100%" viewBox="0 0 100 100"><polygon points="50,5 61,35 95,35 66,57 78,90 50,70 22,90 34,57 5,35 39,35" fill="'+fill+'" stroke="'+stroke+'" stroke-width="2" stroke-dasharray="'+d+'"/></svg>';
-else if(t==='pentagon')o.innerHTML='<svg width="100%" height="100%" viewBox="0 0 100 100"><polygon points="50,5 95,38 78,95 22,95 5,38" fill="'+fill+'" stroke="'+stroke+'" stroke-width="2" stroke-dasharray="'+d+'"/></svg>';
-else if(t==='hexagon')o.innerHTML='<svg width="100%" height="100%" viewBox="0 0 100 100"><polygon points="25,5 75,5 95,50 75,95 25,95 5,50" fill="'+fill+'" stroke="'+stroke+'" stroke-width="2" stroke-dasharray="'+d+'"/></svg>';
-else if(t==='diamond')o.innerHTML='<svg width="100%" height="100%" viewBox="0 0 100 100"><polygon points="50,5 95,50 50,95 5,50" fill="'+fill+'" stroke="'+stroke+'" stroke-width="2" stroke-dasharray="'+d+'"/></svg>';
-else if(t==='3d'||t==='graph'||t==='image'){}
-else{if(isFill)o.style.background=c;else o.style.border='3px '+(strokeStyle==='dashed'?'dashed':strokeStyle==='dotted'?'dotted':'solid')+' '+c;}
-addHandles(o);}
+  if(tool === 'select') {
+    selectedObj = null;
+    for(let i = objects.length - 1; i >= 0; i--) {
+      const o = objects[i];
+      if(o.type === 'rect' && x >= o.x && x <= o.x + o.w && y >= o.y && y <= o.y + o.h) { selectedObj = o; break; }
+      if(o.type === 'circle' && Math.hypot(x - o.x, y - o.y) <= o.r) { selectedObj = o; break; }
+      if(o.type === 'line' && Math.hypot(x - o.x1, y - o.y1) < 10) { selectedObj = o; break; }
+    }
+    if(selectedObj) { startX = x - (selectedObj.x || selectedObj.x1 || 0); startY = y - (selectedObj.y || selectedObj.y1 || 0); }
+    redraw();
+    return;
+  }
 
-function add3D(t){var o=document.createElement('div');o.className='obj';o.dataset.type='3d';o.style.width='120px';o.style.height='120px';o.style.left='100px';o.style.top='100px';o.style.position='absolute';o.style.zIndex=++zIndexCounter;
-var s='';var c=currentColor;
-if(t==='cube')s='<svg width="100%" height="100%" viewBox="0 0 100 100"><polygon points="20,40 60,40 60,80 20,80" fill="'+c+'" stroke="#333"/><polygon points="20,40 40,20 80,20 60,40" fill="'+c+'" opacity="0.7" stroke="#333"/><polygon points="60,40 80,20 80,60 60,80" fill="'+c+'" opacity="0.5" stroke="#333"/></svg>';
-else if(t==='sphere')s='<svg width="100%" height="100%" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="'+c+'" stroke="#333"/><ellipse cx="40" cy="40" rx="15" ry="10" fill="#FFF" opacity="0.5"/></svg>';
-else if(t==='cylinder')s='<svg width="100%" height="100%" viewBox="0 0 100 100"><ellipse cx="50" cy="25" rx="30" ry="10" fill="'+c+'" opacity="0.7" stroke="#333"/><rect x="20" y="25" width="60" height="50" fill="'+c+'"/><ellipse cx="50" cy="75" rx="30" ry="10" fill="'+c+'" opacity="0.5" stroke="#333"/></svg>';
-else if(t==='cone')s='<svg width="100%" height="100%" viewBox="0 0 100 100"><polygon points="50,10 80,80 20,80" fill="'+c+'" stroke="#333"/><ellipse cx="50" cy="80" rx="30" ry="8" fill="'+c+'" opacity="0.5" stroke="#333"/></svg>';
-o.innerHTML=s;addHandles(o);o.addEventListener('mousedown',startDrag);o.addEventListener('touchstart',startDrag,{passive:false});wrap.appendChild(o);selectObj(o);saveHistory();}
+  isDrawing = true;
+  startX = x;
+  startY = y;
 
-function addText(kind){var o=document.createElement('div');o.className='obj';o.dataset.type='text';
-var w=200,h=55,fs='17px',txt='Text';if(kind==='title'){w=380;h=65;fs='30px';txt='📢 Title';o.style.fontWeight='900';}else if(kind==='heading'){w=280;h=55;fs='22px';txt='Heading';o.style.fontWeight='bold';}
-o.style.width=w+'px';o.style.height=h+'px';o.style.left=(80+Math.random()*200)+'px';o.style.top=(80+Math.random()*200)+'px';o.style.position='absolute';o.style.zIndex=++zIndexCounter;o.style.background='#FFF';o.style.border='2px solid '+currentColor;o.style.borderRadius='8px';o.style.color=currentColor;o.style.fontSize=fs;o.style.display='flex';o.style.alignItems='center';o.style.justifyContent='center';o.style.padding='6px';o.style.textAlign='center';o.dataset.color=currentColor;o.textContent=txt;
-o.addEventListener('dblclick',function(e){e.stopPropagation();var v=prompt('Edit:',o.textContent);if(v!==null)o.textContent=v;});
-addHandles(o);o.addEventListener('mousedown',startDrag);wrap.appendChild(o);selectObj(o);saveHistory();}
+  if(tool === 'pencil' || tool === 'eraser') {
+    currentObj = { type: 'path', points: [{x, y}], color: tool === 'eraser' ? '#ffffff' : color, size: tool === 'eraser' ? 20 : 3 };
+    objects.push(currentObj);
+  }
+});
 
-function addSticky(){var o=document.createElement('div');o.className='obj';o.dataset.type='text';o.style.width='180px';o.style.height='140px';o.style.left='150px';o.style.top='150px';o.style.position='absolute';o.style.zIndex=++zIndexCounter;o.style.background='#FEF3C7';o.style.border='2px solid #F59E0B';o.style.borderRadius='4px';o.style.color='#78350F';o.style.fontSize='14px';o.style.padding='12px';o.textContent='Sticky note...';
-o.addEventListener('dblclick',function(e){e.stopPropagation();var v=prompt('Edit:',o.textContent);if(v!==null)o.textContent=v;});
-addHandles(o);o.addEventListener('mousedown',startDrag);wrap.appendChild(o);selectObj(o);saveHistory();}
+canvas.addEventListener('mousemove', (e) => {
+  if(!isDrawing && !selectedObj) return;
+  const rect = canvas.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
 
-function addCallout(){var o=document.createElement('div');o.className='obj';o.dataset.type='callout';o.style.width='180px';o.style.height='80px';o.style.left='150px';o.style.top='150px';o.style.position='absolute';o.style.zIndex=++zIndexCounter;o.style.background='#FFF';o.style.border='3px solid '+currentColor;o.style.borderRadius='20px';o.style.color=currentColor;o.style.fontSize='15px';o.style.display='flex';o.style.alignItems='center';o.style.justifyContent='center';o.style.padding='10px';o.textContent='💬 Info';
-o.addEventListener('dblclick',function(e){e.stopPropagation();var v=prompt('Edit:',o.textContent);if(v!==null)o.textContent=v;});
-addHandles(o);o.addEventListener('mousedown',startDrag);wrap.appendChild(o);selectObj(o);saveHistory();}
+  if(selectedObj) {
+    if(selectedObj.type === 'rect' || selectedObj.type === 'circle') {
+      selectedObj.x = x - startX;
+      selectedObj.y = y - startY;
+    } else if(selectedObj.type === 'line') {
+      selectedObj.x1 = x - startX;
+      selectedObj.y1 = y - startY;
+      selectedObj.x2 = x - startX + (selectedObj.x2 - selectedObj.x1);
+      selectedObj.y2 = y - startY + (selectedObj.y2 - selectedObj.y1);
+    }
+    redraw();
+    return;
+  }
 
-function addNumbering(){var o=document.createElement('div');o.className='obj';o.dataset.type='number';o.style.width='34px';o.style.height='34px';o.style.left=(150+Math.random()*200)+'px';o.style.top=(150+Math.random()*200)+'px';o.style.position='absolute';o.style.zIndex=++zIndexCounter;o.style.background=currentColor;o.style.borderRadius='50%';o.style.color='#FFF';o.style.fontSize='17px';o.style.fontWeight='bold';o.style.display='flex';o.style.alignItems='center';o.style.justifyContent='center';o.style.border='3px solid #FFF';o.textContent=numberingCounter++;
-addHandles(o);o.addEventListener('mousedown',startDrag);wrap.appendChild(o);selectObj(o);saveHistory();}
+  if(tool === 'pencil' || tool === 'eraser') {
+    currentObj.points.push({x, y});
+    redraw();
+  } else if(tool === 'line' || tool === 'rect' || tool === 'circle') {
+    redraw();
+    ctx.beginPath();
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 3;
+    if(tool === 'line') { ctx.moveTo(startX, startY); ctx.lineTo(x, y); }
+    else if(tool === 'rect') { ctx.rect(startX, startY, x - startX, y - startY); }
+    else if(tool === 'circle') { const r = Math.hypot(x - startX, y - startY); ctx.arc(startX, startY, r, 0, 2 * Math.PI); }
+    ctx.stroke();
+  }
+});
 
-function addLettering(){var o=document.createElement('div');o.className='obj';o.dataset.type='number';o.style.width='34px';o.style.height='34px';o.style.left=(150+Math.random()*200)+'px';o.style.top=(150+Math.random()*200)+'px';o.style.position='absolute';o.style.zIndex=++zIndexCounter;o.style.background=currentColor;o.style.borderRadius='50%';o.style.color='#FFF';o.style.fontSize='16px';o.style.fontWeight='bold';o.style.display='flex';o.style.alignItems='center';o.style.justifyContent='center';o.style.border='3px solid #FFF';o.textContent=String.fromCharCode(65+letterCounter++);if(letterCounter>26)letterCounter=0;
-addHandles(o);o.addEventListener('mousedown',startDrag);wrap.appendChild(o);selectObj(o);saveHistory();}
+canvas.addEventListener('mouseup', (e) => {
+  if(selectedObj) { selectedObj = null; return; }
+  if(!isDrawing) return;
+  isDrawing = false;
 
-function addMath(sym){var o=document.createElement('div');o.className='obj';o.dataset.type='math';o.style.width='55px';o.style.height='55px';o.style.left=(200+Math.random()*150)+'px';o.style.top=(200+Math.random()*150)+'px';o.style.position='absolute';o.style.zIndex=++zIndexCounter;o.style.background='#FFF';o.style.border='2px solid '+currentColor;o.style.borderRadius='8px';o.style.color=currentColor;o.style.fontSize='26px';o.style.fontWeight='bold';o.style.display='flex';o.style.alignItems='center';o.style.justifyContent='center';o.innerHTML=sym;
-addHandles(o);o.addEventListener('mousedown',startDrag);wrap.appendChild(o);selectObj(o);saveHistory();}
+  const rect = canvas.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
 
-function addEmoji(label){var map={BAT:'🔋',BULB:'💡',SWITCH:'🔌',MAG:'🧲',RES:'⚡',TUBE:'🧪',FLASK:'⚗️',BEAK:'🥼',BURN:'🔥',HEART:'❤️',BRAIN:'🧠',LUNG:'🫁',DNA:'🧬',CELL:'🦠',LEAF:'🌿'};var sym=map[label]||'⭐';
-var o=document.createElement('div');o.className='obj';o.dataset.type='text';o.style.width='65px';o.style.height='65px';o.style.left=(200+Math.random()*200)+'px';o.style.top=(200+Math.random()*200)+'px';o.style.position='absolute';o.style.zIndex=++zIndexCounter;o.style.background='#FFF';o.style.border='2px solid '+currentColor;o.style.borderRadius='10px';o.style.fontSize='32px';o.style.display='flex';o.style.alignItems='center';o.style.justifyContent='center';o.textContent=sym;
-addHandles(o);o.addEventListener('mousedown',startDrag);wrap.appendChild(o);selectObj(o);saveHistory();}
+  if(tool === 'line') objects.push({ type: 'line', x1: startX, y1: startY, x2: x, y2: y, color: color });
+  else if(tool === 'rect') objects.push({ type: 'rect', x: Math.min(startX, x), y: Math.min(startY, y), w: Math.abs(x - startX), h: Math.abs(y - startY), color: color });
+  else if(tool === 'circle') objects.push({ type: 'circle', x: startX, y: startY, r: Math.hypot(x - startX, y - startY), color: color });
+  redraw();
+});
 
-function addWave(){var o=document.createElement('div');o.className='obj';o.dataset.type='graph';o.style.width='220px';o.style.height='80px';o.style.left='200px';o.style.top='200px';o.style.position='absolute';o.style.zIndex=++zIndexCounter;o.style.background='#FFF';o.style.border='2px solid '+currentColor;o.style.borderRadius='8px';
-var pts='';for(var x=0;x<=220;x+=2)pts+=x+','+(40+25*Math.sin(x/15))+' ';
-o.innerHTML='<svg width="100%" height="100%" viewBox="0 0 220 80"><polyline points="'+pts+'" fill="none" stroke="'+currentColor+'" stroke-width="3"/></svg>';
-addHandles(o);o.addEventListener('mousedown',startDrag);wrap.appendChild(o);selectObj(o);saveHistory();}
-
-function addSpring(){var o=document.createElement('div');o.className='obj';o.dataset.type='graph';o.style.width='200px';o.style.height='60px';o.style.left='200px';o.style.top='200px';o.style.position='absolute';o.style.zIndex=++zIndexCounter;o.style.background='#FFF';o.style.border='2px solid '+currentColor;o.style.borderRadius='8px';
-var pts='10,30 ';for(var i=0;i<22;i++)pts+=(10+i*8.5)+','+(30+((i%2===0)?-18:18))+' ';pts+='190,30';
-o.innerHTML='<svg width="100%" height="100%" viewBox="0 0 200 60"><polyline points="'+pts+'" fill="none" stroke="'+currentColor+'" stroke-width="3"/></svg>';
-addHandles(o);o.addEventListener('mousedown',startDrag);wrap.appendChild(o);selectObj(o);saveHistory();}
-
-function addBond(t){var o=document.createElement('div');o.className='obj';o.style.width='80px';o.style.height='40px';o.style.left='250px';o.style.top='250px';o.style.position='absolute';o.style.zIndex=++zIndexCounter;
-var i='';
-if(t==='single')i='<line x1="10" y1="20" x2="70" y2="20" stroke="'+currentColor+'" stroke-width="3"/>';
-else if(t==='double')i='<line x1="10" y1="14" x2="70" y2="14" stroke="'+currentColor+'" stroke-width="3"/><line x1="10" y1="26" x2="70" y2="26" stroke="'+currentColor+'" stroke-width="3"/>';
-else i='<line x1="10" y1="10" x2="70" y2="10" stroke="'+currentColor+'" stroke-width="3"/><line x1="10" y1="20" x2="70" y2="20" stroke="'+currentColor+'" stroke-width="3"/><line x1="10" y1="30" x2="70" y2="30" stroke="'+currentColor+'" stroke-width="3"/>';
-o.innerHTML='<svg width="100%" height="100%" viewBox="0 0 80 40">'+i+'</svg>';
-addHandles(o);o.addEventListener('mousedown',startDrag);wrap.appendChild(o);selectObj(o);saveHistory();}
-
-function addBenzene(){var o=document.createElement('div');o.className='obj';o.style.width='110px';o.style.height='110px';o.style.left='250px';o.style.top='250px';o.style.position='absolute';o.style.zIndex=++zIndexCounter;
-o.innerHTML='<svg width="100%" height="100%" viewBox="0 0 110 110"><polygon points="55,15 95,38 95,72 55,95 15,72 15,38" fill="none" stroke="'+currentColor+'" stroke-width="3"/><circle cx="55" cy="55" r="25" fill="none" stroke="'+currentColor+'" stroke-width="3"/></svg>';
-addHandles(o);o.addEventListener('mousedown',startDrag);wrap.appendChild(o);selectObj(o);saveHistory();}
-
-function addBranch(){var o=document.createElement('div');o.className='obj';o.style.width='180px';o.style.height='180px';o.style.left='250px';o.style.top='250px';o.style.position='absolute';o.style.zIndex=++zIndexCounter;
-o.innerHTML='<svg width="100%" height="100%" viewBox="0 0 180 180"><line x1="90" y1="180" x2="90" y2="100" stroke="'+currentColor+'" stroke-width="4"/><line x1="90" y1="100" x2="50" y2="60" stroke="'+currentColor+'" stroke-width="3"/><line x1="90" y1="100" x2="130" y2="60" stroke="'+currentColor+'" stroke-width="3"/><line x1="50" y1="60" x2="30" y2="30" stroke="'+currentColor+'" stroke-width="2"/><line x1="50" y1="60" x2="70" y2="30" stroke="'+currentColor+'" stroke-width="2"/><line x1="130" y1="60" x2="110" y2="30" stroke="'+currentColor+'" stroke-width="2"/><line x1="130" y1="60" x2="150" y2="30" stroke="'+currentColor+'" stroke-width="2"/></svg>';
-addHandles(o);o.addEventListener('mousedown',startDrag);wrap.appendChild(o);selectObj(o);saveHistory();}
-
-function addChart(t){var o=document.createElement('div');o.className='obj';o.style.width='220px';o.style.height='180px';o.style.left='250px';o.style.top='250px';o.style.position='absolute';o.style.zIndex=++zIndexCounter;o.style.background='#FFF';o.style.border='2px solid '+currentColor;o.style.borderRadius='8px';
-var i='';var c=currentColor;
-if(t==='bar')i='<line x1="20" y1="160" x2="200" y2="160" stroke="#333" stroke-width="2"/><line x1="20" y1="20" x2="20" y2="160" stroke="#333" stroke-width="2"/><rect x="35" y="100" width="25" height="60" fill="'+c+'"/><rect x="70" y="60" width="25" height="100" fill="'+c+'" opacity="0.7"/><rect x="105" y="80" width="25" height="80" fill="'+c+'" opacity="0.5"/><rect x="140" y="40" width="25" height="120" fill="'+c+'" opacity="0.3"/>';
-else if(t==='line')i='<line x1="20" y1="160" x2="200" y2="160" stroke="#333" stroke-width="2"/><line x1="20" y1="20" x2="20" y2="160" stroke="#333" stroke-width="2"/><polyline points="30,130 70,100 110,110 150,60 190,50" fill="none" stroke="'+c+'" stroke-width="3"/>';
-else i='<circle cx="110" cy="95" r="60" fill="'+c+'" opacity="0.4"/><path d="M 110 95 L 110 35 A 60 60 0 0 1 162 130 Z" fill="'+c+'"/>';
-o.innerHTML='<svg width="100%" height="100%" viewBox="0 0 220 180">'+i+'</svg>';
-addHandles(o);o.addEventListener('mousedown',startDrag);wrap.appendChild(o);selectObj(o);saveHistory();}
-
-function plotFunction(){var eq=prompt('f(x):','sin(x)');if(!eq)return;
-var o=document.createElement('div');o.className='obj';o.dataset.type='graph';o.style.width='280px';o.style.height='280px';o.style.left='200px';o.style.top='200px';o.style.position='absolute';o.style.zIndex=++zIndexCounter;o.style.background='#FFF';o.style.border='3px solid '+currentColor;o.style.borderRadius='8px';
-var pts='';
-try{var fn=new Function('x','return '+eq.replace(/\\^/g,'**'));for(var x=-5;x<=5;x+=0.05){var y=fn(x);if(isFinite(y)&&Math.abs(y)<10)pts+=(140+x*25)+','+(140-y*25)+' ';}}catch(err){}
-o.innerHTML='<svg width="100%" height="100%" viewBox="0 0 280 280"><line x1="0" y1="140" x2="280" y2="140" stroke="#999"/><line x1="140" y1="0" x2="140" y2="280" stroke="#999"/><polyline points="'+pts+'" fill="none" stroke="'+currentColor+'" stroke-width="3"/></svg>';
-addHandles(o);o.addEventListener('mousedown',startDrag);wrap.appendChild(o);selectObj(o);saveHistory();}
-
-function addHandles(o){o.querySelectorAll('.handle').forEach(function(h){h.remove();});var b=document.createElement('div');b.className='handle handle-br';o.appendChild(b);b.addEventListener('mousedown',startResize);b.addEventListener('touchstart',startResize,{passive:false});}
-
-function selectObj(o){document.querySelectorAll('.obj').forEach(function(x){x.classList.remove('selected');});selectedObj=o;o.classList.add('selected');o.style.zIndex=++zIndexCounter;updateLayersList();if(o.dataset.color){var cp=document.getElementById('colorPicker');if(cp)cp.value=o.dataset.color;}}
-
-function deselectAll(e){if(e&&e.target!==wrap&&e.target!==canvas)return;document.querySelectorAll('.obj').forEach(function(o){o.classList.remove('selected');});selectedObj=null;updateLayersList();}
-
-function getPoint(e){var r=wrap.getBoundingClientRect();var cx=e.touches?e.touches[0].clientX:e.clientX;var cy=e.touches?e.touches[0].clientY:e.clientY;return{x:cx-r.left,y:cy-r.top};}
-
-function startDrag(e){if(e.target.classList.contains('handle'))return;e.stopPropagation();selectObj(e.currentTarget);var o=e.currentTarget;var p=getPoint(e);offsetX=p.x-o.offsetLeft;offsetY=p.y-o.offsetTop;document.addEventListener('mousemove',onDrag);document.addEventListener('mouseup',stopDrag);document.addEventListener('touchmove',onDrag,{passive:false});document.addEventListener('touchend',stopDrag);}
-function onDrag(e){if(!selectedObj)return;if(e.cancelable)e.preventDefault();var p=getPoint(e);var nx=p.x-offsetX,ny=p.y-offsetY;if(snapEnabled){nx=Math.round(nx/10)*10;ny=Math.round(ny/10)*10;}selectedObj.style.left=nx+'px';selectedObj.style.top=ny+'px';}
-function stopDrag(){document.removeEventListener('mousemove',onDrag);document.removeEventListener('mouseup',stopDrag);document.removeEventListener('touchmove',onDrag);document.removeEventListener('touchend',stopDrag);saveHistory();}
-
-function startResize(e){e.stopPropagation();isResizing=true;var o=e.currentTarget.parentElement;var p=getPoint(e);startW=o.offsetWidth;startH=o.offsetHeight;sX=p.x;sY=p.y;document.addEventListener('mousemove',onResize);document.addEventListener('mouseup',stopResize);document.addEventListener('touchmove',onResize,{passive:false});document.addEventListener('touchend',stopResize);}
-function onResize(e){if(!isResizing||!selectedObj)return;if(e.cancelable)e.preventDefault();var p=getPoint(e);selectedObj.style.width=Math.max(30,startW+(p.x-sX))+'px';selectedObj.style.height=Math.max(30,startH+(p.y-sY))+'px';}
-function stopResize(){isResizing=false;document.removeEventListener('mousemove',onResize);document.removeEventListener('mouseup',stopResize);document.removeEventListener('touchmove',onResize);document.removeEventListener('touchend',stopResize);saveHistory();}
-
-function rotateBy(deg){if(!selectedObj)return;var c=parseFloat(selectedObj.dataset.rotation)||0;selectedObj.dataset.rotation=c+deg;selectedObj.style.transform='rotate('+(c+deg)+'deg)';saveHistory();}
-
-function setColor(c){currentColor=c;var cp=document.getElementById('colorPicker');if(cp)cp.value=c;
-if(selectedObj){if(['text','number','math','callout'].indexOf(selectedObj.dataset.type)>=0){selectedObj.style.color=c;selectedObj.style.borderColor=c;if(selectedObj.dataset.type==='number')selectedObj.style.background=c;}else if(['3d','graph','image'].indexOf(selectedObj.dataset.type)<0){applyShapeStyle(selectedObj,c);}}}
-
-function setFillMode(m){fillMode=m;if(selectedObj)applyShapeStyle(selectedObj,selectedObj.dataset.color||currentColor);}
-function setStrokeStyle(s){strokeStyle=s;if(selectedObj)applyShapeStyle(selectedObj,selectedObj.dataset.color||currentColor);}
-
-function bringForward(){if(selectedObj){selectedObj.style.zIndex=++zIndexCounter;saveHistory();}}
-function sendBackward(){if(selectedObj){selectedObj.style.zIndex=Math.max(1,parseInt(selectedObj.style.zIndex||10)-1);saveHistory();}}
-function duplicateObj(){if(!selectedObj)return;var c=selectedObj.cloneNode(true);c.style.left=(selectedObj.offsetLeft+20)+'px';c.style.top=(selectedObj.offsetTop+20)+'px';c.style.zIndex=++zIndexCounter;c.classList.remove('selected');c.querySelectorAll('.handle').forEach(function(h){h.remove();});addHandles(c);c.addEventListener('mousedown',startDrag);c.addEventListener('touchstart',startDrag,{passive:false});wrap.appendChild(c);selectObj(c);saveHistory();}
-function toggleLock(){if(selectedObj)selectedObj.style.pointerEvents=selectedObj.style.pointerEvents==='none'?'auto':'none';}
-function alignCenter(){if(selectedObj){selectedObj.style.left=((wrap.offsetWidth-selectedObj.offsetWidth)/2)+'px';saveHistory();}}
-function deleteObj(){if(selectedObj){selectedObj.remove();selectedObj=null;saveHistory();}}
-function clearAll(){if(confirm('Clear all?')){wrap.querySelectorAll('.obj').forEach(function(o){o.remove();});drawingPaths=[];redrawCanvas();selectedObj=null;numberingCounter=1;letterCounter=0;saveHistory();}}
-
-function updateLayersList(){var l=document.getElementById('layersList');if(!l)return;l.innerHTML='';Array.from(wrap.querySelectorAll('.obj')).reverse().forEach(function(o){var it=document.createElement('div');it.className='layer-item';if(o===selectedObj)it.classList.add('selected');var t=o.dataset.type||'obj';it.textContent=t;it.onclick=function(){selectObj(o);};l.appendChild(it);});}
-
-function saveProject(){var d={drawing:drawingPaths,objects:Array.from(wrap.querySelectorAll('.obj')).map(function(o){return{html:o.innerHTML,style:o.getAttribute('style'),type:o.dataset.type,rotation:o.dataset.rotation,color:o.dataset.color};})};try{localStorage.setItem('board',JSON.stringify(d));alert('✅ Saved!');}catch(e){alert('❌ Save failed');}}
-
-function loadProject(){var r=localStorage.getItem('board');if(!r){alert('No saved project');return;}try{var d=JSON.parse(r);wrap.querySelectorAll('.obj').forEach(function(o){o.remove();});drawingPaths=d.drawing||[];redrawCanvas();(d.objects||[]).forEach(function(o){var e=document.createElement('div');e.className='obj';e.dataset.type=o.type;e.dataset.rotation=o.rotation;e.dataset.color=o.color;e.setAttribute('style',o.style);e.innerHTML=o.html;addHandles(e);e.addEventListener('mousedown',startDrag);e.addEventListener('touchstart',startDrag,{passive:false});wrap.appendChild(e);});saveHistory();alert('✅ Loaded!');}catch(e){alert('❌ Load failed');}}
-
-function downloadBoard(){
-  if(typeof html2canvas==='undefined'){alert('Library loading, please try again in 2 seconds');return;}
-  html2canvas(wrap,{backgroundColor:'#FFFFFF',scale:2}).then(function(cnv){
-    var link=document.createElement('a');
-    link.download='my-design-'+Date.now()+'.png';
-    link.href=cnv.toDataURL('image/png');
-    link.click();
+function redraw() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  objects.forEach(o => {
+    ctx.strokeStyle = o.color;
+    ctx.lineWidth = o.size || 3;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    if(o.type === 'path') {
+      ctx.beginPath();
+      if(o.points.length > 0) { ctx.moveTo(o.points[0].x, o.points[0].y); for(let i=1; i<o.points.length; i++) ctx.lineTo(o.points[i].x, o.points[i].y); }
+      ctx.stroke();
+    } else if(o.type === 'line') { ctx.beginPath(); ctx.moveTo(o.x1, o.y1); ctx.lineTo(o.x2, o.y2); ctx.stroke(); }
+    else if(o.type === 'rect') { ctx.strokeRect(o.x, o.y, o.w, o.h); }
+    else if(o.type === 'circle') { ctx.beginPath(); ctx.arc(o.x, o.y, o.r, 0, 2 * Math.PI); ctx.stroke(); }
+    if(selectedObj === o) {
+      ctx.strokeStyle = '#007bff'; ctx.lineWidth = 1; ctx.setLineDash([5, 5]);
+      if(o.type === 'rect') ctx.strokeRect(o.x - 5, o.y - 5, o.w + 10, o.h + 10);
+      if(o.type === 'circle') ctx.strokeRect(o.x - o.r - 5, o.y - o.r - 5, o.r*2 + 10, o.r*2 + 10);
+      ctx.setLineDash([]);
+    }
   });
 }
 
-function shareBoard(){
-  if(typeof html2canvas==='undefined'){alert('Library loading, please try again in 2 seconds');return;}
-  html2canvas(wrap,{backgroundColor:'#FFFFFF',scale:2}).then(function(cnv){
-    cnv.toBlob(function(blob){
-      if(navigator.share&&navigator.canShare){
-        var file=new File([blob],'design.png',{type:'image/png'});
-        if(navigator.canShare({files:[file]})){
-          navigator.share({files:[file],title:'My Design',text:'Check out my design!'});
-          return;
-        }
-      }
-      var link=document.createElement('a');
-      link.download='design-'+Date.now()+'.png';
-      link.href=URL.createObjectURL(blob);
-      link.click();
-    });
-  });
-}
-
-setTimeout(function(){resizeCanvas();saveHistory();},300);
+function clearCanvas() { objects = []; selectedObj = null; redraw(); }
+function undo() { objects.pop(); selectedObj = null; redraw(); }
 </script>
 </body>
 </html>
         """
-        components.html(board_html, height=760)
+        components.html(board_html, height=700)
 
         st.markdown("---")
         st.markdown("### 🧮 Quick Calculator")
