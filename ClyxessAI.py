@@ -8408,7 +8408,7 @@ Now write ENTIRELY in {language}:"""
                 )
                 text = res.choices[0].message.content.strip()
                 if len(text) > 100:
-                    if "Clyxess AI | Secure" not in text:
+                    if "ClyxessChat AI | Secure" not in text:
                         text = text.rstrip() + "\n\n--- Clyxess AI | Secure • Fast • Private"
                     return text, None
                 last_error = f"{model}: short output"
@@ -8440,6 +8440,15 @@ Now write ENTIRELY in {language}:"""
         margin: 0;
     }
     .clyx-header p { color: #94a3b8; font-size: 13px; margin: 6px 0 0 0; }
+    .stat-card {
+        background: rgba(15,23,42,0.7);
+        border: 1px solid #334155;
+        border-radius: 16px;
+        padding: 16px;
+        text-align: center;
+    }
+    .stat-card .label { color: #64748b; font-size: 11px; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; }
+    .stat-card .value { color: #10b981; font-size: 24px; font-weight: 900; margin-top: 4px; }
     </style>
     """, unsafe_allow_html=True)
 
@@ -8449,6 +8458,61 @@ Now write ENTIRELY in {language}:"""
         <p>Personalized AI learning — language apni chuno, jawab usi mein milega</p>
     </div>
     """, unsafe_allow_html=True)
+
+    # STATS
+    c1, c2, c3 = st.columns(3)
+    with c1:
+        st.markdown('<div class="stat-card"><div class="label">Lessons</div><div class="value">0</div></div>', unsafe_allow_html=True)
+    with c2:
+        st.markdown('<div class="stat-card"><div class="label">Level</div><div class="value">1</div></div>', unsafe_allow_html=True)
+    with c3:
+        st.markdown('<div class="stat-card"><div class="label">Streak</div><div class="value">0</div></div>', unsafe_allow_html=True)
+
+    st.markdown("<br>", unsafe_allow_html=True)
+
+    # ============================================================
+    # 👇 NAYA: KIDS PLAYGROUND GRAPH (Chat Ke Upar)
+    # ============================================================
+    st.markdown("### 🎮 Interactive Playground (For Kids)")
+    g1, g2 = st.columns(2)
+    
+    with g1:
+        with st.container():
+            st.markdown("""
+            <div style='background-color: #1e293b; padding: 20px; border-radius: 20px; border: 2px solid #10b981; text-align: center;'>
+                <h4 style='color: #10b981; margin-top: 0;'>📊 Data Science: Count the Fruits!</h4>
+            """, unsafe_allow_html=True)
+            st.write("Baccho, slider ghumao aur dekho graph kaise badalta hai! Data Science matlab data ko count karna aur graph banana.")
+            
+            apples = st.slider("🍎 Apples", 0, 10, 3)
+            bananas = st.slider("🍌 Bananas", 0, 10, 5)
+            grapes = st.slider("🍇 Grapes", 0, 10, 2)
+            
+            st.bar_chart({"Fruits": ["Apples", "Bananas", "Grapes"], "Count": [apples, bananas, grapes]}, x="Fruits", y="Count", color="#10b981")
+            st.markdown("</div>", unsafe_allow_html=True)
+
+    with g2:
+        with st.container():
+            st.markdown("""
+            <div style='background-color: #1e293b; padding: 20px; border-radius: 20px; border: 2px solid #8b5cf6; text-align: center;'>
+                <h4 style='color: #8b5cf6; margin-top: 0;'>🤖 Machine Learning: Teach the Robot!</h4>
+            """, unsafe_allow_html=True)
+            st.write("Robot ko sikhayein ki jaanwar kaise pehchante hain. Jab aap slider ghumayenge, Robot seekhega!")
+            
+            ears = st.radio("Kaan (Ears) lambe hain?", ["Haan (Long)", "Nahi (Short)"], key="robot_ears")
+            tail = st.radio("Poonchh (Tail) hai?", ["Haan (Yes)", "Nahi (No)"], key="robot_tail")
+            
+            if st.button("🤖 Ask Robot to Predict", use_container_width=True):
+                if ears == "Nahi (Short)" and tail == "Haan (Yes)":
+                    st.success("🐶 Robot Bola: Yeh **Doggy (Kutta)** hai! Main sahi se seekh gaya.")
+                    st.balloons()
+                elif ears == "Haan (Long)" and tail == "Nahi (No)":
+                    st.success("🐰 Robot Bola: Yeh **Bunny (Khargosh)** hai! Main sahi se seekh gaya.")
+                else:
+                    st.warning("🤔 Robot Bola: Mujhe samajh nahi aaya. Main abhi seekh raha hoon.")
+            st.markdown("</div>", unsafe_allow_html=True)
+
+    st.markdown("---")
 
     # ============================================================
     # INPUT SECTION
@@ -8522,43 +8586,6 @@ Now write ENTIRELY in {language}:"""
             st.session_state.em_stage = "loading"
             st.rerun()
 
-        # ============================================================
-        # 👇 NAYA GRAPH SECTION (Interactive Side Graph)
-        # ============================================================
-        st.markdown("<br>", unsafe_allow_html=True)
-        with st.container():
-            st.markdown("""
-            <div style='background-color: #1e293b; padding: 15px; border-radius: 15px; border: 1px solid #334155;'>
-                <h4 style='color: #10b981; margin-top: 0; font-size: 16px;'>📊 Live AI Experiment</h4>
-            """, unsafe_allow_html=True)
-            
-            if topic == "Data Science":
-                st.write("**Data Science:** Temperature vs Ice Cream Sales")
-                temp = st.slider("Slide to change Temperature (°C)", 0, 40, 20, key="ds_temp")
-                # Graph data
-                temps = [10, 20, 30, 40]
-                sales = [100, 200, 350, 500]
-                st.line_chart({"Temperature": temps, "Ice Cream Sales": sales}, x="Temperature", y="Ice Cream Sales")
-                st.caption(f"Dekho! Jab temperature {temp}°C hai, toh sales ka pattern upar ja raha hai. Yeh Data Analysis hai.")
-                
-            elif topic == "Machine Learning":
-                st.write("**Machine Learning:** Train the AI Model")
-                slope = st.slider("Slide to adjust AI Prediction Line", 0.0, 2.0, 1.0, step=0.1, key="ml_slope")
-                x_vals = [1, 2, 3, 4, 5]
-                y_actual = [2.1, 3.9, 6.2, 7.8, 10.1] # Noisy data
-                y_pred = [i * slope for i in x_vals]
-                
-                st.line_chart({"X": x_vals, "Actual Data": y_actual, "AI Prediction": y_pred}, x="X", y=["Actual Data", "AI Prediction"])
-                
-                if abs(slope - 2.0) < 0.1:
-                    st.success("🎯 Model Trained! AI ne pattern seekh liya hai.")
-                else:
-                    st.warning("📉 Slider ghumao aur line ko dots se match karo.")
-            else:
-                st.info("Select 'Data Science' or 'Machine Learning' from the dropdown to see the interactive graph here.")
-            
-            st.markdown("</div>", unsafe_allow_html=True)
-
     # ============================================================
     # LOADING / RESULT
     # ============================================================
@@ -8592,29 +8619,69 @@ Now write ENTIRELY in {language}:"""
 
         lesson_text = st.session_state.em_lesson.replace("\\", "\\\\").replace("`", "\\`").replace("$", "\\$")
 
-        # Fixed Syntax Error by using normal string and .replace()
         typewriter_html = """
         <!DOCTYPE html>
         <html>
         <head>
         <style>
             body { margin: 0; padding: 0; background: transparent; font-family: 'Inter', system-ui, sans-serif; }
-            .lesson-container { background: rgba(15,23,42,0.7); border: 1px solid #334155; border-radius: 16px; padding: 24px; max-height: 620px; overflow-y: auto; }
-            .lesson-header { display: flex; align-items: center; gap: 8px; padding-bottom: 12px; border-bottom: 1px solid #334155; margin-bottom: 16px; }
-            .lesson-header .dot { width: 8px; height: 8px; border-radius: 50%; background: #10b981; box-shadow: 0 0 10px #10b981; animation: pulse 1.5s infinite; }
+            .lesson-container {
+                background: rgba(15,23,42,0.7);
+                border: 1px solid #334155;
+                border-radius: 16px;
+                padding: 24px;
+                max-height: 620px;
+                overflow-y: auto;
+            }
+            .lesson-header {
+                display: flex; align-items: center; gap: 8px;
+                padding-bottom: 12px; border-bottom: 1px solid #334155; margin-bottom: 16px;
+            }
+            .lesson-header .dot {
+                width: 8px; height: 8px; border-radius: 50%;
+                background: #10b981; box-shadow: 0 0 10px #10b981;
+                animation: pulse 1.5s infinite;
+            }
             @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
-            .lesson-header .title { color: #10b981; font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
-            .responding-status { display: flex; align-items: center; gap: 10px; padding: 12px 16px; background: linear-gradient(90deg, rgba(16,185,129,0.08), rgba(6,182,212,0.08)); border: 1px solid rgba(16,185,129,0.25); border-radius: 12px; margin-bottom: 18px; animation: fadeIn 0.4s ease; }
+            .lesson-header .title {
+                color: #10b981; font-size: 12px; font-weight: 800;
+                text-transform: uppercase; letter-spacing: 1px;
+            }
+
+            .responding-status {
+                display: flex; align-items: center; gap: 10px;
+                padding: 12px 16px;
+                background: linear-gradient(90deg, rgba(16,185,129,0.08), rgba(6,182,212,0.08));
+                border: 1px solid rgba(16,185,129,0.25);
+                border-radius: 12px;
+                margin-bottom: 18px;
+                animation: fadeIn 0.4s ease;
+            }
             @keyframes fadeIn { from { opacity:0; transform: translateY(-6px); } to { opacity:1; transform: translateY(0); } }
-            .responding-status .pulse-dot { width: 10px; height: 10px; border-radius: 50%; background: #10b981; box-shadow: 0 0 12px #10b981; animation: strongPulse 1.2s infinite; }
+            .responding-status .pulse-dot {
+                width: 10px; height: 10px; border-radius: 50%;
+                background: #10b981; box-shadow: 0 0 12px #10b981;
+                animation: strongPulse 1.2s infinite;
+            }
             @keyframes strongPulse { 0%,100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.4); opacity: 0.5; } }
             .responding-status .status-text { color: #10b981; font-size: 13px; font-weight: 700; letter-spacing: 0.3px; }
-            .responding-status .shimmer { background: linear-gradient(90deg, #10b981 0%, #6ee7b7 50%, #10b981 100%); background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: shimmer 2s linear infinite; }
+            .responding-status .shimmer {
+                background: linear-gradient(90deg, #10b981 0%, #6ee7b7 50%, #10b981 100%);
+                background-size: 200% auto;
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                animation: shimmer 2s linear infinite;
+            }
             @keyframes shimmer { to { background-position: 200% center; } }
+
             .lesson-content { color: #e2e8f0; font-size: 14.5px; line-height: 1.8; white-space: pre-wrap; word-wrap: break-word; }
             .cursor { color: #10b981; font-weight: bold; animation: blink 1s infinite; }
             @keyframes blink { 0%,50% { opacity: 1; } 51%,100% { opacity: 0; } }
-            .footer { margin-top: 20px; padding-top: 12px; border-top: 1px solid #334155; text-align: center; color: #10b981; font-size: 11px; font-weight: 700; letter-spacing: 1px; opacity: 0; transition: opacity 0.5s ease; }
+            .footer {
+                margin-top: 20px; padding-top: 12px; border-top: 1px solid #334155;
+                text-align: center; color: #10b981; font-size: 11px; font-weight: 700;
+                letter-spacing: 1px; opacity: 0; transition: opacity 0.5s ease;
+            }
             .footer.show { opacity: 1; }
             ::-webkit-scrollbar { width: 6px; }
             ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
@@ -8622,8 +8689,16 @@ Now write ENTIRELY in {language}:"""
         </head>
         <body>
         <div class="lesson-container">
-            <div class="lesson-header"><div class="dot"></div><div class="title">AI Teacher Response</div></div>
-            <div class="responding-status" id="respondingBox"><div class="pulse-dot"></div><div class="status-text">Clyxess is responding<span class="shimmer">...</span></div></div>
+            <div class="lesson-header">
+                <div class="dot"></div>
+                <div class="title">AI Teacher Response</div>
+            </div>
+
+            <div class="responding-status" id="respondingBox">
+                <div class="pulse-dot"></div>
+                <div class="status-text">Clyxess is responding<span class="shimmer">...</span></div>
+            </div>
+
             <div class="lesson-content"><span id="typed"></span><span class="cursor" id="cursor">▊</span></div>
             <div class="footer" id="footer">🛡️ Clyxess AI | Secure • Fast • Private</div>
         </div>
@@ -8635,6 +8710,7 @@ Now write ENTIRELY in {language}:"""
             const container = document.querySelector('.lesson-container');
             const footer = document.getElementById('footer');
             const respondingBox = document.getElementById('respondingBox');
+
             function type() {
                 if (i < fullText.length) {
                     target.innerHTML = fullText.substring(0, i + 1);
@@ -8657,6 +8733,7 @@ Now write ENTIRELY in {language}:"""
         </body>
         </html>
         """
+        
         typewriter_html = typewriter_html.replace("__LESSON_TEXT__", lesson_text)
 
         components.html(typewriter_html, height=700, scrolling=False)
