@@ -8304,6 +8304,7 @@ def render_datascienceand_machinelearning():
     import time
     import streamlit as st
     import streamlit.components.v1 as components
+    import random
 
     GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "")
 
@@ -8338,57 +8339,29 @@ def render_datascienceand_machinelearning():
         style = AGE_STYLE.get(age_group, AGE_STYLE["school"])
 
         prompt = f"""You are Clyxess AI — Data Science & ML teacher.
-
 USER'S QUESTION: "{question}"
-
 Student: {user_name} | Age Level: {age_group} | Topic: {topic}
 Teaching style: {style}
 
 🔴 CRITICAL RULE #1 — LANGUAGE LOCK:
 You MUST reply ONLY in {language}. 
-
-- If language is "English" → reply ONLY in English (no Hindi words at all)
-- If language is "Hindi" → reply ONLY in Hindi (Devanagari script)
-- If language is "Hinglish" → reply in Hindi+English mix
-- Same for ALL other languages.
-
 DO NOT switch languages. DO NOT default to Hindi. 
 Even the section headings (Concept, Example, Activity, Next Step, Pro Tip) should be translated into {language}.
 
 🔴 CRITICAL RULE #2 — FOOTER (English only):
 At the VERY END of your reply, on a new line, write exactly:
-
 --- Clyxess AI | Secure • Fast • Private
-
-Do NOT translate this footer.
 
 🔴 RULE #3 — FORMAT:
-
-📚 Concept:
-[2-4 lines in {language}]
-
-🎯 Example:
-[1-2 examples in {language}]
-
-🛠️ Activity:
-[hands-on task in {language}]
-
-🚀 Next Step:
-[next hint in {language}]
-
-💡 Pro Tip:
-[one important point in {language}]
-
---- Clyxess AI | Secure • Fast • Private
+📚 Concept: [2-4 lines in {language}]
+🎯 Example: [1-2 examples in {language}]
+🛠️ Activity: [hands-on task in {language}]
+🚀 Next Step: [next hint in {language}]
+💡 Pro Tip: [one important point in {language}]
 
 Now write ENTIRELY in {language}:"""
 
-        MODELS = [
-            "openai/gpt-oss-120b",
-            "qwen/qwen3-32b",
-            "meta-llama/llama-4-maverick-17b-128e-instruct",
-            "openai/gpt-oss-20b"
-        ]
+        MODELS = ["openai/gpt-oss-120b", "qwen/qwen3-32b", "meta-llama/llama-4-maverick-17b-128e-instruct", "openai/gpt-oss-20b"]
 
         last_error = ""
         for model in MODELS:
@@ -8397,7 +8370,7 @@ Now write ENTIRELY in {language}:"""
                 client = Groq(api_key=GROQ_API_KEY)
                 res = client.chat.completions.create(
                     messages=[
-                        {"role": "system", "content": f"You are Clyxess AI. You MUST reply ONLY in {language}. Never switch languages. Always end with: --- Clyxess AI | Secure • Fast • Private"},
+                        {"role": "system", "content": f"You are Clyxess AI. You MUST reply ONLY in {language}. Always end with: --- Clyxess AI | Secure • Fast • Private"},
                         {"role": "user", "content": prompt}
                     ],
                     model=model,
@@ -8413,11 +8386,10 @@ Now write ENTIRELY in {language}:"""
             except Exception as e:
                 last_error = f"{model}: {str(e)[:80]}"
                 continue
-
         return None, last_error or "All models failed"
 
     # ============================================================
-    # STYLING
+    # STYLING (Header & UI)
     # ============================================================
     st.markdown("""
     <style>
@@ -8426,6 +8398,7 @@ Now write ENTIRELY in {language}:"""
         border: 1px solid #334155;
         border-radius: 20px;
         padding: 24px 28px;
+        margin-top: 20px;
         margin-bottom: 20px;
         box-shadow: 0 10px 40px rgba(16,185,129,0.1);
     }
@@ -8444,13 +8417,60 @@ Now write ENTIRELY in {language}:"""
     st.markdown("""
     <div class="clyx-header">
         <h1>🧠 Clyxess AI — Data Science & ML Lab</h1>
-        <p>Personalized AI learning — language apni chuno, jawab usi mein milega</p>
+        <p>Explore interactive models or ask our AI Teacher anything!</p>
     </div>
     """, unsafe_allow_html=True)
 
     # ============================================================
-    # INPUT SECTION
+    # 🚀 NEW FEATURE: INTERACTIVE VISUAL LABS
     # ============================================================
+    st.markdown("### 🔬 Interactive AI Experiments")
+    
+    lab_tab1, lab_tab2 = st.tabs(["🏙️ Data Science: Smart City", "🚗 Machine Learning: Self-Driving Car"])
+    
+    with lab_tab1:
+        st.markdown("#### Data Science: Smart City Simulator")
+        st.write("Use Data to save the city! Adjust the sliders and see how AI predicts Pollution.")
+        
+        c1, c2, c3 = st.columns(3)
+        with c1: trees = st.slider("🌳 Plant Trees (Thousands)", 0, 100, 10)
+        with c2: ev = st.slider("🚌 Electric Buses (%)", 0, 100, 20)
+        with c3: fac = st.slider("🏭 Limit Factories (%)", 0, 100, 30)
+        
+        # AI Prediction Logic (Regression)
+        predicted_aqi = max(20, 150 - (trees * 0.5) - (ev * 0.8) - (fac * 0.6))
+        
+        st.markdown(f"### Predicted Air Quality (AQI): **{int(predicted_aqi)}**")
+        
+        if predicted_aqi < 60:
+            st.success("🌟 Excellent! The city is green and healthy. Data Science saved the day!")
+            st.balloons()
+        elif predicted_aqi < 100:
+            st.warning("😷 Moderate Pollution. Need more trees or electric vehicles.")
+        else:
+            st.error("🚨 Danger! High Pollution. The city is not safe. Change your policies!")
+
+    with lab_tab2:
+        st.markdown("#### Machine Learning: Self-Driving Car Vision")
+        st.write("Tesla style AI! Select what is in front of the car. The AI will decide to Brake or Accelerate.")
+        
+        obstacle = st.radio("What does the camera see?", ["🛣️ Clear Road", "🚶 Pedestrian", "🚧 Traffic Cone"], horizontal=True)
+        
+        if st.button("🚗 Run Car AI"):
+            if obstacle == "🛣️ Clear Road":
+                st.success("🚗 **AI Decision:** ACCELERATE! (Speed up to 60 km/h). Path is clear.")
+            elif obstacle == "🚶 Pedestrian":
+                st.error("🛑 **AI Decision:** EMERGENCY BRAKE! (Stop immediately). Pedestrian detected on road.")
+            else:
+                st.warning("⚠️ **AI Decision:** SLOW DOWN! Traffic cone detected. Change lane.")
+
+    st.markdown("---")
+
+    # ============================================================
+    # 📖 ORIGINAL FEATURE: ASK AI TEACHER
+    # ============================================================
+    st.markdown("### 👨‍🏫 Ask AI Teacher")
+    
     col_left, col_right = st.columns([1, 2])
 
     with col_left:
@@ -8464,26 +8484,14 @@ Now write ENTIRELY in {language}:"""
             label_visibility="collapsed",
             key="em_age_radio"
         )
-        if "8-12" in age_choice:
-            st.session_state.em_age = "kids"
-        elif "13-17" in age_choice:
-            st.session_state.em_age = "school"
-        else:
-            st.session_state.em_age = "college"
+        if "8-12" in age_choice: st.session_state.em_age = "kids"
+        elif "13-17" in age_choice: st.session_state.em_age = "school"
+        else: st.session_state.em_age = "college"
 
-        # ⭐ LANGUAGE DROPDOWN
         st.markdown("#### 🌐 Language")
         language_label = st.selectbox(
             "Language",
-            [
-                "English", "हिंदी (Hindi)", "Hinglish (Hindi + English)",
-                "मराठी (Marathi)", "বাংলা (Bengali)", "தமிழ் (Tamil)",
-                "తెలుగు (Telugu)", "ગુજરાતી (Gujarati)", "ಕನ್ನಡ (Kannada)",
-                "മലയാളം (Malayalam)", "ਪੰਜਾਬੀ (Punjabi)", "ଓଡ଼ିଆ (Odia)",
-                "اردو (Urdu)", "Español (Spanish)", "Français (French)",
-                "Deutsch (German)", "日本語 (Japanese)", "中文 (Chinese)",
-                "العربية (Arabic)", "Português (Portuguese)", "Русский (Russian)", "한국어 (Korean)"
-            ],
+            ["English", "हिंदी (Hindi)", "Hinglish (Hindi + English)", "मराठी (Marathi)", "Español (Spanish)", "Français (French)", "Deutsch (German)", "日本語 (Japanese)"],
             label_visibility="collapsed",
             key="em_lang_sel"
         )
@@ -8493,12 +8501,7 @@ Now write ENTIRELY in {language}:"""
         st.markdown("#### 📚 Topic")
         topic = st.selectbox(
             "Topic",
-            [
-                "Data Science", "Machine Learning", "Neural Networks",
-                "Deep Learning", "Python for Data Science", "Statistics",
-                "AI Ethics", "Computer Vision", "Natural Language Processing",
-                "Reinforcement Learning"
-            ],
+            ["Data Science", "Machine Learning", "Neural Networks", "Deep Learning", "Python for Data Science", "Statistics", "AI Ethics", "Computer Vision", "NLP"],
             label_visibility="collapsed",
             key="em_topic_sel"
         )
@@ -8529,11 +8532,7 @@ Now write ENTIRELY in {language}:"""
     if st.session_state.em_stage == "loading":
         with st.spinner(f"🧠 Clyxess is responding in {st.session_state.em_language}..."):
             lesson, err = call_groq(
-                st.session_state.em_age,
-                st.session_state.em_topic,
-                st.session_state.em_prompt,
-                user_name,
-                st.session_state.em_language
+                st.session_state.em_age, st.session_state.em_topic, st.session_state.em_prompt, user_name, st.session_state.em_language
             )
         if lesson:
             st.session_state.em_lesson = lesson
@@ -8557,68 +8556,28 @@ Now write ENTIRELY in {language}:"""
 
         lesson_text = st.session_state.em_lesson.replace("\\", "\\\\").replace("`", "\\`").replace("$", "\\$")
 
-        # 👇 Yahan f-string hatakar normal string use ki hai taaki {} ka error na aaye
         typewriter_html = """
         <!DOCTYPE html>
         <html>
         <head>
         <style>
             body { margin: 0; padding: 0; background: transparent; font-family: 'Inter', system-ui, sans-serif; }
-            .lesson-container {
-                background: rgba(15,23,42,0.7);
-                border: 1px solid #334155;
-                border-radius: 16px;
-                padding: 24px;
-                max-height: 620px;
-                overflow-y: auto;
-            }
-            .lesson-header {
-                display: flex; align-items: center; gap: 8px;
-                padding-bottom: 12px; border-bottom: 1px solid #334155; margin-bottom: 16px;
-            }
-            .lesson-header .dot {
-                width: 8px; height: 8px; border-radius: 50%;
-                background: #10b981; box-shadow: 0 0 10px #10b981;
-                animation: pulse 1.5s infinite;
-            }
+            .lesson-container { background: rgba(15,23,42,0.7); border: 1px solid #334155; border-radius: 16px; padding: 24px; max-height: 620px; overflow-y: auto; }
+            .lesson-header { display: flex; align-items: center; gap: 8px; padding-bottom: 12px; border-bottom: 1px solid #334155; margin-bottom: 16px; }
+            .lesson-header .dot { width: 8px; height: 8px; border-radius: 50%; background: #10b981; box-shadow: 0 0 10px #10b981; animation: pulse 1.5s infinite; }
             @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
-            .lesson-header .title {
-                color: #10b981; font-size: 12px; font-weight: 800;
-                text-transform: uppercase; letter-spacing: 1px;
-            }
-            .responding-status {
-                display: flex; align-items: center; gap: 10px;
-                padding: 12px 16px;
-                background: linear-gradient(90deg, rgba(16,185,129,0.08), rgba(6,182,212,0.08));
-                border: 1px solid rgba(16,185,129,0.25);
-                border-radius: 12px;
-                margin-bottom: 18px;
-                animation: fadeIn 0.4s ease;
-            }
+            .lesson-header .title { color: #10b981; font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
+            .responding-status { display: flex; align-items: center; gap: 10px; padding: 12px 16px; background: linear-gradient(90deg, rgba(16,185,129,0.08), rgba(6,182,212,0.08)); border: 1px solid rgba(16,185,129,0.25); border-radius: 12px; margin-bottom: 18px; animation: fadeIn 0.4s ease; }
             @keyframes fadeIn { from { opacity:0; transform: translateY(-6px); } to { opacity:1; transform: translateY(0); } }
-            .responding-status .pulse-dot {
-                width: 10px; height: 10px; border-radius: 50%;
-                background: #10b981; box-shadow: 0 0 12px #10b981;
-                animation: strongPulse 1.2s infinite;
-            }
+            .responding-status .pulse-dot { width: 10px; height: 10px; border-radius: 50%; background: #10b981; box-shadow: 0 0 12px #10b981; animation: strongPulse 1.2s infinite; }
             @keyframes strongPulse { 0%,100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.4); opacity: 0.5; } }
             .responding-status .status-text { color: #10b981; font-size: 13px; font-weight: 700; letter-spacing: 0.3px; }
-            .responding-status .shimmer {
-                background: linear-gradient(90deg, #10b981 0%, #6ee7b7 50%, #10b981 100%);
-                background-size: 200% auto;
-                -webkit-background-clip: text;
-                -webkit-text-fill-color: transparent;
-                animation: shimmer 2s linear infinite;
-            }
+            .responding-status .shimmer { background: linear-gradient(90deg, #10b981 0%, #6ee7b7 50%, #10b981 100%); background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: shimmer 2s linear infinite; }
             @keyframes shimmer { to { background-position: 200% center; } }
             .lesson-content { color: #e2e8f0; font-size: 14.5px; line-height: 1.8; white-space: pre-wrap; word-wrap: break-word; }
             .cursor { color: #10b981; font-weight: bold; animation: blink 1s infinite; }
             @keyframes blink { 0%,50% { opacity: 1; } 51%,100% { opacity: 0; } }
-            .footer {
-                margin-top: 20px; padding-top: 12px; border-top: 1px solid #334155;
-                text-align: center; color: #10b981; font-size: 11px; font-weight: 700;
-                letter-spacing: 1px; opacity: 0; transition: opacity 0.5s ease;
-            }
+            .footer { margin-top: 20px; padding-top: 12px; border-top: 1px solid #334155; text-align: center; color: #10b981; font-size: 11px; font-weight: 700; letter-spacing: 1px; opacity: 0; transition: opacity 0.5s ease; }
             .footer.show { opacity: 1; }
             ::-webkit-scrollbar { width: 6px; }
             ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
@@ -8626,14 +8585,8 @@ Now write ENTIRELY in {language}:"""
         </head>
         <body>
         <div class="lesson-container">
-            <div class="lesson-header">
-                <div class="dot"></div>
-                <div class="title">AI Teacher Response</div>
-            </div>
-            <div class="responding-status" id="respondingBox">
-                <div class="pulse-dot"></div>
-                <div class="status-text">Clyxess is responding<span class="shimmer">...</span></div>
-            </div>
+            <div class="lesson-header"><div class="dot"></div><div class="title">AI Teacher Response</div></div>
+            <div class="responding-status" id="respondingBox"><div class="pulse-dot"></div><div class="status-text">Clyxess is responding<span class="shimmer">...</span></div></div>
             <div class="lesson-content"><span id="typed"></span><span class="cursor" id="cursor">▊</span></div>
             <div class="footer" id="footer">🛡️ Clyxess AI | Secure • Fast • Private</div>
         </div>
@@ -8645,7 +8598,6 @@ Now write ENTIRELY in {language}:"""
             const container = document.querySelector('.lesson-container');
             const footer = document.getElementById('footer');
             const respondingBox = document.getElementById('respondingBox');
-
             function type() {
                 if (i < fullText.length) {
                     target.innerHTML = fullText.substring(0, i + 1);
@@ -8668,10 +8620,7 @@ Now write ENTIRELY in {language}:"""
         </body>
         </html>
         """
-        
-        # Yahan hum text ko replace kar rahe hain
         typewriter_html = typewriter_html.replace("__LESSON_TEXT__", lesson_text)
-
         components.html(typewriter_html, height=700, scrolling=False)
 
         col_a, col_b = st.columns([1, 1])
@@ -8681,13 +8630,7 @@ Now write ENTIRELY in {language}:"""
                 st.session_state.em_lesson = ""
                 st.rerun()
         with col_b:
-            st.download_button(
-                "📥 Download Lesson",
-                data=st.session_state.em_lesson,
-                file_name=f"{st.session_state.em_topic.replace(' ', '_')}_lesson.txt",
-                mime="text/plain",
-                use_container_width=True
-            )     
+            st.download_button("📥 Download Lesson", data=st.session_state.em_lesson, file_name=f"{st.session_state.em_topic.replace(' ', '_')}_lesson.txt", mime="text/plain", use_container_width=True)     
  
 def render_math_lab(client):
     """
