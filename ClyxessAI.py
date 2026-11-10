@@ -205,6 +205,11 @@ GROQ_MODELS = [
 ]
 QUESTIONS_PER_LEVEL = 10
 
+# --- TERA WALA ADD KIYA HUA - ISKO BHI DAAL DE ---
+GROQ_STT_MODEL = "whisper-large-v3-turbo"  # Bachha bolega, ye sunega
+GROQ_TTS_MODEL = "playai-tts"  # AI bolega, bachha sunega
+GROQ_SAFETY_MODEL = "openai/gpt-oss-20b"  # Safety ke liye, isko alag rakh
+
 # ============================================================
 # PLAY & LEARN CONFIG
 # ============================================================
