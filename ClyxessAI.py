@@ -4929,10 +4929,15 @@ def render_learn_language():
             background-color: #2a2a33 !important; color: white !important; border: 1px solid #444 !important; border-bottom-left-radius: 4px;
         }
         
-        .hint-box {
-            background-color: #1e1e24; border-left: 4px solid #ffcc00;
+        .level-info {
+            background-color: #1e1e24; border-left: 4px solid #00FFAA;
             padding: 10px 15px; border-radius: 8px; color: #ccc; font-size: 14px;
             margin-bottom: 15px; margin-top: 10px;
+        }
+        
+        .safety-box {
+            background-color: #2b1b1b; border-left: 4px solid #ff3b6e;
+            padding: 10px 15px; border-radius: 8px; color: #ffcccc; font-size: 14px;
         }
 
         div[data-testid="stAudioInput"] { display: flex; justify-content: center; margin-top: 10px; }
@@ -4949,94 +4954,57 @@ def render_learn_language():
     """, unsafe_allow_html=True)
 
     # ==========================================
-    # 🌐 2. DICTIONARY (100% Dynamic Translations)
+    # 🌐 2. DICTIONARY & LANGUAGES
     # ==========================================
     UI_TEXTS = {
-        "hi-IN": {
-            "title": "🌍 क्लाइक्सेस लैंग्वेज लैब",
-            "lbl_my": "मैं कौनसी भाषा बोलता हूँ?",
-            "lbl_target": "मुझे कौनसी सीखनी है?",
-            "lbl_level": "लेवल चुनें:",
-            "hint_title": "💡 क्विक हिंट्स:",
-            "hint_1": "• बोलें: 'Apple सिखाओ'",
-            "hint_2": "• बोलें: 'Cat कैसे बोलते हैं?'",
-            "mic_lbl": "🎤 माइक दबाएं और बोलें",
-            "type_lbl": "या यहाँ टाइप करके भेजें...",
-            "welcome": "नमस्ते! 👋 मैं लुसी हूँ। चलो शुरू करें! आप मुझसे कोई भी शब्द पूछ सकते हैं।"
-        },
-        "en-US": {
-            "title": "🌍 Clyxess Language Lab",
-            "lbl_my": "What language do I speak?",
-            "lbl_target": "What do I want to learn?",
-            "lbl_level": "Select Level:",
-            "hint_title": "💡 Quick Hints:",
-            "hint_1": "• Say: 'Teach me Apple'",
-            "hint_2": "• Say: 'How to say Cat?'",
-            "mic_lbl": "🎤 Press mic and speak",
-            "type_lbl": "Or type here to send...",
-            "welcome": "Hello! 👋 I am Luicy. Let's start! You can ask me any word."
-        },
-        "bn-IN": {
-            "title": "🌍 ক্লাইক্সেস ল্যাঙ্গুয়েজ ল্যাব",
-            "lbl_my": "আমি কোন ভাষা বলি?",
-            "lbl_target": "আমি কি শিখতে চাই?",
-            "lbl_level": "লেভেল বাছাই করুন:",
-            "hint_title": "💡 দ্রুত টিপস:",
-            "hint_1": "• বলুন: 'Apple শেখাও'",
-            "hint_2": "• বলুন: 'Cat কিভাবে বলব?'",
-            "mic_lbl": "🎤 মাইক চেপে বলুন",
-            "type_lbl": "অথবা এখানে টাইপ করুন...",
-            "welcome": "নমস্কার! 👋 আমি লুসি। চলুন শুরু করি! আপনি আমাকে যেকোনো শব্দ জিজ্ঞাসা করতে পারেন।"
-        },
-        "ta-IN": {
-            "title": "🌍 கிளைக்சஸ் மொழி ஆய்வகம்",
-            "lbl_my": "நான் எந்த மொழி பேசுகிறேன்?",
-            "lbl_target": "நான் என்ன கற்க விரும்புகிறேன்?",
-            "lbl_level": "நிலையைத் தேர்ந்தெடுக்கவும்:",
-            "hint_title": "💡 விரைவான குறிப்புகள்:",
-            "hint_1": "• சொல்லுங்கள்: 'Apple கற்றுக்கொடு'",
-            "hint_2": "• சொல்லுங்கள்: 'Cat எப்படி சொல்வது?'",
-            "mic_lbl": "🎤 மைக்கை அழுத்தி பேசுங்கள்",
-            "type_lbl": "அல்லது இங்கே தட்டச்சு செய்யவும்...",
-            "welcome": "வணக்கம்! 👋 நான் லூசி. தொடங்குவோம்! நீங்கள் எந்த வார்த்தையையும் கேட்கலாம்."
-        }
+        "hi-IN": {"title": "🌍 क्लाइक्सेस लैंग्वेज लैब", "lbl_my": "मैं कौनसी भाषा बोलता हूँ?", "lbl_target": "मुझे कौनसी सीखनी है?", "lbl_level": "लेवल चुनें:", "lbl_model": "AI मॉडल चुनें:", "mic_lbl": "🎤 माइक दबाएं और बोलें", "type_lbl": "या यहाँ टाइप करें...", "welcome": "नमस्ते! 👋 मैं मिस आरिया हूँ। आज हम क्या सीखेंगे?"},
+        "en-US": {"title": "🌍 Clyxess Language Lab", "lbl_my": "What language do I speak?", "lbl_target": "What do I want to learn?", "lbl_level": "Select Level:", "lbl_model": "Select AI Model:", "mic_lbl": "🎤 Press mic and speak", "type_lbl": "Or type here to send...", "welcome": "Hello! 👋 I am Miss Aria. What will we learn today?"}
     }
-    # Default fallback to English if language not in dict
-    def get_ui_text(lang_code):
-        return UI_TEXTS.get(lang_code, UI_TEXTS["en-US"])
+    def get_ui_text(lang_code): return UI_TEXTS.get(lang_code, UI_TEXTS["en-US"])
 
-    MOTHER_TONGUES = {
-        "hi-IN": "🇮🇳 Hindi", "en-US": "🇺🇸 English", "bn-IN": "🇮🇳 Bengali", "ta-IN": "🇮🇳 Tamil"
+    LANGUAGES = {
+        "hi-IN": "🇮🇳 Hindi", "en-US": "🇺🇸 English", "bn-IN": "🇮🇳 Bengali", "ta-IN": "🇮🇳 Tamil", "te-IN": "🇮🇳 Telugu",
+        "es-ES": "🇪🇸 Spanish", "fr-FR": "🇫🇷 French", "de-DE": "🇩🇪 German", "ja-JP": "🇯🇵 Japanese", "zh-CN": "🇨🇳 Chinese"
     }
-    TARGET_LANGUAGES = {
-        "en-US": "🇺🇸 English", "zh-CN": "🇨🇳 Chinese", "ja-JP": "🇯🇵 Japanese", "es-ES": "🇪🇸 Spanish"
-    }
+
     DIFFICULTY_LEVELS = {
-        "easy": "🌱 Easy", "medium": "🚀 Medium", "hard": "🔥 Hard"
+        "easy": "🌱 Easy (Beginner)", "medium": "🚀 Medium (Intermediate)", "hard": "🔥 Hard (Advanced)", "technical": "⚙️ Technical (Science & Tech)"
+    }
+
+    LEVEL_DESCRIPTIONS = {
+        "easy": "<b>Is level mein aap seekhenge:</b><br>• Basic words (Fruits, Colors)<br>• Daily greetings<br>• Mother tongue se translation",
+        "medium": "<b>Is level mein aap seekhenge:</b><br>• Grammar basics<br>• Daily conversations<br>• Short sentences banana",
+        "hard": "<b>Is level mein aap seekhenge:</b><br>• Complex Grammar<br>• Idioms & Phrases<br>• Storytelling aur long sentences",
+        "technical": "<b>Is level mein aap seekhenge:</b><br>• IT aur Science ki vocabulary<br>• Tech sentences<br>• Complex science concepts"
     }
 
     # ==========================================
-    # 🎯 3. SELECTIONS (Dynamic Language)
+    # 🎯 3. UI & SELECTIONS
     # ==========================================
-    # Pehle sirf language select karte hain taaki UI text pata chal sake
-    st.markdown(f'<div class="lang-card"><h3 style="margin:0; color:white;">{UI_TEXTS["en-US"]["title"]}</h3></div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="lang-card"><h3 style="margin:0; color:white;">🌍 Clyxess Language Lab</h3></div>', unsafe_allow_html=True)
     
-    col1, col2, col3 = st.columns(3)
+    col1, col2 = st.columns(2)
     with col1:
-        my_lang = st.selectbox("Mother Tongue", list(MOTHER_TONGUES.keys()), format_func=lambda x: MOTHER_TONGUES[x])
+        my_lang = st.selectbox("Mother Tongue", list(LANGUAGES.keys()), format_func=lambda x: LANGUAGES[x], key="lang_my")
     
-    # Ab jo language select hui hai, uska text uthate hain
     ui = get_ui_text(my_lang)
     
     with col2:
-        target_lang = st.selectbox(ui["lbl_target"], list(TARGET_LANGUAGES.keys()), format_func=lambda x: TARGET_LANGUAGES[x])
+        target_lang = st.selectbox(ui["lbl_target"], list(LANGUAGES.keys()), format_func=lambda x: LANGUAGES[x], key="lang_target", index=1)
+    
+    col3, col4 = st.columns(2)
     with col3:
-        difficulty = st.selectbox(ui["lbl_level"], list(DIFFICULTY_LEVELS.keys()), format_func=lambda x: DIFFICULTY_LEVELS[x])
+        difficulty = st.selectbox(ui["lbl_level"], list(DIFFICULTY_LEVELS.keys()), format_func=lambda x: DIFFICULTY_LEVELS[x], key="lang_diff")
+    with col4:
+        # 👇 NAYA: Model Selection Dropdown (Groq models from your image)
+        selected_model = st.selectbox(ui["lbl_model"], ["openai/gpt-oss-120b", "qwen/qwen3-32b"], key="model_sel")
+
+    st.markdown(f'<div class="level-info">{LEVEL_DESCRIPTIONS[difficulty]}</div>', unsafe_allow_html=True)
 
     # ==========================================
     # 💾 4. SESSION STATE
     # ==========================================
-    if ("luicy_chat" not in st.session_state or 
+    if ("aria_chat" not in st.session_state or 
         st.session_state.get("current_target") != target_lang or 
         st.session_state.get("current_mother") != my_lang or
         st.session_state.get("current_diff") != difficulty):
@@ -5046,46 +5014,66 @@ def render_learn_language():
         st.session_state.current_diff = difficulty
         st.session_state.last_spoken_msg = ""
         
-        # Welcome message in selected Mother Tongue
-        st.session_state.luicy_chat = [
+        st.session_state.aria_chat = [
             {"role": "assistant", "content": ui["welcome"]}
         ]
 
     # ==========================================
-    # 🎭 5. LUICY'S STRICT PROMPT
+    # 🎭 5. MISS ARIA'S PROMPT
     # ==========================================
     SYSTEM_PROMPT = f"""
-    You are Luicy, an AI Language Teacher created by Clyxess AI, NeuroClyx Technology.
+    You are Miss Aria, a friendly, encouraging Female AI Language Teacher created by Clyxess AI.
     
     CRITICAL LANGUAGE RULE:
-    - The user's selected Mother Tongue is {MOTHER_TONGUES[my_lang]}.
-    - You MUST reply, explain, and give hints ONLY in {MOTHER_TONGUES[my_lang]}. 
-    - Even if the user types in English, you MUST reply in {MOTHER_TONGUES[my_lang]}. Do NOT reply in English unless the Mother Tongue selected is English.
+    - The user's selected Mother Tongue is {LANGUAGES[my_lang]}.
+    - You MUST reply, explain, and correct mistakes ONLY in {LANGUAGES[my_lang]}. 
     
-    TARGET LANGUAGE TO TEACH: {TARGET_LANGUAGES[target_lang]}
+    TARGET LANGUAGE TO TEACH: {LANGUAGES[target_lang]}
     DIFFICULTY LEVEL: {DIFFICULTY_LEVELS[difficulty]}
     
+    HANDLING MISTAKES & TYPOS:
+    - The user is a child/student. They will make spelling mistakes or type incomplete words. 
+    - Try to GUESS what they meant. (e.g., if they type "aple", understand they mean "apple").
+    - GENTLY CORRECT them: "Arre beta, aapne 'aple' likha, lekin sahi spelling 'Apple' hoti hai. Kya aap yahi puchna chahte the?"
+    - Then, answer their intended question based on the context.
+    - If you absolutely cannot understand, ask them kindly: "Beta, mujhe thoda samajh nahi aaya. Kya aap dobara likh sakte hain?"
+
     TEACHING RULES:
-    1. If the user says "teach me" (in any language), give a basic word based on the level. NEVER give hard words unless asked.
-    2. NEVER repeat the same word twice in a row. Keep changing the words.
-    3. FORMAT:
-       **Word:** [Word in Target Language]
-       **Pronunciation:** [Pronunciation written in {MOTHER_TONGUES[my_lang]} script]
-       **Meaning:** [Meaning in {MOTHER_TONGUES[my_lang]}]
-    4. If asked "Who made you?", say: "I am Clyxess AI, created by NeuroClyx Technology."
-    5. End with a hint in {MOTHER_TONGUES[my_lang]}.
+    1. Keep your explanations strictly to the {DIFFICULTY_LEVELS[difficulty]} level.
+    2. FORMAT:
+       **Word/Concept:** [Word in Target Language]
+       **Pronunciation:** [Pronunciation in {LANGUAGES[my_lang]}]
+       **Meaning:** [Meaning in {LANGUAGES[my_lang]}]
+    3. End with a small question or task in {LANGUAGES[my_lang]}.
     """
 
     # ==========================================
-    # 💬 6. CHAT DISPLAY & TTS
+    # 🛡️ 6. SAFETY FILTER (Using GPT OSS 20B)
     # ==========================================
-    for i, msg in enumerate(st.session_state.luicy_chat):
+    def check_safety(text):
+        """Checks if the user input is safe for kids."""
+        try:
+            safety_prompt = f"Is the following text safe for a child to read? Reply ONLY with 'SAFE' or 'UNSAFE'. Text: '{text}'"
+            res = client.chat.completions.create(
+                model="openai/gpt-oss-20b", # Using the moderation/reasoning model from your image
+                messages=[{"role": "user", "content": safety_prompt}],
+                max_tokens=10, temperature=0.0
+            )
+            ans = res.choices[0].message.content.strip().upper()
+            return "UNSAFE" not in ans
+        except Exception:
+            return True # Default to safe if API fails to avoid breaking the app
+
+    # ==========================================
+    # 💬 7. CHAT DISPLAY & TTS
+    # ==========================================
+    for i, msg in enumerate(st.session_state.aria_chat):
         avatar = "👩‍🏫" if msg["role"] == "assistant" else "🧑"
         with st.chat_message(msg["role"], avatar=avatar):
             st.markdown(msg["content"])
             
-            # Voice TTS (Only speaks once per message)
-            if msg["role"] == "assistant" and i == len(st.session_state.luicy_chat) - 1:
+            # Voice TTS (Browser Native)
+            if msg["role"] == "assistant" and i == len(st.session_state.aria_chat) - 1:
                 clean_text = msg["content"].split('*')[0].replace('**', '').replace('\n', ' ').strip()
                 if clean_text != st.session_state.get("last_spoken_msg", "") and clean_text:
                     st.session_state.last_spoken_msg = clean_text
@@ -5104,18 +5092,7 @@ def render_learn_language():
                     components.html(tts_js, height=0)
 
     # ==========================================
-    # 💡 7. DYNAMIC HINT BOX
-    # ==========================================
-    st.markdown(f"""
-    <div class="hint-box">
-        <b>{ui['hint_title']}</b><br>
-        {ui['hint_1']}<br>
-        {ui['hint_2']}
-    </div>
-    """, unsafe_allow_html=True)
-
-    # ==========================================
-    # 🎤 8. INPUT AREA
+    # 🎤 8. INPUT AREA (STT using Whisper Large v3 Turbo)
     # ==========================================
     st.write(f"<p style='text-align:center; font-weight:bold; color:#ff3b6e;'>{ui['mic_lbl']}</p>", unsafe_allow_html=True)
     
@@ -5126,43 +5103,50 @@ def render_learn_language():
         audio_bytes = audio_value.getvalue()
         if st.session_state.get("last_audio") != audio_bytes:
             st.session_state.last_audio = audio_bytes 
-            with st.spinner("..."):
+            with st.spinner("Processing Voice..."):
                 try:
                     transcript = client.audio.transcriptions.create(
-                        model="whisper-large-v3-turbo", 
+                        model="whisper-large-v3-turbo", # From your image
                         file=("audio.wav", audio_bytes)
                     )
                     user_prompt = transcript.text
                 except Exception as e:
-                    pass # silent fail
+                    pass 
 
     text_prompt = st.chat_input(ui["type_lbl"])
     if text_prompt:
         user_prompt = text_prompt
 
     # ==========================================
-    # 🧠 9. AI LOGIC
+    # 🧠 9. AI LOGIC (With Safety Check)
     # ==========================================
     if user_prompt:
-        st.session_state.luicy_chat.append({"role": "user", "content": user_prompt})
+        # Check Safety First
+        is_safe = check_safety(user_prompt)
         
-        with st.chat_message("user", avatar="🧑"):
-            st.markdown(user_prompt)
+        if not is_safe:
+            st.markdown('<div class="safety-box">🚫 <b>Safety Alert:</b> Beta, yeh word theek nahi hai. Kripya acche shabdon ka istemal karein.</div>', unsafe_allow_html=True)
+        else:
+            st.session_state.aria_chat.append({"role": "user", "content": user_prompt})
+            
+            with st.chat_message("user", avatar="🧑"):
+                st.markdown(user_prompt)
 
-        with st.chat_message("assistant", avatar="👩‍🏫"):
-            with st.spinner("..."):
-                try:
-                    response = client.chat.completions.create(
-                        model="openai/gpt-oss-120b", 
-                        messages=[{"role": "system", "content": SYSTEM_PROMPT}] + st.session_state.luicy_chat[-5:],
-                        temperature=0.6, max_tokens=250
-                    )
-                    reply = response.choices[0].message.content
-                    st.markdown(reply)
-                    st.session_state.luicy_chat.append({"role": "assistant", "content": reply})
-                    st.rerun()
-                except Exception as e:
-                    st.error(f"Error: {e}")    
+            with st.chat_message("assistant", avatar="👩‍🏫"):
+                with st.spinner("Miss Aria is thinking..."):
+                    try:
+                        # Using selected_model (GPT OSS 120B or Qwen 3.8 27B)
+                        response = client.chat.completions.create(
+                            model=selected_model, 
+                            messages=[{"role": "system", "content": SYSTEM_PROMPT}] + st.session_state.aria_chat[-5:],
+                            temperature=0.6, max_tokens=300
+                        )
+                        reply = response.choices[0].message.content
+                        st.markdown(reply)
+                        st.session_state.aria_chat.append({"role": "assistant", "content": reply})
+                        st.rerun()
+                    except Exception as e:
+                        st.error(f"Error: {e}")   
 
 def render_cyber_security():
     # ==========================================
