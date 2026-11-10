@@ -8325,7 +8325,7 @@ def render_datascienceand_machinelearning():
     # ============================================================
     # AI GENERATOR — LANGUAGE LOCKED + FOOTER
     # ============================================================
-    def call_groq(age_group, topic, question, user_name, language):
+    def call_groq(age_group, topic, question, language):
         if not GROQ_API_KEY:
             return None, "GROQ_API_KEY set nahi hai"
 
@@ -8341,7 +8341,7 @@ def render_datascienceand_machinelearning():
 
 USER'S QUESTION: "{question}"
 
-Student: {user_name} | Age Level: {age_group} | Topic: {topic}
+Student: Student | Age Level: {age_group} | Topic: {topic}
 Teaching style: {style}
 
 🔴 CRITICAL RULE #1 — LANGUAGE LOCK:
@@ -8440,15 +8440,6 @@ Now write ENTIRELY in {language}:"""
         margin: 0;
     }
     .clyx-header p { color: #94a3b8; font-size: 13px; margin: 6px 0 0 0; }
-    .stat-card {
-        background: rgba(15,23,42,0.7);
-        border: 1px solid #334155;
-        border-radius: 16px;
-        padding: 16px;
-        text-align: center;
-    }
-    .stat-card .label { color: #64748b; font-size: 11px; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; }
-    .stat-card .value { color: #10b981; font-size: 24px; font-weight: 900; margin-top: 4px; }
     </style>
     """, unsafe_allow_html=True)
 
@@ -8459,26 +8450,12 @@ Now write ENTIRELY in {language}:"""
     </div>
     """, unsafe_allow_html=True)
 
-    # STATS
-    c1, c2, c3 = st.columns(3)
-    with c1:
-        st.markdown('<div class="stat-card"><div class="label">Lessons</div><div class="value">0</div></div>', unsafe_allow_html=True)
-    with c2:
-        st.markdown('<div class="stat-card"><div class="label">Level</div><div class="value">1</div></div>', unsafe_allow_html=True)
-    with c3:
-        st.markdown('<div class="stat-card"><div class="label">Streak</div><div class="value">0</div></div>', unsafe_allow_html=True)
-
-    st.markdown("<br>", unsafe_allow_html=True)
-
     # ============================================================
-    # INPUT SECTION
+    # INPUT SECTION (Boxes Removed)
     # ============================================================
     col_left, col_right = st.columns([1, 2])
 
     with col_left:
-        st.markdown("#### 👤 Student Info")
-        user_name = st.text_input("Your Name", value="Student", key="em_user")
-
         st.markdown("#### 🎂 Age Group")
         age_choice = st.radio(
             "Age",
@@ -8540,7 +8517,16 @@ Now write ENTIRELY in {language}:"""
                 "AI Ethics",
                 "Computer Vision",
                 "Natural Language Processing",
-                "Reinforcement Learning"
+                "Reinforcement Learning",
+                "Pandas & NumPy",
+                "Data Visualization",
+                "Regression Models",
+                "Classification Algorithms",
+                "Clustering",
+                "Big Data",
+                "Generative AI",
+                "Decision Trees",
+                "Model Evaluation"
             ],
             label_visibility="collapsed",
             key="em_topic_sel"
@@ -8553,7 +8539,7 @@ Now write ENTIRELY in {language}:"""
         custom_q = st.text_area(
             "Question",
             placeholder="e.g., What is Machine Learning?",
-            height=120,
+            height=180,
             label_visibility="collapsed",
             key="em_q"
         )
@@ -8575,7 +8561,6 @@ Now write ENTIRELY in {language}:"""
                 st.session_state.em_age,
                 st.session_state.em_topic,
                 st.session_state.em_prompt,
-                user_name,
                 st.session_state.em_language
             )
         if lesson:
@@ -8600,94 +8585,73 @@ Now write ENTIRELY in {language}:"""
 
         lesson_text = st.session_state.em_lesson.replace("\\", "\\\\").replace("`", "\\`").replace("$", "\\$")
 
-        typewriter_html = f"""
+        # Fixed Syntax Error by using normal string and .replace()
+        typewriter_html = """
         <!DOCTYPE html>
         <html>
         <head>
         <style>
-            body {{ margin: 0; padding: 0; background: transparent; font-family: 'Inter', system-ui, sans-serif; }}
-            .lesson-container {{
+            body { margin: 0; padding: 0; background: transparent; font-family: 'Inter', system-ui, sans-serif; }
+            .lesson-container {
                 background: rgba(15,23,42,0.7);
                 border: 1px solid #334155;
                 border-radius: 16px;
                 padding: 24px;
                 max-height: 620px;
                 overflow-y: auto;
-            }}
-            .lesson-header {{
+            }
+            .lesson-header {
                 display: flex; align-items: center; gap: 8px;
                 padding-bottom: 12px; border-bottom: 1px solid #334155; margin-bottom: 16px;
-            }}
-            .lesson-header .dot {{
+            }
+            .lesson-header .dot {
                 width: 8px; height: 8px; border-radius: 50%;
                 background: #10b981; box-shadow: 0 0 10px #10b981;
                 animation: pulse 1.5s infinite;
-            }}
-            @keyframes pulse {{ 0%,100% {{ opacity: 1; }} 50% {{ opacity: 0.4; }} }}
-            .lesson-header .title {{
+            }
+            @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+            .lesson-header .title {
                 color: #10b981; font-size: 12px; font-weight: 800;
                 text-transform: uppercase; letter-spacing: 1px;
-            }}
+            }
 
-            /* ⭐ Clyxess is responding status */
-            .responding-status {{
-                display: flex;
-                align-items: center;
-                gap: 10px;
+            .responding-status {
+                display: flex; align-items: center; gap: 10px;
                 padding: 12px 16px;
                 background: linear-gradient(90deg, rgba(16,185,129,0.08), rgba(6,182,212,0.08));
                 border: 1px solid rgba(16,185,129,0.25);
                 border-radius: 12px;
                 margin-bottom: 18px;
                 animation: fadeIn 0.4s ease;
-            }}
-            @keyframes fadeIn {{ from {{ opacity:0; transform: translateY(-6px); }} to {{ opacity:1; transform: translateY(0); }} }}
-            .responding-status .pulse-dot {{
+            }
+            @keyframes fadeIn { from { opacity:0; transform: translateY(-6px); } to { opacity:1; transform: translateY(0); } }
+            .responding-status .pulse-dot {
                 width: 10px; height: 10px; border-radius: 50%;
-                background: #10b981;
-                box-shadow: 0 0 12px #10b981;
+                background: #10b981; box-shadow: 0 0 12px #10b981;
                 animation: strongPulse 1.2s infinite;
-            }}
-            @keyframes strongPulse {{
-                0%,100% {{ transform: scale(1); opacity: 1; }}
-                50% {{ transform: scale(1.4); opacity: 0.5; }}
-            }}
-            .responding-status .status-text {{
-                color: #10b981;
-                font-size: 13px;
-                font-weight: 700;
-                letter-spacing: 0.3px;
-            }}
-            .responding-status .shimmer {{
+            }
+            @keyframes strongPulse { 0%,100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.4); opacity: 0.5; } }
+            .responding-status .status-text { color: #10b981; font-size: 13px; font-weight: 700; letter-spacing: 0.3px; }
+            .responding-status .shimmer {
                 background: linear-gradient(90deg, #10b981 0%, #6ee7b7 50%, #10b981 100%);
                 background-size: 200% auto;
                 -webkit-background-clip: text;
                 -webkit-text-fill-color: transparent;
                 animation: shimmer 2s linear infinite;
-            }}
-            @keyframes shimmer {{ to {{ background-position: 200% center; }} }}
+            }
+            @keyframes shimmer { to { background-position: 200% center; } }
 
-            .lesson-content {{
-                color: #e2e8f0; font-size: 14.5px;
-                line-height: 1.8; white-space: pre-wrap; word-wrap: break-word;
-            }}
-            .cursor {{ color: #10b981; font-weight: bold; animation: blink 1s infinite; }}
-            @keyframes blink {{ 0%,50% {{ opacity: 1; }} 51%,100% {{ opacity: 0; }} }}
-            .footer {{
-                margin-top: 20px;
-                padding-top: 12px;
-                border-top: 1px solid #334155;
-                text-align: center;
-                color: #10b981;
-                font-size: 11px;
-                font-weight: 700;
-                letter-spacing: 1px;
-                opacity: 0;
-                transition: opacity 0.5s ease;
-            }}
-            .footer.show {{ opacity: 1; }}
-            ::-webkit-scrollbar {{ width: 6px; }}
-            ::-webkit-scrollbar-thumb {{ background: #334155; border-radius: 3px; }}
+            .lesson-content { color: #e2e8f0; font-size: 14.5px; line-height: 1.8; white-space: pre-wrap; word-wrap: break-word; }
+            .cursor { color: #10b981; font-weight: bold; animation: blink 1s infinite; }
+            @keyframes blink { 0%,50% { opacity: 1; } 51%,100% { opacity: 0; } }
+            .footer {
+                margin-top: 20px; padding-top: 12px; border-top: 1px solid #334155;
+                text-align: center; color: #10b981; font-size: 11px; font-weight: 700;
+                letter-spacing: 1px; opacity: 0; transition: opacity 0.5s ease;
+            }
+            .footer.show { opacity: 1; }
+            ::-webkit-scrollbar { width: 6px; }
+            ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
         </style>
         </head>
         <body>
@@ -8697,7 +8661,6 @@ Now write ENTIRELY in {language}:"""
                 <div class="title">AI Teacher Response</div>
             </div>
 
-            <!-- Clyxess is responding status -->
             <div class="responding-status" id="respondingBox">
                 <div class="pulse-dot"></div>
                 <div class="status-text">Clyxess is responding<span class="shimmer">...</span></div>
@@ -8707,7 +8670,7 @@ Now write ENTIRELY in {language}:"""
             <div class="footer" id="footer">🛡️ Clyxess AI | Secure • Fast • Private</div>
         </div>
         <script>
-            const fullText = `{lesson_text}`;
+            const fullText = `__LESSON_TEXT__`;
             let i = 0;
             const target = document.getElementById('typed');
             const cursor = document.getElementById('cursor');
@@ -8715,28 +8678,30 @@ Now write ENTIRELY in {language}:"""
             const footer = document.getElementById('footer');
             const respondingBox = document.getElementById('respondingBox');
 
-            function type() {{
-                if (i < fullText.length) {{
+            function type() {
+                if (i < fullText.length) {
                     target.innerHTML = fullText.substring(0, i + 1);
                     container.scrollTop = container.scrollHeight;
                     i++;
                     const delay = fullText[i-1] === '\\n' ? 5 : 12;
                     setTimeout(type, delay);
-                }} else {{
+                } else {
                     cursor.style.display = 'none';
                     respondingBox.style.transition = 'opacity 0.4s, transform 0.4s';
                     respondingBox.style.opacity = '0';
                     respondingBox.style.transform = 'translateY(-6px)';
-                    setTimeout(() => {{ respondingBox.style.display = 'none'; }}, 400);
+                    setTimeout(() => { respondingBox.style.display = 'none'; }, 400);
                     footer.classList.add('show');
                     container.scrollTop = container.scrollHeight;
-                }}
-            }}
+                }
+            }
             setTimeout(type, 400);
         </script>
         </body>
         </html>
         """
+        
+        typewriter_html = typewriter_html.replace("__LESSON_TEXT__", lesson_text)
 
         components.html(typewriter_html, height=700, scrolling=False)
 
@@ -8753,7 +8718,7 @@ Now write ENTIRELY in {language}:"""
                 file_name=f"{st.session_state.em_topic.replace(' ', '_')}_lesson.txt",
                 mime="text/plain",
                 use_container_width=True
-            )       
+            )      
  
 def render_math_lab(client):
     """
