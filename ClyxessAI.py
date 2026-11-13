@@ -2490,16 +2490,36 @@ def render_login_signup():
     RAZORPAY_MONTHLY_LINK = "https://rzp.io/rzp/nNI2b7Qd" 
     RAZORPAY_YEARLY_LINK = "https://rzp.io/rzp/0mWgHct"   
 
-    # 🎨 PREMIUM CSS (Compact & Professional)
+    # 🎨 PREMIUM CSS (Plain Dark Background & Gradient Text)
     st.markdown("""
     <style>
         @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css');
-        .stApp { background: radial-gradient(circle at top right, #1e1b4b 0%, #050814 50%) !important; }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap');
+        
+        /* 👇 PLAIN DARK BACKGROUND (No Cosmos, No Web) 👇 */
+        .stApp { background-color: #0B0E14 !important; font-family: 'Inter', sans-serif; }
         header {visibility: hidden;} footer {visibility: hidden;}
         [data-testid="stSidebar"] { display: none !important; }
         
         .block-container { max-width: 1100px !important; padding-top: 2rem !important; }
         
+        /* 👇 PREMIUM MULTI-COLOR GRADIENT TEXT 👇 */
+        .brand-text-container { text-align: center; margin-bottom: 30px; }
+        .brand-title-1 { 
+            font-size: 38px; font-weight: 900; color: #ffffff; 
+            margin-bottom: 0; letter-spacing: -1px; line-height: 1.2;
+        }
+        .brand-title-2 { 
+            font-size: 46px; font-weight: 900; margin-top: 0; letter-spacing: -1px;
+            background: linear-gradient(90deg, #00FFAA 0%, #00BFFF 30%, #8B5CF6 70%, #FF007F 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+            animation: shine 3s infinite linear alternate;
+        }
+        @keyframes shine {
+            0% { filter: brightness(1); }
+            100% { filter: brightness(1.3); }
+        }
+
         .stTextInput input {
             background-color: #0b0e17 !important; color: white !important;
             border: 1px solid #1c2538 !important; border-radius: 10px !important; padding: 12px !important;
@@ -2526,14 +2546,14 @@ def render_login_signup():
         .facebook-btn:hover { background-color: #166fe5; color: #fff; }
 
         /* ==========================================
-           👇 FIX 1: PERFECT CARD & TEXT SIZE 👇
+           👇 PRICING CARDS 👇
            ========================================== */
         .pricing-card { 
             background: #111827; border-radius: 15px; 
-            padding: 20px 15px; /* Padding kam ki taaki text ko jagah mile */
+            padding: 20px 15px; 
             border: 1px solid #1f2937; 
             text-align: left; position: relative; 
-            height: 520px; /* Fixed height sabke liye barabar */
+            height: 520px; 
             display: flex; flex-direction: column; 
             transition: all 0.3s ease-in-out; cursor: pointer; 
         }
@@ -2549,12 +2569,11 @@ def render_login_signup():
         .badge-popular { position: absolute; top: -12px; right: 15px; background: #8b5cf6; color: white; padding: 3px 10px; border-radius: 15px; font-size: 10px; font-weight: 700; }
         .badge-save { position: absolute; top: -12px; right: 15px; background: #f59e0b; color: white; padding: 3px 10px; border-radius: 15px; font-size: 10px; font-weight: 700; }
         
-        /* 👇 TEXT KO CHHOTA KAR DIYA HAI 👇 */
         .feature-list { 
             list-style: none; padding: 0; margin: 10px 0; 
-            color: #d1d5db; font-size: 11.5px; /* Font chhota kiya */
-            line-height: 1.3; /* Lines ke beech space kam kiya */
-            flex-grow: 1; /* Text ko bachi hui jagah lene do */
+            color: #d1d5db; font-size: 11.5px; 
+            line-height: 1.3; 
+            flex-grow: 1; 
         }
         .feature-list li { margin-bottom: 5px; display: flex; align-items: flex-start; gap: 6px; }
         .feature-list li::before { content: "✔"; color: #10b981; font-weight: bold; font-size: 11px; margin-top: 2px; flex-shrink: 0; }
@@ -2581,51 +2600,24 @@ def render_login_signup():
             transform: scale(1.02); box-shadow: 0 6px 20px rgba(139, 92, 246, 0.6) !important;
         }
 
-        /* ==========================================
-           👇 FIX 2: TARGETING BUTTONS BY URL FOR HOVER COLORS 👇
-           ========================================== */
-        /* Monthly Button - Purple Base */
+        /* Razorpay Buttons */
         a[href*="nNI2b7Qd"] {
-            background-color: #8b5cf6 !important;
-            color: white !important; border: none !important;
+            background-color: #8b5cf6 !important; color: white !important; border: none !important;
             width: 100% !important; display: flex !important; justify-content: center !important;
             font-weight: 600 !important; border-radius: 10px !important;
             padding: 8px !important; margin-top: 10px !important; transition: 0.3s !important;
             font-size: 14px !important;
         }
-        a[href*="nNI2b7Qd"]:hover {
-            background-color: #a855f7 !important;
-            box-shadow: 0 0 15px rgba(168, 85, 247, 0.8) !important;
-        }
+        a[href*="nNI2b7Qd"]:hover { background-color: #a855f7 !important; box-shadow: 0 0 15px rgba(168, 85, 247, 0.8) !important; }
 
-        /* Yearly Button - Gold Base */
         a[href*="0mWgHct"] {
-            background-color: #f59e0b !important;
-            color: white !important; border: none !important;
+            background-color: #f59e0b !important; color: white !important; border: none !important;
             width: 100% !important; display: flex !important; justify-content: center !important;
             font-weight: 600 !important; border-radius: 10px !important;
             padding: 8px !important; margin-top: 10px !important; transition: 0.3s !important;
             font-size: 14px !important;
         }
-        a[href*="0mWgHct"]:hover {
-            background-color: #fbbf24 !important;
-            box-shadow: 0 0 15px rgba(251, 191, 36, 0.8) !important;
-        }
-
-        /* ==========================================
-           👇 FIX 3: SEAMLESS COSMOS IMAGE 👇
-           ========================================== */
-        .cosmos-container {
-            width: 100%; display: flex; justify-content: center;
-            margin-top: 20px; margin-bottom: 20px;
-        }
-        .cosmos-image {
-            width: 100%; max-width: 1000px;
-            mix-blend-mode: screen; 
-            opacity: 0.7;
-            mask-image: linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%);
-            -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%);
-        }
+        a[href*="0mWgHct"]:hover { background-color: #fbbf24 !important; box-shadow: 0 0 15px rgba(251, 191, 36, 0.8) !important; }
     </style>
     """, unsafe_allow_html=True)
 
@@ -2693,10 +2685,12 @@ def render_login_signup():
         _, center_col, _ = st.columns([1, 1.2, 1])
         
         with center_col:
+            # 👇 NAYA GRADIENT BRAND HEADER 👇
             st.markdown("""
-            <div style="text-align: center; margin-bottom: 30px;">
-                <h1 style="color: white; font-size: 34px; font-weight: 800; margin-bottom: 5px;">Clyxess <span style="color: #3b82f6;">AI</span></h1>
-                <p style="color: #9ca3af; font-size: 14px;">Learn future with Clyxess AI school</p>
+            <div class="brand-text-container">
+                <div class="brand-title-1">Start Learn Future</div>
+                <div class="brand-title-2">with CLYXESS AI</div>
+                <p style="color: #9ca3af; font-size: 14px; margin-top: 10px;">The ultimate AI school for your child</p>
             </div>
             """, unsafe_allow_html=True)
             
@@ -2869,8 +2863,9 @@ def render_login_signup():
             
         st.markdown("""
         <div style="text-align: center; margin-top: 1rem; margin-bottom: 2rem;">
-            <h1 style="color: white; font-size: 34px; font-weight: 800;">Choose Your Plan</h1>
-            <p style="color: #9ca3af; font-size: 15px;">Learn future with Clyxess AI Unlock all features for your child better education learning.</p>
+            <div class="brand-title-1" style="font-size: 32px;">Choose Your</div>
+            <div class="brand-title-2" style="font-size: 38px;">Premium Plan</div>
+            <p style="color: #9ca3af; font-size: 15px; margin-top: 10px;">Unlock all features for your child's better education.</p>
         </div>
         """, unsafe_allow_html=True)
 
@@ -2950,13 +2945,6 @@ def render_login_signup():
             """, unsafe_allow_html=True)
           
             st.link_button("Buy Yearly ₹16788", RAZORPAY_YEARLY_LINK, use_container_width=True)
-
-        # 👇 SEAMLESS COSMOS IMAGE 👇
-        st.markdown("""
-        <div class="cosmos-container">
-            <img src="https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?q=80&w=1000&auto=format&fit=crop" class="cosmos-image" alt="Cosmos Math Background">
-        </div>
-        """, unsafe_allow_html=True)
 
         st.stop() 
 
