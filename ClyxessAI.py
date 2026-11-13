@@ -2473,6 +2473,7 @@ def load_latest_chat_cloud():
     except Exception:
         pass
 
+
 def render_login_signup():
     # 🛠️ Imports
     import streamlit as st
@@ -2496,15 +2497,15 @@ def render_login_signup():
         @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css');
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap');
         
-        /* 👇 PLAIN DARK BACKGROUND (No Cosmos, No Web) 👇 */
+        /* PLAIN DARK BACKGROUND */
         .stApp { background-color: #0B0E14 !important; font-family: 'Inter', sans-serif; }
         header {visibility: hidden;} footer {visibility: hidden;}
         [data-testid="stSidebar"] { display: none !important; }
         
         .block-container { max-width: 1100px !important; padding-top: 2rem !important; }
         
-        /* 👇 PREMIUM MULTI-COLOR GRADIENT TEXT 👇 */
-        .brand-text-container { text-align: center; margin-bottom: 30px; }
+        /* PREMIUM MULTI-COLOR GRADIENT TEXT */
+        .brand-text-container { text-align: center; margin-bottom: 30px; margin-top: 30px; }
         .brand-title-1 { 
             font-size: 38px; font-weight: 900; color: #ffffff; 
             margin-bottom: 0; letter-spacing: -1px; line-height: 1.2;
@@ -2545,9 +2546,7 @@ def render_login_signup():
         .facebook-btn { background-color: #1877F2; color: #ffffff; border: none; }
         .facebook-btn:hover { background-color: #166fe5; color: #fff; }
 
-        /* ==========================================
-           👇 PRICING CARDS 👇
-           ========================================== */
+        /* PRICING CARDS */
         .pricing-card { 
             background: #111827; border-radius: 15px; 
             padding: 20px 15px; 
@@ -2600,7 +2599,6 @@ def render_login_signup():
             transform: scale(1.02); box-shadow: 0 6px 20px rgba(139, 92, 246, 0.6) !important;
         }
 
-        /* Razorpay Buttons */
         a[href*="nNI2b7Qd"] {
             background-color: #8b5cf6 !important; color: white !important; border: none !important;
             width: 100% !important; display: flex !important; justify-content: center !important;
@@ -2685,7 +2683,6 @@ def render_login_signup():
         _, center_col, _ = st.columns([1, 1.2, 1])
         
         with center_col:
-            # 👇 NAYA GRADIENT BRAND HEADER 👇
             st.markdown("""
             <div class="brand-text-container">
                 <div class="brand-title-1">Start Learn Future</div>
@@ -2946,6 +2943,14 @@ def render_login_signup():
           
             st.link_button("Buy Yearly ₹16788", RAZORPAY_YEARLY_LINK, use_container_width=True)
 
+        # 👇 YAHAN LAGAYA HAI BRAND NAME (Cosmos image ki jagah) 👇
+        st.markdown("""
+        <div class="brand-text-container" style="margin-top: 50px;">
+            <div class="brand-title-1" style="font-size: 24px;">Start Learn Future</div>
+            <div class="brand-title-2" style="font-size: 32px;">with CLYXESS AI</div>
+        </div>
+        """, unsafe_allow_html=True)
+
         st.stop() 
 
     # ==========================================
@@ -2961,7 +2966,6 @@ def render_login_signup():
     if st.sidebar.button("🚪 Log Out", use_container_width=True, key="btn_logout"):
         st.session_state.clear()
         st.rerun()
-
     
 
 def render_image_generator():
