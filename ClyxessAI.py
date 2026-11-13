@@ -2943,13 +2943,7 @@ def render_login_signup():
           
             st.link_button("Buy Yearly ₹16788", RAZORPAY_YEARLY_LINK, use_container_width=True)
 
-        # 👇 YAHAN LAGAYA HAI BRAND NAME (Cosmos image ki jagah) 👇
-        st.markdown("""
-        <div class="brand-text-container" style="margin-top: 50px;">
-            <div class="brand-title-1" style="font-size: 24px;">Start Learn Future</div>
-            <div class="brand-title-2" style="font-size: 32px;">with CLYXESS AI</div>
-        </div>
-        """, unsafe_allow_html=True)
+        # 👇 YAHAN KUCH BHI NAHI HAI (Image aur Brand dono hata diye hain) 👇
 
         st.stop() 
 
@@ -2963,7 +2957,7 @@ def render_login_signup():
         st.rerun()
     st.sidebar.markdown("---")
 
-    if st.sidebar.button("🚪 Log Out", use_container_width=True, key="btn_logout"):
+    if st.sidebar.button("🚪 Log Out", use_container_width=True, key="btn_log_out"):
         st.session_state.clear()
         st.rerun()
     
