@@ -2974,8 +2974,6 @@ def render_login_signup():
         st.session_state.clear()
         st.rerun()
 
-    st.sidebar.markdown("### 📚 Select Mode")
-    mode = st.sidebar.radio("", ["Normal Chat", "Cyber Security", "Homework"])
     
 
 def render_image_generator():
