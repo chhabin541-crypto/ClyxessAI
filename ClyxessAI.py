@@ -2526,15 +2526,12 @@ def render_login_signup():
         .facebook-btn { background-color: #1877F2; color: #ffffff; border: none; }
         .facebook-btn:hover { background-color: #166fe5; color: #fff; }
 
-        /* ==========================================
-           👇 FIX 1: PERFECT CARD & TEXT SIZE 👇
-           ========================================== */
         .pricing-card { 
             background: #111827; border-radius: 15px; 
-            padding: 20px 15px; 
+            padding: 20px 15px;
             border: 1px solid #1f2937; 
             text-align: left; position: relative; 
-            height: 520px; 
+            height: 520px;
             display: flex; flex-direction: column; 
             transition: all 0.3s ease-in-out; cursor: pointer; 
         }
@@ -2552,9 +2549,9 @@ def render_login_signup():
         
         .feature-list { 
             list-style: none; padding: 0; margin: 10px 0; 
-            color: #d1d5db; font-size: 11.5px; 
-            line-height: 1.3; 
-            flex-grow: 1; 
+            color: #d1d5db; font-size: 11.5px;
+            line-height: 1.3;
+            flex-grow: 1;
         }
         .feature-list li { margin-bottom: 5px; display: flex; align-items: flex-start; gap: 6px; }
         .feature-list li::before { content: "✔"; color: #10b981; font-weight: bold; font-size: 11px; margin-top: 2px; flex-shrink: 0; }
@@ -2581,10 +2578,6 @@ def render_login_signup():
             transform: scale(1.02); box-shadow: 0 6px 20px rgba(139, 92, 246, 0.6) !important;
         }
 
-        /* ==========================================
-           👇 FIX 2: TARGETING BUTTONS BY URL FOR HOVER COLORS 👇
-           ========================================== */
-        /* Monthly Button - Purple Base */
         a[href*="nNI2b7Qd"] {
             background-color: #8b5cf6 !important;
             color: white !important; border: none !important;
@@ -2598,7 +2591,6 @@ def render_login_signup():
             box-shadow: 0 0 15px rgba(168, 85, 247, 0.8) !important;
         }
 
-        /* Yearly Button - Gold Base */
         a[href*="0mWgHct"] {
             background-color: #f59e0b !important;
             color: white !important; border: none !important;
@@ -2936,8 +2928,6 @@ def render_login_signup():
           
             st.link_button("Buy Yearly ₹16788", RAZORPAY_YEARLY_LINK, use_container_width=True)
 
-        # (Image code yahan se pooori tarah DELETE kar diya gaya hai)
-
         st.stop() 
 
     # ==========================================
@@ -2953,9 +2943,6 @@ def render_login_signup():
     if st.sidebar.button("🚪 Log Out", use_container_width=True, key="btn_logout"):
         st.session_state.clear()
         st.rerun()
-
-    st.sidebar.markdown("### 📚 Select Mode")
-    mode = st.sidebar.radio("", ["Normal Chat", "Cyber Security", "Homework"])
     
 
 def render_image_generator():
