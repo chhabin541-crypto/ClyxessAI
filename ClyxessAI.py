@@ -12263,7 +12263,7 @@ def render_parent_dashboard():
             if not logs:
                 return "Abhi tak koi study record nahi hai. Bacche ke padhne par yahan report aayegi."
                 
-            total_mins = sum(item['duration_minutes'] for item in logs)
+            total_mins = sum(item.get('duration_minutes', 0) for item in logs)
             hours = total_mins // 60
             mins = total_mins % 60
             
@@ -12273,7 +12273,7 @@ def render_parent_dashboard():
             subjects = {}
             for log in logs:
                 subj = log.get('subject', 'General')
-                subjects[subj] = subjects.get(subj, 0) + log['duration_minutes']
+                subjects[subj] = subjects.get(subj, 0) + log.get('duration_minutes', 0)
                 
             for subj, time_spent in subjects.items():
                 report_text += f"- {subj}: {time_spent} mins\n"
@@ -12354,13 +12354,12 @@ def render_parent_dashboard():
     ])
 
     # ------------------------------------------
-    # TAB 1: FILTERS (Exact Match with Sidebar)
+    # TAB 1: FILTERS (Yeh bilkul waisa hi hai)
     # ------------------------------------------
     with tab1:
         st.subheader("Allowed AI Learning Modes")
         st.write("Uncheck any mode you want to lock from your child's menu.")
         
-        # 👇 YAHAN MAINE EXACT EMOJIS KE SATH NAAM MATCH KAR DIYE HAIN 👇
         ALL_MODES = [
             "Normal Chat",
             "Creative Lab (School Mode)", 
@@ -12380,7 +12379,6 @@ def render_parent_dashboard():
             "🔢 Math Lab",  
             "💸 Learn Finance", 
             "📱 Data Science and Machine Learning"
-            # Parent Dashboard aur Login ko yahan nahi dala kyunki unhe lock nahi karna chahiye
         ]
         
         current_allowed = settings.get('allowed_modes', {})
@@ -12399,13 +12397,11 @@ def render_parent_dashboard():
                 with col2:
                     new_settings[mode] = st.toggle(mode, value=is_allowed, key=f"toggle_{i}")
                     
-        # Dashboard aur Login ko hamesha True rakhna hai database mein
         new_settings["👨‍👩‍👦 Parent Dashboard"] = True
         new_settings["🔐 Login / Sign Up"] = True
 
         if st.button("💾 Save Mode Settings", type="primary", use_container_width=True):
             try:
-                # UPSERT use kiya hai taaki naya user ho ya purana, data pakka save ho
                 supabase.table("parent_settings").upsert({
                     "user_email": user_email,
                     "allowed_modes": new_settings
@@ -12416,14 +12412,14 @@ def render_parent_dashboard():
                 st.error(f"Error saving settings: {e}")
 
     # ------------------------------------------
-    # TAB 2: SCREEN TIME
+    # TAB 2: SCREEN TIME (FIXED)
     # ------------------------------------------
     with tab2:
         st.subheader("Today's Student Screen Time")
         today = datetime.datetime.now(datetime.timezone.utc).date().isoformat()
         try:
             logs_res = supabase.table("study_logs").select("duration_minutes").eq("user_email", user_email).gte("created_at", today).execute()
-            total_mins_today = sum(item['duration_minutes'] for item in logs_res.data) if logs_res.data else 0
+            total_mins_today = sum(item.get('duration_minutes', 0) for item in logs_res.data) if logs_res.data else 0
         except:
             total_mins_today = 0
             
@@ -12433,41 +12429,54 @@ def render_parent_dashboard():
         
         st.write("**Set Daily Screen Time Limit:**")
         limit_options = [15, 30, 45, 60, 90, 120]
-        selected_limit = st.radio("Select Limit (minutes)", limit_options, horizontal=True, key="time_radio")
+        
+        # Default to saved limit if exists
+        saved_limit = settings.get('time_limit_mins', 60)
+        default_idx = limit_options.index(saved_limit) if saved_limit in limit_options else 3
+        
+        selected_limit = st.radio("Select Limit (minutes)", limit_options, index=default_idx, horizontal=True, key="time_radio")
         
         if st.button("Update Time Limit"):
             try:
-                supabase.table("parent_settings").update({"time_limit_mins": selected_limit}).eq("user_email", user_email).execute()
+                # UPSERT use kiya taaki naya row ban jaye agar pehle se nahi hai
+                supabase.table("parent_settings").upsert({"user_email": user_email, "time_limit_mins": selected_limit}).execute()
                 st.success("✅ Time limit updated in database!")
+                st.rerun()
             except Exception as e:
                 st.error(f"Error: {e}")
 
     # ------------------------------------------
-    # TAB 3: AUDIT LOGS
+    # TAB 3: AUDIT LOGS (FIXED)
     # ------------------------------------------
     with tab3:
         st.subheader("Search Student Chat Prompts")
         try:
             audit_res = supabase.table("audit_logs").select("*").eq("user_email", user_email).order("created_at", desc=True).limit(20).execute()
             logs = audit_res.data
-        except:
+        except Exception as e:
             logs = []
+            st.error(f"Database Error: {e}")
             
         if not logs:
             st.info("Abhi tak koi chat history record nahi hui hai.")
         else:
             for log in logs:
-                status_color = "#10b981" if log.get('status') == 'Safe' else "#ef4444"
-                status_text = "✅ Safe" if log.get('status') == 'Safe' else "🚫 Blocked"
+                status = log.get('status', 'Safe')
+                status_color = "#10b981" if status == 'Safe' else "#ef4444"
+                status_text = "✅ Safe - Educational" if status == 'Safe' else "🚫 Blocked by Safety Filter"
+                
                 st.markdown(f"""
                 <div style="background-color: #1e1e1e; padding: 15px; border-radius: 10px; margin-bottom: 10px; border-left: 5px solid {status_color};">
-                    <p style="margin: 0; color: #fff; font-size: 16px;"><b>{log.get('prompt', '')[:50]}...</b></p>
-                    <span style="background-color: {status_color}22; color: {status_color}; padding: 3px 8px; border-radius: 5px; font-size: 12px;">{status_text}</span>
+                    <p style="margin: 0; color: #fff; font-size: 16px;"><b>{log.get('prompt', '')[:70]}...</b></p>
+                    <div style="display: flex; justify-content: space-between; margin-top: 8px;">
+                        <span style="background-color: {status_color}22; color: {status_color}; padding: 3px 8px; border-radius: 5px; font-size: 12px;">{status_text}</span>
+                        <span style="color: #888; font-size: 12px;">{log.get('created_at', '')[:16]}</span>
+                    </div>
                 </div>
                 """, unsafe_allow_html=True)
 
     # ------------------------------------------
-    # TAB 4: PROGRESS REPORT
+    # TAB 4: PROGRESS REPORT (FIXED)
     # ------------------------------------------
     with tab4:
         st.subheader("📄 Learning Progress Report")
@@ -12499,7 +12508,7 @@ def render_parent_dashboard():
             )
 
     # ------------------------------------------
-    # TAB 5: SECURITY
+    # TAB 5: SECURITY (FIXED PIN & EMAIL SAVE)
     # ------------------------------------------
     with tab5:
         st.subheader("🔑 Change 4-Digit Parent PIN")
@@ -12517,7 +12526,8 @@ def render_parent_dashboard():
                     if current_pin != saved_pin:
                         st.error("❌ Current PIN is incorrect.")
                     else:
-                        supabase.table("parent_settings").update({"parent_pin": new_pin}).eq("user_email", user_email).execute()
+                        # UPSERT logic so it saves even if row is new
+                        supabase.table("parent_settings").upsert({"user_email": user_email, "parent_pin": new_pin}).execute()
                         st.success("✅ PIN updated successfully in database!")
                 except Exception as e:
                     st.error(f"Error updating PIN: {e}")
@@ -12528,8 +12538,10 @@ def render_parent_dashboard():
         
         if st.button("Save Email Preferences"):
             try:
-                supabase.table("parent_settings").update({"alert_email": alert_email}).eq("user_email", user_email).execute()
+                # UPSERT logic so it saves even if row is new
+                supabase.table("parent_settings").upsert({"user_email": user_email, "alert_email": alert_email}).execute()
                 st.success("✅ Email preferences saved in database!")
+                st.rerun()
             except Exception as e:
                 st.error(f"Error saving email: {e}")
 
@@ -12660,7 +12672,7 @@ if mode != st.session_state.prev_mode:
     st.session_state.mode_start_time = time.time()
 
 # ---- routes: one unique screen per feature ----
-if mode == "🔐 Login / Sign Up":
+if mode == "🔐 Login / Sign Up": 
     render_login_signup(); st.stop() 
 if mode == "📱 Data Science and Machine Learning":
     render_datascienceand_machinelearning(); st.stop() 
