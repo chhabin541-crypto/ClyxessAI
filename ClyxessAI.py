@@ -2978,72 +2978,6 @@ def render_login_signup():
     mode = st.sidebar.radio("", ["Normal Chat", "Cyber Security", "Homework"])
     
 
-def render_image_generator():
-    import streamlit as st
-    import urllib.parse
-
-    st.title("🎨 AI Engineering Diagram Lab")
-    st.write("Machine ka naam likho. Left side mein **Line Art Diagram** aur Right side mein **Text Explanation** milega.")
-
-    # 🌐 Languages Dropdown
-    languages = ["English", "Hindi (हिंदी)", "Hinglish", "Bengali", "Tamil", "Telugu", "Marathi", "Gujarati", "Spanish", "French"]
-    selected_lang = st.selectbox("🌐 Select Explanation Language", languages)
-
-    # Input Text Area
-    prompt = st.text_area("What machine or concept should I explain?", 
-                          placeholder="Example: Car Chassis / Truck Engine / Rocket")
-    
-    if st.button("🔍 Generate Diagram & Explain", type="primary", use_container_width=True) and prompt.strip():
-        
-        # Hum layout ko 2 columns mein divide kar rahe hain
-        col_img, col_text = st.columns([1.2, 1])
-
-        # ==========================================
-        # LEFT SIDE: LINE ART DIAGRAM
-        # ==========================================
-        with col_img:
-            with st.spinner("🎨 AI line art diagram bana raha hai..."):
-                
-                # ⭐ STRICT PROMPT: AI ko sirf lines banane ko bolo, text bilkul na banaye
-                strict_prompt = f"Black and white line art, technical schematic drawing of {prompt}, engineering blueprint style, clean thin lines, white background, no shading, no 3D, NO TEXT LABELS, minimalist."
-                
-                encoded_prompt = urllib.parse.quote(strict_prompt)
-                backup_url = f"https://image.pollinations.ai/prompt/{encoded_prompt}?width=800&height=600&nologo=true&model=flux"
-                
-                try:
-                    st.image(backup_url, caption=f"Line Art: {prompt}", use_container_width=True)
-                    st.link_button("⬇️ Download Line Art", backup_url, use_container_width=True)
-                except Exception as e:
-                    st.error(f"Image Error: {e}")
-
-        # ==========================================
-        # RIGHT SIDE: PARTS TEXT EXPLANATION
-        # ==========================================
-        with col_text:
-            with st.spinner("🤖 AI parts list bana raha hai..."):
-                
-                # ⭐ PROMPT: AI ko bolo ki woh ek list banaye (Tyre, Engine, etc.)
-                explain_prompt = f"""
-                You are an engineering teacher. 
-                List the main parts of a '{prompt}' and explain what each part does in 1 line.
-                Format exactly like this:
-                - **Part Name**: Explanation.
-
-                Language: {selected_lang}.
-                List 5 to 8 parts. Keep it simple for students.
-                """
-                
-                try:
-                    res = client.chat.completions.create(
-                        model="openai/gpt-oss-120b", # Aapka Groq text model
-                        messages=[{"role": "user", "content": explain_prompt}],
-                        temperature=0.5, max_tokens=600
-                    )
-                    st.success(f"### 📖 Parts of {prompt}")
-                    st.markdown(res.choices[0].message.content)
-                    
-                except Exception as e:
-                    st.error(f"Explanation Error: {e}") 
         
 def render_coding_lab_mod():
     import streamlit.components.v1 as components
@@ -12557,7 +12491,6 @@ ALL_MODES = [
     "Creative Lab (School Mode)", 
     "🈳 Learn Language",
     "🎮 Play & Learn",
-    "🎨 Creative AI Image Generator",
     "📷 Vision Lab", 
     "✈️ Aero Lab", 
     "💡 Logic Lab",
@@ -12655,9 +12588,7 @@ if mode == "🧠 Learn AI":
 if mode == "👨‍💻 Coding Lab":
     render_coding_lab_mod(); st.stop() 
 if mode == "👨‍👩‍👦 Parent Dashboard":
-    render_parent_dashboard(); st.stop()
-if mode == "🎨 Creative AI Image Generator":
-    render_image_generator(); st.stop() 
+    render_parent_dashboard(); st.stop() 
 if mode == "🎨 Art Machine Design":
     render_art_machinedesign(); st.stop() 
 if mode == "🈳 Learn Language":
