@@ -3733,7 +3733,7 @@ applyAge('5 Years');
     html_code = html_code.replace("__BASE_URL__", base_url)
     components.html(html_code, height=950, scrolling=False)   
     
-def render_vision_lab():
+def render_doubt_clear():
     import streamlit as st
     import datetime
     import html
