@@ -12943,6 +12943,19 @@ def render_school_chat():
     if not prompt:
         return
 
+    # 👇 NAYA CODE: Database mein chat save karna (Parent Dashboard ke liye) 👇
+    user_email = st.session_state.get("user_email", "")
+    if user_email:
+        try:
+            supabase.table("audit_logs").insert({
+                "user_email": user_email,
+                "prompt": prompt,
+                "status": "Safe - Educational"
+            }).execute()
+        except Exception:
+            pass # Agar database mein save na ho toh chat na ruke, isliye silent ignore
+    # 👆 NAYA CODE KHATAM 👆
+
     messages = st.session_state.school_messages
     messages.append({"role": "user", "content": prompt})
     with st.chat_message("user"):
