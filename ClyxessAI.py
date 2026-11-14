@@ -1574,7 +1574,7 @@ Return ONLY valid JSON with this format:
 def render_play_and_learn(client=None):
     """
     Clyxess AI — Duolingo Style Adaptive Play & Learn
-    FIXED: 100% Strict Language, Dummy Stats Removed, Real TTS Voice.
+    FIXED: 100% Strict Language, Logical Pattern Game, No Duplicate Questions.
     """
 
     import streamlit as st
@@ -1678,8 +1678,59 @@ def render_play_and_learn(client=None):
             "need_score": "🎯 Se necesitan 8/10 para desbloquear.", "easy": "Fácil", "medium": "Medio", "hard": "Difícil", "expert": "Experto", "master": "Maestro",
             "g_select": "🖼️ Seleccionar Imagen", "g_which": "🔎 ¿Cuál es?", "g_match": "🔗 Emparejar", "g_build": "🧩 Construir Oración", "g_tap": "👂 Toca lo que oyes", "g_math": "🔢 Desafío Matemático", "g_mem": "🧠 Memoria", "g_pat": "🔷 Patrón", "g_odd": "🎯 Encuentra el diferente", "g_log": "🧩 Lógica", "g_fin": "💰 Finanzas", "g_tech": "🤖 Tecnología"
         },
+        "fr": {
+            "title": "🎮 Jouer & Apprendre", "subtitle": "Apprendre en jouant",
+            "start": "🚀 Commencer", "continue": "CONTINUER", "check": "VÉRIFIER", "clear": "🗑️ Effacer", "correct": "Correct !", "wrong": "Presque !",
+            "score": "Score", "level": "Niveau", "xp": "XP", "hearts": "Vies", "streak": "Série", "question": "Question",
+            "choose": "Choisissez la bonne réponse", "choose_image": "Quel mot correspond à cette image ?", "choose_word": "Quelle image correspond à ce mot ?",
+            "build": "Construisez la phrase correcte", "match": "Associez les paires", "complete": "Niveau Terminé !", "passed": "Niveau Débloqué !",
+            "try_again": "Réessayer", "new_game": "Nouveau Jeu", "home": "Accueil", "next": "Niveau Suivant",
+            "listen": "Écouter", "play_sound": "Jouer le son", "auto_diff": "🎯 La difficulté augmente automatiquement.",
+            "choose_game": "🎮 Choisissez un jeu", "matched": "Associé", "no_hearts": "❤️ Plus de vies. La pratique rend parfait !",
+            "need_score": "🎯 8/10 requis pour débloquer.", "easy": "Facile", "medium": "Moyen", "hard": "Difficile", "expert": "Expert", "master": "Maître",
+            "g_select": "🖼️ Choisir Image", "g_which": "🔎 Lequel est-ce ?", "g_match": "🔗 Associer", "g_build": "🧩 Construire Phrase", "g_tap": "👂 Touchez ce que vous entendez", "g_math": "🔢 Défi Math", "g_mem": "🧠 Mémoire", "g_pat": "🔷 Motif", "g_odd": "🎯 Trouver l'intrus", "g_log": "🧩 Logique", "g_fin": "💰 Finances", "g_tech": "🤖 Technologie"
+        },
+        "de": {
+            "title": "🎮 Spielen & Lernen", "subtitle": "Lernen durch Spielen",
+            "start": "🚀 Starten", "continue": "WEITER", "check": "PRÜFEN", "clear": "🗑️ Löschen", "correct": "Richtig!", "wrong": "Fast!",
+            "score": "Punkte", "level": "Level", "xp": "XP", "hearts": "Herzen", "streak": "Serie", "question": "Frage",
+            "choose": "Wähle die richtige Antwort", "choose_image": "Welches Wort passt zu diesem Bild?", "choose_word": "Welches Bild passt zu diesem Wort?",
+            "build": "Bilde den richtigen Satz", "match": "Paare zuordnen", "complete": "Level Abgeschlossen!", "passed": "Level Freigeschaltet!",
+            "try_again": "Erneut versuchen", "new_game": "Neues Spiel", "home": "Startseite", "next": "Nächstes Level",
+            "listen": "Hören", "play_sound": "Ton abspielen", "auto_diff": "🎯 Die Schwierigkeit erhöht sich automatisch.",
+            "choose_game": "🎮 Wähle ein Spiel", "matched": "Zugeordnet", "no_hearts": "❤️ Keine Herzen mehr. Übung macht den Meister!",
+            "need_score": "🎯 8/10 benötigt zum Freischalten.", "easy": "Einfach", "medium": "Mittel", "hard": "Schwer", "expert": "Experte", "master": "Meister",
+            "g_select": "🖼️ Bild wählen", "g_which": "🔎 Welches ist das?", "g_match": "🔗 Paare zuordnen", "g_build": "🧩 Satz bilden", "g_tap": "👂 Tippe was du hörst", "g_math": "🔢 Mathe Herausforderung", "g_mem": "🧠 Gedächtnis", "g_pat": "🔷 Muster", "g_odd": "🎯 Finde das Andere", "g_log": "🧩 Logik", "g_fin": "💰 Finanzen", "g_tech": "🤖 Technologie"
+        },
+        "ru": {
+            "title": "🎮 Играй и Учись", "subtitle": "Учись играя",
+            "start": "🚀 Начать", "continue": "ДАЛЕЕ", "check": "ПРОВЕРИТЬ", "clear": "🗑️ Очистить", "correct": "Верно!", "wrong": "Почти!",
+            "score": "Счет", "level": "Уровень", "xp": "Опыт", "hearts": "Жизни", "streak": "Серия", "question": "Вопрос",
+            "choose": "Выберите правильный ответ", "choose_image": "Какое слово соответствует картинке?", "choose_word": "Какая картинка соответствует слову?",
+            "build": "Составьте правильное предложение", "match": "Сопоставьте пары", "complete": "Уровень Пройден!", "passed": "Уровень Открыт!",
+            "try_again": "Попробовать снова", "new_game": "Новая игра", "home": "Главная", "next": "Следующий уровень",
+            "listen": "Слушать", "play_sound": "Воспроизвести", "auto_diff": "🎯 Сложность увеличивается автоматически.",
+            "choose_game": "🎮 Выберите игру", "matched": "Сопоставлено", "no_hearts": "❤️ Жизни закончились. Практика — путь к успеху!",
+            "need_score": "🎯 Нужно 8/10 для открытия.", "easy": "Легко", "medium": "Средне", "hard": "Сложно", "expert": "Эксперт", "master": "Мастер",
+            "g_select": "🖼️ Выбрать картинку", "g_which": "🔎 Что это?", "g_match": "🔗 Сопоставить", "g_build": "🧩 Составить предложение", "g_tap": "👂 Нажми на услышанное", "g_math": "🔢 Математика", "g_mem": "🧠 Память", "g_pat": "🔷 Узор", "g_odd": "🎯 Найди лишнее", "g_log": "🧩 Логика", "g_fin": "💰 Финансы", "g_tech": "🤖 Технологии"
+        },
+        "mr": {
+            "title": "🎮 खेळा आणि शिका", "subtitle": "खेळता खेळता शिका", "start": "🚀 खेळ सुरू करा",
+            "continue": "पुढे जा", "check": "तपासा", "clear": "🗑️ साफ करा", "correct": "बरोबर!",
+            "wrong": "पुन्हा प्रयत्न करा!", "score": "स्कोअर", "level": "लेव्हल", "xp": "XP",
+            "hearts": "जीव", "streak": "स्ट्रीक", "question": "प्रश्न", "choose": "योग्य उत्तर निवडा",
+            "choose_image": "कोणता शब्द या चित्राशी जुळतो?", "choose_word": "कोणते चित्र या शब्दाशी जुळते?",
+            "build": "योग्य वाक्य तयार करा", "match": "जोड्या जुळवा", "complete": "लेव्हल पूर्ण!",
+            "passed": "नवीन लेव्हल अनलॉक!", "try_again": "पुन्हा प्रयत्न", "new_game": "नवीन गेम",
+            "home": "गेम होम", "next": "पुढील लेव्हल", "listen": "ऐका", "play_sound": "आवाज ऐका", 
+            "auto_diff": "🎯 तुम्ही चांगले खेळल्यास लेव्हल कठीण होईल.", "choose_game": "🎮 गेम निवडा", 
+            "matched": "जुळले", "no_hearts": "❤️ जीव संपले! काळजी करू नका, सराव करा.", "need_score": "🎯 पुढील लेव्हलसाठी 8/10 गरजेचे आहे.",
+            "easy": "सोपे", "medium": "मध्यम", "hard": "कठीण", "expert": "एक्सपर्ट", "master": "मास्टर",
+            "g_select": "🖼️ चित्र निवडा", "g_which": "🔎 हे काय आहे?", "g_match": "🔗 जोड्या जुळवा", "g_build": "🧩 वाक्य बनवा", "g_tap": "👂 ऐकून निवडा", "g_math": "🔢 गणित", "g_mem": "🧠 स्मरणशक्ती", "g_pat": "🔷 पॅटर्न", "g_odd": "🎯 वेगळे निवडा", "g_log": "🧩 लॉजिक", "g_fin": "💰 पैसे", "g_tech": "🤖 तंत्रज्ञान"
+        }
     }
     
+    # Fallback strictly to English if translation missing
     U = UI.get(LANG, UI["en"])
 
     # ============================================================
@@ -1701,17 +1752,25 @@ def render_play_and_learn(client=None):
     }
 
     # ============================================================
-    # WORDS (STRICT LANGUAGE)
+    # EXPANDED WORDS LIST
     # ============================================================
     WORDS = [
-        {"emoji": "🍎", "en": "Apple", "hi": "सेब", "zh": "苹果", "ja": "りんご", "es": "Manzana", "mr": "सफरचंद", "bn": "আপেল", "ta": "ஆப்பிள்"},
-        {"emoji": "🐶", "en": "Dog", "hi": "कुत्ता", "zh": "狗", "ja": "犬", "es": "Perro", "mr": "कुत्रा", "bn": "কুকুর", "ta": "நாய்"},
-        {"emoji": "🐱", "en": "Cat", "hi": "बिल्ली", "zh": "猫", "ja": "猫", "es": "Gato", "mr": "मांजर", "bn": "বিড়াল", "ta": "பூனை"},
-        {"emoji": "📚", "en": "Book", "hi": "किताब", "zh": "书", "ja": "本", "es": "Libro", "mr": "पुस्तक", "bn": "বই", "ta": "புத்தகம்"},
-        {"emoji": "🌞", "en": "Sun", "hi": "सूरज", "zh": "太阳", "ja": "太陽", "es": "Sol", "mr": "सूर्य", "bn": "সূর্য", "ta": "சூரியன்"},
-        {"emoji": "🌙", "en": "Moon", "hi": "चाँद", "zh": "月亮", "ja": "月", "es": "Luna", "mr": "चंद्र", "bn": "চাঁদ", "ta": "நிலா"},
-        {"emoji": "💧", "en": "Water", "hi": "पानी", "zh": "水", "ja": "水", "es": "Agua", "mr": "पाणी", "bn": "জল", "ta": "தண்ணீர்"},
-        {"emoji": "🌳", "en": "Tree", "hi": "पेड़", "zh": "树", "ja": "木", "es": "Árbol", "mr": "झाड", "bn": "গাছ", "ta": "மரம்"},
+        {"emoji": "🍎", "en": "Apple", "hi": "सेब", "zh": "苹果", "ja": "りんご", "es": "Manzana", "fr": "Pomme", "de": "Apfel", "ru": "Яблоко", "mr": "सफरचंद"},
+        {"emoji": "🐶", "en": "Dog", "hi": "कुत्ता", "zh": "狗", "ja": "犬", "es": "Perro", "fr": "Chien", "de": "Hund", "ru": "Собака", "mr": "कुत्रा"},
+        {"emoji": "🐱", "en": "Cat", "hi": "बिल्ली", "zh": "猫", "ja": "猫", "es": "Gato", "fr": "Chat", "de": "Katze", "ru": "Кошка", "mr": "मांजर"},
+        {"emoji": "📚", "en": "Book", "hi": "किताब", "zh": "书", "ja": "本", "es": "Libro", "fr": "Livre", "de": "Buch", "ru": "Книга", "mr": "पुस्तक"},
+        {"emoji": "🌞", "en": "Sun", "hi": "सूरज", "zh": "太阳", "ja": "太陽", "es": "Sol", "fr": "Soleil", "de": "Sonne", "ru": "Солнце", "mr": "सूर्य"},
+        {"emoji": "🌙", "en": "Moon", "hi": "चाँद", "zh": "月亮", "ja": "月", "es": "Luna", "fr": "Lune", "de": "Mond", "ru": "Луна", "mr": "चंद्र"},
+        {"emoji": "💧", "en": "Water", "hi": "पानी", "zh": "水", "ja": "水", "es": "Agua", "fr": "Eau", "de": "Wasser", "ru": "Вода", "mr": "पाणी"},
+        {"emoji": "🌳", "en": "Tree", "hi": "पेड़", "zh": "树", "ja": "木", "es": "Árbol", "fr": "Arbre", "de": "Baum", "ru": "Дерево", "mr": "झाड"},
+        {"emoji": "🚗", "en": "Car", "hi": "गाड़ी", "zh": "汽车", "ja": "車", "es": "Coche", "fr": "Voiture", "de": "Auto", "ru": "Машина", "mr": "गाडी"},
+        {"emoji": "🏠", "en": "House", "hi": "घर", "zh": "房子", "ja": "家", "es": "Casa", "fr": "Maison", "de": "Haus", "ru": "Дом", "mr": "घर"},
+        {"emoji": "🍌", "en": "Banana", "hi": "केला", "zh": "香蕉", "ja": "バナナ", "es": "Plátano", "fr": "Banane", "de": "Banane", "ru": "Банан", "mr": "केळ"},
+        {"emoji": "🍕", "en": "Pizza", "hi": "पिज्जा", "zh": "披萨", "ja": "ピザ", "es": "Pizza", "fr": "Pizza", "de": "Pizza", "ru": "Пицца", "mr": "पिझ्झा"},
+        {"emoji": "⚽", "en": "Ball", "hi": "गेंद", "zh": "球", "ja": "ボール", "es": "Pelota", "fr": "Ballon", "de": "Ball", "ru": "Мяч", "mr": "चेंडू"},
+        {"emoji": "🎸", "en": "Guitar", "hi": "गिटार", "zh": "吉他", "ja": "ギター", "es": "Guitarra", "fr": "Guitare", "de": "Gitarre", "ru": "Гитара", "mr": "गिटार"},
+        {"emoji": "🌸", "en": "Flower", "hi": "फूल", "zh": "花", "ja": "花", "es": "Flor", "fr": "Fleur", "de": "Blume", "ru": "Цветок", "mr": "फूल"},
+        {"emoji": "👟", "en": "Shoe", "hi": "जूता", "zh": "鞋", "ja": "靴", "es": "Zapato", "fr": "Chaussure", "de": "Schuh", "ru": "Обувь", "mr": "शूज"},
     ]
 
     def word_text(item):
@@ -1751,7 +1810,7 @@ def render_play_and_learn(client=None):
         if key not in st.session_state:
             st.session_state[key] = value
 
-    # Reset on language change strictly
+    # Reset strictly on language change
     if st.session_state.pal_last_language != selected_language:
         st.session_state.pal_last_language = selected_language
         st.session_state.pal_started = False
@@ -1762,6 +1821,7 @@ def render_play_and_learn(client=None):
         st.session_state.pal_feedback = None
         st.session_state.pal_level_finished = False
         st.session_state.pal_last_spoken_idx = -1
+        st.rerun()
 
     # ============================================================
     # DIFFICULTY
@@ -1781,7 +1841,6 @@ def render_play_and_learn(client=None):
         .pal-hero { background: linear-gradient(135deg,#151515,#202020,#111827); padding:24px; border-radius:22px; color:white; border:1px solid rgba(255,255,255,.12); margin-bottom:18px; box-shadow:0 12px 35px rgba(0,0,0,.25); }
         .pal-title { font-size:32px; font-weight:900; margin:0; }
         .pal-subtitle { color:#b9c3d0; margin-top:7px; }
-        .pal-stat { background:#202b3b; border:1px solid #34445a; padding:12px; border-radius:14px; text-align:center; color:white; }
         .pal-progress { width:100%; height:13px; background:#303030; border-radius:20px; overflow:hidden; margin-top:8px; }
         .pal-progress-inner { height:100%; background:linear-gradient(90deg,#58cc02,#7ee33b,#58cc02); border-radius:20px; transition:width .4s ease; }
         .pal-question { background:#172235; border:2px solid #2e4058; border-radius:20px; padding:28px; text-align:center; color:white; margin:18px 0; }
@@ -1824,10 +1883,6 @@ def render_play_and_learn(client=None):
     """, unsafe_allow_html=True)
 
     # ============================================================
-    # 👇 5 DUMMY BOXES REMOVED COMPLETELY 👇
-    # ============================================================
-
-    # ============================================================
     # QUESTION GENERATORS
     # ============================================================
     def make_select_question():
@@ -1852,23 +1907,41 @@ def render_play_and_learn(client=None):
         return {"type": "match_pairs", "question": U["match"], "pairs": pairs, "right": shuffled_right}
 
     def make_sentence_question():
-        if LANG == "hi": target = ["यह", "एक", "सेब", "है"]
-        elif LANG == "zh": target = ["这", "是", "一个", "苹果"]
-        elif LANG == "ja": target = ["これ", "は", "りんご", "です"]
-        elif LANG == "es": target = ["Esta", "es", "una", "manzana"]
-        else: target = ["This", "is", "an", "apple"]
-        bank = target + (["book", "water", "dog"] if LANG == "en" else ["किताब", "पानी", "कुत्ता"])
+        sentences_pool = {
+            "en": [
+                ["This", "is", "an", "apple"], ["I", "love", "coding"], ["The", "dog", "is", "running"],
+                ["She", "is", "my", "friend"], ["We", "go", "to", "school"], ["Cats", "are", "cute"],
+                ["I", "like", "pizza"], ["He", "plays", "football"], ["The", "sun", "is", "bright"],
+                ["I", "have", "a", "book"], ["My", "car", "is", "red"], ["Trees", "are", "green"]
+            ],
+            "hi": [
+                ["यह", "एक", "सेब", "है"], ["मुझे", "कोडिंग", "पसंद", "है"], ["कुत्ता", "दौड़", "रहा", "है"],
+                ["वह", "मेरी", "दोस्त", "है"], ["हम", "स्कूल", "जाते", "हैं"], ["बिल्लियाँ", "प्यारी", "हैं"],
+                ["मुझे", "पिज्जा", "पसंद", "है"], ["वह", "फुटबॉल", "खेलता", "है"], ["सूरज", "चमक", "रहा", "है"],
+                ["मेरे", "पास", "एक", "किताब", "है"], ["मेरी", "गाड़ी", "लाल", "है"], ["पेड़", "हरे", "हैं"]
+            ]
+        }
+        
+        pool = sentences_pool.get(LANG, sentences_pool["en"])
+        target = random.choice(pool)
+        
+        distractors = {
+            "en": ["dog", "cat", "book", "water", "car", "house"],
+            "hi": ["कुत्ता", "बिल्ली", "किताब", "पानी", "गाड़ी", "घर"]
+        }.get(LANG, ["dog", "cat", "book", "water", "car", "house"])
+        
+        bank = target + random.sample(distractors, 3)
         random.shuffle(bank)
         return {"type": "build_sentence", "question": U["build"], "target": target, "bank": bank}
 
     def make_tap_hear_question():
-        if LANG == "hi": target = ["यह", "एक", "सेब", "है"]
-        elif LANG == "zh": target = ["这", "是", "一个", "苹果"]
-        elif LANG == "ja": target = ["これ", "は", "りんご", "です"]
-        elif LANG == "es": target = ["Esta", "es", "una", "manzana"]
-        else: target = ["This", "is", "an", "apple"]
-        word_to_hear = random.choice(target)
-        return {"type": "tap_hear", "question": f"🔊 {U['listen']}: '{word_to_hear}'", "target_word": word_to_hear, "options": list(target)}
+        target_obj = random.choice(WORDS)
+        target_word = word_text(target_obj)
+        
+        other_words = [word_text(w) for w in WORDS if w != target_obj]
+        opts = [target_word] + random.sample(other_words, 3)
+        random.shuffle(opts)
+        return {"type": "tap_hear", "question": f"🔊 {U['listen']}: '{target_word}'", "target_word": target_word, "options": opts}
 
     def make_math_question():
         level = st.session_state.pal_level
@@ -1898,14 +1971,26 @@ def render_play_and_learn(client=None):
         items = random.sample(WORDS, 4)
         return {"type": "memory", "question": "🧠 Remember the first item", "items": items, "correct": items[0]["emoji"]}
 
+    # 👇 FIXED PATTERN GAME (Logical sequences & correct answer always in options) 👇
     def make_pattern_question():
         patterns = [
+            # Alternating Shapes
             {"question": "🔴 🔵 🔴 🔵 ?", "options": ["🔴", "🟢", "🟡", "🟣"], "answer": "🔴"},
             {"question": "⭐ 🌙 ⭐ 🌙 ?", "options": ["⭐", "🌙", "☀️", "🌈"], "answer": "⭐"},
-            {"question": "1️⃣ 2️⃣ 1️⃣ 2️⃣ ?", "options": ["1️⃣", "2️⃣", "3️⃣", "4️⃣"], "answer": "1️⃣"},
+            {"question": "🐶 🐱 🐶 🐱 ?", "options": ["🐶", "🐭", "🐰", "🦊"], "answer": "🐶"},
+            # Number Sequences
+            {"question": "1, 2, 3, 4, ?", "options": ["5", "6", "7", "8"], "answer": "5"},
+            {"question": "2, 4, 6, 8, ?", "options": ["10", "11", "12", "9"], "answer": "10"},
+            {"question": "5, 10, 15, 20, ?", "options": ["25", "30", "35", "40"], "answer": "25"},
+            {"question": "10, 20, 30, 40, ?", "options": ["50", "60", "70", "80"], "answer": "50"},
+            # Growing Shapes
+            {"question": "🟢 🟢🟢 🟢🟢🟢 ?", "options": ["🟢🟢🟢🟢", "🟢", "🟢🟢", "🟢🟢🟢🟢🟢"], "answer": "🟢🟢🟢🟢"},
         ]
         p = random.choice(patterns)
-        return {"type": "pattern", **p}
+        # Shuffle options so the answer isn't always first, but keep the correct one inside!
+        opts = p["options"][:]
+        random.shuffle(opts)
+        return {"type": "pattern", "question": p["question"], "options": opts, "answer": p["answer"]}
 
     def make_odd_one_question():
         items = ["🍎"] * 7
@@ -1948,6 +2033,31 @@ def render_play_and_learn(client=None):
         }
         return generators[game_type]()
 
+    # 👇 UNIQUE QUESTION GENERATOR (No Double-Double) 👇
+    def generate_unique_questions(game_type, count=10):
+        questions = []
+        used_keys = set()
+        attempts = 0
+        
+        while len(questions) < count and attempts < 200:
+            q = generate_question(game_type)
+            
+            if "target" in q: key = tuple(q["target"])
+            elif "target_word" in q: key = q["target_word"]
+            elif "pairs" in q: key = tuple(sorted([p["left"] for p in q["pairs"]]))
+            elif "items" in q and q["type"] == "odd_one": key = tuple(q["items"])
+            else: key = q.get("question", str(q))
+                
+            if key not in used_keys:
+                used_keys.add(key)
+                questions.append(q)
+            attempts += 1
+            
+        while len(questions) < count:
+            questions.append(generate_question(game_type))
+            
+        return questions
+
     # ============================================================
     # HOME SCREEN
     # ============================================================
@@ -1963,7 +2073,7 @@ def render_play_and_learn(client=None):
             with cols[i % 2]:
                 if st.button(game_name, key=f"pal_home_{game_key}", use_container_width=True):
                     st.session_state.pal_game = game_key
-                    st.session_state.pal_questions = [generate_question(game_key) for _ in range(QUESTIONS_PER_LEVEL)]
+                    st.session_state.pal_questions = generate_unique_questions(game_key, QUESTIONS_PER_LEVEL)
                     st.session_state.pal_index = 0
                     st.session_state.pal_score = 0
                     st.session_state.pal_hearts = MAX_HEARTS
@@ -2206,7 +2316,7 @@ def render_play_and_learn(client=None):
                 st.warning(U["need_score"])
                 if st.button(f"🔄 {U['try_again']}", type="primary", use_container_width=True, key="pal_retry"):
                     game_type = st.session_state.pal_game
-                    st.session_state.pal_questions = [generate_question(game_type) for _ in range(QUESTIONS_PER_LEVEL)]
+                    st.session_state.pal_questions = generate_unique_questions(game_type, QUESTIONS_PER_LEVEL)
                     st.session_state.pal_index = 0
                     st.session_state.pal_score = 0
                     st.session_state.pal_hearts = MAX_HEARTS
@@ -2237,14 +2347,15 @@ def render_play_and_learn(client=None):
             st.session_state.pal_last_spoken_idx = -1
             st.rerun()
     with c2:
-        if st.button("🔄 " + U["new_game"], use_container_width=True, key="pal_new_bottom"):
-            game_type = st.session_state.pal_game
-            if game_type:
-                st.session_state.pal_questions = [generate_question(game_type) for _ in range(QUESTIONS_PER_LEVEL)]
+        if st.button("🔄 " + U.get("new_game", "New Game"), use_container_width=True, key="pal_new_bottom"):
+            st.session_state.pal_started = False
+            st.session_state.pal_game = None
+            st.session_state.pal_questions = []
             st.session_state.pal_index = 0
             st.session_state.pal_score = 0
             st.session_state.pal_hearts = MAX_HEARTS
             st.session_state.pal_feedback = None
+            st.session_state.pal_level_finished = False
             st.session_state.pal_built_words = []
             st.session_state.pal_used_word_indexes = []
             st.session_state.pal_match_left = None
