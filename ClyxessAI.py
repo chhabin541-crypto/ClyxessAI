@@ -1570,17 +1570,17 @@ Return ONLY valid JSON with this format:
     return (pool * ((count // max(1,len(pool)))+1))[:count]
 
 
-
 def render_play_and_learn(client=None):
     """
     Clyxess AI — Duolingo Style Adaptive Play & Learn
-    FIXED: No duplicate games, all questions visible
+    FIXED: 5 Dummy Boxes removed, Strict Language, Real Voice TTS.
     """
 
     import streamlit as st
     import random
     import time
     import html
+    import streamlit.components.v1 as components
 
     # ============================================================
     # CONFIG
@@ -1589,110 +1589,121 @@ def render_play_and_learn(client=None):
     PASS_SCORE = 8
     MAX_HEARTS = 5
 
-    if "PLAY_LANGUAGES" in globals() and PLAY_LANGUAGES:
-        AVAILABLE_LANGUAGES = PLAY_LANGUAGES
-    else:
-        AVAILABLE_LANGUAGES = {
-            "English": "English", "Hindi": "Hindi", "Marathi": "Marathi",
-            "Bengali": "Bengali", "Tamil": "Tamil", "Telugu": "Telugu",
-            "Gujarati": "Gujarati", "Kannada": "Kannada",
-            "Malayalam": "Malayalam", "Odia": "Odia", "Punjabi": "Punjabi",
-        }
+    # Language Codes for TTS
+    LANG_MAP = {
+        "en": "en-US", "hi": "hi-IN", "zh": "zh-CN", "ja": "ja-JP", 
+        "es": "es-ES", "fr": "fr-FR", "de": "de-DE", "ru": "ru-RU",
+        "mr": "mr-IN", "bn": "bn-IN", "ta": "ta-IN", "te": "te-IN",
+        "gu": "gu-IN", "kn": "kn-IN", "ml": "ml-IN", "pa": "pa-IN", "or": "or-IN"
+    }
 
-    def language_name(label):
-        if isinstance(label, str): return label
-        return str(label)
+    AVAILABLE_LANGUAGES = {
+        "English": "en", "Hindi": "hi", "Marathi": "mr", "Bengali": "bn", "Tamil": "ta",
+        "Telugu": "te", "Gujarati": "gu", "Kannada": "kn", "Malayalam": "ml", "Odia": "or", "Punjabi": "pa",
+        "Chinese": "zh", "Japanese": "ja", "Spanish": "es", "French": "fr", "German": "de", "Russian": "ru"
+    }
 
     selected_language = st.selectbox(
         "🌐 Language", list(AVAILABLE_LANGUAGES.keys()), key="pal_language"
     )
-    selected_language_value = language_name(AVAILABLE_LANGUAGES[selected_language])
-
-    lang_lower = (str(selected_language) + " " + str(selected_language_value)).lower()
-
-    if "hindi" in lang_lower or "हिंदी" in lang_lower: LANG = "hi"
-    elif "marathi" in lang_lower or "मराठी" in lang_lower: LANG = "mr"
-    elif "bengali" in lang_lower or "বাংলা" in lang_lower: LANG = "bn"
-    elif "tamil" in lang_lower or "தமிழ்" in lang_lower: LANG = "ta"
-    elif "telugu" in lang_lower or "తెలుగు" in lang_lower: LANG = "te"
-    elif "gujarati" in lang_lower or "ગુજરાતી" in lang_lower: LANG = "gu"
-    elif "kannada" in lang_lower or "ಕನ್ನಡ" in lang_lower: LANG = "kn"
-    elif "malayalam" in lang_lower or "മലയാളം" in lang_lower: LANG = "ml"
-    elif "punjabi" in lang_lower or "ਪੰਜਾਬੀ" in lang_lower: LANG = "pa"
-    elif "odia" in lang_lower or "ଓଡ଼ିଆ" in lang_lower: LANG = "or"
-    elif "english" in lang_lower: LANG = "en"
-    else: LANG = "en"
+    LANG = AVAILABLE_LANGUAGES[selected_language]
 
     # ============================================================
-    # UI LANGUAGE PACK
+    # UI LANGUAGE PACK (STRICT)
     # ============================================================
     UI = {
         "en": {"title": "🎮 Play & Learn", "subtitle": "Learn by playing • Your level grows with you",
                "start": "🚀 Start Playing", "continue": "CONTINUE", "check": "CHECK", "clear": "🗑️ Clear",
                "correct": "Correct!", "wrong": "Not quite!", "score": "Score", "level": "Level",
                "xp": "XP", "hearts": "Hearts", "streak": "Streak", "question": "Question",
-               "choose": "Choose the correct answer", "build": "Build the correct sentence",
+               "choose": "Choose the correct answer", "choose_image": "Which word matches this image?",
+               "choose_word": "Which image matches this word?", "build": "Build the correct sentence",
                "match": "Match the pairs", "complete": "Level Complete!", "passed": "Level Unlocked!",
                "try_again": "Try Again", "new_game": "New Game", "home": "Game Home", "next": "Next Level",
-               "correct_answer": "Correct answer", "your_answer": "Your answer",
+               "correct_answer": "Correct answer", "your_answer": "Your answer", "listen": "Listen",
+               "play_sound": "Play Sound", "auto_diff": "🎯 Difficulty automatically increases as you improve.",
                "easy": "Easy", "medium": "Medium", "hard": "Hard", "expert": "Expert", "master": "Master"},
+        
         "hi": {"title": "🎮 खेलो और सीखो", "subtitle": "खेलते-खेलते सीखो • आपका Level आपके साथ बढ़ेगा",
                "start": "🚀 खेल शुरू करें", "continue": "आगे बढ़ें", "check": "जाँचें", "clear": "🗑️ साफ करें",
                "correct": "सही जवाब!", "wrong": "कोशिश अच्छी थी!", "score": "स्कोर", "level": "लेवल",
                "xp": "XP", "hearts": "जान", "streak": "स्ट्रीक", "question": "प्रश्न",
-               "choose": "सही जवाब चुनें", "build": "सही वाक्य बनाएँ", "match": "जोड़ी मिलाएँ",
+               "choose": "सही जवाब चुनें", "choose_image": "कौन सा शब्द इस छवि से मेल खाता है?",
+               "choose_word": "कौन सी छवि इस शब्द से मेल खाती है?", "build": "सही वाक्य बनाएँ", "match": "जोड़ी मिलाएँ",
                "complete": "लेवल पूरा!", "passed": "नया लेवल खुल गया!", "try_again": "फिर कोशिश करें",
                "new_game": "नया गेम", "home": "गेम होम", "next": "अगला लेवल",
-               "correct_answer": "सही उत्तर", "your_answer": "आपका उत्तर",
-               "easy": "आसान", "medium": "मध्यम", "hard": "कठिन", "expert": "एक्सपर्ट", "master": "मास्टर"},
-        "mr": {"title": "🎮 खेळा आणि शिका", "subtitle": "खेळता खेळता शिका", "start": "🚀 खेळ सुरू करा",
-               "continue": "पुढे जा", "check": "तपासा", "clear": "🗑️ साफ करा", "correct": "बरोबर!",
-               "wrong": "पुन्हा प्रयत्न करा!", "score": "स्कोअर", "level": "लेव्हल", "xp": "XP",
-               "hearts": "जीव", "streak": "स्ट्रीक", "question": "प्रश्न", "choose": "योग्य उत्तर निवडा",
-               "build": "योग्य वाक्य तयार करा", "match": "जोड्या जुळवा", "complete": "लेव्हल पूर्ण!",
-               "passed": "नवीन लेव्हल अनलॉक!", "try_again": "पुन्हा प्रयत्न", "new_game": "नवीन गेम",
-               "home": "गेम होम", "next": "पुढील लेव्हल", "correct_answer": "योग्य उत्तर",
-               "your_answer": "तुमचे उत्तर", "easy": "सोपे", "medium": "मध्यम", "hard": "कठीण",
-               "expert": "एक्सपर्ट", "master": "मास्टर"},
-        "bn": {"title": "🎮 খেলো এবং শেখো", "subtitle": "খেলতে খেলতে শেখো", "start": "🚀 খেলা শুরু করুন",
-               "continue": "এগিয়ে যান", "check": "পরীক্ষা করুন", "clear": "🗑️ পরিষ্কার",
-               "correct": "সঠিক!", "wrong": "আবার চেষ্টা করুন!", "score": "স্কোর", "level": "লেভেল",
-               "xp": "XP", "hearts": "জীবন", "streak": "স্ট্রিক", "question": "প্রশ্ন",
-               "choose": "সঠিক উত্তর নির্বাচন করুন", "build": "সঠিক বাক্য তৈরি করুন", "match": "জোড়া মেলান",
-               "complete": "লেভেল সম্পূর্ণ!", "passed": "নতুন লেভেল আনলক!", "try_again": "আবার চেষ্টা করুন",
-               "new_game": "নতুন গেম", "home": "গেম হোম", "next": "পরবর্তী লেভেল",
-               "correct_answer": "সঠিক উত্তর", "your_answer": "আপনার উত্তর",
-               "easy": "সহজ", "medium": "মাঝারি", "hard": "কঠিন", "expert": "এক্সপার্ট", "master": "মাস্টার"},
-        "ta": {"title": "🎮 விளையாடி கற்றுக்கொள்ளுங்கள்", "subtitle": "விளையாடிக்கொண்டே கற்றுக்கொள்ளுங்கள்",
-               "start": "🚀 விளையாட்டை தொடங்கு", "continue": "தொடரவும்", "check": "சரிபார்க்கவும்",
-               "clear": "🗑️ அழி", "correct": "சரியான பதில்!", "wrong": "மீண்டும் முயற்சிக்கவும்!",
-               "score": "மதிப்பெண்", "level": "நிலை", "xp": "XP", "hearts": "வாழ்க்கைகள்",
-               "streak": "தொடர்", "question": "கேள்வி", "choose": "சரியான பதிலை தேர்வு செய்யவும்",
-               "build": "சரியான வாக்கியத்தை உருவாக்கவும்", "match": "ஜோடிகளை பொருத்தவும்",
-               "complete": "நிலை முடிந்தது!", "passed": "புதிய நிலை திறக்கப்பட்டது!",
-               "try_again": "மீண்டும் முயற்சிக்கவும்", "new_game": "புதிய விளையாட்டு",
-               "home": "விளையாட்டு முகப்பு", "next": "அடுத்த நிலை",
-               "correct_answer": "சரியான பதில்", "your_answer": "உங்கள் பதில்",
-               "easy": "எளிது", "medium": "நடுத்தரம்", "hard": "கடினம்", "expert": "நிபுணர்", "master": "மாஸ்டர்"},
+               "correct_answer": "सही उत्तर", "your_answer": "आपका उत्तर", "listen": "सुनो",
+               "play_sound": "आवाज़ सुनें", "auto_diff": "🎯 जैसे-जैसे आप अच्छा करते हैं, गेम अपने आप कठिन होता जाएगा।",
+               "easy": "आसान", "medium": "मध्यम", "hard": "कठीन", "expert": "एक्सपर्ट", "master": "मास्टर"},
+
+        "zh": {"title": "🎮 玩与学", "subtitle": "边玩边学 • 你的等级会随着你提升", "start": "🚀 开始游戏",
+               "continue": "继续", "check": "检查", "clear": "🗑️ 清除", "correct": "正确！", "wrong": "不太对！",
+               "score": "分数", "level": "等级", "xp": "经验", "hearts": "生命", "streak": "连胜", "question": "问题",
+               "choose": "选择正确答案", "choose_image": "哪个词与这张图片匹配？", "choose_word": "哪张图片与这个词匹配？",
+               "build": "构造正确的句子", "match": "配对", "complete": "关卡完成！", "passed": "关卡解锁！",
+               "try_again": "再试一次", "new_game": "新游戏", "home": "游戏主页", "next": "下一关",
+               "correct_answer": "正确答案", "your_answer": "你的答案", "listen": "听", "play_sound": "播放声音",
+               "auto_diff": "🎯 难度会随着你的进步自动增加。", "easy": "简单", "medium": "中等", "hard": "困难",
+               "expert": "专家", "master": "大师"},
+
+        "ja": {"title": "🎮 遊んで学ぶ", "subtitle": "遊びながら学ぶ • レベルアップ", "start": "🚀 ゲーム開始",
+               "continue": "続ける", "check": "確認", "clear": "🗑️ クリア", "correct": "正解！", "wrong": "惜しい！",
+               "score": "スコア", "level": "レベル", "xp": "XP", "hearts": "ハート", "streak": "連続", "question": "質問",
+               "choose": "正解を選んでください", "choose_image": "どの単語がこの画像に一致しますか？", "choose_word": "どの画像がこの単語に一致しますか？",
+               "build": "正しい文を作成", "match": "ペアを合わせる", "complete": "レベル完了！", "passed": "レベル解放！",
+               "try_again": "再試行", "new_game": "新しいゲーム", "home": "ホーム", "next": "次のレベル",
+               "correct_answer": "正解", "your_answer": "あなたの答え", "listen": "聞く", "play_sound": "音を鳴らす",
+               "auto_diff": "🎯 上達するにつれて難易度が自動的に上がります。", "easy": "簡単", "medium": "普通", "hard": "難しい",
+               "expert": "エキスパート", "master": "マスター"},
+
+        "es": {"title": "🎮 Juega y Aprende", "subtitle": "Aprende jugando • Tu nivel crece contigo", "start": "🚀 Empezar a Jugar",
+               "continue": "CONTINUAR", "check": "COMPROBAR", "clear": "🗑️ Limpiar", "correct": "¡Correcto!", "wrong": "¡Casi!",
+               "score": "Puntuación", "level": "Nivel", "xp": "XP", "hearts": "Vidas", "streak": "Racha", "question": "Pregunta",
+               "choose": "Elige la respuesta correcta", "choose_image": "¿Qué palabra coincide con esta imagen?", "choose_word": "¿Qué imagen coincide con esta palabra?",
+               "build": "Construye la oración correcta", "match": "Empareja los pares", "complete": "¡Nivel Completado!", "passed": "¡Nivel Desbloqueado!",
+               "try_again": "Intentar de nuevo", "new_game": "Nuevo Juego", "home": "Inicio", "next": "Siguiente Nivel",
+               "correct_answer": "Respuesta correcta", "your_answer": "Tu respuesta", "listen": "Escuchar", "play_sound": "Reproducir sonido",
+               "auto_diff": "🎯 La dificultad aumenta automáticamente a medida que mejoras.", "easy": "Fácil", "medium": "Medio", "hard": "Difícil",
+               "expert": "Experto", "master": "Maestro"},
     }
+    
+    # Fallback to English if specific translation is missing
     U = UI.get(LANG, UI["en"])
 
     # ============================================================
-    # WORDS
+    # WORDS (Strict Language Translation)
     # ============================================================
     WORDS = [
-        {"emoji": "🍎", "en": "Apple", "hi": "सेब", "mr": "सफरचंद", "bn": "আপেল", "ta": "ஆப்பிள்"},
-        {"emoji": "🐶", "en": "Dog", "hi": "कुत्ता", "mr": "कुत्रा", "bn": "কুকুর", "ta": "நாய்"},
-        {"emoji": "🐱", "en": "Cat", "hi": "बिल्ली", "mr": "मांजर", "bn": "বিড়াল", "ta": "பூனை"},
-        {"emoji": "📚", "en": "Book", "hi": "किताब", "mr": "पुस्तक", "bn": "বই", "ta": "புத்தகம்"},
-        {"emoji": "🌞", "en": "Sun", "hi": "सूरज", "mr": "सूर्य", "bn": "সূর্য", "ta": "சூரியன்"},
-        {"emoji": "🌙", "en": "Moon", "hi": "चाँद", "mr": "चंद्र", "bn": "চাঁদ", "ta": "நிலா"},
-        {"emoji": "💧", "en": "Water", "hi": "पानी", "mr": "पाणी", "bn": "জল", "ta": "தண்ணீர்"},
-        {"emoji": "🌳", "en": "Tree", "hi": "पेड़", "mr": "झाड", "bn": "গাছ", "ta": "மரம்"},
+        {"emoji": "🍎", "en": "Apple", "hi": "सेब", "zh": "苹果", "ja": "りんご", "es": "Manzana", "mr": "सफरचंद", "bn": "আপেল", "ta": "ஆப்பிள்"},
+        {"emoji": "🐶", "en": "Dog", "hi": "कुत्ता", "zh": "狗", "ja": "犬", "es": "Perro", "mr": "कुत्रा", "bn": "কুকুর", "ta": "நாய்"},
+        {"emoji": "🐱", "en": "Cat", "hi": "बिल्ली", "zh": "猫", "ja": "猫", "es": "Gato", "mr": "मांजर", "bn": "বিড়াল", "ta": "பூனை"},
+        {"emoji": "📚", "en": "Book", "hi": "किताब", "zh": "书", "ja": "本", "es": "Libro", "mr": "पुस्तक", "bn": "বই", "ta": "புத்தகம்"},
+        {"emoji": "🌞", "en": "Sun", "hi": "सूरज", "zh": "太阳", "ja": "太陽", "es": "Sol", "mr": "सूर्य", "bn": "সূর্য", "ta": "சூரியன்"},
+        {"emoji": "🌙", "en": "Moon", "hi": "चाँद", "zh": "月亮", "ja": "月", "es": "Luna", "mr": "चंद्र", "bn": "চাঁদ", "ta": "நிலா"},
+        {"emoji": "💧", "en": "Water", "hi": "पानी", "zh": "水", "ja": "水", "es": "Agua", "mr": "पाणी", "bn": "জল", "ta": "தண்ணீர்"},
+        {"emoji": "🌳", "en": "Tree", "hi": "पेड़", "zh": "树", "ja": "木", "es": "Árbol", "mr": "झाड", "bn": "গাছ", "ta": "மரம்"},
     ]
 
     def word_text(item):
         return item.get(LANG, item.get("en", ""))
+
+    # ============================================================
+    # REAL TTS VOICE FUNCTION
+    # ============================================================
+    def speak_text(text, lang_code):
+        js = f"""
+            <script>
+                if ('speechSynthesis' in window) {{
+                    window.speechSynthesis.cancel();
+                    var msg = new SpeechSynthesisUtterance("{text}");
+                    msg.lang = "{lang_code}";
+                    msg.rate = 0.9;
+                    msg.pitch = 1.1;
+                    window.speechSynthesis.speak(msg);
+                }}
+            </script>
+        """
+        components.html(js, height=0)
 
     # ============================================================
     # SESSION STATE
@@ -1705,11 +1716,13 @@ def render_play_and_learn(client=None):
         "pal_used_word_indexes": [], "pal_match_left": None, "pal_match_right": None,
         "pal_matched": [], "pal_feedback": None, "pal_game_finished": False,
         "pal_level_finished": False, "pal_completed_levels": 0, "pal_last_language": None,
+        "pal_last_spoken_idx": -1, # For Voice
     }
     for key, value in defaults.items():
         if key not in st.session_state:
             st.session_state[key] = value
 
+    # Reset on language change
     if st.session_state.pal_last_language != selected_language:
         st.session_state.pal_last_language = selected_language
         st.session_state.pal_started = False
@@ -1717,16 +1730,9 @@ def render_play_and_learn(client=None):
         st.session_state.pal_questions = []
         st.session_state.pal_index = 0
         st.session_state.pal_score = 0
-        st.session_state.pal_selected = None
-        st.session_state.pal_selected_items = []
-        st.session_state.pal_built_words = []
-        st.session_state.pal_used_word_indexes = []
-        st.session_state.pal_match_left = None
-        st.session_state.pal_match_right = None
-        st.session_state.pal_matched = []
         st.session_state.pal_feedback = None
-        st.session_state.pal_game_finished = False
         st.session_state.pal_level_finished = False
+        st.session_state.pal_last_spoken_idx = -1
 
     # ============================================================
     # DIFFICULTY
@@ -1756,9 +1762,6 @@ def render_play_and_learn(client=None):
         </style>
     """, unsafe_allow_html=True)
 
-    # ============================================================
-    # CELEBRATION
-    # ============================================================
     def celebrate():
         try: st.balloons()
         except Exception: pass
@@ -1792,16 +1795,10 @@ def render_play_and_learn(client=None):
     """, unsafe_allow_html=True)
 
     # ============================================================
-    # STATS
+    # 👇 5 DUMMY BOXES REMOVED HERE (Replaced with a simple text line)
     # ============================================================
-    s1, s2, s3, s4, s5 = st.columns(5)
-    with s1: st.markdown(f'<div class="pal-stat">🏆<br><b>{U["level"]} {st.session_state.pal_level}</b></div>', unsafe_allow_html=True)
-    with s2: st.markdown(f'<div class="pal-stat">⭐<br><b>{st.session_state.pal_xp} {U["xp"]}</b></div>', unsafe_allow_html=True)
-    with s3: st.markdown(f'<div class="pal-stat">❤️<br><b>{st.session_state.pal_hearts}</b></div>', unsafe_allow_html=True)
-    with s4: st.markdown(f'<div class="pal-stat">🔥<br><b>{st.session_state.pal_streak} {U["streak"]}</b></div>', unsafe_allow_html=True)
-    with s5: st.markdown(f'<div class="pal-stat">🎯<br><b>{difficulty}</b></div>', unsafe_allow_html=True)
-
-    st.caption(f"🌐 {selected_language} • 🎯 {difficulty} • {U['level']} {st.session_state.pal_level}")
+    st.markdown(f"🏆 **{U['level']} {st.session_state.pal_level}** | ⭐ **{st.session_state.pal_xp} {U['xp']}** | ❤️ **{st.session_state.pal_hearts}** | 🔥 **{st.session_state.pal_streak} {U['streak']}** | 🎯 **{difficulty}**")
+    st.caption(f"🌐 {selected_language} • {U['level']} {st.session_state.pal_level}")
 
     # ============================================================
     # GAME TYPES
@@ -1825,7 +1822,6 @@ def render_play_and_learn(client=None):
     # QUESTION GENERATORS
     # ============================================================
     def make_select_question():
-        """Show emoji, choose correct word"""
         correct = random.choice(WORDS)
         opts = random.sample(WORDS, min(4, len(WORDS)))
         if correct not in opts: opts[0] = correct
@@ -1833,13 +1829,12 @@ def render_play_and_learn(client=None):
         return {
             "type": "select_image",
             "question": correct["emoji"],
-            "instruction": "Which word matches this image?",
+            "instruction": U["choose_image"], # Strict Language
             "correct": word_text(correct),
             "options": opts,
         }
 
     def make_which_question():
-        """Show word, choose correct emoji"""
         correct = random.choice(WORDS)
         opts = random.sample(WORDS, min(4, len(WORDS)))
         if correct not in opts: opts[0] = correct
@@ -1847,7 +1842,7 @@ def render_play_and_learn(client=None):
         return {
             "type": "which_is",
             "question": word_text(correct),
-            "instruction": "Which image matches this word?",
+            "instruction": U["choose_word"], # Strict Language
             "correct": correct["emoji"],
             "options": opts,
         }
@@ -1857,39 +1852,29 @@ def render_play_and_learn(client=None):
         pairs = [{"left": item["emoji"], "right": word_text(item)} for item in selected]
         shuffled_right = [x["right"] for x in pairs]
         random.shuffle(shuffled_right)
-        return {
-            "type": "match_pairs",
-            "question": "Match the pairs",
-            "pairs": pairs,
-            "right": shuffled_right,
-        }
+        return {"type": "match_pairs", "question": U["match"], "pairs": pairs, "right": shuffled_right}
 
     def make_sentence_question():
+        # Fallback simple sentence generation
         if LANG == "hi": target = ["यह", "एक", "सेब", "है"]
-        elif LANG == "mr": target = ["हे", "एक", "सफरचंद", "आहे"]
-        elif LANG == "bn": target = ["এটি", "একটি", "আপেল"]
-        elif LANG == "ta": target = ["இது", "ஒரு", "ஆப்பிள்"]
+        elif LANG == "zh": target = ["这", "是", "一个", "苹果"]
+        elif LANG == "ja": target = ["これ", "は", "りんご", "です"]
+        elif LANG == "es": target = ["Esta", "es", "una", "manzana"]
         else: target = ["This", "is", "an", "apple"]
         bank = target + (["book", "water", "dog"] if LANG == "en" else ["किताब", "पानी", "कुत्ता"])
         random.shuffle(bank)
-        return {
-            "type": "build_sentence",
-            "question": U["build"],
-            "target": target,
-            "bank": bank,
-        }
+        return {"type": "build_sentence", "question": U["build"], "target": target, "bank": bank}
 
     def make_tap_hear_question():
-        """Tap the word you hear"""
         if LANG == "hi": target = ["यह", "एक", "सेब", "है"]
-        elif LANG == "mr": target = ["हे", "एक", "सफरचंद", "आहे"]
-        elif LANG == "bn": target = ["এটি", "একটি", "আপেল"]
-        elif LANG == "ta": target = ["இது", "ஒரு", "ஆப்பிள்"]
+        elif LANG == "zh": target = ["这", "是", "一个", "苹果"]
+        elif LANG == "ja": target = ["これ", "は", "りんご", "です"]
+        elif LANG == "es": target = ["Esta", "es", "una", "manzana"]
         else: target = ["This", "is", "an", "apple"]
         word_to_hear = random.choice(target)
         return {
             "type": "tap_hear",
-            "question": f"🔊 Tap the word you hear: '{word_to_hear}'",
+            "question": f"🔊 {U['listen']}: '{word_to_hear}'",
             "target_word": word_to_hear,
             "options": list(target),
         }
@@ -1925,7 +1910,7 @@ def render_play_and_learn(client=None):
 
     def make_memory_question():
         items = random.sample(WORDS, 4)
-        return {"type": "memory", "question": "🧠 Remember the first item, then choose it.", "items": items, "correct": items[0]["emoji"]}
+        return {"type": "memory", "question": "🧠 Remember the first item", "items": items, "correct": items[0]["emoji"]}
 
     def make_pattern_question():
         patterns = [
@@ -1994,8 +1979,7 @@ def render_play_and_learn(client=None):
     if not st.session_state.pal_started:
         st.markdown(f"### 🏆 {U['level']} {st.session_state.pal_level} • {difficulty}")
         st.progress(min(st.session_state.pal_completed_levels / 10, 1.0))
-        st.info("🎯 Difficulty automatically increases as you improve." if LANG == "en"
-                else "🎯 जैसे-जैसे आप अच्छा करते हैं, गेम अपने आप कठिन होता जाएगा।")
+        st.info(U["auto_diff"]) # Strict Language
         st.markdown("### 🎮 Choose a Game")
 
         game_items = list(GAME_TYPES.items())
@@ -2016,6 +2000,7 @@ def render_play_and_learn(client=None):
                     st.session_state.pal_matched = []
                     st.session_state.pal_feedback = None
                     st.session_state.pal_started = True
+                    st.session_state.pal_last_spoken_idx = -1 # Reset voice
                     st.rerun()
         return
 
@@ -2200,10 +2185,20 @@ def render_play_and_learn(client=None):
                 process_answer(is_correct)
                 st.rerun()
 
-    # --- TAP HEAR ---
+    # --- TAP HEAR (REAL VOICE MIC) ---
     elif game_type == "tap_hear":
-        st.info(f"🔊 Listen: **{current['target_word']}**")
-        st.caption("Tap the correct word:")
+        # Real TTS Voice Trigger
+        if st.session_state.get("pal_last_spoken_idx") != idx:
+            speak_text(current['target_word'], LANG_MAP.get(LANG, "en-US"))
+            st.session_state.pal_last_spoken_idx = idx
+            
+        st.info(f"🔊 {U['listen']}: **{current['target_word']}**")
+        
+        # Manual Play Button
+        if st.button(f"🔊 {U['play_sound']}", key=f"pal_speak_{idx}"):
+            speak_text(current['target_word'], LANG_MAP.get(LANG, "en-US"))
+
+        st.caption(U["choose"])
         options = current["options"]
         cols = st.columns(2)
         for i, word in enumerate(options):
@@ -2294,6 +2289,7 @@ def render_play_and_learn(client=None):
                 st.session_state.pal_match_left = None
                 st.session_state.pal_match_right = None
                 st.session_state.pal_matched = []
+                st.session_state.pal_last_spoken_idx = -1 # Reset for next question
                 st.rerun()
         else:
             score = st.session_state.pal_score
@@ -2322,6 +2318,7 @@ def render_play_and_learn(client=None):
                     st.session_state.pal_built_words = []
                     st.session_state.pal_used_word_indexes = []
                     st.session_state.pal_matched = []
+                    st.session_state.pal_last_spoken_idx = -1
                     st.rerun()
             else:
                 st.warning(f"🎯 {PASS_SCORE}/10 needed to unlock the next level.")
@@ -2336,6 +2333,7 @@ def render_play_and_learn(client=None):
                     st.session_state.pal_built_words = []
                     st.session_state.pal_used_word_indexes = []
                     st.session_state.pal_matched = []
+                    st.session_state.pal_last_spoken_idx = -1
                     st.rerun()
 
     # ============================================================
@@ -2357,6 +2355,7 @@ def render_play_and_learn(client=None):
             st.session_state.pal_match_left = None
             st.session_state.pal_match_right = None
             st.session_state.pal_matched = []
+            st.session_state.pal_last_spoken_idx = -1
             st.rerun()
     with c2:
         if st.button("🔄 " + U["new_game"], use_container_width=True, key="pal_new_bottom"):
@@ -2372,11 +2371,11 @@ def render_play_and_learn(client=None):
             st.session_state.pal_match_left = None
             st.session_state.pal_match_right = None
             st.session_state.pal_matched = []
+            st.session_state.pal_last_spoken_idx = -1
             st.rerun()
 
-# ============================================================
-# EXTRA FEATURES — integrated without creating duplicate core modes
-# ============================================================
+
+
 def analyze_image_with_groq(image_bytes, mime, question, selected_language="English"):
     from openai import OpenAI
     import base64
