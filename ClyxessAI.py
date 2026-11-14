@@ -1570,14 +1570,6 @@ Return ONLY valid JSON with this format:
     return (pool * ((count // max(1,len(pool)))+1))[:count]
 
 
-# ============================================================
-# PLAY & LEARN UI
-# ============================================================
-
-# ============================================================
-# 🎮 PLAY & LEARN — COMPLETE SINGLE FILE CODE
-# Clyxess AI by NeuroClyx Technology
-# ============================================================
 
 def render_play_and_learn(client=None):
     """
