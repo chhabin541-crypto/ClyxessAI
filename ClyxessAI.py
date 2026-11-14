@@ -2978,7 +2978,6 @@ def render_login_signup():
     mode = st.sidebar.radio("", ["Normal Chat", "Cyber Security", "Homework"])
     
 
-        
 def render_coding_lab_mod():
     import streamlit.components.v1 as components
     import socket
@@ -3096,22 +3095,38 @@ body.light .rwrap{background:linear-gradient(135deg,#e5e7eb,#d1d5db)}
 #robotChat{display:none;position:fixed;bottom:80px;right:16px;width:310px;background:var(--panel);border:2px solid var(--accent);border-radius:16px;padding:12px;z-index:9001;box-shadow:0 12px 40px rgba(0,0,0,0.5);max-height:450px;flex-direction:column}
 #robotChat h4{color:var(--accent);margin-bottom:8px;font-size:12px;display:flex;justify-content:space-between;align-items:center}
 #autoCheckMsg{color:var(--text);font-size:10px;line-height:1.4;background:var(--panel2);padding:8px;border-radius:8px;border-left:3px solid var(--success);margin-bottom:8px;}
-#chatHistory{color:var(--text);font-size:11px;line-height:1.5;background:var(--panel2);padding:10px;border-radius:10px;border-left:3px solid var(--accent);flex:1;overflow-y:auto;max-height:250px;}
+#chatHistory{color:var(--text);font-size:11px;line-height:1.5;background:var(--panel2);padding:10px;border-radius:10px;border-left:3px solid var(--accent);flex:1;overflow-y:auto;max-height:200px;}
 .robot-input-row{display:flex;gap:5px;margin-top:8px;}
 #robotInput{flex:1;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:8px;border-radius:6px;font-size:11px;}
 #robotSendBtn{background:var(--accent);border:none;color:#fff;padding:8px 12px;border-radius:6px;cursor:pointer;font-size:11px;}
 
 /* MODALS */
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:10000;justify-content:center;align-items:center}
-.modal-box{background:var(--panel);border:2px solid var(--accent);padding:20px;border-radius:16px;width:90%;max-width:600px;max-height:80vh;overflow-y:auto;position:relative}
-.modal-box h3{color:var(--text);margin-bottom:15px;display:flex;justify-content:space-between;}
-.close-btn{background:#ef4444;color:#fff;border:none;padding:4px 8px;border-radius:6px;cursor:pointer}
-.color-preview-box{width:100%;height:100px;border-radius:10px;margin-bottom:15px;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-weight:bold;font-family:monospace;font-size:20px;text-shadow:1px 1px 2px #000;}
-.sym-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px;}
-.sym-card{background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:10px;text-align:center;cursor:pointer;transition:0.2s}
+.modal-box{background:var(--panel);border:2px solid var(--accent);padding:15px;border-radius:16px;width:90%;max-width:600px;max-height:80vh;overflow-y:auto;position:relative}
+.modal-box h3{color:var(--text);margin-bottom:15px;display:flex;justify-content:space-between;font-size:14px;}
+.close-btn{background:#ef4444;color:#fff;border:none;padding:2px 6px;border-radius:4px;cursor:pointer;font-size:10px;}
+.color-preview-box{width:100%;height:60px;border-radius:10px;margin-bottom:15px;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-weight:bold;font-family:monospace;font-size:16px;text-shadow:1px 1px 2px #000;}
+.sym-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:6px;}
+.sym-card{background:var(--panel2);border:1px solid var(--border);border-radius:8px;padding:6px 4px;text-align:center;cursor:pointer;transition:0.2s}
 .sym-card:hover{border-color:var(--accent);transform:translateY(-2px)}
-.sym-char{font-size:24px;font-weight:bold;color:var(--accent);font-family:monospace;}
-.sym-name{font-size:10px;color:var(--muted2);margin-top:5px;}
+.sym-char{font-size:16px;font-weight:bold;color:var(--accent);font-family:monospace;}
+.sym-name{font-size:8px;color:var(--muted2);margin-top:2px;line-height:1.1;}
+
+/* 👇 LEARN CARDS KO CHHOTA KIYA HAI (HALF SIZE) 👇 */
+#learnPanel{display:none;position:fixed;inset:0;background:var(--bg);z-index:9500;overflow-y:auto;padding:20px}
+#learnPanel.open{display:block}
+.learnHead{display:flex;justify-content:space-between;align-items:center;max-width:1100px;margin:0 auto 20px;padding:12px 16px;background:var(--panel);border-radius:12px;border:1px solid var(--border)}
+.learnHead h2{margin:0;font-size:18px;color:var(--text)}
+.learnGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;max-width:1100px;margin:0 auto}
+.learnCard{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:8px;transition:0.2s}
+.learnCard:hover{border-color:var(--accent);transform:translateY(-2px)}
+.learnCard h3{color:var(--accent);font-size:11px;margin-bottom:4px;display:flex;align-items:center;gap:4px}
+.learnPreview{background:#fff;border-radius:6px;padding:6px;min-height:45px;margin-bottom:6px;color:#111;font-size:9px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:2px;overflow:hidden}
+.learnCode{background:#0a0a0f;color:#a5f3fc;font-family:Consolas,monospace;font-size:8px;padding:6px;border-radius:4px;white-space:pre-wrap;word-break:break-all;max-height:70px;overflow:auto;line-height:1.3;position:relative}
+.learnCode.copyBtn{position:absolute;top:2px;right:2px;background:#6366f1;color:#fff;border:none;padding:2px 4px;border-radius:3px;font-size:7px;cursor:pointer;font-family:Arial}
+.learnCode.copyBtn:hover{background:#4f46e5}
+.learnTip{font-size:8px;color:var(--muted2);margin-top:4px;line-height:1.2}
+body.light.learnCode{background:#1e293b;color:#67e8f9}
 </style>
 </head>
 <body>
@@ -3130,10 +3145,8 @@ body.light .rwrap{background:linear-gradient(135deg,#e5e7eb,#d1d5db)}
 <button class="btn" onclick="downloadCode()">⬇ Download</button>
 <button class="btn" onclick="copyAllCode()">📋 Copy</button>
 <button class="btn" style="border-color:#f59e0b;color:#fbbf24" onclick="openQR()">📱 QR</button>
-<!-- NAYE BUTTONS ADD KIYE HAIN -->
 <button class="btn" style="border-color:#00FFAA;color:#00FFAA" onclick="openColorPicker()">🎨 Color</button>
 <button class="btn" style="border-color:#FF007F;color:#FF007F" onclick="openSymbols()">🧩 Symbols</button>
-<!-- ===================== -->
 <button class="btn-icon" onclick="toggleTheme()" id="themeBtn">🌙</button>
 </div>
 
@@ -3200,33 +3213,51 @@ body.light .rwrap{background:linear-gradient(135deg,#e5e7eb,#d1d5db)}
     <div class="modal-box">
         <h3>🎨 Color Picker <button class="close-btn" onclick="closeColorPicker()">✕</button></h3>
         <div id="colorPreview" class="color-preview-box">#000000</div>
-        <input type="color" id="colorInput" style="width:100%; height:50px; cursor:pointer; border-radius:10px;" onchange="updateColorCode()">
-        <p style="font-size:12px; color:var(--muted2); margin-top:15px;">Hex Code (CSS mein use karein):</p>
-        <div style="display:flex; gap:10px; margin-top:5px;">
-            <input type="text" id="hexCodeInput" readonly style="flex:1; padding:10px; background:var(--bg); color:var(--text); border:1px solid var(--border); border-radius:6px; font-family:monospace;">
+        <input type="color" id="colorInput" style="width:100%; height:40px; cursor:pointer; border-radius:8px;" onchange="updateColorCode()">
+        <p style="font-size:11px; color:var(--muted2); margin-top:10px;">Hex Code (CSS mein use karein):</p>
+        <div style="display:flex; gap:8px; margin-top:5px;">
+            <input type="text" id="hexCodeInput" readonly style="flex:1; padding:8px; background:var(--bg); color:var(--text); border:1px solid var(--border); border-radius:6px; font-family:monospace; font-size:12px;">
             <button class="btn" style="background:var(--success); color:#fff; border:none;" onclick="copyHexCode()">Copy</button>
         </div>
     </div>
 </div>
 
-<!-- SYMBOLS MODAL -->
+<!-- SYMBOLS MODAL (FULL & COMPACT) -->
 <div id="symbolsModal" class="modal-overlay">
     <div class="modal-box">
         <h3>🧩 Coding Barakhadi <button class="close-btn" onclick="closeSymbols()">✕</button></h3>
-        <p style="font-size:12px; color:var(--muted2); margin-bottom:15px;">Kisi bhi symbol par click karein, wo aapke code mein jud jayega!</p>
+        <p style="font-size:11px; color:var(--muted2); margin-bottom:15px;">Click karein, symbol code mein jud jayega!</p>
         <div class="sym-grid">
-            <div class="sym-card" onclick="insertSymbol('.')"><div class="sym-char">.</div><div class="sym-name">Dot (Class/Prop)</div></div>
-            <div class="sym-card" onclick="insertSymbol(',')"><div class="sym-char">,</div><div class="sym-name">Comma (Separate)</div></div>
-            <div class="sym-card" onclick="insertSymbol(';')"><div class="sym-char">;</div><div class="sym-name">Semicolon (End)</div></div>
-            <div class="sym-card" onclick="insertSymbol(':')"><div class="sym-char">:</div><div class="sym-name">Colon (Block)</div></div>
-            <div class="sym-card" onclick="insertSymbol('()')"><div class="sym-char">( )</div><div class="sym-name">Parentheses (Function)</div></div>
-            <div class="sym-card" onclick="insertSymbol('{}')"><div class="sym-char">{ }</div><div class="sym-name">Curly (Object)</div></div>
-            <div class="sym-card" onclick="insertSymbol('[]')"><div class="sym-char">[ ]</div><div class="sym-name">Square (Array)</div></div>
-            <div class="sym-card" onclick="insertSymbol('<>')"><div class="sym-char">&lt; &gt;</div><div class="sym-name">Angle (HTML Tag)</div></div>
-            <div class="sym-card" onclick="insertSymbol('=')"><div class="sym-char">=</div><div class="sym-name">Equals (Assign)</div></div>
-            <div class="sym-card" onclick="insertSymbol('==')"><div class="sym-char">==</div><div class="sym-name">Double Equal (Check)</div></div>
+            <div class="sym-card" onclick="insertSymbol('.')"><div class="sym-char">.</div><div class="sym-name">Dot</div></div>
+            <div class="sym-card" onclick="insertSymbol(',')"><div class="sym-char">,</div><div class="sym-name">Comma</div></div>
+            <div class="sym-card" onclick="insertSymbol(';')"><div class="sym-char">;</div><div class="sym-name">Semicolon</div></div>
+            <div class="sym-card" onclick="insertSymbol(':')"><div class="sym-char">:</div><div class="sym-name">Colon</div></div>
+            <div class="sym-card" onclick="insertSymbol('()')"><div class="sym-char">( )</div><div class="sym-name">Parentheses</div></div>
+            <div class="sym-card" onclick="insertSymbol('{}')"><div class="sym-char">{ }</div><div class="sym-name">Curly Braces</div></div>
+            <div class="sym-card" onclick="insertSymbol('[]')"><div class="sym-char">[ ]</div><div class="sym-name">Square Brackets</div></div>
+            <div class="sym-card" onclick="insertSymbol('<>')"><div class="sym-char">&lt; &gt;</div><div class="sym-name">Angle Brackets</div></div>
+            <div class="sym-card" onclick="insertSymbol('=')"><div class="sym-char">=</div><div class="sym-name">Equals</div></div>
+            <div class="sym-card" onclick="insertSymbol('==')"><div class="sym-char">==</div><div class="sym-name">Double Equals</div></div>
             <div class="sym-card" onclick="insertSymbol('!=')"><div class="sym-char">!=</div><div class="sym-name">Not Equal</div></div>
-            <div class="sym-card" onclick="insertSymbol('#')"><div class="sym-char">#</div><div class="sym-name">Hash (Comment)</div></div>
+            <div class="sym-card" onclick="insertSymbol('+')"><div class="sym-char">+</div><div class="sym-name">Plus</div></div>
+            <div class="sym-card" onclick="insertSymbol('-')"><div class="sym-char">-</div><div class="sym-name">Minus</div></div>
+            <div class="sym-card" onclick="insertSymbol('*')"><div class="sym-char">*</div><div class="sym-name">Asterisk</div></div>
+            <div class="sym-card" onclick="insertSymbol('/')"><div class="sym-char">/</div><div class="sym-name">Slash</div></div>
+            <div class="sym-card" onclick="insertSymbol('%')"><div class="sym-char">%</div><div class="sym-name">Percent</div></div>
+            <div class="sym-card" onclick="insertSymbol('&')"><div class="sym-char">&amp;</div><div class="sym-name">Ampersand</div></div>
+            <div class="sym-card" onclick="insertSymbol('|')"><div class="sym-char">|</div><div class="sym-name">Pipe</div></div>
+            <div class="sym-card" onclick="insertSymbol('!')"><div class="sym-char">!</div><div class="sym-name">Exclamation</div></div>
+            <div class="sym-card" onclick="insertSymbol('?')"><div class="sym-char">?</div><div class="sym-name">Question</div></div>
+            <div class="sym-card" onclick="insertSymbol('@')"><div class="sym-char">@</div><div class="sym-name">At Symbol</div></div>
+            <div class="sym-card" onclick="insertSymbol('#')"><div class="sym-char">#</div><div class="sym-name">Hash</div></div>
+            <div class="sym-card" onclick="insertSymbol('$')"><div class="sym-char">$</div><div class="sym-name">Dollar</div></div>
+            <div class="sym-card" onclick="insertSymbol('^')"><div class="sym-char">^</div><div class="sym-name">Caret</div></div>
+            <div class="sym-card" onclick="insertSymbol('_')"><div class="sym-char">_</div><div class="sym-name">Underscore</div></div>
+            <div class="sym-card" onclick="insertSymbol('~')"><div class="sym-char">~</div><div class="sym-name">Tilde</div></div>
+            <div class="sym-card" onclick="insertSymbol('&&')"><div class="sym-char">&amp;&amp;</div><div class="sym-name">AND</div></div>
+            <div class="sym-card" onclick="insertSymbol('||')"><div class="sym-char">||</div><div class="sym-name">OR</div></div>
+            <div class="sym-card" onclick="insertSymbol('"')"><div class="sym-char">"</div><div class="sym-name">Quote</div></div>
+            <div class="sym-card" onclick="insertSymbol("'")"><div class="sym-char">'</div><div class="sym-name">Apostrophe</div></div>
         </div>
     </div>
 </div>
@@ -3247,7 +3278,7 @@ body.light .rwrap{background:linear-gradient(135deg,#e5e7eb,#d1d5db)}
 
 <div id="emojiPanel"></div>
 
-<!-- ROBOT CHAT (UPDATED) -->
+<!-- CHHOTU MASTER -->
 <div id="robot" onclick="toggleRobot()">🤖</div>
 <div id="robotChat">
 <h4><span>🤖 Chhotu Master</span> <span onclick="toggleRobot()" style="cursor:pointer; color:#ef4444;">✕</span></h4>
@@ -3261,6 +3292,8 @@ body.light .rwrap{background:linear-gradient(135deg,#e5e7eb,#d1d5db)}
 
 <script>
 const CLS_MAP={"5 Years":"Class 1","6 Years":"Class 1","7 Years":"Class 2","8 Years":"Class 3","9 Years":"Class 4","10 Years":"Class 5","11-12 Years":"Class 6-7","13-14 Years":"Class 8-9","15-16 Years":"Class 10","17-18 Years":"Class 11-12","18+ Years":"College"};
+
+// RESTORED ALL 18 LEARN CARDS
 const LEARN_CARDS = [
   {title:"📝 Heading (H1)", preview:`<h1 style="font-size:28px;color:#dc2626;margin:0">Hello Duniya!</h1>`, code:`<h1>Hello Duniya!</h1>`, tip:"Bada title ke liye <h1> use karo."},
   {title:"📄 Paragraph", preview:`<p style="margin:0;color:#333">Main 5 saal ka hu aur mujhe coding pasand hai!</p>`, code:`<p>Yahan apni baat likho...</p>`, tip:"Text ke liye <p> use karo."},
@@ -3270,7 +3303,16 @@ const LEARN_CARDS = [
   {title:"🔗 Link", preview:`<a href="#" style="color:#6366f1;text-decoration:underline">Click Karo</a>`, code:`<a href="https://google.com">Google</a>`, tip:"Link ke liye <a href='...'> use karo."},
   {title:"📋 List", preview:`<ul style="margin:0;padding-left:20px;color:#333"><li>Class 1 - Drawing</li><li>Class 2 - Coding</li></ul>`, code:`<ul>\n <li>Class 1 - Drawing</li>\n <li>Class 2 - Coding</li>\n</ul>`, tip:"List ke liye <ul> aur <li> use karo."},
   {title:"📊 Slider", preview:`<input type="range" min="0" max="100" value="50" style="width:150px">`, code:`<input type="range" min="0" max="100">`, tip:"Slider ke liye input type='range' likho."},
-  {title:"✍️ Input Box", preview:`<input type="text" placeholder="Naam..." style="padding:8px;border-radius:6px;border:1px solid #ccc">`, code:`<input type="text" placeholder="Naam likho...">`, tip:"Input ke liye input type='text' use karo."}
+  {title:"✍️ Input Box", preview:`<input type="text" placeholder="Naam..." style="padding:8px;border-radius:6px;border:1px solid #ccc">`, code:`<input type="text" placeholder="Naam likho...">`, tip:"Input ke liye input type='text' use karo."},
+  {title:"🎯 Alert", preview:`<button onclick="alert('Wah! 🌟')" style="padding:8px 16px;background:#22c55e;color:#fff;border:none;border-radius:8px">Click Karo</button>`, code:`<button onclick="alert('Wah!')">Click Karo</button>`, tip:"onclick='alert(...)' se click pe popup aata hai."},
+  {title:"🖍️ Background Color", preview:`<div style="background:#fef9c3;padding:15px;border-radius:10px;color:#333;width:100%;text-align:center">Rangila Box!</div>`, code:`<div style="background:#fef9c3;padding:15px">Rangila Box!</div>`, tip:"background: color se box rangila hota hai."},
+  {title:"⬛ Box Border", preview:`<div style="border:3px solid #dc2626;padding:12px;border-radius:10px;color:#333;width:100%;text-align:center">Mera Box</div>`, code:`<div style="border:3px solid red;padding:12px">Mera Box</div>`, tip:"border: 3px solid red se border aata hai."},
+  {title:"🎬 Emoji", preview:`<div style="font-size:30px">😀 🚀 ❤️ 🌟 🎉</div>`, code:`😀 🚀 ❤️ 🌟 🎉`, tip:"Emoji seedha code me likho!"},
+  {title:"🖼️ Circle Image", preview:`<img src="https://cdn-icons-png.flaticon.com/512/616/616408.png" width="70" style="border-radius:50%">`, code:`<img src="LINK" style="border-radius:50%">`, tip:"border-radius:50% se gol image banti hai."},
+  {title:"📐 Center Text", preview:`<div style="text-align:center;color:#333">Yeh Center Me Hai</div>`, code:`<div style="text-align:center">Yeh Center Me Hai</div>`, tip:"text-align:center se text center aata hai."},
+  {title:"🎮 Score Game", preview:`<div style="text-align:center"><p style="margin:0;color:#333">Score: <b id="demoScore">0</b></p><button onclick="document.getElementById('demoScore').innerText++" style="padding:6px 12px;background:#f59e0b;color:#fff;border:none;border-radius:6px">+1</button></div>`, code:`<p>Score: <span id="s">0</span></p>\n<button onclick="document.getElementById('s').innerText++">+1</button>`, tip:"Click pe score badhao!"},
+  {title:"🌈 Gradient", preview:`<div style="background:linear-gradient(135deg,#667eea,#764ba2);padding:15px;color:#fff;border-radius:10px;width:100%;text-align:center">Gradient!</div>`, code:`<div style="background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;padding:15px">Gradient!</div>`, tip:"2 rang mix karne ke liye gradient use karo."},
+  {title:"💬 Flex Box", preview:`<div style="display:flex;gap:8px"><div style="background:#333;color:#fff;padding:8px;border-radius:8px">Side</div><div style="background:#eee;color:#333;padding:8px;border-radius:8px;flex:1">Main</div></div>`, code:`<div style="display:flex">\n <div>Side</div>\n <div>Main</div>\n</div>`, tip:"display:flex se side-by-side boxes bante hain."}
 ];
 
 const ageTemplates={
@@ -3311,23 +3353,8 @@ const backendData = {
   "MATLAB": { ext: "main.m", code: "disp('Hello Duniya!')" }
 };
 
-// 👇 Judge0 CE ke Language IDs 👇
 const apiMap = {
-  "Python": 100, // Python 3.12.5
-  "Java": 91, // JDK 17.0.6
-  "C": 103, // GCC 14.1.0
-  "C++": 105, // GCC 14.1.0
-  "C#": 51, // Mono 6.6.0.161
-  "PHP": 98, // 8.3.11
-  "Ruby": 72, // 2.7.0
-  "Go": 107, // 1.23.5
-  "Rust": 108, // 1.85.0
-  "Swift": 83, // 5.2.3
-  "Kotlin": 111, // 2.1.10
-  "TypeScript": 101, // 5.6.2
-  "SQL": 82, // SQLite 3.27.2
-  "R": 99, // 4.4.1
-  "MATLAB": null // Supported nahi hai
+  "Python": 100, "Java": 91, "C": 103, "C++": 105, "C#": 51, "PHP": 98, "Ruby": 72, "Go": 107, "Rust": 108, "Swift": 83, "Kotlin": 111, "TypeScript": 101, "SQL": 82, "R": 99, "MATLAB": null
 };
 
 const LANGUAGES=["HTML","CSS","JavaScript","Python","Java","C","C++","C#","PHP","Ruby","Go","Rust","Swift","Kotlin","TypeScript","SQL","Scratch (Block)","Block Coding","R","MATLAB"];
@@ -3411,7 +3438,6 @@ function selectLang(lang, el){
   }
 }
 
-// 👇 Naya Judge0 CE API Logic 👇
 async function runBackendCode() {
   const lang = currentLang;
   const code = document.getElementById('editorHTML').value;
@@ -3431,51 +3457,24 @@ async function runBackendCode() {
   consoleOutput.style.color = "#eab308"; 
 
   try {
-    // Step 1: Submit code to Judge0
     const submitResponse = await fetch("https://ce.judge0.com/submissions?base64_encoded=false&wait=false", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        source_code: code,
-        language_id: langId
-      })
+      body: JSON.stringify({ source_code: code, language_id: langId })
     });
-    
     const submitResult = await submitResponse.json();
     const token = submitResult.token;
-
-    if (!token) {
-      throw new Error("Submission failed, no token received.");
-    }
-
-    // Step 2: Poll for result
     let result = null;
     while (true) {
       const pollResponse = await fetch(`https://ce.judge0.com/submissions/${token}?base64_encoded=false`);
       result = await pollResponse.json();
-      
-      // Status 1 = In Queue, 2 = Processing
-      if (result.status && result.status.id !== 1 && result.status.id !== 2) {
-        break;
-      }
-      await new Promise(r => setTimeout(r, 500)); // Wait 0.5s before polling again
+      if (result.status && result.status.id !== 1 && result.status.id !== 2) break;
+      await new Promise(r => setTimeout(r, 500));
     }
-
-    // Step 3: Display output
-    if (result.stdout) {
-      consoleOutput.innerText = "> Output:\n\n" + result.stdout;
-      consoleOutput.style.color = "#22c55e"; 
-    } else if (result.stderr) {
-      consoleOutput.innerText = "> Error:\n\n" + result.stderr;
-      consoleOutput.style.color = "#ef4444"; 
-    } else if (result.compile_output) {
-      consoleOutput.innerText = "> Compilation Error:\n\n" + result.compile_output;
-      consoleOutput.style.color = "#ef4444";
-    } else {
-      consoleOutput.innerText = "> Code ran successfully (No output).";
-      consoleOutput.style.color = "#22c55e"; 
-    }
-
+    if (result.stdout) consoleOutput.innerText = "> Output:\n\n" + result.stdout;
+    else if (result.stderr) consoleOutput.innerText = "> Error:\n\n" + result.stderr;
+    else if (result.compile_output) consoleOutput.innerText = "> Compilation Error:\n\n" + result.compile_output;
+    else consoleOutput.innerText = "> Code ran successfully (No output).";
   } catch (error) {
     consoleOutput.innerText = "> Network Error: " + error.message;
     consoleOutput.style.color = "#ef4444";
@@ -3740,9 +3739,7 @@ let timer;
   });
 });
 
-// ==========================================
-// 👇 NAYE FUNCTIONS (COLOR, SYMBOLS, CHAT) 👇
-// ==========================================
+// NAYE FUNCTIONS
 function openColorPicker() { document.getElementById('colorModal').style.display = 'flex'; }
 function closeColorPicker() { document.getElementById('colorModal').style.display = 'none'; }
 function updateColorCode() {
@@ -3769,6 +3766,7 @@ function insertSymbol(sym) {
     closeSymbols();
 }
 
+// SMART CHHOTU MASTER LOGIC
 function handleRobotInput(e) { if (e.key === 'Enter') processRobotInput(); }
 function processRobotInput() {
     const input = document.getElementById('robotInput').value.trim();
@@ -3776,26 +3774,31 @@ function processRobotInput() {
     const msgBox = document.getElementById('chatHistory');
     document.getElementById('robotInput').value = '';
     
-    // User message
+    // Add user message
     msgBox.innerHTML += `<div style="text-align:right; color:#a1a1aa; margin-top:5px; font-size:10px;"><b>You:</b> ${input}</div>`;
 
     let reply = "";
-    const nonCodingWords = ["mausam", "weather", "khana", "food", "khel", "game", "movie", "film", "gaana", "song", "cricket"];
-    const isNonCoding = nonCodingWords.some(word => input.toLowerCase().includes(word));
+    const text = input.toLowerCase();
+    const nonCodingWords = ["mausam", "weather", "khana", "food", "khel", "game", "movie", "film", "gaana", "song", "cricket", "messi"];
 
-    if (isNonCoding) {
+    if (nonCodingWords.some(word => text.includes(word))) {
         reply = "Beta, main ek Coding Teacher hoon. Main sirf coding aur programming mein aapki madad kar sakta hoon. Aisi baaton ke liye 'School Mode Chat' use karein. 😊";
-    } else if (input.toLowerCase().includes("html")) {
-        reply = "HTML ek structure hai. Ghar banane jaisa! Isme tags (<h1>, <p>) use hote hain.";
-    } else if (input.toLowerCase().includes("css")) {
-        reply = "CSS se hum website ko sundar banate hain. Color, size, design sab CSS se aata hai.";
-    } else if (input.toLowerCase().includes("js") || input.toLowerCase().includes("javascript")) {
+    } else if (text.includes("sikhao") || text.includes("help") || text.includes("kaise")) {
+        reply = "Mujhe apna code dikhao. Main dekh kar bataunga kahan galti hai. Left side mein 'Learn' button bhi hai, wahan se naye codes seekh sakte ho!";
+    } else if (text.includes("error") || text.includes("galat") || text.includes("sahi")) {
+        analyzeCode(); // Force check
+        reply = "Maine aapka code check kiya hai. Upar check message mein dekho kya error hai. Agar wahan green tick hai, toh code sahi hai!";
+    } else if (text.includes("html")) {
+        reply = "HTML website ka dhancha (structure) hai. Isme tags (<h1>, <p>, <img>) use hote hain. Jaise ghar banane ke liye brick lagti hai!";
+    } else if (text.includes("css")) {
+        reply = "CSS se hum website ko sundar banate hain. Color, size, background sab CSS se aata hai.";
+    } else if (text.includes("js") || text.includes("javascript")) {
         reply = "JavaScript website mein jaan daalta hai! Button dabane par kuch karwana ho toh JS use hota hai.";
     } else {
-        reply = "Yeh ek accha coding sawal hai! Main abhi seekh raha hoon. Aap apna code check karo, main galtiyan bata dunga!";
+        reply = "Yeh ek accha sawal hai! Main abhi seekh raha hoon. Par aap apna code check karo, main galtiyan bata dunga!";
     }
 
-    // AI message after delay
+    // Add AI response
     setTimeout(() => {
         msgBox.innerHTML += `<div style="text-align:left; color:#fff; margin-top:5px; font-size:11px;"><b>🤖 Master:</b> ${reply}</div>`;
         msgBox.scrollTop = msgBox.scrollHeight;
@@ -3834,7 +3837,8 @@ applyAge('5 Years');
 </html>
 '''
     html_code = html_code.replace("__BASE_URL__", base_url)
-    components.html(html_code, height=950, scrolling=False) 
+    components.html(html_code, height=950, scrolling=False)        
+
     
 def render_doubt_clear():
     import streamlit as st
