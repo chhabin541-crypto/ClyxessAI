@@ -12491,7 +12491,7 @@ ALL_MODES = [
     "Creative Lab (School Mode)", 
     "🈳 Learn Language",
     "🎮 Play & Learn",
-    "📷 Vision Lab", 
+    "📷 Doubt Clear", 
     "✈️ Aero Lab", 
     "💡 Logic Lab",
     "🧠 Cyber Security", 
@@ -12599,8 +12599,8 @@ if mode == "🧠 Cyber Security":
     render_cyber_security(); st.stop() 
 if mode == "✈️ Aero Lab":
     render_aero_lab(); st.stop()
-if mode == "📷 Vision Lab":
-    render_vision_lab(); st.stop()
+if mode == "📷 Doubt Clear":
+    render_doubt_clear(); st.stop()
 if mode == "🎭 Peer Roleplay Modes":
     render_roleplay(); st.stop()
 if mode == "📝 Interactive Homework & Test":
